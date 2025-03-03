@@ -29,9 +29,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         event(new Registered(($user = User::create($validated))));
 
-        Auth::login($user);
-
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        // Remove automatic login and redirect to login page instead
+        // Auth::login($user);
+        
+        session()->flash('status', 'Account created successfully. Please login with your credentials.');
+        $this->redirect(route('login', absolute: false), navigate: true);
     }
 }; ?>
 
