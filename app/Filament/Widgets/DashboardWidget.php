@@ -20,7 +20,7 @@ class GamificationStatsWidget extends BaseWidget
             "users.id",
             "=",
             "experiences.user_id"
-        )->sum("experiences.points");
+        )->sum("experiences.experience_points");
 
         $totalAchievements = 0;
         if (class_exists("\LevelUp\Experience\Models\Achievement")) {

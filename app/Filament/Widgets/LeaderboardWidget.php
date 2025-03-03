@@ -32,8 +32,8 @@ class LeaderboardWidget extends BaseWidget
     {
         return User::query()
             ->join("experiences", "users.id", "=", "experiences.user_id")
-            ->select("users.*", "experiences.points", "experiences.level_id")
-            ->orderBy("experiences.points", "desc");
+            ->select("users.*", "experiences.experience_points", "experiences.level_id")
+            ->orderBy("experiences.experience_points", "desc");
     }
 
     protected function getTableColumns(): array
@@ -63,14 +63,14 @@ class LeaderboardWidget extends BaseWidget
     protected function getTableActions(): array
     {
         return [
-            Tables\Actions\Action::make("view")
-                ->url(
-                    fn(User $record): string => route(
-                        "filament.resources.user-stats.view",
-                        $record
-                    )
-                )
-                ->icon("heroicon-s-eye"),
+            // Tables\Actions\Action::make("view")
+            //     ->url(
+            //         fn(User $record): string => route(
+            //             "filament.resources.user-stats.view",
+            //             $record
+            //         )
+            //     )
+            //     ->icon("heroicon-s-eye"),
         ];
     }
 }
