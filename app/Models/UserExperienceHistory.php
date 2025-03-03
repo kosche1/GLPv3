@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Badge extends Model
+class UserExperienceHistory extends Model
 {
     use HasFactory;
 
@@ -15,13 +15,14 @@ class Badge extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        "name",
+        "user_id",
+        "action_type",
+        "points_changed",
+        "points_total",
+        "level_before",
+        "level_after",
         "description",
-        "image",
-        "trigger_type",
-        "trigger_conditions",
-        "rarity_level",
-        "is_hidden",
+        "metadata",
     ];
 
     /**
@@ -30,17 +31,14 @@ class Badge extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        "trigger_conditions" => "array",
-        "is_hidden" => "boolean",
+        "metadata" => "array",
     ];
 
     /**
-     * Get the users who have earned this badge.
+     * Get the user that owns the experience history.
      */
-    public function users()
+    public function user()
     {
-        return $this->belongsToMany(User::class, "user_badges")
-            ->withPivot("earned_at", "is_pinned", "is_showcased")
-            ->withTimestamps();
+        return $this->belongsTo(User::class);
     }
 }
