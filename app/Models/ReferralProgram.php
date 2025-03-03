@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Badge extends Model
+class ReferralProgram extends Model
 {
     use HasFactory;
 
@@ -17,11 +17,10 @@ class Badge extends Model
     protected $fillable = [
         "name",
         "description",
-        "image",
-        "trigger_type",
-        "trigger_conditions",
-        "rarity_level",
-        "is_hidden",
+        "referrer_points",
+        "referee_points",
+        "is_active",
+        "additional_rewards",
     ];
 
     /**
@@ -30,17 +29,15 @@ class Badge extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        "trigger_conditions" => "array",
-        "is_hidden" => "boolean",
+        "is_active" => "boolean",
+        "additional_rewards" => "array",
     ];
 
     /**
-     * Get the users who have earned this badge.
+     * Get the referrals using this program.
      */
-    public function users()
+    public function referrals()
     {
-        return $this->belongsToMany(User::class, "user_badges")
-            ->withPivot("earned_at", "is_pinned", "is_showcased")
-            ->withTimestamps();
+        return $this->hasMany(Referral::class);
     }
 }
