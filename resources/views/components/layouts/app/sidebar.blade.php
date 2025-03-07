@@ -11,15 +11,39 @@
                 <x-app-logo class="size-8" href="#"></x-app-logo>
             </a>
 
-            <flux:navlist variant="outline">
-                <flux:navlist.group heading="Platform" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                </flux:navlist.group>
-            </flux:navlist>
-
+            <flux:navlist.group heading="Overview" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
+                <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Dashboard') }}</flux:navlist.item>
+                <flux:navlist.item icon="bell" :href="route('notifications')" :current="request()->routeIs('notifications')" wire:navigate class="py-1">{{ __('Notifications') }}</flux:navlist.item>
+            </flux:navlist.group>
+            
+            <!-- Academic Resources -->
+            <flux:navlist.group heading="Academic Resources" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
+                <flux:navlist.item icon="academic-cap" :href="route('courses')" :current="request()->routeIs('courses')" wire:navigate class="py-1">{{ __('Courses') }}</flux:navlist.item>
+                <flux:navlist.item icon="book-open" :href="route('learning-materials')" :current="request()->routeIs('learning-materials')" wire:navigate class="py-1">{{ __('Learning Materials') }}</flux:navlist.item>
+                <flux:navlist.item icon="document-text" :href="route('assignments')" :current="request()->routeIs('assignments')" wire:navigate class="py-1">{{ __('Assignments') }}</flux:navlist.item>
+            </flux:navlist.group>
+            
+            <!-- Student Management -->
+            <flux:navlist.group heading="Student Management" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
+                <flux:navlist.item icon="user" :href="route('profile')" :current="request()->routeIs('profile')" wire:navigate class="py-1">{{ __('Profile') }}</flux:navlist.item>
+                <flux:navlist.item icon="calendar" :href="route('schedule')" :current="request()->routeIs('schedule')" wire:navigate class="py-1">{{ __('Schedule') }}</flux:navlist.item>
+                <flux:navlist.item icon="chart-bar" :href="route('grades')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Grades') }}</flux:navlist.item>
+            </flux:navlist.group>
+            
+            <!-- Communication -->
+            <flux:navlist.group heading="Communication" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
+                <flux:navlist.item icon="chat-bubble-left-right" :href="route('messages')" :current="request()->routeIs('messages')" wire:navigate class="py-1">{{ __('Messages') }}</flux:navlist.item>
+                <flux:navlist.item icon="users" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Forums') }}</flux:navlist.item>
+            </flux:navlist.group>
+            
+            <!-- Support & Help -->
+            <flux:navlist.group heading="Support" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
+                <flux:navlist.item icon="question-mark-circle" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Help Center') }}</flux:navlist.item>
+                <flux:navlist.item icon="lifebuoy" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Technical Support') }}</flux:navlist.item>
+            </flux:navlist.group>
             <flux:spacer />
 
-            <flux:navlist variant="outline">
+            <!-- <flux:navlist variant="outline">
                 <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
                 {{ __('Repository') }}
                 </flux:navlist.item>
@@ -27,7 +51,7 @@
                 <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits" target="_blank">
                 {{ __('Documentation') }}
                 </flux:navlist.item>
-            </flux:navlist>
+            </flux:navlist> -->
 
             <!-- Desktop User Menu -->
             <flux:dropdown position="bottom" align="start">
