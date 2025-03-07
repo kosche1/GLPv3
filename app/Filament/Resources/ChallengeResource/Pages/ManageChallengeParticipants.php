@@ -123,38 +123,37 @@ class ManageChallengeParticipants extends Page
                     }),
             ])
             ->headerActions([
-                Tables\Actions\Action::make("add_participant")
-                    ->label("Add Participant")
-                    ->form([
-                        Select::make("user_id")
-                            ->label("User")
-                            ->required()
-                            ->options(function () {
-                                // Get users who are not already participants
-                                $existingParticipantIds = $this->challenge
-                                    ->users()
-                                    ->pluck("user_id")
-                                    ->toArray();
-                                return User::whereNotIn(
-                                    "id",
-                                    $existingParticipantIds
-                                )
-                                    ->pluck("name", "id")
-                                    ->toArray();
-                            })
-                            ->searchable(),
-                    ])
-                    ->action(function (array $data): void {
-                        $this->challenge->users()->attach($data["user_id"], [
-                            "status" => "enrolled",
-                            "progress" => 0,
-                        ]);
-
-                        $this->notify(
-                            "success",
-                            "User added to challenge successfully"
-                        );
-                    }),
+                // Tables\Actions\Action::make("add_participant")
+                //     ->label("Add Participant")
+                //     ->form([
+                //         Select::make("user_id")
+                //             ->label("User")
+                //             ->required()
+                //             ->options(function () {
+                //                 // Get users who are not already participants
+                //                 $existingParticipantIds = $this->challenge
+                //                     ->users()
+                //                     ->pluck("user_id")
+                //                     ->toArray();
+                //                 return User::whereNotIn(
+                //                     "id",
+                //                     $existingParticipantIds
+                //                 )
+                //                     ->pluck("name", "id")
+                //                     ->toArray();
+                //             })
+                //             ->searchable(),
+                //     ])
+                //     ->action(function (array $data): void {
+                //         $this->challenge->users()->attach($data["user_id"], [
+                //             "status" => "enrolled",
+                //             "progress" => 0,
+                //         ]);
+                //         $this->notify(
+                //             "success",
+                //             "User added to challenge successfully"
+                //         );
+                //     }),
             ])
             ->actions([
                 Tables\Actions\Action::make("update_status")
