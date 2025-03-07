@@ -25,6 +25,7 @@ class ChallengeResource extends Resource
     {
         return $form->schema([
             Forms\Components\Section::make("Basic Information")->schema([
+                // Existing basic fields...
                 Forms\Components\TextInput::make("name")
                     ->required()
                     ->maxLength(255),
@@ -41,106 +42,166 @@ class ChallengeResource extends Resource
                             ->after("start_date")
                             ->helperText("Leave empty for ongoing challenges"),
                     ]),
-                Forms\Components\Grid::make()
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\TextInput::make("points_reward")
-                            ->required()
-                            ->numeric()
-                            ->minValue(0)
-                            ->default(10),
-                        Forms\Components\TextInput::make("max_participants")
-                            ->numeric()
-                            ->minValue(1)
-                            ->placeholder("Unlimited if empty"),
-                    ]),
-                Forms\Components\Grid::make()
-                    ->columns(2)
-                    ->schema([
-                        Forms\Components\Select::make("difficulty_level")
-                            ->required()
-                            ->options([
-                                "easy" => "Easy",
-                                "medium" => "Medium",
-                                "hard" => "Hard",
-                                "expert" => "Expert",
-                            ])
-                            ->default("medium"),
-                        Forms\Components\Select::make("required_level")
-                            ->required()
-                            ->options(function () {
-                                $levels = Level::all()
-                                    ->pluck("level", "level")
-                                    ->toArray();
-                                return $levels;
-                            })
-                            ->default(1)
-                            ->helperText(
-                                "Minimum user level required to participate"
-                            ),
-                    ]),
-                Forms\Components\Toggle::make("is_active")
-                    ->label("Active")
-                    ->default(true)
-                    ->helperText(
-                        "Inactive challenges are not visible to users"
-                    ),
+                // ... other existing fields
             ]),
-            Forms\Components\Section::make("Completion Requirements")->schema([
-                Forms\Components\KeyValue::make("completion_criteria")
-                    ->keyLabel("Criteria")
-                    ->valueLabel("Value")
+
+            Forms\Components\Section::make("Challenge Configuration")->schema([
+                Forms\Components\Select::make("challenge_type")
+                    ->label("Challenge Type")
                     ->required()
-                    ->default([
-                        "complete_tasks" => "1",
-                        "streak_days" => "0",
+                    ->options([
+                        "standard" => "Standard Challenge",
+                        "flashcard" => "Flashcard Challenge",
+                        "crossword" => "Crossword Puzzle",
+                        "word_search" => "Word Search",
+                        "quiz" => "Quiz Challenge",
                     ])
+                    ->default("standard")
+                    ->reactive()
+                    ->afterStateUpdated(function (callable $set) {
+                        $set("challenge_content", []);
+                    }),
+
+                Forms\Components\TextInput::make("time_limit")
+                    ->label("Time Limit (minutes)")
+                    ->numeric()
+                    ->minValue(1)
+                    ->placeholder("Leave empty for no time limit")
                     ->helperText(
-                        "Define what users need to do to complete this challenge"
+                        "How long users have to complete this challenge"
                     ),
             ]),
-            Forms\Components\Section::make("Rewards")->schema([
-                Forms\Components\KeyValue::make("additional_rewards")
-                    ->keyLabel("Reward Type")
-                    ->valueLabel("Value")
-                    ->helperText("Additional rewards beyond points"),
-                Forms\Components\CheckboxList::make("badges")
-                    ->relationship("badges", "name")
-                    ->helperText(
-                        "Badges awarded for completing this challenge"
-                    ),
-                Forms\Components\CheckboxList::make("achievements")
-                    ->relationship("achievements", "name")
-                    ->helperText(
-                        "Achievements granted for completing this challenge"
-                    ),
-            ]),
-            Forms\Components\Section::make("Required Activities")->schema([
-                Forms\Components\Repeater::make("activities")
-                    ->relationship("activities")
-                    ->schema([
-                        Forms\Components\Select::make("activity_id")
-                            ->label("Activity")
-                            ->relationship("activity", "name")
-                            ->required(),
-                        Forms\Components\TextInput::make("required_count")
-                            ->label("Required Count")
-                            ->numeric()
-                            ->minValue(1)
-                            ->default(1)
-                            ->required()
-                            ->helperText(
-                                "How many times user must perform this activity"
-                            ),
-                    ])
-                    ->itemLabel(
-                        fn(array $state): ?string => $state["activity_id"]
-                            ? "Activity #{$state["activity_id"]} (x{$state["required_count"]})"
-                            : null
-                    )
-                    ->addActionLabel("Add Activity")
-                    ->collapsible(),
-            ]),
+
+            // Dynamic content section for each challenge type
+            Forms\Components\Section::make("Challenge Content")
+                ->schema(function (Forms\Get $get) {
+                    $challengeType = $get("challenge_type");
+
+                    return match ($challengeType) {
+                        "flashcard" => [
+                            Forms\Components\Repeater::make(
+                                "challenge_content.cards"
+                            )
+                                ->label("Flashcards")
+                                ->schema([
+                                    Forms\Components\TextInput::make("front")
+                                        ->label("Front of Card")
+                                        ->required(),
+                                    Forms\Components\Textarea::make("back")
+                                        ->label("Back of Card")
+                                        ->required(),
+                                    Forms\Components\FileUpload::make("image")
+                                        ->label("Card Image (Optional)")
+                                        ->image()
+                                        ->directory("flashcards"),
+                                ])
+                                ->defaultItems(3)
+                                ->collapsible()
+                                ->columnSpanFull(),
+                        ],
+
+                        "crossword" => [
+                            Forms\Components\KeyValue::make(
+                                "challenge_content.size"
+                            )
+                                ->label("Puzzle Size")
+                                ->default([
+                                    "width" => "10",
+                                    "height" => "10",
+                                ]),
+                            Forms\Components\Repeater::make(
+                                "challenge_content.words"
+                            )
+                                ->label("Crossword Words")
+                                ->schema([
+                                    Forms\Components\TextInput::make(
+                                        "word"
+                                    )->required(),
+                                    Forms\Components\TextInput::make(
+                                        "clue"
+                                    )->required(),
+                                    Forms\Components\Select::make("direction")
+                                        ->options([
+                                            "across" => "Across",
+                                            "down" => "Down",
+                                        ])
+                                        ->default("across")
+                                        ->required(),
+                                ])
+                                ->defaultItems(5)
+                                ->collapsible()
+                                ->columnSpanFull(),
+                        ],
+
+                        "word_search" => [
+                            Forms\Components\KeyValue::make(
+                                "challenge_content.size"
+                            )
+                                ->label("Puzzle Size")
+                                ->default([
+                                    "width" => "12",
+                                    "height" => "12",
+                                ]),
+                            Forms\Components\Repeater::make(
+                                "challenge_content.words"
+                            )
+                                ->label("Hidden Words")
+                                ->schema([
+                                    Forms\Components\TextInput::make(
+                                        "word"
+                                    )->required(),
+                                    Forms\Components\TextInput::make(
+                                        "hint"
+                                    )->required(),
+                                ])
+                                ->defaultItems(8)
+                                ->columnSpanFull(),
+                        ],
+
+                        "quiz" => [
+                            Forms\Components\Repeater::make(
+                                "challenge_content.questions"
+                            )
+                                ->label("Quiz Questions")
+                                ->schema([
+                                    Forms\Components\TextInput::make("question")
+                                        ->required()
+                                        ->columnSpanFull(),
+                                    Forms\Components\Repeater::make("options")
+                                        ->schema([
+                                            Forms\Components\TextInput::make(
+                                                "text"
+                                            )->required(),
+                                            Forms\Components\Toggle::make(
+                                                "is_correct"
+                                            )
+                                                ->label("Correct Answer")
+                                                ->default(false),
+                                        ])
+                                        ->defaultItems(4)
+                                        ->columns(2),
+                                    Forms\Components\TextInput::make("points")
+                                        ->numeric()
+                                        ->default(1)
+                                        ->label("Points for correct answer"),
+                                ])
+                                ->defaultItems(5)
+                                ->collapsible()
+                                ->columnSpanFull(),
+                        ],
+
+                        default => [
+                            Forms\Components\Placeholder::make("standard_note")
+                                ->content(
+                                    'Standard challenges don\'t require specific content configuration.'
+                                )
+                                ->columnSpanFull(),
+                        ],
+                    };
+                })
+                ->columnSpanFull(),
+
+            // ... rest of your form sections
         ]);
     }
 
@@ -149,17 +210,28 @@ class ChallengeResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make("name")->searchable(),
+                Tables\Columns\BadgeColumn::make("challenge_type")
+                    ->label("Type")
+                    ->colors([
+                        "primary" => "standard",
+                        "success" => "flashcard",
+                        "warning" => "crossword",
+                        "danger" => "word_search",
+                        "info" => "quiz",
+                    ]),
                 Tables\Columns\BadgeColumn::make("difficulty_level")->colors([
                     "success" => "easy",
                     "warning" => "medium",
                     "danger" => "hard",
                     "gray" => "expert",
                 ]),
+                Tables\Columns\TextColumn::make("time_limit")
+                    ->label("Time Limit")
+                    ->formatStateUsing(
+                        fn($state) => $state ? "{$state} min" : "No limit"
+                    ),
                 Tables\Columns\TextColumn::make("points_reward")->sortable(),
                 Tables\Columns\TextColumn::make("start_date")
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make("end_date")
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make("users_count")
@@ -171,6 +243,19 @@ class ChallengeResource extends Resource
                     ->sortable(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make("challenge_type")->options([
+                    "standard" => "Standard Challenge",
+                    "flashcard" => "Flashcard Challenge",
+                    "crossword" => "Crossword Puzzle",
+                    "word_search" => "Word Search",
+                    "quiz" => "Quiz Challenge",
+                ]),
+                Tables\Filters\SelectFilter::make("difficulty_level")->options([
+                    "easy" => "Easy",
+                    "medium" => "Medium",
+                    "hard" => "Hard",
+                    "expert" => "Expert",
+                ]),
                 Tables\Filters\SelectFilter::make("difficulty_level")->options([
                     "easy" => "Easy",
                     "medium" => "Medium",

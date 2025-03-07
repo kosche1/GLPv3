@@ -23,6 +23,10 @@ return new class extends Migration {
             $table->json("completion_criteria")->nullable();
             $table->json("additional_rewards")->nullable();
             $table->integer("required_level")->default(1);
+            // New fields for challenge types
+            $table->string("challenge_type")->default("standard"); // 'standard', 'flashcard', 'crossword', 'word_search', etc.
+            $table->integer("time_limit")->nullable(); // Time limit in minutes
+            $table->json("challenge_content")->nullable(); // Structured content based on the challenge type
             $table->timestamps();
         });
         Schema::create("user_challenges", function (Blueprint $table) {

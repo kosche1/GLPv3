@@ -27,6 +27,10 @@ class Challenge extends Model
         "completion_criteria",
         "additional_rewards",
         "required_level",
+        // New fields
+        "challenge_type",
+        "time_limit",
+        "challenge_content",
     ];
 
     /**
@@ -40,6 +44,8 @@ class Challenge extends Model
         "is_active" => "boolean",
         "completion_criteria" => "array",
         "additional_rewards" => "array",
+        // New field to cast
+        "challenge_content" => "array",
     ];
 
     /**

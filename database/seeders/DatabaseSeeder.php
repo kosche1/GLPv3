@@ -44,6 +44,8 @@ class DatabaseSeeder extends Seeder
             UserStreakSeeder::class,
             ReferralSeeder::class,
             LeaderboardEntrySeeder::class,
+            //challengetype
+            ChallengeTypeSeeder::class,
         ]);
     }
 }
