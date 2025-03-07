@@ -37,136 +37,152 @@
             </div>
         </div>
 
-        <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-700 bg-neutral-800 p-6">
+        <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-700 bg-neutral-800 p-6" style="min-height: 400px; height: 500px;">
             <h3 class="text-sm font-medium text-neutral-400 mb-4">Course Performance</h3>
-            <div class="h-[600px]">
-                <canvas id="coursePerformanceChart"></canvas>
+            <div class="flex flex-col gap-2 h-[calc(100%-2rem)]">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="text-xs text-neutral-400">Less</div>
+                        <div class="flex items-center gap-1">
+                            <div class="h-3 w-3 rounded-sm bg-neutral-700"></div>
+                            <div class="h-3 w-3 rounded-sm bg-green-900"></div>
+                            <div class="h-3 w-3 rounded-sm bg-green-700"></div>
+                            <div class="h-3 w-3 rounded-sm bg-green-500"></div>
+                            <div class="h-3 w-3 rounded-sm bg-green-300"></div>
+                        </div>
+                        <div class="text-xs text-neutral-400">More</div>
+                    </div>
+                    <div class="text-xs text-neutral-400">Learn how we count contributions</div>
+                </div>
+                <div class="overflow-x-auto h-full">
+                    <div class="contribution-calendar min-w-[800px] h-full">
+                        <div id="contributionGraph" class="mt-2 w-full h-[calc(100%-0.5rem)]"></div>
+                    </div>
+                </div>
             </div>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
-                const ctx = document.getElementById('coursePerformanceChart');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                        datasets: [{
-                            label: 'Math 101',
-                            data: [85, 88, 82, 90, 85, 88, 86],
-                            borderColor: 'rgb(59, 130, 246)',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            fill: true,
-                            pointBackgroundColor: 'rgb(59, 130, 246)',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }, {
-                            label: 'History',
-                            data: [78, 82, 85, 83, 86, 88, 84],
-                            borderColor: 'rgb(139, 92, 246)',
-                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            fill: true,
-                            pointBackgroundColor: 'rgb(139, 92, 246)',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }, {
-                            label: 'Physics',
-                            data: [90, 85, 88, 92, 88, 90, 89],
-                            borderColor: 'rgb(245, 158, 11)',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            fill: true,
-                            pointBackgroundColor: 'rgb(245, 158, 11)',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: {
-                            duration: 1000,
-                            easing: 'easeInOutQuart'
-                        },
-                        interaction: {
-                            mode: 'index',
-                            intersect: false
-                        },
-                        scales: {
-                            y: {
-                                type: 'category',
-                                labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                                grid: {
-                                    color: 'rgba(255, 255, 255, 0.05)',
-                                    drawBorder: false
-                                },
-                                ticks: {
-                                    color: '#9CA3AF',
-                                    padding: 10,
-                                    font: {
-                                        size: 11
-                                    }
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                },
-                                ticks: {
-                                    color: '#9CA3AF',
-                                    padding: 10,
-                                    font: {
-                                        size: 11
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                labels: {
-                                    color: '#9CA3AF',
-                                    padding: 20,
-                                    font: {
-                                        size: 12,
-                                        weight: '500'
-                                    },
-                                    usePointStyle: true,
-                                    pointStyle: 'circle'
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(17, 24, 39, 0.9)',
-                                titleColor: '#fff',
-                                bodyColor: '#9CA3AF',
-                                padding: 12,
-                                borderColor: 'rgba(255, 255, 255, 0.1)',
-                                borderWidth: 1,
-                                displayColors: true,
-                                usePointStyle: true,
-                                titleFont: {
-                                    size: 12,
-                                    weight: '600'
-                                },
-                                bodyFont: {
-                                    size: 11
-                                },
-                                callbacks: {
-                                    label: function(context) {
-                                        return context.dataset.label + ': ' + context.parsed.y + '%';
-                                    }
-                                }
-                            }
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log('DOM Content Loaded');
+                    // Configuration
+                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+                    
+                    // Generate a year of data (for demo purposes)
+                    function generateData() {
+                        console.log('Generating data');
+                        const data = {};
+                        const now = new Date();
+                        const currentYear = now.getFullYear();
+                        
+                        // Start from 12 months ago
+                        const startDate = new Date(now);
+                        startDate.setMonth(now.getMonth() - 11);
+                        startDate.setDate(1);
+                        
+                        // Generate random activity data for each day
+                        let currentDate = new Date(startDate);
+                        while (currentDate <= now) {
+                            const dateStr = currentDate.toISOString().split('T')[0];
+                            const randomActivity = Math.floor(Math.random() * 5);
+                            data[dateStr] = randomActivity;
+                            currentDate.setDate(currentDate.getDate() + 1);
                         }
+                        
+                        return data;
                     }
+                    
+                    // Create the contribution graph
+                    function createContributionGraph() {
+                        console.log('Creating contribution graph');
+                        const graphContainer = document.getElementById('contributionGraph');
+                        
+                        if (!graphContainer) {
+                            console.error('Graph container not found!');
+                            return;
+                        }
+                        
+                        const graphData = generateData();
+                        
+                        // Clear existing content
+                        graphContainer.innerHTML = '';
+                        
+                        // Create month labels
+                        const monthsRow = document.createElement('div');
+                        monthsRow.className = 'flex text-xs text-neutral-400 mb-1';
+                        monthsRow.innerHTML = '<div class="w-8"></div>';
+                        
+                        // Get the start and end dates
+                        const dates = Object.keys(graphData).sort();
+                        const startDate = new Date(dates[0]);
+                        const endDate = new Date(dates[dates.length - 1]);
+                        
+                        // Add month labels
+                        let currentMonth = startDate.getMonth();
+                        for (let m = 0; m < 12; m++) {
+                            const monthIndex = (startDate.getMonth() + m) % 12;
+                            const monthWidth = m === 11 ? 'flex-1' : 'w-[60px]';
+                            monthsRow.innerHTML += `<div class="${monthWidth} text-center">${months[monthIndex]}</div>`;
+                        }
+                        
+                        graphContainer.appendChild(monthsRow);
+                        
+                        // Create the grid
+                        const grid = document.createElement('div');
+                        grid.className = 'flex h-full';
+                        
+                        // Create day labels column
+                        const daysCol = document.createElement('div');
+                        daysCol.className = 'flex flex-col w-8 text-xs text-neutral-400 justify-between py-1';
+                        daysCol.innerHTML = days.map(day => `<div class="h-4">${day}</div>`).join('');
+                        
+                        grid.appendChild(daysCol);
+                        
+                        // Create the weeks container
+                        const weeksContainer = document.createElement('div');
+                        weeksContainer.className = 'flex flex-1 gap-1';
+                        
+                        // Calculate number of weeks
+                        const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
+                        const totalWeeks = Math.ceil((endDate - startDate) / millisecondsPerWeek);
+                        
+                        // Create week columns
+                        for (let week = 0; week < totalWeeks; week++) {
+                            const weekCol = document.createElement('div');
+                            weekCol.className = 'flex flex-col gap-1 w-4';
+                            
+                            for (let day = 0; day < 5; day++) {
+                                const currentDate = new Date(startDate);
+                                currentDate.setDate(startDate.getDate() + (week * 7) + day);
+                                
+                                if (currentDate > new Date()) {
+                                    weekCol.innerHTML += '<div class="h-4 w-4"></div>';
+                                    continue;
+                                }
+                                
+                                const dateStr = currentDate.toISOString().split('T')[0];
+                                const activityLevel = graphData[dateStr] || 0;
+                                
+                                let bgColor = 'bg-neutral-700';
+                                if (activityLevel === 1) bgColor = 'bg-green-900';
+                                if (activityLevel === 2) bgColor = 'bg-green-700';
+                                if (activityLevel === 3) bgColor = 'bg-green-500';
+                                if (activityLevel === 4) bgColor = 'bg-green-300';
+                                
+                                weekCol.innerHTML += `
+                                    <div class="h-4 w-4 rounded-sm ${bgColor}" 
+                                         title="${currentDate.toDateString()}: ${activityLevel} contributions">
+                                    </div>`;
+                            }
+                            
+                            weeksContainer.appendChild(weekCol);
+                        }
+                        
+                        grid.appendChild(weeksContainer);
+                        graphContainer.appendChild(grid);
+                        console.log('Graph creation completed');
+                    }
+                    
+                    createContributionGraph();
                 });
             </script>
         </div>
