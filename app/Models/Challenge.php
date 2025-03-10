@@ -27,10 +27,12 @@ class Challenge extends Model
         "completion_criteria",
         "additional_rewards",
         "required_level",
-        // New fields
+        // IT-focused challenge types
         "challenge_type",
         "time_limit",
         "challenge_content",
+        "programming_language", // New field for programming language focus
+        "tech_category",       // New field for categorizing tech topics
     ];
 
     /**
@@ -44,9 +46,21 @@ class Challenge extends Model
         "is_active" => "boolean",
         "completion_criteria" => "array",
         "additional_rewards" => "array",
-        // New field to cast
         "challenge_content" => "array",
     ];
+
+    /**
+     * Determine if the challenge is currently active based on dates.
+     *
+     * @return bool
+     */
+    public function isCurrentlyActive()
+    {
+        $now = now();
+        return $this->is_active && 
+               $now->greaterThanOrEqualTo($this->start_date) && 
+               ($this->end_date === null || $now->lessThanOrEqualTo($this->end_date));
+    }
 
     /**
      * Get the users participating in this challenge.
@@ -65,6 +79,7 @@ class Challenge extends Model
             ->withTimestamps();
     }
 
+    // Rest of the relationships remain the same
     /**
      * Get the badges associated with this challenge.
      */
