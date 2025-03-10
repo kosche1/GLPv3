@@ -3,273 +3,136 @@
 namespace Database\Seeders;
 
 use App\Models\Challenge;
-use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class ChallengeTypeSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // 1. Standard Challenge
+        // 1. Coding Challenge - Python Basics
         Challenge::create([
-            "name" => "Complete 5 Activities Challenge",
-            "description" =>
-                "Complete 5 different learning activities to earn points and badges.",
-            "start_date" => Carbon::now(),
-            "end_date" => Carbon::now()->addDays(14),
-            "points_reward" => 100,
-            "difficulty_level" => "easy",
-            "is_active" => true,
-            "max_participants" => 100,
-            "required_level" => 1,
-            "challenge_type" => "standard",
-            "completion_criteria" => [
-                "activity_count" => 5,
-                "min_score" => 70,
-            ],
-        ]);
-
-        // 2. Flashcard Challenge
-        Challenge::create([
-            "name" => "Programming Concepts Flashcards",
-            "description" =>
-                "Master programming concepts by completing this flashcard challenge.",
+            "name" => "Python Fundamentals Challenge",
+            "description" => "Test your knowledge of Python basics including variables, data types, loops, and functions.",
             "start_date" => Carbon::now(),
             "end_date" => Carbon::now()->addDays(7),
             "points_reward" => 150,
-            "difficulty_level" => "medium",
-            "is_active" => true,
-            "max_participants" => 50,
-            "required_level" => 2,
-            "challenge_type" => "flashcard",
-            "time_limit" => 30, // 30 minutes
-            "challenge_content" => [
-                [
-                    "question" => "What is a variable?",
-                    "answer" =>
-                        "A named storage location in memory that can hold a value",
-                ],
-                [
-                    "question" => "What is a function?",
-                    "answer" =>
-                        "A reusable block of code designed to perform a specific task",
-                ],
-                [
-                    "question" => "What is inheritance in OOP?",
-                    "answer" =>
-                        "A mechanism where a class can inherit properties and methods from another class",
-                ],
-                [
-                    "question" =>
-                        "What is the difference between == and === in JavaScript?",
-                    "answer" =>
-                        "== compares values, while === compares both values and types",
-                ],
-                [
-                    "question" => "What is an algorithm?",
-                    "answer" =>
-                        "A step-by-step procedure for solving a problem or accomplishing a task",
-                ],
-            ],
-        ]);
-
-        // 3. Crossword Puzzle Challenge
-        Challenge::create([
-            "name" => "Web Development Terminology Crossword",
-            "description" =>
-                "Test your knowledge of web development terms in this fun crossword puzzle.",
-            "start_date" => Carbon::now(),
-            "end_date" => Carbon::now()->addDays(10),
-            "points_reward" => 200,
-            "difficulty_level" => "medium",
-            "is_active" => true,
-            "max_participants" => 75,
-            "required_level" => 3,
-            "challenge_type" => "crossword",
-            "time_limit" => 45, // 45 minutes
-            "challenge_content" => [
-                [
-                    "key" => "Language used to structure web content",
-                    "value" => "HTML",
-                ],
-                [
-                    "key" => "Styling language for web pages",
-                    "value" => "CSS",
-                ],
-                [
-                    "key" => "Client-side scripting language",
-                    "value" => "JAVASCRIPT",
-                ],
-                [
-                    "key" =>
-                        "Server-side scripting language created by Rasmus Lerdorf",
-                    "value" => "PHP",
-                ],
-                [
-                    "key" => "A framework for building user interfaces",
-                    "value" => "REACT",
-                ],
-                [
-                    "key" => "Data interchange format commonly used with APIs",
-                    "value" => "JSON",
-                ],
-                [
-                    "key" => "Method to request data from a server",
-                    "value" => "GET",
-                ],
-                [
-                    "key" => "Method to send data to a server",
-                    "value" => "POST",
-                ],
-            ],
-        ]);
-
-        // 4. Word Search Challenge
-        Challenge::create([
-            "name" => "Data Science Terms Word Search",
-            "description" =>
-                "Find all the data science terms hidden in this word search puzzle.",
-            "start_date" => Carbon::now(),
-            "end_date" => Carbon::now()->addDays(5),
-            "points_reward" => 120,
-            "difficulty_level" => "easy",
+            "difficulty_level" => "beginner",
             "is_active" => true,
             "max_participants" => 100,
             "required_level" => 1,
-            "challenge_type" => "word_search",
-            "time_limit" => 20, // 20 minutes
+            "challenge_type" => "quiz",
+            "time_limit" => 30, // 30 minutes
+            "programming_language" => "python",
+            "tech_category" => "general",
             "challenge_content" => [
-                "grid_size" => 15,
-                "words" => [
-                    "PYTHON",
-                    "ALGORITHM",
-                    "DATABASE",
-                    "ANALYTICS",
-                    "STATISTICS",
-                    "REGRESSION",
-                    "CLUSTERING",
-                    "MACHINE",
-                    "LEARNING",
-                    "NEURAL",
-                    "NETWORK",
-                    "VISUALIZATION",
-                    "PANDAS",
-                    "TENSORFLOW",
-                ],
+                "questions" => [
+                    [
+                        "question" => "Which of the following is NOT a valid Python data type?",
+                        "options" => [
+                            ["text" => "int", "is_correct" => false],
+                            ["text" => "float", "is_correct" => false],
+                            ["text" => "char", "is_correct" => true],
+                            ["text" => "bool", "is_correct" => false],
+                        ],
+                        "points" => 1
+                    ],
+                    [
+                        "question" => "What will be the output of the following code?\n\nx = 5\nif x > 3:\n    print('Greater')\nelse:\n    print('Lesser')",
+                        "options" => [
+                            ["text" => "Greater", "is_correct" => true],
+                            ["text" => "Lesser", "is_correct" => false],
+                            ["text" => "Error", "is_correct" => false],
+                            ["text" => "No output", "is_correct" => false],
+                        ],
+                        "points" => 1
+                    ],
+                    [
+                        "question" => "How do you create a list in Python?",
+                        "options" => [
+                            ["text" => "list = (1, 2, 3)", "is_correct" => false],
+                            ["text" => "list = [1, 2, 3]", "is_correct" => true],
+                            ["text" => "list = {1, 2, 3}", "is_correct" => false],
+                            ["text" => "list = '1, 2, 3'", "is_correct" => false],
+                        ],
+                        "points" => 1
+                    ],
+                    [
+                        "question" => "Which method is used to add an element to the end of a list?",
+                        "options" => [
+                            ["text" => "append()", "is_correct" => true],
+                            ["text" => "add()", "is_correct" => false],
+                            ["text" => "insert()", "is_correct" => false],
+                            ["text" => "extend()", "is_correct" => false],
+                        ],
+                        "points" => 1
+                    ],
+                    [
+                        "question" => "What is the correct way to define a function in Python?",
+                        "options" => [
+                            ["text" => "function my_func():", "is_correct" => false],
+                            ["text" => "def my_func():", "is_correct" => true],
+                            ["text" => "create my_func():", "is_correct" => false],
+                            ["text" => "func my_func():", "is_correct" => false],
+                        ],
+                        "points" => 1
+                    ],
+                ]
             ],
         ]);
 
-        // 5. Quiz Challenge
+        // 2. JavaScript Debugging Challenge
         Challenge::create([
-            "name" => "Cloud Computing Mastery Quiz",
-            "description" =>
-                "Test your knowledge about cloud computing concepts and services.",
+            "name" => "JavaScript Debugging Challenge",
+            "description" => "Find and fix the bugs in the JavaScript code snippets.",
             "start_date" => Carbon::now(),
-            "end_date" => Carbon::now()->addDays(7),
-            "points_reward" => 180,
-            "difficulty_level" => "hard",
+            "end_date" => Carbon::now()->addDays(10),
+            "points_reward" => 200,
+            "difficulty_level" => "intermediate",
             "is_active" => true,
             "max_participants" => 50,
-            "required_level" => 4,
-            "challenge_type" => "quiz",
-            "time_limit" => 25, // 25 minutes
+            "required_level" => 3,
+            "challenge_type" => "debugging",
+            "time_limit" => 45, // 45 minutes
+            "programming_language" => "javascript",
+            "tech_category" => "web_dev",
             "challenge_content" => [
-                [
-                    "question" =>
-                        "What is the main advantage of cloud computing?",
-                    "options" => [
-                        "Lower cost",
-                        "Scalability",
-                        "Better security",
-                        "Faster performance",
-                    ],
-                    "correct_answer" => 1, // Scalability (index 1)
-                ],
-                [
-                    "question" =>
-                        "Which of these is NOT a major cloud service model?",
-                    "options" => [
-                        "Infrastructure as a Service (IaaS)",
-                        "Platform as a Service (PaaS)",
-                        "Software as a Service (SaaS)",
-                        "Hardware as a Service (HaaS)",
-                    ],
-                    "correct_answer" => 3, // HaaS (index 3)
-                ],
-                [
-                    "question" =>
-                        "Which company offers the AWS cloud platform?",
-                    "options" => ["Microsoft", "Google", "Amazon", "IBM"],
-                    "correct_answer" => 2, // Amazon (index 2)
-                ],
-                [
-                    "question" =>
-                        "What is a cloud deployment model where services are shared by multiple organizations?",
-                    "options" => [
-                        "Public cloud",
-                        "Private cloud",
-                        "Community cloud",
-                        "Hybrid cloud",
-                    ],
-                    "correct_answer" => 2, // Community cloud (index 2)
-                ],
-                [
-                    "question" =>
-                        "Which of these is a characteristic of cloud computing?",
-                    "options" => [
-                        "Limited resource pooling",
-                        "On-demand self-service",
-                        "Fixed bandwidth",
-                        "Single-tenant architecture",
-                    ],
-                    "correct_answer" => 1, // On-demand self-service (index 1)
-                ],
+                "scenario" => "You're working on a web application and need to fix several JavaScript bugs that are causing the application to malfunction.",
+                "buggy_code" => "// Bug 1: Event listener not working\ndocument.getElementByID('submit-button').addEventListener('click', submitForm);\n\n// Bug 2: Incorrect array manipulation\nfunction processArray(arr) {\n  for(let i = 0; i <= arr.length; i++) {\n    console.log(arr[i].name);\n  }\n}\n\n// Bug 3: Async function issue\nasync function fetchData() {\n  const response = await fetch('https://api.example.com/data');\n  return response;\n}\n\n// Bug 4: Closure problem\nfunction createCounter() {\n  var count = 0;\n  return {\n    increment: function() { count++; },\n    getCount: function() { return count; }\n  }\n}\nconst counter1 = createCounter();\nconst counter2 = createCounter();\ncounter1.increment();\nconsole.log(counter2.getCount());",
+                "expected_behavior" => "1. The submit button should trigger the submitForm function when clicked.\n2. The processArray function should correctly iterate through the array and log each item's name.\n3. The fetchData function should return the parsed JSON data.\n4. The counter should maintain its own state.",
+                "current_behavior" => "1. The event listener is not attaching to the button.\n2. The loop is causing an undefined error at the end of the array.\n3. The fetchData function returns a Response object instead of the data.\n4. Counter2 is showing the count from counter1.",
+                "hints" => [
+                    ["hint" => "Check the DOM selector method spelling"],
+                    ["hint" => "Array indices start at 0 and end at length-1"],
+                    ["hint" => "Remember to parse the response to JSON"],
+                    ["hint" => "Each counter should maintain its own independent state"]
+                ]
             ],
         ]);
 
-        // 6. Coding Challenge
+        // 3. Database Design Challenge
         Challenge::create([
-            "name" => "Algorithmic Problem Solving",
-            "description" =>
-                "Solve coding problems to improve your algorithmic thinking and programming skills.",
+            "name" => "SQL Database Challenge",
+            "description" => "Design and query a database for an e-commerce platform.",
             "start_date" => Carbon::now(),
             "end_date" => Carbon::now()->addDays(14),
-            "points_reward" => 300,
-            "difficulty_level" => "expert",
+            "points_reward" => 250,
+            "difficulty_level" => "advanced",
             "is_active" => true,
-            "max_participants" => 30,
+            "max_participants" => 40,
             "required_level" => 5,
-            "challenge_type" => "coding",
-            "time_limit" => 120, // 2 hours
+            "challenge_type" => "database",
+            "time_limit" => 60, // 60 minutes
+            "programming_language" => "sql",
+            "tech_category" => "databases",
             "challenge_content" => [
-                [
-                    "title" => "Reverse a String",
-                    "description" =>
-                        "Write a function that reverses a string without using built-in reverse functions.",
-                    "example_input" => "hello",
-                    "example_output" => "olleh",
-                    "test_cases" => [
-                        ["input" => "hello", "output" => "olleh"],
-                        ["input" => "world", "output" => "dlrow"],
-                        ["input" => "12345", "output" => "54321"],
-                    ],
-                ],
-                [
-                    "title" => "Find the Missing Number",
-                    "description" =>
-                        "Given an array containing n distinct numbers taken from 0 to n, find the missing number.",
-                    "example_input" => "[3,0,1]",
-                    "example_output" => "2",
-                    "test_cases" => [
-                        ["input" => "[3,0,1]", "output" => "2"],
-                        ["input" => "[9,6,4,2,3,5,7,0,1]", "output" => "8"],
-                        ["input" => "[0]", "output" => "1"],
-                    ],
-                ],
+                "scenario" => "You are tasked with designing a database for an e-commerce platform that needs to track products, customers, orders, and reviews.",
+                "schema" => "-- Existing tables:\n\nCREATE TABLE customers (\n  customer_id INT PRIMARY KEY,\n  name VARCHAR(100),\n  email VARCHAR(100),\n  registration_date DATE\n);\n\nCREATE TABLE products (\n  product_id INT PRIMARY KEY,\n  name VARCHAR(100),\n  description TEXT,\n  price DECIMAL(10,2),\n  stock_quantity INT\n);\n\nCREATE TABLE orders (\n  order_id INT PRIMARY KEY,\n  customer_id INT,\n  order_date DATE,\n  total_amount DECIMAL(10,2),\n  status VARCHAR(20),\n  FOREIGN KEY (customer_id) REFERENCES customers(customer_id)\n);\n\nCREATE TABLE order_items (\n  order_id INT,\n  product_id INT,\n  quantity INT,\n  price_per_unit DECIMAL(10,2),\n  PRIMARY KEY (order_id, product_id),\n  FOREIGN KEY (order_id) REFERENCES orders(order_id),\n  FOREIGN KEY (product_id) REFERENCES products(product_id)\n);",
+                "tasks" => "1. Create a new table for product reviews with appropriate foreign keys.\n2. Write a query to find the top 5 customers who have spent the most money.\n3. Write a query to find products that have never been ordered.\n4. Create a view that shows each product along with its average review rating.\n5. Write a stored procedure that updates product stock quantities when a new order is placed.",
+                "sample_data" => "-- Sample data available in the database\n\n-- Customers\nINSERT INTO customers VALUES (1, 'John Smith', 'john@example.com', '2022-01-15');\nINSERT INTO customers VALUES (2, 'Jane Doe', 'jane@example.com', '2022-02-20');\nINSERT INTO customers VALUES (3, 'Bob Johnson', 'bob@example.com', '2022-03-10');\n\n-- Products\nINSERT INTO products VALUES (101, 'Laptop', 'High-performance laptop', 1200.00, 15);\nINSERT INTO products VALUES (102, 'Smartphone', 'Latest model smartphone', 800.00, 25);\nINSERT INTO products VALUES (103, 'Headphones', 'Noise-cancelling headphones', 150.00, 40);\nINSERT INTO products VALUES (104, 'Tablet', '10-inch tablet', 300.00, 20);\nINSERT INTO products VALUES (105, 'Smartwatch', 'Fitness tracking watch', 250.00, 30);\n\n-- Orders\nINSERT INTO orders VALUES (1001, 1, '2023-01-05', 1350.00, 'Delivered');\nINSERT INTO orders VALUES (1002, 2, '2023-01-10', 800.00, 'Delivered');\nINSERT INTO orders VALUES (1003, 3, '2023-01-15', 450.00, 'Processing');\nINSERT INTO orders VALUES (1004, 1, '2023-02-01', 250.00, 'Delivered');\n\n-- Order Items\nINSERT INTO order_items VALUES (1001, 101, 1, 1200.00);\nINSERT INTO order_items VALUES (1001, 103, 1, 150.00);\nINSERT INTO order_items VALUES (1002, 102, 1, 800.00);\nINSERT INTO order_items VALUES (1003, 103, 3, 150.00);\nINSERT INTO order_items VALUES (1004, 105, 1, 250.00);"
             ],
         ]);
+
+        // Continue with more IT-focused challenges...
     }
 }
