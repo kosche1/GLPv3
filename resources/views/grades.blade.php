@@ -11,7 +11,6 @@
                 </select>
             </div>
         </div>
-        <br>
 
         <!-- GPA Summary Card -->
         <div class="mb-8 rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-900">
@@ -30,7 +29,6 @@
                 </div>
             </div>
         </div>
-        <br>
 
         <!-- Course Grades Table -->
         <div class="rounded-lg bg-white shadow-sm dark:bg-zinc-900">
@@ -93,7 +91,6 @@
                 <span>Current: 3.85</span>
             </div>
         </div>
-        <br>
 
         <!-- Recent Activity Section -->
         <div class="mb-8 rounded-lg bg-white p-6 shadow-sm dark:bg-zinc-900">
