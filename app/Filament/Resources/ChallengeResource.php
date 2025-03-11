@@ -480,7 +480,7 @@ public static function table(Table $table): Table
             Tables\Actions\DeleteBulkAction::make(),
             Tables\Actions\BulkAction::make("activate")
                 ->label("Activate Selected")
-                ->icon("heroicon-s-check-circle")
+                ->icon("heroicon-o-check-badge")
                 ->action(
                     fn(Collection $records) => $records->each->update([
                         "is_active" => true,

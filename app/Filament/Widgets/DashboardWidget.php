@@ -10,7 +10,7 @@ use App\Models\Referral;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Card;
 
-class GamificationStatsWidget extends BaseWidget
+class DashboardWidget extends BaseWidget
 {
     protected function getCards(): array
     {
@@ -56,7 +56,7 @@ class GamificationStatsWidget extends BaseWidget
 
             Card::make("Achievements Created", $totalAchievements)
                 ->description("Available to be earned")
-                ->descriptionIcon("heroicon-s-badge-check"),
+                ->descriptionIcon("heroicon-o-check-badge"),
 
             Card::make("Badges Awarded", $badgesAwarded)
                 ->description("Total badges earned by users")
@@ -64,11 +64,11 @@ class GamificationStatsWidget extends BaseWidget
 
             Card::make("Active Tasks", $activeTasks)
                 ->description("Tasks available for completion")
-                ->descriptionIcon("heroicon-s-clipboard-check"),
+                ->descriptionIcon("heroicon-o-clipboard"),
 
             Card::make("Successful Referrals", $successfulReferrals)
                 ->description("Completed and rewarded")
-                ->descriptionIcon("heroicon-s-user-add"),
+                ->descriptionIcon("heroicon-s-user-plus"),
         ];
     }
 }
