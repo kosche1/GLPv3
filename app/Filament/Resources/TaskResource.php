@@ -42,9 +42,14 @@ class TaskResource extends Resource
                 Forms\Components\Toggle::make("is_active")
                     ->label("Active")
                     ->default(true),
-                Forms\Components\KeyValue::make(
-                    "completion_criteria"
-                )->required(),
+                Forms\Components\KeyValue::make("completion_criteria")
+                    ->required()
+                    ->helperText(
+                        "Define the criteria for completing this task"
+                    ),
+                Forms\Components\KeyValue::make("answer_key")
+                    ->helperText("The correct answers for this task")
+                    ->columnSpanFull(),
                 Forms\Components\KeyValue::make(
                     "additional_rewards"
                 )->helperText("Additional rewards beyond points"),

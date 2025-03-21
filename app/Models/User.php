@@ -279,4 +279,8 @@ class User extends Authenticatable
             ->whereNotIn("id", $currentChallengeIds)
             ->get();
     }
+    public function studentAnswers()
+    {
+    return $this->hasMany(StudentAnswer::class);
+    }
 }

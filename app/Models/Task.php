@@ -21,6 +21,7 @@ class Task extends Model
         "type",
         "is_active",
         "completion_criteria",
+        "answer_key",
         "additional_rewards",
     ];
 
@@ -32,6 +33,7 @@ class Task extends Model
     protected $casts = [
         "is_active" => "boolean",
         "completion_criteria" => "array",
+        "answer_key" => "array",
         "additional_rewards" => "array",
     ];
 
@@ -49,5 +51,22 @@ class Task extends Model
                 "reward_claimed_at"
             )
             ->withTimestamps();
+    }
+    public function studentAnswers()
+    {
+        return $this->hasMany(StudentAnswer::class);
+    }
+    public function checkAnswer($studentAnswer)
+    {
+        // Compare student answer with answer key
+        if (empty($this->answer_key)) {
+            return false;
+        }
+
+        // Sort both arrays to ensure consistent comparison
+        $sortedStudentAnswer = collect($studentAnswer)->sortKeys()->toArray();
+        $sortedAnswerKey = collect($this->answer_key)->sortKeys()->toArray();
+
+        return $sortedStudentAnswer == $sortedAnswerKey;
     }
 }
