@@ -43,11 +43,13 @@ class TaskResource extends Resource
                     ->label("Active")
                     ->default(true),
                 Forms\Components\KeyValue::make("completion_criteria")
+                    ->valueLabel("Requirement")
+                    ->keyLabel("Criteria")
                     ->required()
                     ->helperText(
                         "Define the criteria for completing this task"
                     ),
-                Forms\Components\KeyValue::make("answer_key")
+                Forms\Components\Textarea::make("answer_key")
                     ->helperText("The correct answers for this task")
                     ->columnSpanFull(),
                 Forms\Components\KeyValue::make(
