@@ -1,8 +1,7 @@
 <template>
     <div class="flex flex-col gap-4 h-full">
       <div
-        class="relative w-full flex-1 rounded-lg overflow-hidden border border-neutral-700"
-      >
+        class="relative w-full flex-1 rounded-lg overflow-hidden border border-neutral-700">
         <div id="editor" class="w-full h-full"></div>
       </div>
       <div class="flex justify-end">

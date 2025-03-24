@@ -9,10 +9,10 @@
             </div>
         </div>
 
-        <div class="grid gap-4 md:grid-cols-3">
+        <div class="grid gap-4 md:grid-cols-3 h-full">
             <!-- Task Content -->
-            <div class="md:col-span-2 flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800">
-                <div class="space-y-6">
+            <div class="md:col-span-2 flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 h-full">
+                <div class="space-y-6 flex-1">
                     <div class="space-y-4">
                         <div class="flex items-center gap-2">
                             <span class="px-3 py-1 text-sm font-medium text-emerald-400 bg-emerald-500/10 rounded-full">{{ $currentTask->points_reward ?? 0 }} Points</span>
@@ -55,13 +55,128 @@
             </div>
 
             <!-- Code Editor -->
-            <div class="flex flex-col h-[600px] p-6 rounded-xl border border-neutral-700 bg-neutral-800">
+            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 h-full">
                 <h2 class="text-lg font-semibold text-white mb-4">Your Solution</h2>
-                  <div class="flex-1 min-h-0">
-                    <code-editor :initial-code="{{ json_encode($challenge->challenge_content['buggy_code'] ?? '') }}"
-                   :task-id="{{ json_encode($currentTask->id) }}"
-                    />
-                </div>
+                  <div class="flex-1 relative min-h-[400px]" id="monaco-editor-container" style="width:100%;overflow:hidden;">
+                    <div id="monaco-loading" class="absolute inset-0 flex items-center justify-center bg-neutral-900">
+                      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-400"></div>
+                    </div>
+                  </div>
+                  <button id="submit-solution" class="mt-4 w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center">
+                    Submit Solution
+                  </button>
+                  <script>
+                    // Load Monaco Editor dependencies
+                    (function() {
+                      // Add Monaco Editor CSS
+                      var link = document.createElement('link');
+                      link.rel = 'stylesheet';
+                      link.href = 'https://unpkg.com/monaco-editor@0.33.0/min/vs/editor/editor.main.css';
+                      document.head.appendChild(link);
+
+                      // Configure Monaco Environment
+                      window.MonacoEnvironment = {
+                        getWorkerUrl: function(workerId, label) {
+                          return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+                            self.MonacoEnvironment = {
+                              baseUrl: 'https://unpkg.com/monaco-editor@0.33.0/min/'
+                            };
+                            importScripts('https://unpkg.com/monaco-editor@0.33.0/min/vs/base/worker/workerMain.js');
+                          `)}`;
+                        }
+                      };
+
+                      // Load Monaco Editor
+                      var script = document.createElement('script');
+                      script.src = 'https://unpkg.com/monaco-editor@0.33.0/min/vs/loader.js';
+                      script.onload = function() {
+                        require.config({
+                          paths: { 'vs': 'https://unpkg.com/monaco-editor@0.33.0/min/vs' }
+                        });
+                        
+                        require(['vs/editor/editor.main'], function() {
+                          var loadingEl = document.getElementById('monaco-loading');
+                          var container = document.getElementById('monaco-editor-container');
+                          var submitBtn = document.getElementById('submit-solution');
+                          
+                          if (!container) {
+                            console.error('Monaco container element not found');
+                            return;
+                          }
+
+                          try {
+                            // Create editor instance
+                            var editor = monaco.editor.create(container, {
+                              value: {!! json_encode($challenge->challenge_content['buggy_code'] ?? '') !!},
+                              language: 'javascript',
+                              theme: 'vs-dark',
+                              automaticLayout: true,
+                              minimap: { enabled: false },
+                              scrollBeyondLastLine: false,
+                              lineNumbers: 'on',
+                              roundedSelection: true,
+                              readOnly: false,
+                              fontSize: 14,
+                              lineHeight: 21,
+                              padding: { top: 16, bottom: 16 },
+                              scrollbar: {
+                                vertical: 'visible',
+                                horizontal: 'visible',
+                                useShadows: false,
+                                verticalHasArrows: true,
+                                horizontalHasArrows: true
+                              }
+                            });
+                            
+                            // Hide loading indicator
+                            if (loadingEl) loadingEl.style.display = 'none';
+                            container.style.opacity = '1';
+                            
+                            // Force initial layout
+                            editor.layout();
+                            
+                            // Handle window resize
+                            window.addEventListener('resize', function() {
+                              editor.layout();
+                            });
+                            
+                            // Handle container resize
+                            if (window.ResizeObserver) {
+                              new ResizeObserver(function() {
+                                editor.layout();
+                              }).observe(container);
+                            }
+
+                            // Handle submit button click
+                            if (submitBtn) {
+                              submitBtn.addEventListener('click', function() {
+                                var code = editor.getValue();
+                                console.log('Submitted code:', code);
+                                // Add your submission logic here
+                              });
+                            }
+                          } catch (err) {
+                            console.error('Monaco editor initialization failed:', err);
+                            if (loadingEl) loadingEl.innerHTML = '<div class="text-red-500 text-center p-4">Failed to initialize editor</div>';
+                          }
+                        });
+                      };
+                      document.head.appendChild(script);
+                    })();
+                  </script>
+                  <style>
+                    #monaco-editor-container {
+                      opacity: 0;
+                      transition: opacity 0.3s ease-in-out;
+                      height: 100%;
+                    }
+                    .monaco-editor {
+                      height: 100% !important;
+                    }
+                    .monaco-editor .overflow-guard {
+                      border-radius: 0.5rem;
+                    }
+                  </style>
             </div>
 
             <!-- Task Navigation -->
