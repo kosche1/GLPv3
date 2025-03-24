@@ -8,3 +8,9 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance
+
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/src-noconflict/ace.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/src-noconflict/mode-python.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/src-noconflict/theme-monokai.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/src-noconflict/snippets/python.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/css/ace.min.css" rel="stylesheet">

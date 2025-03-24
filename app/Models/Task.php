@@ -23,6 +23,7 @@ class Task extends Model
         "completion_criteria",
         "answer_key",
         "additional_rewards",
+        "challenge_id",
     ];
 
     /**
@@ -52,6 +53,7 @@ class Task extends Model
             )
             ->withTimestamps();
     }
+// 
     public function studentAnswers()
     {
         return $this->hasMany(StudentAnswer::class);

@@ -1,6 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\Challenge;
+
+Route::get('/challenge/{challenge}', function (Challenge $challenge) {
+    return view('challenge', ['challenge' => $challenge]);
+})->name('challenge');
+
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
@@ -12,6 +18,9 @@ Route::view('dashboard', 'dashboard')
     ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('learning', [\App\Http\Controllers\LearningController::class, 'index'])->name('learning');
+    Route::get('challenge/{challenge}', [\App\Http\Controllers\LearningController::class, 'show'])->name('challenge');
+    Route::get('challenge/{challenge}/task/{task}', [\App\Http\Controllers\LearningController::class, 'showTask'])->name('challenge.task');
     Route::view('notifications', 'notifications')->name('notifications');
     Route::view('courses', 'courses')->name('courses');
     Route::view('learning-materials', 'learning-materials')->name('learning-materials');
@@ -20,6 +29,9 @@ Route::middleware(['auth'])->group(function () {
     Route::view('schedule', 'schedule')->name('schedule');
     Route::view('grades','grades')->name('grades');
     Route::view('messages','messages')->name('messages');
+    Route::view('forums','forums')->name('forums');
+    Route::view('help-center', 'help-center')->name('help-center');
+    Route::view('technical-support', 'technical-support')->name('technical-support');
 
     Route::redirect('settings', 'settings/profile');
 

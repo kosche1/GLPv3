@@ -11,6 +11,8 @@ use Filament\Resources\Resource;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ChallengeResource\Pages;
+use App\Filament\Resources\ChallengeResource\RelationManagers\TasksRelationManager;
+use Filament\Forms\Components\FileUpload;
 
 class ChallengeResource extends Resource
 {
@@ -50,6 +52,12 @@ class ChallengeResource extends Resource
                 Forms\Components\TextInput::make("points_reward")
                     ->numeric()
                     ->required(),
+                FileUpload::make('image')
+                    ->disk('public')
+                    ->directory('challenge-images')
+                    ->image()
+                    ->imageEditor()
+                    ->columnSpanFull(),
                 Forms\Components\Toggle::make("is_active")
                     ->default(true),
                 Forms\Components\TextInput::make("max_participants")
@@ -66,15 +74,9 @@ class ChallengeResource extends Resource
                 ->label("Challenge Type")
                 ->required()
                 ->options([
-                    "coding_challenge" => "Coding Challenge",
                     "debugging" => "Debugging Exercise",
                     "algorithm" => "Algorithm Challenge",
-                    "quiz" => "Technical Quiz",
-                    "flashcard" => "Technical Flashcards",
-                    "project" => "Mini Project",
-                    "code_review" => "Code Review Challenge",
                     "database" => "Database Challenge",
-                    "security" => "Security Challenge",
                     "ui_design" => "UI/UX Challenge",
                 ])
                 ->default("coding_challenge")
@@ -87,16 +89,10 @@ class ChallengeResource extends Resource
                 ->label("Programming Language")
                 ->options([
                     "python" => "Python",
-                    "javascript" => "JavaScript",
                     "java" => "Java",
                     "csharp" => "C#",
-                    "cpp" => "C++",
                     "php" => "PHP",
-                    "ruby" => "Ruby",
-                    "swift" => "Swift",
-                    "go" => "Go",
                     "sql" => "SQL",
-                    "multiple" => "Multiple Languages",
                     "none" => "Not Language Specific",
                 ])
                 ->default("none")
@@ -118,67 +114,44 @@ class ChallengeResource extends Resource
         Forms\Components\Section::make("Challenge Content")
             ->schema(function (Forms\Get $get) {
                 $challengeType = $get("challenge_type");
-
                 return match ($challengeType) {
-                    "coding_challenge" => [
-                        Forms\Components\Textarea::make("challenge_content.problem_statement")
-                            ->label("Problem Statement")
-                            ->required()
-                            ->columnSpanFull(),
-                        Forms\Components\Textarea::make("challenge_content.input_format")
-                            ->label("Input Format")
-                            ->required(),
-                        Forms\Components\Textarea::make("challenge_content.output_format")
-                            ->label("Output Format")
-                            ->required(),
-                        Forms\Components\Textarea::make("challenge_content.constraints")
-                            ->label("Constraints")
-                            ->required(),
-                        Forms\Components\Textarea::make("challenge_content.sample_input")
-                            ->label("Sample Input")
-                            ->required(),
-                        Forms\Components\Textarea::make("challenge_content.sample_output")
-                            ->label("Sample Output")
-                            ->required(),
-                        Forms\Components\Textarea::make("challenge_content.explanation")
-                            ->label("Explanation")
-                            ->columnSpanFull(),
-                        Forms\Components\Textarea::make("challenge_content.starter_code")
-                            ->label("Starter Code")
-                            ->columnSpanFull(),
-                    ],
-
                     "debugging" => [
                         Forms\Components\Textarea::make("challenge_content.scenario")
                             ->label("Debugging Scenario")
                             ->required()
+                            ->hint('Provide a scenario where the user is expected to debug the given code.')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make("challenge_content.buggy_code")
                             ->label("Code with Bugs")
                             ->required()
+                            ->hint('Provide the code that contains bugs.')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make("challenge_content.expected_behavior")
                             ->label("Expected Behavior")
-                            ->required(),
+                            ->required()
+                            ->hint('What should the code look like after debugging?'),
                         Forms\Components\Textarea::make("challenge_content.current_behavior")
                             ->label("Current Behavior")
-                            ->required(),
-                        Forms\Components\Repeater::make("challenge_content.hints")
-                            ->label("Hints")
-                            ->schema([
-                                Forms\Components\TextInput::make("hint")
-                                    ->required(),
-                            ])
-                            ->defaultItems(3),
+                            ->required()
+                            ->hint('What is the current behavior of the code?'),
+                        // Forms\Components\Repeater::make("challenge_content.hints")
+                        //     ->label("Hints")
+                        //     ->schema([
+                        //         Forms\Components\TextInput::make("hint")
+                        //             ->required(),
+                        //     ])
+                        //     ->defaultItems(3),
                     ],
 
                     "algorithm" => [
                         Forms\Components\Textarea::make("challenge_content.problem_statement")
                             ->label("Algorithm Problem")
                             ->required()
+                            ->hint('Describe the problem and provide a clear statement.')
                             ->columnSpanFull(),
                         Forms\Components\Select::make("challenge_content.algorithm_type")
                             ->label("Algorithm Type")
+                            ->hint('Select the type of algorithm.')
                             ->options([
                                 "sorting" => "Sorting",
                                 "searching" => "Searching",
@@ -192,111 +165,11 @@ class ChallengeResource extends Resource
                         Forms\Components\Textarea::make("challenge_content.example")
                             ->label("Example")
                             ->required()
+                            ->hint('Provide an example of the algorithm in action.')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make("challenge_content.solution_approach")
                             ->label("Solution Approach")
-                            ->columnSpanFull(),
-                    ],
-
-                    "quiz" => [
-                        Forms\Components\Repeater::make("challenge_content.questions")
-                            ->label("Technical Quiz Questions")
-                            ->schema([
-                                Forms\Components\TextInput::make("question")
-                                    ->required()
-                                    ->columnSpanFull(),
-                                Forms\Components\Repeater::make("options")
-                                    ->schema([
-                                        Forms\Components\TextInput::make("text")
-                                            ->required(),
-                                        Forms\Components\Toggle::make("is_correct")
-                                            ->label("Correct Answer")
-                                            ->default(false),
-                                    ])
-                                    ->defaultItems(4)
-                                    ->columns(2),
-                                Forms\Components\TextInput::make("points")
-                                    ->numeric()
-                                    ->default(1)
-                                    ->label("Points for correct answer"),
-                                Forms\Components\Textarea::make("explanation")
-                                    ->label("Explanation (shown after answering)")
-                                    ->columnSpanFull(),
-                            ])
-                            ->defaultItems(5)
-                            ->collapsible()
-                            ->columnSpanFull(),
-                    ],
-
-                    "flashcard" => [
-                        Forms\Components\Repeater::make("challenge_content.cards")
-                            ->label("Technical Flashcards")
-                            ->schema([
-                                Forms\Components\TextInput::make("term")
-                                    ->label("Technical Term")
-                                    ->required(),
-                                Forms\Components\Textarea::make("definition")
-                                    ->label("Definition")
-                                    ->required(),
-                                Forms\Components\FileUpload::make("image")
-                                    ->label("Illustration (Optional)")
-                                    ->image()
-                                    ->directory("flashcards"),
-                                Forms\Components\TextInput::make("code_example")
-                                    ->label("Code Example (Optional)")
-                                    ->columnSpanFull(),
-                            ])
-                            ->defaultItems(5)
-                            ->collapsible()
-                            ->columnSpanFull(),
-                    ],
-
-                    "project" => [
-                        Forms\Components\Textarea::make("challenge_content.project_brief")
-                            ->label("Project Brief")
-                            ->required()
-                            ->columnSpanFull(),
-                        Forms\Components\Textarea::make("challenge_content.requirements")
-                            ->label("Technical Requirements")
-                            ->required()
-                            ->columnSpanFull(),
-                        Forms\Components\Textarea::make("challenge_content.deliverables")
-                            ->label("Deliverables")
-                            ->required(),
-                        Forms\Components\Textarea::make("challenge_content.evaluation_criteria")
-                            ->label("Evaluation Criteria")
-                            ->required(),
-                        Forms\Components\Textarea::make("challenge_content.resources")
-                            ->label("Helpful Resources")
-                            ->columnSpanFull(),
-                    ],
-
-                    "code_review" => [
-                        Forms\Components\Textarea::make("challenge_content.code_to_review")
-                            ->label("Code to Review")
-                            ->required()
-                            ->columnSpanFull(),
-                        Forms\Components\Textarea::make("challenge_content.context")
-                            ->label("Code Context")
-                            ->required(),
-                        Forms\Components\Textarea::make("challenge_content.review_guidelines")
-                            ->label("Review Guidelines")
-                            ->required(),
-                        Forms\Components\Repeater::make("challenge_content.issues")
-                            ->label("Known Issues (Hidden from participants)")
-                            ->schema([
-                                Forms\Components\TextInput::make("issue")
-                                    ->required(),
-                                Forms\Components\Select::make("severity")
-                                    ->options([
-                                        "critical" => "Critical",
-                                        "major" => "Major",
-                                        "minor" => "Minor",
-                                        "improvement" => "Improvement",
-                                    ])
-                                    ->required(),
-                            ])
-                            ->defaultItems(3)
+                            ->hint('Describe the approach to solving the algorithm.')
                             ->columnSpanFull(),
                     ],
 
@@ -304,41 +177,22 @@ class ChallengeResource extends Resource
                         Forms\Components\Textarea::make("challenge_content.scenario")
                             ->label("Database Scenario")
                             ->required()
+                            ->hint('Describe the scenario for the database challenge.')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make("challenge_content.schema")
                             ->label("Database Schema")
                             ->required()
+                            ->hint('Provide the database schema.')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make("challenge_content.tasks")
                             ->label("SQL Tasks")
                             ->required()
+                            ->hint('List the tasks for the database challenge.')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make("challenge_content.sample_data")
                             ->label("Sample Data")
                             ->required()
-                            ->columnSpanFull(),
-                    ],
-
-                    "security" => [
-                        Forms\Components\Textarea::make("challenge_content.scenario")
-                            ->label("Security Scenario")
-                            ->required()
-                            ->columnSpanFull(),
-                        Forms\Components\Textarea::make("challenge_content.vulnerable_code")
-                            ->label("Vulnerable Code/System")
-                            ->required()
-                            ->columnSpanFull(),
-                        Forms\Components\Repeater::make("challenge_content.tasks")
-                            ->label("Security Tasks")
-                            ->schema([
-                                Forms\Components\TextInput::make("task")
-                                    ->required()
-                                    ->columnSpanFull(),
-                                Forms\Components\TextInput::make("points")
-                                    ->numeric()
-                                    ->default(1),
-                            ])
-                            ->defaultItems(3)
+                            ->hint('Provide sample data for the database challenge.')
                             ->columnSpanFull(),
                     ],
 
@@ -346,18 +200,22 @@ class ChallengeResource extends Resource
                         Forms\Components\Textarea::make("challenge_content.design_brief")
                             ->label("Design Brief")
                             ->required()
+                            ->hint('"Provide a brief description of the UI/UX challenge."')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make("challenge_content.requirements")
                             ->label("UI/UX Requirements")
                             ->required()
+                            ->hint('Provide the requirements for the UI/UX challenge.')
                             ->columnSpanFull(),
                         Forms\Components\FileUpload::make("challenge_content.assets")
                             ->label("Design Assets")
                             ->multiple()
+                            ->hint('Upload any design assets for the UI/UX challenge.')
                             ->directory("ui_challenges"),
                         Forms\Components\Textarea::make("challenge_content.evaluation_criteria")
                             ->label("Evaluation Criteria")
                             ->required()
+                            ->hint('Describe the evaluation criteria for the UI/UX challenge.')
                             ->columnSpanFull(),
                     ],
 
@@ -523,6 +381,7 @@ return parent::getEloquentQuery()
 public static function getRelations(): array
 {
 return [
+    TasksRelationManager::class,
     // RelationManagers\BadgesRelationManager::class,
     // RelationManagers\AchievementsRelationManager::class,
     // RelationManagers\ActivitiesRelationManager::class,

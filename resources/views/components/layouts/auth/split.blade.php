@@ -4,8 +4,15 @@
         @include('partials.head')
     </head>
 
-    
     <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
+        <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900 transition-opacity duration-500">
+            <div class="loader">
+                @for ($i = 0; $i < 8; $i++)
+                    <div class="loader-square"></div>
+                @endfor
+            </div>
+        </div>
+
         <div class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r dark:border-neutral-800">
                 <div class="absolute inset-0 bg-neutral-900"></div>
@@ -28,8 +35,6 @@
                 </div>
             </div>
 
-
-
             <div class="w-full lg:p-8">
                 <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                     <a href="{{ route('home') }}" class="z-20 flex flex-col items-center gap-2 font-medium lg:hidden" wire:navigate>
@@ -43,6 +48,16 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            window.addEventListener('load', function() {
+                document.getElementById('loading-screen').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('loading-screen').style.display = 'none';
+                }, 500);
+            });
+        </script>
+
         @fluxScripts
     </body>
 </html>
