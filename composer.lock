@@ -4,8 +4,92 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "60a20ee05dde5279920413d5e2e4ddae",
+    "content-hash": "6bb3fba41cbec92a1e2269c162cbe051",
     "packages": [
+        {
+            "name": "abdelhamiderrahmouni/filament-monaco-editor",
+            "version": "v0.2.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/abdelhamiderrahmouni/filament-monaco-editor.git",
+                "reference": "19ee073a593fe02865d8cfcad18db996f21b5fc5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/abdelhamiderrahmouni/filament-monaco-editor/zipball/19ee073a593fe02865d8cfcad18db996f21b5fc5",
+                "reference": "19ee073a593fe02865d8cfcad18db996f21b5fc5",
+                "shasum": ""
+            },
+            "require": {
+                "filament/forms": "^3.0",
+                "php": "^8.1",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^7.9",
+                "nunomaduro/larastan": "^2.0.1",
+                "orchestra/testbench": "^8.0",
+                "pestphp/pest": "^2.1",
+                "pestphp/pest-plugin-arch": "^2.0",
+                "pestphp/pest-plugin-laravel": "^2.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "MonacoEditor": "AbdelhamidErrahmouni\\FilamentMonacoEditor\\Facades\\MonacoEditor"
+                    },
+                    "providers": [
+                        "AbdelhamidErrahmouni\\FilamentMonacoEditor\\MonacoEditorServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "AbdelhamidErrahmouni\\FilamentMonacoEditor\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Abdelhamid Errahmouni",
+                    "email": "abdelhamid.errahmouni@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A monaco editor form field for filamentphp.",
+            "homepage": "https://github.com/abdelhamiderrahmouni/filament-monaco-editor",
+            "keywords": [
+                "Abdelhamid Errahmouni",
+                "Monaco",
+                "code editor",
+                "filament monaco code editor",
+                "filament monaco editor",
+                "filamentphp",
+                "laravel",
+                "monaco editor",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/abdelhamiderrahmouni/filament-monaco-editor/issues",
+                "source": "https://github.com/abdelhamiderrahmouni/filament-monaco-editor"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/AbdelhamidErrahmouni",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-05-16T10:37:32+00:00"
+        },
         {
             "name": "anourvalar/eloquent-serialize",
             "version": "1.2.29",

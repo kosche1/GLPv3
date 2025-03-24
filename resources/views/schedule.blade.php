@@ -1,6 +1,6 @@
 <x-layouts.app>
-    <div class="p-8">
-        <div class="mx-auto max-w-7xl">
+    <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+        <div class="mx-auto w-full max-w-7xl p-8">
             <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-semibold text-zinc-900 dark:text-white">{{ __('Schedule') }}</h1>
                 <div class="flex rounded-lg shadow-sm" role="group">
@@ -42,12 +42,12 @@
                 </div>
             </div>
             
-            <div class="border rounded-lg overflow-hidden bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700">
-                <div class="divide-y divide-zinc-200 dark:divide-zinc-700">
+            <div class="border rounded-xl overflow-hidden bg-white dark:bg-neutral-800 border-zinc-200 dark:border-neutral-700 transition-all duration-300 hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600">
+                <div class="divide-y divide-zinc-200 dark:divide-neutral-700">
                     <!-- Monday -->
                     <div class="p-4">
                         <div class="flex items-center mb-2">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-zinc-800">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-neutral-800">
                                 <span class="font-medium text-zinc-900 dark:text-white">10</span>
                             </div>
                             <div>
@@ -57,7 +57,7 @@
                         </div>
                         
                         <div class="ml-16 space-y-3">
-                            <div class="p-3 rounded-md border bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-900">
+                            <div class="p-3 rounded-lg border bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-900 transition-all duration-300 hover:scale-[1.02]">
                                 <div class="flex justify-between items-start">
                                     <h3 class="font-medium">Project Kickoff</h3>
                                     <span class="text-xs">09:00 AM</span>
@@ -69,7 +69,7 @@
                     <!-- Tuesday -->
                     <div class="p-4">
                         <div class="flex items-center mb-2">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-zinc-800">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-neutral-800">
                                 <span class="font-medium text-zinc-900 dark:text-white">11</span>
                             </div>
                             <div>
@@ -86,7 +86,7 @@
                     <!-- Wednesday -->
                     <div class="p-4">
                         <div class="flex items-center mb-2">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-zinc-800">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-neutral-800">
                                 <span class="font-medium text-zinc-900 dark:text-white">12</span>
                             </div>
                             <div>
@@ -96,7 +96,7 @@
                         </div>
                         
                         <div class="ml-16 space-y-3">
-                        <div class="p-3 rounded-md border bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-900">
+                        <div class="p-3 rounded-lg border bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-900 transition-all duration-300 hover:scale-[1.02]">
                                 <div class="flex justify-between items-start">
                                     <h3 class="font-medium">Design Review</h3>
                                     <span class="text-xs">02:30 PM</span>
@@ -108,7 +108,7 @@
                     <!-- Thursday -->
                     <div class="p-4">
                         <div class="flex items-center mb-2">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-zinc-800">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-neutral-800">
                                 <span class="font-medium text-zinc-900 dark:text-white">13</span>
                             </div>
                             <div>
@@ -125,7 +125,7 @@
                     <!-- Friday -->
                     <div class="p-4">
                         <div class="flex items-center mb-2">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-zinc-800">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-neutral-800">
                                 <span class="font-medium text-zinc-900 dark:text-white">14</span>
                             </div>
                             <div>
@@ -142,7 +142,7 @@
                     <!-- Saturday -->
                     <div class="p-4">
                         <div class="flex items-center mb-2">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-zinc-800">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-neutral-800">
                                 <span class="font-medium text-zinc-900 dark:text-white">15</span>
                             </div>
                             <div>
@@ -152,7 +152,7 @@
                         </div>
                         
                         <div class="ml-16 space-y-3">
-                        <div class="p-3 rounded-md border bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-900">
+                        <div class="p-3 rounded-lg border bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-900 transition-all duration-300 hover:scale-[1.02]">
                                 <div class="flex justify-between items-start">
                                     <h3 class="font-medium">Backend Development</h3>
                                     <span class="text-xs">02:30 PM</span>
@@ -164,7 +164,7 @@
                     <!-- Sunday -->
                     <div class="p-4">
                         <div class="flex items-center mb-2">
-                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-zinc-800">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-zinc-100 dark:bg-neutral-800">
                                 <span class="font-medium text-zinc-900 dark:text-white">16</span>
                             </div>
                             <div>
@@ -174,7 +174,7 @@
                         </div>
                         
                         <div class="ml-16 space-y-3">
-                        <div class="p-3 rounded-md border bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-900">
+                        <div class="p-3 rounded-lg border bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/50 dark:text-rose-300 dark:border-rose-900 transition-all duration-300 hover:scale-[1.02]">
                                 <div class="flex justify-between items-start">
                                     <h3 class="font-medium">Design Review</h3>
                                     <span class="text-xs">02:30 PM</span>
@@ -188,11 +188,11 @@
         <!-- Pagination -->
         <div class="mt-8 flex items-center justify-center">
             <nav class="flex space-x-2" aria-label="Pagination">
-                <a href="#" class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700">Previous</a>
-                <a href="#" class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700">1</a>
-                <a href="#" class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700">2</a>
-                <a href="#" class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700">3</a>
-                <a href="#" class="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700">Next</a>
+                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">Previous</a>
+                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">1</a>
+                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">2</a>
+                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">3</a>
+                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">Next</a>
             </nav>
         </div>
     </div>

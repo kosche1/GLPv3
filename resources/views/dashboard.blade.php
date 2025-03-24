@@ -1,5 +1,12 @@
 <x-layouts.app>
-    <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+    <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl" id="app">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold text-white">Dashboard</h1>
+            <a href="{{ route('learning') }}" class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-emerald-500 bg-emerald-500/10 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/50 hover:bg-emerald-500/20 group">
+                <span class="text-lg font-semibold text-emerald-400 group-hover:text-emerald-300">Start Now</span>
+                <!-- <span class="text-sm text-neutral-400 mt-1">Begin Learning</span> -->
+            </a>
+        </div>
         <div class="grid auto-rows-min gap-4 md:grid-cols-3">
             <div class="flex flex-col justify-between p-6 rounded-xl border border-neutral-700 bg-neutral-800 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">
                 <div class="space-y-1">
@@ -189,7 +196,7 @@
         <div class="grid gap-6 md:grid-cols-3">
             <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">
                 <h3 class="text-sm font-medium text-neutral-400 mb-4">Upcoming Challenges</h3>
-                <div class="w-full max-w-[320px] mx-auto bg-white shadow-md rounded-lg overflow-hidden dark:bg-zinc-900">
+                <div class="bg-neutral-800 border border-neutral-700 overflow-hidden shadow-sm sm:rounded-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:shadow-lg hover:shadow-neutral-700/20">
                     <div class="flex justify-between items-center px-6 py-4">
                         <div class="flex items-center">
                             <div class="mx-3">
@@ -225,21 +232,13 @@
                                     <p class="text-xs text-gray-500 dark:text-gray-400">Due in 3 days</p>
                                 </div>
                             </div>
-                            <!-- <div class="flex items-center gap-3">
-                                <div class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-medium">P</div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Physics Lab Report</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">Due in 1 week</p>
-                                </div>
-                            </div> -->
                         </div>
                     </div>
                 </div>
             </div>
-
             <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">
                 <h3 class="text-sm font-medium text-neutral-400 mb-4">Active Challenges</h3>
-                <div class="w-full max-w-[320px] mx-auto bg-white shadow-md rounded-lg overflow-hidden dark:bg-zinc-900">
+                <div class="bg-neutral-800 border border-neutral-700 overflow-hidden shadow-sm sm:rounded-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:shadow-lg hover:shadow-neutral-700/20">
                     <div class="flex justify-between items-center px-6 py-4">
                         <div class="flex items-center">
                             <div class="mx-3">
@@ -345,6 +344,4 @@
                 <span class="ml-3 text-sm font-medium text-neutral-400">Grades</span>
             </a>
         </div>
-
-
 </x-layouts.app>

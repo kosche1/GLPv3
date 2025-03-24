@@ -1,4 +1,4 @@
-<div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950 transition-opacity duration-300">
+<!-- <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950 transition-opacity duration-300">
     <div class="loader">
         @for ($i = 1; $i <= 9; $i++)
             <div class="loader-square"></div>
@@ -18,4 +18,4 @@
             }, 500);
         }
     });
-</script>
+</script> -->

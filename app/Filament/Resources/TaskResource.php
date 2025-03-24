@@ -79,6 +79,25 @@ class TaskResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('attachToChallenge')
+                    ->label('Attach to Challenge')
+                    ->icon('heroicon-s-link')
+                    ->hidden(fn (Task $record) => $record->challenge_id !== null)
+                    ->form([
+                        Forms\Components\Select::make('challenge_id')
+                            ->label('Select Challenge')
+                            ->options(fn () => \App\Models\Challenge::where('is_active', true)
+                                ->pluck('name', 'id'))
+                            ->required()
+                            ->searchable()
+                    ])
+                    ->action(function (Task $record, array $data): void {
+                        $record->update(['challenge_id' => $data['challenge_id']]);
+                        Filament\Notifications\Notification::make()
+                            ->success()
+                            ->title('Task attached to challenge successfully')
+                            ->send();
+                    })
             ])
             ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
     }

@@ -22,6 +22,7 @@ class Task extends Model
         "is_active",
         "completion_criteria",
         "additional_rewards",
+        "challenge_id",
     ];
 
     /**
@@ -49,5 +50,13 @@ class Task extends Model
                 "reward_claimed_at"
             )
             ->withTimestamps();
+    }
+
+    /**
+     * Get the challenge that owns the task.
+     */
+    public function challenge()
+    {
+        return $this->belongsTo(Challenge::class);
     }
 }

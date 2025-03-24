@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
-@import 'loading-screen.css';
+@import './loading-screen.css';
 
 @source "../views";
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -174,7 +174,7 @@ select:focus[data-flux-control] {
  background-size: cover;
  background-position: center;
  background-attachment: fixed;
- animation: square-animation 10s ease-in-out infinite both;
+ animation: square-animation 5s ease-in-out 1 both;
 }
 
 .loader-square:nth-of-type(0) {
@@ -182,29 +182,44 @@ select:focus[data-flux-control] {
 }
 
 .loader-square:nth-of-type(1) {
- animation-delay: -1.4285714286s;
+ animation-delay: -0.7142857143s;
 }
 
 .loader-square:nth-of-type(2) {
- animation-delay: -2.8571428571s;
+ animation-delay: -1.4285714286s;
 }
 
 .loader-square:nth-of-type(3) {
- animation-delay: -4.2857142857s;
+ animation-delay: -2.1428571429s;
 }
 
 .loader-square:nth-of-type(4) {
- animation-delay: -5.7142857143s;
+ animation-delay: -2.8571428572s;
 }
 
 .loader-square:nth-of-type(5) {
- animation-delay: -7.1428571429s;
+ animation-delay: -3.5714285715s;
 }
 
 .loader-square:nth-of-type(6) {
- animation-delay: -8.5714285714s;
+ animation-delay: -4.2857142857s;
 }
 
 .loader-square:nth-of-type(7) {
- animation-delay: -10s;
+ animation-delay: -5s;
+}
+
+.login-form {
+  opacity: 0;
+  display: none;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.login-form.show {
+  opacity: 1;
+  display: block;
+}
+
+.loader.hide {
+  display: none;
 }

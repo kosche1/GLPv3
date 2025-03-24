@@ -33,6 +33,7 @@ class Challenge extends Model
         "challenge_content",
         "programming_language", // New field for programming language focus
         "tech_category",       // New field for categorizing tech topics
+        "image",              // Field for storing challenge image path
     ];
 
     /**
@@ -89,6 +90,17 @@ class Challenge extends Model
             Badge::class,
             "challenge_badges"
         )->withTimestamps();
+    }
+
+    /**
+     * Get the achievements associated with this challenge.
+     */
+    /**
+     * Get the tasks associated with this challenge.
+     */
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
     }
 
     /**
