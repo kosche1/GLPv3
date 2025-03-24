@@ -57,11 +57,9 @@
             <!-- Code Editor -->
             <div class="flex flex-col h-[600px] p-6 rounded-xl border border-neutral-700 bg-neutral-800">
                 <h2 class="text-lg font-semibold text-white mb-4">Your Solution</h2>
-                <div class="flex-1 min-h-0">
-                    <code-editor
-                        :initial-code="{{ json_encode($challenge->challenge_content['buggy_code'] ?? '') }}"
-                        :challenge-id="{{ json_encode($challenge->id) }}"
-                        :task-id="{{ json_encode($currentTask->id) }}"
+                  <div class="flex-1 min-h-0">
+                    <code-editor :initial-code="{{ json_encode($challenge->challenge_content['buggy_code'] ?? '') }}"
+                   :task-id="{{ json_encode($currentTask->id) }}"
                     />
                 </div>
             </div>

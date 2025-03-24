@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6bb3fba41cbec92a1e2269c162cbe051",
+    "content-hash": "170d1e1b5bbf492925782ca60e6c4596",
     "packages": [
         {
             "name": "abdelhamiderrahmouni/filament-monaco-editor",
@@ -7912,6 +7912,81 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.11.0"
             },
             "time": "2022-06-03T18:03:27+00:00"
+        },
+        {
+            "name": "westacks/filament-monaco-editor",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/westacks/filament-monaco-editor.git",
+                "reference": "e379847bc6c7c349669a7b7ca5a255f7601a63e7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/westacks/filament-monaco-editor/zipball/e379847bc6c7c349669a7b7ca5a255f7601a63e7",
+                "reference": "e379847bc6c7c349669a7b7ca5a255f7601a63e7",
+                "shasum": ""
+            },
+            "require": {
+                "filament/forms": "^3.2",
+                "illuminate/contracts": "^11.0 || ^12.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.1",
+                "orchestra/testbench": "^9.0 || ^10.0",
+                "pestphp/pest": "^2.0",
+                "pestphp/pest-plugin-arch": "^2.0",
+                "pestphp/pest-plugin-laravel": "^2.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "WeStacks\\FilamentMonacoEditor\\FilamentMonacoEditorServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WeStacks\\FilamentMonacoEditor\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Connor Howell",
+                    "email": "connor.howell@mail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Monaco Editor integration for Filament Panels & Forms",
+            "homepage": "https://github.com/westacks/filament-monaco-editor",
+            "keywords": [
+                "filament-monaco-editor",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/westacks/filament-monaco-editor/issues",
+                "source": "https://github.com/westacks/filament-monaco-editor"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/WeStacks",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-03-01T20:54:46+00:00"
         }
     ],
     "packages-dev": [
