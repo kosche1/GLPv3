@@ -48,6 +48,9 @@ class TasksRelationManager extends RelationManager
                     ->valueLabel('Value')
                     ->addable()
                     ->deletable(),
+                Forms\Components\Textarea::make('answer_key')
+                    ->helperText('The correct answers for this task')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -106,6 +109,7 @@ class TasksRelationManager extends RelationManager
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\DetachBulkAction::make(),
                 ]),
+
             ]);
     }
 }
