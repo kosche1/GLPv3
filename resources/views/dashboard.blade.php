@@ -11,11 +11,11 @@
                 <svg class="h-6 w-6 text-orange-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 17.75L5.82802 20.995L7.00702 14.122L2.00702 9.25495L8.90702 8.25495L11.993 2.00195L15.079 8.25495L21.979 9.25495L16.979 14.122L18.158 20.995L12 17.75Z" fill="currentColor"/>
                 </svg>
-                <h2 class="text-4xl font-light">Welcome back, Student</h2>
+                <h2 class="text-4xl font-light">Welcome back, {{ explode(' ', auth()->user()->name)[0]}}!</h2>
             </div>
             <p class="text-gray-400 mb-8">Track your progress and continue your learning journey</p>
             
-            <!-- Main Action Button (Claude-style) -->
+            <!-- Main Action Button -->
             <div class="w-full max-w-3xl mx-auto mb-8">
     <div class="relative rounded-xl bg-neutral-800 border border-neutral-700 overflow-hidden">
         <a href="{{ route('learning') }}" 

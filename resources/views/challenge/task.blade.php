@@ -9,9 +9,9 @@
             </div>
         </div>
 
-        <div class="grid gap-4 md:grid-cols-3 h-full">
+        <div class="grid gap-4 grid-cols-1 md:grid-cols-2 h-full">
             <!-- Task Content -->
-            <div class="md:col-span-2 flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 h-full">
+            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 h-full">
                 <div class="space-y-6 flex-1">
                     <div class="space-y-4">
                         <div class="flex items-center gap-2">
@@ -56,15 +56,43 @@
 
             <!-- Code Editor -->
             <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 h-full">
-                <h2 class="text-lg font-semibold text-white mb-4">Your Solution</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-white">Your Solution</h2>
+                    <button onclick="document.getElementById('run-code').click()" class="flex items-center justify-center p-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
                   <div class="flex-1 relative min-h-[400px]" id="monaco-editor-container" style="width:100%;overflow:hidden;">
                     <div id="monaco-loading" class="absolute inset-0 flex items-center justify-center bg-neutral-900">
                       <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-400"></div>
                     </div>
                   </div>
-                  <button id="submit-solution" class="mt-4 w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center">
-                    Submit Solution
-                  </button>
+                  <button id="run-code" style="display: none;"></button>
+                  <div id="code-output" class="mt-4 p-4 rounded-xl bg-neutral-900 border border-neutral-700 hidden">
+                    <div class="flex items-center justify-between mb-2">
+                      <h3 class="text-sm font-medium text-neutral-300">Execution Output</h3>
+                      <button onclick="clearOutput()" class="text-sm text-neutral-500 hover:text-neutral-400 transition-colors duration-300">
+                        Clear
+                      </button>
+                    </div>
+                    <div id="output-content" class="font-mono text-sm whitespace-pre-wrap break-words overflow-x-auto max-h-[200px] overflow-y-auto"></div>
+                  </div>
+                  <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button id="submit-solution" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center">
+                      Submit Solution
+                    </button>
+                    @if($nextTask)
+                      <a href="{{ route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) }}" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center">
+                        Next Task
+                      </a>
+                    @else
+                      <div class="w-full py-3 px-4 rounded-xl bg-neutral-700 text-neutral-400 font-semibold text-center cursor-not-allowed">
+                        Last Task
+                      </div>
+                    @endif
+                  </div>
                   <script>
                     // Load Monaco Editor dependencies
                     (function() {
@@ -108,7 +136,7 @@
                             // Create editor instance
                             var editor = monaco.editor.create(container, {
                               value: {!! json_encode($challenge->challenge_content['buggy_code'] ?? '') !!},
-                              language: 'javascript',
+                              language: {!! json_encode($challenge->programming_language ?? 'none') !!},
                               theme: 'vs-dark',
                               automaticLayout: true,
                               minimap: { enabled: false },
@@ -147,6 +175,63 @@
                               }).observe(container);
                             }
 
+                            // Handle run code button click
+                            var runBtn = document.getElementById('run-code');
+                            var outputDiv = document.getElementById('code-output');
+                            var outputContent = document.getElementById('output-content');
+
+                            function displayOutput(content, isError = false) {
+                              if (!outputDiv || !outputContent) return;
+                              outputDiv.classList.remove('hidden');
+                              const sanitizedContent = content.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+                              const outputElement = document.createElement('div');
+                              outputElement.className = isError ? 'text-red-400' : 'text-emerald-400';
+                              outputElement.innerHTML = sanitizedContent;
+                              outputContent.appendChild(outputElement);
+                              outputContent.scrollTop = outputContent.scrollHeight;
+                            }
+
+                            function clearOutput() {
+                              outputContent.innerHTML = '';
+                              outputDiv.classList.add('hidden');
+                            }
+
+                            if (runBtn) {
+                              runBtn.addEventListener('click', function() {
+                                var code = editor.getValue();
+                                clearOutput();
+                                // Send code to backend for Python execution
+                                const language = editor.getModel().getLanguageId();
+                                const endpoint = language === 'java' ? '/api/execute-java' : '/api/execute-python';
+                                fetch(endpoint, {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                                  },
+                                  body: JSON.stringify({ code: code })
+                                })
+                                .then(response => {
+                                  if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                  }
+                                  return response.json();
+                                })
+                                .then(data => {
+                                  if (data.error) {
+                                    displayOutput(data.error, true);
+                                  } else if (data.output) {
+                                    displayOutput(data.output);
+                                  } else {
+                                    displayOutput('No output received from execution');
+                                  }
+                                })
+                                .catch(error => {
+                                  displayOutput(`Error executing code: ${error.message}`, true);
+                                });
+                              });
+                            }
+
                             // Handle submit button click
                             if (submitBtn) {
                               submitBtn.addEventListener('click', function() {
@@ -179,21 +264,7 @@
                   </style>
             </div>
 
-            <!-- Task Navigation -->
-            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800">
-                <h2 class="text-lg font-semibold text-white mb-4">Task Navigation</h2>
-                <div class="space-y-4">
-                    @if($nextTask)
-                        <a href="{{ route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) }}" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center">
-                            Next Task
-                        </a>
-                    @else
-                        <div class="w-full py-3 px-4 rounded-xl bg-neutral-700 text-neutral-400 font-semibold text-center cursor-not-allowed">
-                            Last Task
-                        </div>
-                    @endif
-                </div>
-            </div>
+
         </div>
     </div>
 </x-layouts.app>

@@ -249,19 +249,6 @@
                             @endfor
                         @endif
                     </div>
-                    {{-- @if($nextTask)
-                    <a href="{{ route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) }}" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center">
-                        @if($challenge->tasks->where('progress', '>', 0)->count() > 0)
-                            Continue Challenge
-                        @else
-                            Start Challenge
-                        @endif
-                    </a>
-                    @else
-                    <div class="w-full py-3 px-4 rounded-xl bg-neutral-600 text-white font-semibold text-center cursor-not-allowed">
-                        No tasks available
-                    </div>
-                    @endif --}}
                 </div>
             </div>
         </div>
