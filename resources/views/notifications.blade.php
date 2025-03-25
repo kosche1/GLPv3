@@ -10,7 +10,7 @@
                     <div class="relative">
                         <input type="text" placeholder="Search notifications..." class="w-64 rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm text-white placeholder-neutral-400 focus:border-neutral-600 focus:outline-none transition-all duration-300 hover:border-neutral-600">
                     </div>
-                    <select class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm text-white focus:border-neutral-600 focus:outline-none transition-all duration-300 hover:border-neutral-600">
+                    <select class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm text-white focus:border-neutral-600 focus:outline-none transition-all duration-300 hover:border-neutral-600" x-data="{ status: 'all' }" x-on:change="$wire.setStatus($event.target.value)">
                         <option value="all">All Notifications</option>
                         <option value="unread">Unread</option>
                         <option value="read">Read</option>
@@ -21,24 +21,24 @@
 
             <!-- Notifications List -->
             <div class="mt-8 space-y-4">
-                @for ($i = 1; $i <= 3; $i++)
+                @foreach (\App\Models\Challenge::all() as $challenge)
                 <div class="rounded-xl border border-neutral-700 bg-neutral-800 p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">
                     <div class="mb-4 flex items-center justify-between">
                         <div class="flex items-center space-x-3">
-                            <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
-                            <span class="text-sm font-medium text-white">{{ $i === 1 ? 'New Message' : ($i === 2 ? 'System Update' : 'Assignment Feedback') }}</span>
+                            <span class="h-2.5 w-2.5 rounded-full bg-rose-500" x-bind:class="{ 'bg-green-500': $challenge->status === 'read', 'bg-rose-500': $challenge->status === 'unread' }"></span>
+                            <span class="text-sm font-medium text-white">{{ $challenge->name }}</span>
                         </div>
-                        <span class="text-sm text-neutral-400">{{ $i }} hour{{ $i !== 1 ? 's' : '' }} ago</span>
+                        <span class="text-sm text-neutral-400">{{ $challenge->start_date->diffForHumans() }}</span>
                     </div>
-                    <p class="mb-4 text-sm text-neutral-300">{{ $i === 1 ? 'You have received a new message from your instructor regarding your recent submission.' : ($i === 2 ? 'Important system maintenance update scheduled for tomorrow at 2:00 PM.' : 'Your assignment has been graded. Click to view the feedback.') }}</p>
+                    <p class="mb-4 text-sm text-neutral-300">{{ $challenge->description }}</p>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
-                            <span class="text-sm text-neutral-400">{{ $i === 1 ? 'Course Message' : ($i === 2 ? 'System Notice' : 'Grade Update') }}</span>
+                            <span class="text-sm text-neutral-400">{{ $challenge->challenge_type }}</span>
                         </div>
-                        <button class="text-sm font-medium text-rose-400 hover:text-rose-300 transition-colors">Mark as read</button>
+                        <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="text-sm font-medium text-rose-400 hover:text-rose-300 transition-colors">View Course</a>
                     </div>
                 </div>
-                @endfor
+                @endforeach
             </div>
 
         <!-- Pagination -->
