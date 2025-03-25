@@ -17,23 +17,23 @@
             
             <!-- Main Action Button -->
             <div class="w-full max-w-3xl mx-auto mb-8">
-    <div class="relative rounded-xl bg-neutral-800 border border-neutral-700 overflow-hidden">
-        <a href="{{ route('learning') }}" 
-            class="block w-full p-6 text-center rounded-xl border-2 border-emerald-500 bg-emerald-500/10 
-                   transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-emerald-900/50 hover:bg-emerald-500/20 
-                   focus:outline-none focus:ring-4 focus:ring-emerald-500/50 active:scale-[0.98] 
-                   animate-pulse group relative overflow-hidden">
-            
-            <!-- Background effect -->
-            <div class="absolute inset-0 bg-[radial-gradient(circle,_rgba(16,185,129,0.2)_0%,_rgba(0,0,0,0)_70%)] opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+                <div class="relative rounded-xl bg-neutral-800 border border-neutral-700 overflow-hidden">
+                    <a href="{{ route('learning') }}" 
+                        class="block w-full p-6 text-center rounded-xl border-2 border-emerald-500 bg-emerald-500/10 
+                            transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-emerald-900/50 hover:bg-emerald-500/20 
+                            focus:outline-none focus:ring-4 focus:ring-emerald-500/50 active:scale-[0.98] 
+                            animate-pulse group relative overflow-hidden">
+                        
+                        <!-- Background effect -->
+                        <div class="absolute inset-0 bg-[radial-gradient(circle,_rgba(16,185,129,0.2)_0%,_rgba(0,0,0,0)_70%)] opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
 
-            <!-- Text -->
-            <span class="relative text-lg font-semibold text-emerald-400 group-hover:text-emerald-300 transition-colors duration-300">
-                Start Now
-            </span>
-        </a>
-    </div>
-</div>
+                        <!-- Text -->
+                        <span class="relative text-xl font-semibold text-emerald-400 group-hover:text-emerald-300 transition-colors duration-300 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)] glow">
+                        Start Now
+                        </span>
+                    </a>
+                </div>
+            </div>
 
 
             <!-- Collaboration Tools (Claude-style) -->
@@ -94,22 +94,6 @@
             </div>
         </div>
 
-        <!-- New Feature Notification (Claude-style) -->
-        <div class="relative mb-8 rounded-xl border border-neutral-700 bg-neutral-800 p-6">
-            <div class="absolute top-4 right-4">
-                <button class="text-gray-400 hover:text-gray-300">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="flex items-center gap-2 mb-2">
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-400">NEW</span>
-                <h3 class="text-lg font-medium text-white">Analysis tool</h3>
-            </div>
-            <p class="text-gray-300 mb-2">Track your learning progress with our new analytics dashboard. Visualize your performance and identify areas for improvement.</p>
-            <a href="#" class="text-emerald-400 hover:text-emerald-300 text-sm font-medium">Try it out</a>
-        </div>
         
         <!-- Activity Graph -->
         <div class="relative overflow-hidden rounded-xl border border-neutral-700 bg-neutral-800 p-6 mb-8" style="min-height: 400px; height: 500px;">
@@ -262,123 +246,62 @@
             </script>
         </div>
         
-        <!-- Challenges and Progress Section -->
-        <div class="grid gap-6 md:grid-cols-3 mb-8">
-            <!-- Upcoming Challenges -->
-            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800">
-                <h3 class="text-sm font-medium text-gray-400 mb-4">Upcoming Challenges</h3>
-                <div class="bg-neutral-800 border border-neutral-700 overflow-hidden rounded-lg">
-                    <div class="flex justify-between items-center px-6 py-4">
-                        <div class="flex items-center">
-                            <div class="mx-3">
-                                <h3 class="text-lg font-medium text-gray-200">
-                                    Math 101 - Problem Set
-                                </h3>
-                                <p class="text-gray-400">High Priority</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="px-6 py-4">
-                        <div class="flex items-center">
-                            <div class="w-full">
-                                <div class="flex justify-between mb-2">
-                                    <span class="text-sm font-medium text-gray-300">Time Remaining</span>
-                                    <span class="text-sm font-medium text-red-400">Due Tomorrow</span>
-                                </div>
-                                <div class="relative h-2 bg-gray-700 rounded-full overflow-hidden">
-                                    <div class="absolute left-0 top-0 h-full bg-red-500 w-[90%]"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4 space-y-3">
-                            <div class="flex items-center gap-3">
-                                <div class="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-medium">H</div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-300">History Essay</p>
-                                    <p class="text-xs text-gray-400">Due in 3 days</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Leaderboard Section -->
+        <div class="w-full max-w-3xl mx-auto mb-8">
+            <h3 class="text-lg font-medium text-gray-200 mb-4">Leaderboard</h3>
+            <div class="bg-neutral-800 border border-neutral-700 rounded-xl p-6">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-neutral-700">
+                            <th class="pb-2 text-gray-400">Rank</th>
+                            <th class="pb-2 text-gray-400">Student</th>
+                            <th class="pb-2 text-gray-400">XP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-neutral-700">
+                            <td class="py-2 text-emerald-400">🥇 1</td>
+                            <td class="py-2">John Doe</td>
+                            <td class="py-2 text-green-400">1500 XP</td>
+                        </tr>
+                        <tr class="border-b border-neutral-700">
+                            <td class="py-2 text-yellow-400">🥈 2</td>
+                            <td class="py-2">Jane Smith</td>
+                            <td class="py-2 text-green-400">1300 XP</td>
+                        </tr>
+                        <tr class="border-b border-neutral-700">
+                            <td class="py-2 text-gray-400">🥉 3</td>
+                            <td class="py-2">Alex Johnson</td>
+                            <td class="py-2 text-green-400">1100 XP</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            
-            <!-- Active Challenges -->
-            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800">
-                <h3 class="text-sm font-medium text-gray-400 mb-4">Active Challenges</h3>
-                <div class="bg-neutral-800 border border-neutral-700 overflow-hidden rounded-lg">
-                    <div class="flex justify-between items-center px-6 py-4">
-                        <div class="flex items-center">
-                            <div class="mx-3">
-                                <h3 class="text-lg font-medium text-gray-200">
-                                    Data Structures Challenge
-                                </h3>
-                                <p class="text-gray-400">Advanced Level</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-6 w-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                            </svg>
-                            <svg class="h-6 w-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="px-6 py-4">
-                        <div class="flex items-center">
-                            <div class="w-full">
-                                <div class="flex justify-between mb-2">
-                                    <span class="text-sm font-medium text-gray-300">Progress</span>
-                                    <span class="text-sm font-medium text-gray-300">75%</span>
-                                </div>
-                                <div class="relative h-2 bg-gray-700 rounded-full overflow-hidden">
-                                    <div class="absolute left-0 top-0 h-full bg-emerald-500 w-3/4"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4 flex justify-between items-center text-sm text-gray-400">
-                            <span>Tasks Completed: 6/8</span>
-                            <span>2 days left</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        </div>
 
-            <!-- Student Progress Overview -->
-            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800">
-                <h3 class="text-sm font-medium text-gray-400 mb-4">Student Progress Overview</h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="p-4 rounded-lg bg-emerald-900/20 border border-emerald-800/30">
-                        <div class="flex items-center gap-3">
-                            <svg class="h-5 w-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                            <div>
-                                <p class="text-sm text-neutral-400">Current GPA</p>
-                                <p class="text-lg font-semibold text-white">3.85</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 rounded-lg bg-emerald-900/20 border border-emerald-800/30">
-                        <div class="flex items-center gap-3">
-                            <svg class="h-5 w-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                            </svg>
-                            <div>
-                                <p class="text-sm text-neutral-400">Assignments</p>
-                                <p class="text-lg font-semibold text-white">85%</p>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Badges Section -->
+        <div class="w-full max-w-3xl mx-auto mb-8">
+            <h3 class="text-lg font-medium text-gray-200 mb-4">Badges Earned</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-4 bg-neutral-800 border border-neutral-700 rounded-xl text-center">
+                    <img src="https://cdn-icons-png.flaticon.com/128/1828/1828640.png" class="w-12 mx-auto mb-2" alt="Achievement">
+                    <p class="text-gray-200 text-sm">Top Performer</p>
+                </div>
+                <div class="p-4 bg-neutral-800 border border-neutral-700 rounded-xl text-center">
+                    <img src="https://cdn-icons-png.flaticon.com/128/599/599502.png" class="w-12 mx-auto mb-2" alt="Assignment Completed">
+                    <p class="text-gray-200 text-sm">100 Assignments</p>
+                </div>
+                <div class="p-4 bg-neutral-800 border border-neutral-700 rounded-xl text-center">
+                    <img src="https://cdn-icons-png.flaticon.com/128/4436/4436481.png" class="w-12 mx-auto mb-2" alt="Study Streak">
+                    <p class="text-gray-200 text-sm">7-Day Streak</p>
+                </div>
+                <div class="p-4 bg-neutral-800 border border-neutral-700 rounded-xl text-center">
+                    <img src="https://cdn-icons-png.flaticon.com/128/3106/3106776.png" class="w-12 mx-auto mb-2" alt="Collaborator">
+                    <p class="text-gray-200 text-sm">Collaboration King</p>
                 </div>
             </div>
         </div>
+
         
         <!-- Recent Chats Section (Claude-style) -->
         <div class="flex items-center justify-between mb-4">

@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Challenge;
+use App\Http\Controllers\CourseController;
+
+
+
 
 Route::get('/challenge/{challenge}', function (Challenge $challenge) {
     return view('challenge', ['challenge' => $challenge]);
@@ -22,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('challenge/{challenge}', [\App\Http\Controllers\LearningController::class, 'show'])->name('challenge');
     Route::get('challenge/{challenge}/task/{task}', [\App\Http\Controllers\LearningController::class, 'showTask'])->name('challenge.task');
     Route::view('notifications', 'notifications')->name('notifications');
-    Route::view('courses', 'courses')->name('courses');
+    Route::get('courses', [CourseController::class, 'index'])->name('courses');
     Route::view('learning-materials', 'learning-materials')->name('learning-materials');
     Route::view('assignments', 'assignments')->name('assignments');
     Route::view('profile', 'profile')->name('profile');
