@@ -5,7 +5,13 @@
     </head>
 
     <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900 transition-opacity duration-500">
+        <div x-data="{ isLoading: true }"
+             x-init="setTimeout(() => { isLoading = false }, 500)"
+             x-show="isLoading"
+             x-transition:leave="transition-opacity duration-500"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900">
             <div class="loader">
                 @for ($i = 0; $i < 8; $i++)
                     <div class="loader-square"></div>
