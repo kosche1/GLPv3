@@ -25,7 +25,11 @@ class DatabaseSeeder extends Seeder
             // Gamification base data
             LevelSeeder::class,
             BadgeSeeder::class,
+            
+            // Challenges must be seeded before tasks since tasks depend on challenges
+            ChallengeTypeSeeder::class,
             TaskSeeder::class,
+            
             DailyRewardTierSeeder::class,
             RewardSeeder::class,
             ReferralProgramSeeder::class,
@@ -44,8 +48,6 @@ class DatabaseSeeder extends Seeder
             UserStreakSeeder::class,
             ReferralSeeder::class,
             LeaderboardEntrySeeder::class,
-            //challengetype
-            ChallengeTypeSeeder::class,
         ]);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use LevelUp\Experience\Models\Achievement;
+use Illuminate\Support\Carbon;
 
 class Challenge extends Model
 {
@@ -57,7 +58,7 @@ class Challenge extends Model
      */
     public function isCurrentlyActive()
     {
-        $now = now();
+        $now = Carbon::now();
         return $this->is_active && 
                $now->greaterThanOrEqualTo($this->start_date) && 
                ($this->end_date === null || $now->lessThanOrEqualTo($this->end_date));
@@ -80,7 +81,6 @@ class Challenge extends Model
             ->withTimestamps();
     }
 
-    // Rest of the relationships remain the same
     /**
      * Get the badges associated with this challenge.
      */
@@ -92,9 +92,6 @@ class Challenge extends Model
         )->withTimestamps();
     }
 
-    /**
-     * Get the achievements associated with this challenge.
-     */
     /**
      * Get the tasks associated with this challenge.
      */

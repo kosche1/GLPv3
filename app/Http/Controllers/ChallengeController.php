@@ -17,7 +17,7 @@ class ChallengeController extends Controller
     public function showTask(Challenge $challenge, Task $task)
     {
         if ($task->challenge_id !== $challenge->id) {
-            return redirect()->route('challenges')
+            return back()
                 ->with('error', 'Task not found in this challenge');
         }
         
@@ -27,7 +27,7 @@ class ChallengeController extends Controller
             ->exists();
         
         if ($isCompleted) {
-            return redirect()->route('challenge', $challenge)
+            return back()
                 ->with('message', 'You have already completed this task!');
         }
         

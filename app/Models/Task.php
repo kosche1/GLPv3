@@ -86,9 +86,14 @@ class Task extends Model
         
         // For output comparison tasks, check against the answer key
         if (isset($studentAnswer['output']) && !empty($this->answer_key)) {
+            // If answer_key is an array, convert to JSON string for comparison
+            $answerKeyString = is_array($this->answer_key) 
+                ? json_encode($this->answer_key) 
+                : $this->answer_key;
+                
             // Normalize both strings (trim whitespace, convert to lowercase)
             $normalizedOutput = trim(strtolower($studentAnswer['output']));
-            $normalizedAnswerKey = trim(strtolower($this->answer_key));
+            $normalizedAnswerKey = trim(strtolower($answerKeyString));
             
             // Check if the normalized output matches the answer key
             return $normalizedOutput === $normalizedAnswerKey;

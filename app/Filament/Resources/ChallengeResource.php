@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\ChallengeResource\Pages;
 use App\Filament\Resources\ChallengeResource\RelationManagers\TasksRelationManager;
 use Filament\Forms\Components\FileUpload;
+use Illuminate\Support\Facades\DB;
 
 class ChallengeResource extends Resource
 {
@@ -96,9 +97,11 @@ class ChallengeResource extends Resource
                     "none" => "Not Language Specific",
                 ])
                 ->default("none")
-                ->visible(fn (Forms\Get $get) => in_array($get("challenge_type"), [
-                    "coding_challenge", "debugging", "algorithm", "project", "code_review"
-                ])),
+                ->visible(function (Forms\Get $get) {
+                    return in_array($get("challenge_type"), [
+                        "coding_challenge", "debugging", "algorithm", "project", "code_review"
+                    ]);
+                }),
 
             Forms\Components\TextInput::make("time_limit")
                 ->label("Time Limit (minutes)")
@@ -363,7 +366,7 @@ public static function table(Table $table): Table
                             ]);
                         } else {
                             $record->update([
-                                'end_date' => now()->addDays(7)
+                                'end_date' => DB::raw('NOW() + INTERVAL 7 DAY')
                             ]);
                         }
                     }
