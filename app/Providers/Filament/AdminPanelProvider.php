@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use AssistantEngine\Filament\FilamentAssistantPlugin;
 use App\Filament\Resources\UserResource\Widgets\UserStats;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -51,6 +52,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+                FilamentAssistantPlugin::make(),
             ])
 
             ->middleware([

@@ -8,6 +8,7 @@
     "require": {
         "php": "^8.2",
         "abdelhamiderrahmouni/filament-monaco-editor": "^0.2.5",
+        "assistant-engine/filament-assistant": "^2.1",
         "bezhansalleh/filament-shield": "^3.3",
         "cjmellor/level-up": "^1.4",
         "filament/filament": "^3.3",
