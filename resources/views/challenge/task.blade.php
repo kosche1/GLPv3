@@ -180,6 +180,8 @@
                             var outputDiv = document.getElementById('code-output');
                             var outputContent = document.getElementById('output-content');
 
+                            let lastExecutionOutput = '';
+
                             function displayOutput(content, isError = false) {
                               if (!outputDiv || !outputContent) return;
                               outputDiv.classList.remove('hidden');
@@ -189,11 +191,13 @@
                               outputElement.innerHTML = sanitizedContent;
                               outputContent.appendChild(outputElement);
                               outputContent.scrollTop = outputContent.scrollHeight;
+                              lastExecutionOutput = content.toString(); // Store the raw output
                             }
 
-                            function clearOutput() {
-                              outputContent.innerHTML = '';
-                              outputDiv.classList.add('hidden');
+                            window.clearOutput = function() {
+                              document.getElementById('output-content').innerHTML = '';
+                              document.getElementById('code-output').classList.add('hidden');
+                              lastExecutionOutput = '';
                             }
 
                             if (runBtn) {
@@ -236,8 +240,84 @@
                             if (submitBtn) {
                               submitBtn.addEventListener('click', function() {
                                 var code = editor.getValue();
-                                console.log('Submitted code:', code);
-                                // Add your submission logic here
+                                
+                                // Store the current output before clearing
+                                const currentOutput = lastExecutionOutput;
+                                
+                                // Show loading state
+                                clearOutput();
+                                displayOutput('Submitting solution...', false);
+                                
+                                fetch('/api/submit-solution', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                                  },
+                                  body: JSON.stringify({
+                                    task_id: {{ $currentTask->id }},
+                                    student_answer: { 
+                                      code: code,
+                                      output: currentOutput // Use the stored output, not the current one with "Submitting solution..."
+                                    }
+                                  })
+                                })
+                                .then(response => {
+                                  // Check if the response is JSON
+                                  const contentType = response.headers.get('content-type');
+                                  if (contentType && contentType.includes('application/json')) {
+                                    return response.json().then(data => {
+                                      if (!response.ok) {
+                                        throw new Error(`HTTP error! status: ${response.status}, message: ${data.message || 'Unknown error'}`);
+                                      }
+                                      return data;
+                                    });
+                                  } else {
+                                    // Handle non-JSON response (like HTML)
+                                    return response.text().then(text => {
+                                      console.error('Received non-JSON response:', text.substring(0, 100) + '...');
+                                      throw new Error(`Received non-JSON response. You might need to log in or there's a server error.`);
+                                    });
+                                  }
+                                })
+                                .then(data => {
+                                  // Clear the "Submitting solution..." message
+                                  clearOutput();
+                                  
+                                  if (data.success) {
+                                    if (data.is_correct) {
+                                      // Display success message
+                                      displayOutput('✅ Your answer is correct! Solution and Results are Correct.', false);
+                                      displayOutput('Redirecting to Challenge Page...', false);
+                                      
+                                      // If there's a redirect URL, navigate to it after a short delay
+                                      if (data.redirect) {
+                                        setTimeout(() => {
+                                          // If with_message flag is set, add it to the URL
+                                          if (data.with_message) {
+                                            const redirectUrl = new URL(data.redirect);
+                                            const params = new URLSearchParams(redirectUrl.search);
+                                            params.append('message', 'Task completed successfully!');
+                                            redirectUrl.search = params.toString();
+                                            window.location.href = redirectUrl.toString();
+                                          } else {
+                                            window.location.href = data.redirect;
+                                          }
+                                        }, 3000); // 3-second delay for user to see the success message
+                                      }
+                                    } else {
+                                      // Display error message for incorrect answer
+                                      displayOutput('❌ Your solution output doesn\'t match the expected result. Please try again.', true);
+                                    }
+                                  } else {
+                                    displayOutput(data.message || 'Failed to submit solution', true);
+                                  }
+                                })
+                                .catch(error => {
+                                  clearOutput();
+                                  console.error('Submission error:', error);
+                                  displayOutput(`Error submitting solution: ${error.message}`, true);
+                                });
                               });
                             }
                           } catch (err) {

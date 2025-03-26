@@ -33,7 +33,7 @@
             <!-- Communication -->
             <flux:navlist.group heading="Communication" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
                 <flux:navlist.item icon="chat-bubble-left-right" :href="route('messages')" :current="request()->routeIs('messages')" wire:navigate class="py-1">{{ __('Messages') }}</flux:navlist.item>
-                <flux:navlist.item icon="users" :href="route('forums')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Forums') }}</flux:navlist.item>
+            <flux:navlist.item icon="users" :href="route('forums')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Forums') }}</flux:navlist.item>
             </flux:navlist.group>
             
             <!-- Support & Help -->

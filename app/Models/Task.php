@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Task extends Model
 {
@@ -24,6 +25,9 @@ class Task extends Model
         "answer_key",
         "additional_rewards",
         "challenge_id",
+        "expected_output",
+        "expected_solution",
+        "order"
     ];
 
     /**
@@ -36,6 +40,8 @@ class Task extends Model
         "completion_criteria" => "array",
         "answer_key" => "array",
         "additional_rewards" => "array",
+        "expected_output" => "array",
+        "expected_solution" => "array",
     ];
 
     /**
@@ -53,22 +59,44 @@ class Task extends Model
             )
             ->withTimestamps();
     }
-// 
+
     public function studentAnswers()
     {
         return $this->hasMany(StudentAnswer::class);
     }
+
+    public function challenge()
+    {
+        return $this->belongsTo(Challenge::class);
+    }
+
+    /**
+     * Check if the student's answer is correct
+     * 
+     * @param array $studentAnswer
+     * @return bool
+     */
     public function checkAnswer($studentAnswer)
     {
-        // Compare student answer with answer key
-        if (empty($this->answer_key)) {
-            return false;
+        // Log the student answer for debugging
+        Log::info('Checking answer:', [
+            'task_id' => $this->id,
+            'student_answer' => $studentAnswer
+        ]);
+        
+        // For output comparison tasks, check against the answer key
+        if (isset($studentAnswer['output']) && !empty($this->answer_key)) {
+            // Normalize both strings (trim whitespace, convert to lowercase)
+            $normalizedOutput = trim(strtolower($studentAnswer['output']));
+            $normalizedAnswerKey = trim(strtolower($this->answer_key));
+            
+            // Check if the normalized output matches the answer key
+            return $normalizedOutput === $normalizedAnswerKey;
         }
-
-        // Sort both arrays to ensure consistent comparison
-        $sortedStudentAnswer = collect($studentAnswer)->sortKeys()->toArray();
-        $sortedAnswerKey = collect($this->answer_key)->sortKeys()->toArray();
-
-        return $sortedStudentAnswer == $sortedAnswerKey;
+        
+        // For other types of tasks or if no answer key is provided
+        // You might want to implement other checking logic here
+        
+        return false;
     }
 }

@@ -48,7 +48,7 @@
                         <span class="text-gray-200">View Courses</span>
                     </a>
                     <a href="{{ route('assignments') }}" class="flex items-center justify-center py-3 px-4 rounded-lg bg-neutral-800 border border-neutral-700 hover:bg-neutral-800/90 hover:border-neutral-600 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 transition-colors">
-                        <span class="text-gray-200">Complete Assignments</span>
+                        <span class="text-gray-200">Complete Challenges</span>
                     </a>
                     <a href="{{ route('grades') }}" class="flex items-center justify-center py-3 px-4 rounded-lg bg-neutral-800 border border-neutral-700 hover:bg-neutral-800/90 hover:border-neutral-600 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 transition-colors">
                         <span class="text-gray-200">Check Grades</span>
@@ -58,14 +58,27 @@
         </div>
         
         <!-- Stats Cards -->
+        @php
+            $achievement = \App\Models\StudentAchievement::getLatestScore(auth()->id());
+            $score = $achievement ? number_format($achievement->score, 2) : '0.00';
+            $scoreChange = $achievement ? $achievement->score_change : 0;
+            
+            $attendancePercentage = \App\Models\StudentAttendance::getAttendancePercentage(auth()->id());
+            $attendanceChange = \App\Models\StudentAttendance::getAttendanceChange(auth()->id());
+            
+            $credits = \App\Models\StudentCredit::getCreditsInfo(auth()->id());
+            $creditsCompleted = $credits ? $credits->credits_completed : 0;
+            $creditsRequired = $credits ? $credits->credits_required : 120;
+            $completionPercentage = $credits ? $credits->completion_percentage : 0;
+        @endphp
         <div class="grid auto-rows-min gap-4 md:grid-cols-3 mb-8">
             <div class="flex flex-col justify-between p-6 rounded-xl border border-neutral-700 bg-neutral-800 transition-all duration-300 hover:bg-neutral-800/90 hover:border-neutral-600 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50">
                 <div class="space-y-1">
                     <h3 class="text-sm font-medium text-gray-400">Achievements</h3>
-                    <p class="text-2xl font-semibold text-white">3.75</p>
+                    <p class="text-2xl font-semibold text-white">{{ $score }}</p>
                 </div>
-                <div class="inline-flex items-center text-sm font-medium text-green-400">
-                    +0.15
+                <div class="inline-flex items-center text-sm font-medium {{ $scoreChange >= 0 ? 'text-green-400' : 'text-red-400' }}">
+                    {{ $scoreChange >= 0 ? '+' . number_format($scoreChange, 2) : number_format($scoreChange, 2) }}
                     <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                     </svg>
@@ -74,10 +87,10 @@
             <div class="flex flex-col justify-between p-6 rounded-xl border border-neutral-700 bg-neutral-800 transition-all duration-300 hover:bg-neutral-800/90 hover:border-neutral-600 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50">
                 <div class="space-y-1">
                     <h3 class="text-sm font-medium text-gray-400">Attendance</h3>
-                    <p class="text-2xl font-semibold text-white">95%</p>
+                    <p class="text-2xl font-semibold text-white">{{ $attendancePercentage }}%</p>
                 </div>
-                <div class="inline-flex items-center text-sm font-medium text-green-400">
-                    +2%
+                <div class="inline-flex items-center text-sm font-medium {{ $attendanceChange >= 0 ? 'text-green-400' : 'text-red-400' }}">
+                    {{ $attendanceChange >= 0 ? '+' . $attendanceChange : $attendanceChange }}%
                     <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                     </svg>
@@ -86,10 +99,10 @@
             <div class="flex flex-col justify-between p-6 rounded-xl border border-neutral-700 bg-neutral-800 transition-all duration-300 hover:bg-neutral-800/90 hover:border-neutral-600 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50">
                 <div class="space-y-1">
                     <h3 class="text-sm font-medium text-gray-400">Credits Completed</h3>
-                    <p class="text-2xl font-semibold text-white">45/120</p>
+                    <p class="text-2xl font-semibold text-white">{{ $creditsCompleted }}/{{ $creditsRequired }}</p>
                 </div>
                 <div class="text-sm font-medium text-gray-400">
-                    37.5% completed
+                    {{ $completionPercentage }}% completed
                 </div>
             </div>
         </div>
