@@ -5,20 +5,10 @@
     </head>
 
     <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div x-data="{ isLoading: true }"
-             x-init="setTimeout(() => { isLoading = false }, 500)"
-             x-show="isLoading"
-             x-transition:leave="transition-opacity duration-500"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900">
-            <div class="loader">
-                @for ($i = 0; $i < 8; $i++)
-                    <div class="loader-square"></div>
-                @endfor
-            </div>
-        </div>
+        <!-- Loading Screen -->
+        <x-loading-screen />
 
+        <!-- Main Content -->
         <div class="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div class="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r dark:border-neutral-800">
                 <div class="absolute inset-0 bg-neutral-900"></div>
@@ -55,15 +45,20 @@
             </div>
         </div>
 
-        <script>
-            window.addEventListener('load', function() {
-                document.getElementById('loading-screen').style.opacity = '0';
-                setTimeout(function() {
-                    document.getElementById('loading-screen').style.display = 'none';
-                }, 500);
-            });
-        </script>
-
         @fluxScripts
     </body>
+    <script>
+        // Fallback to ensure loading screen disappears
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(function() {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }
+            }, 300);
+        });
+    </script>
 </html>

@@ -67,8 +67,7 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
-
-/* From Uiverse.io by ZacharyCrespin */
+/* Loading animation keyframes */
 @keyframes square-animation {
     0% {
         left: 0;
@@ -156,6 +155,21 @@ select:focus[data-flux-control] {
     }
 }
 
+/* Loading screen styles */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #171717; /* neutral-900 */
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease-out;
+}
+
 .loader {
     position: relative;
     width: 96px;
@@ -175,52 +189,46 @@ select:focus[data-flux-control] {
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
-    animation: square-animation 5s ease-in-out 1 both;
-}
-
-.loader-square:nth-of-type(0) {
-    animation-delay: 0s;
+    animation: square-animation 5s ease-in-out infinite;
 }
 
 .loader-square:nth-of-type(1) {
-    animation-delay: -0.7142857143s;
+    animation-delay: 0s;
 }
 
 .loader-square:nth-of-type(2) {
-    animation-delay: -1.4285714286s;
+    animation-delay: -0.7142857143s;
 }
 
 .loader-square:nth-of-type(3) {
-    animation-delay: -2.1428571429s;
+    animation-delay: -1.4285714286s;
 }
 
 .loader-square:nth-of-type(4) {
-    animation-delay: -2.8571428572s;
+    animation-delay: -2.1428571429s;
 }
 
 .loader-square:nth-of-type(5) {
-    animation-delay: -3.5714285715s;
+    animation-delay: -2.8571428572s;
 }
 
 .loader-square:nth-of-type(6) {
-    animation-delay: -4.2857142857s;
+    animation-delay: -3.5714285715s;
 }
 
 .loader-square:nth-of-type(7) {
+    animation-delay: -4.2857142857s;
+}
+
+.loader-square:nth-of-type(8) {
     animation-delay: -5s;
 }
 
-.login-form {
-    opacity: 0;
-    display: none;
-    transition: opacity 0.3s ease-in-out;
+/* Alpine.js transition classes */
+.transition-opacity {
+    transition-property: opacity;
 }
 
-.login-form.show {
-    opacity: 1;
-    display: block;
-}
-
-.loader.hide {
-    display: none;
+.duration-500 {
+    transition-duration: 500ms;
 }
