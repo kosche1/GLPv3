@@ -123,7 +123,7 @@
             // Initialize variables
             let editor = null;
             let lastExecutionOutput = '';
-            
+
             // Store references to DOM elements
             const container = document.getElementById('monaco-editor-container');
             const loadingEl = document.getElementById('monaco-loading');
@@ -132,16 +132,16 @@
             const outputDiv = document.getElementById('code-output');
             const outputContent = document.getElementById('output-content');
             const clearOutputBtn = document.getElementById('clear-output-btn');
-            
+
             // Store initial values - need to escape properly for JS
             const initialCode = `{!! addslashes($challenge->challenge_content['buggy_code'] ?? '') !!}`;
             const programmingLanguage = '{!! $challenge->programming_language ?? "javascript" !!}';
-            
+
             // Map challenge language names to Monaco language names
             const languageMap = {
                 'php': 'php',
                 'python': 'python',
-                'java': 'java', 
+                'java': 'java',
                 'sql': 'sql',
                 'javascript': 'javascript',
                 'js': 'javascript',
@@ -149,13 +149,13 @@
                 'css': 'css',
                 'none': 'plaintext'
             };
-            
+
             // Normalize the language name
             let monacoLanguage = (programmingLanguage || 'plaintext').toLowerCase();
             monacoLanguage = languageMap[monacoLanguage] || 'plaintext';
-            
+
             console.log('Language detected:', programmingLanguage, 'Mapped to:', monacoLanguage);
-            
+
             // Output handling functions
             function clearOutput() {
                 if (!outputContent) return;
@@ -163,7 +163,7 @@
                 outputDiv.classList.add('hidden');
                 lastExecutionOutput = '';
             }
-            
+
             function displayOutput(content, isError = false) {
                 if (!outputDiv || !outputContent) return;
                 outputDiv.classList.remove('hidden');
@@ -179,20 +179,20 @@
                 outputContent.scrollTop = outputContent.scrollHeight;
                 lastExecutionOutput = content.toString();
             }
-            
+
             // Execute code function
             function executeCode() {
                 if (!editor) {
                     console.error('Editor not initialized');
                     return;
                 }
-                
+
                 const code = editor.getValue();
                 clearOutput();
-                
+
                 const language = editor.getModel().getLanguageId();
                 const endpoint = language === 'java' ? '/api/execute-java' : '/api/execute-python';
-                
+
                 fetch(endpoint, {
                     method: 'POST',
                     headers: {
@@ -220,20 +220,20 @@
                     displayOutput(`Error executing code: ${error.message}`, true);
                 });
             }
-            
+
             // Submit solution function
             function submitSolution() {
                 if (!editor) {
                     console.error('Editor not initialized');
                     return;
                 }
-                
+
                 const code = editor.getValue();
                 const currentOutput = lastExecutionOutput;
-                
+
                 clearOutput();
                 displayOutput('Submitting solution...', false);
-                
+
                 fetch('/api/submit-solution', {
                     method: 'POST',
                     headers: {
@@ -242,7 +242,7 @@
                     },
                     body: JSON.stringify({
                         task_id: {{ $currentTask->id }},
-                        student_answer: { 
+                        student_answer: {
                             code: code,
                             output: currentOutput
                         }
@@ -266,12 +266,12 @@
                 })
                 .then(data => {
                     clearOutput();
-                    
+
                     if (data.success) {
                         if (data.is_correct) {
                             displayOutput('✅ Your answer is correct! Solution and Results are Correct.', false);
                             displayOutput('Redirecting to Challenge Page...', false);
-                            
+
                             if (data.redirect) {
                                 setTimeout(() => {
                                     if (data.with_message) {
@@ -298,7 +298,7 @@
                     displayOutput(`Error submitting solution: ${error.message}`, true);
                 });
             }
-            
+
             // Initialize Monaco editor directly (simpler approach than before)
             if (typeof require !== 'undefined') {
                 require(['vs/editor/editor.main'], function() {
@@ -313,7 +313,7 @@
                         require(['vs/basic-languages/python/python.contribution'], function() {})
                     ]).then(() => {
                         console.log('Language definitions loaded');
-                        
+
                         // Create editor
                         try {
                             editor = monaco.editor.create(container, {
@@ -336,14 +336,14 @@
                                     horizontalHasArrows: true
                                 }
                             });
-                            
+
                             // Hide loading indicator and show editor
                             if (loadingEl) loadingEl.style.display = 'none';
                             container.style.opacity = '1';
-                            
+
                             // Force layout update
                             setTimeout(() => editor.layout(), 100);
-                            
+
                             console.log('Monaco editor initialized successfully with language:', monacoLanguage);
                         } catch (error) {
                             console.error('Failed to initialize Monaco editor:', error);
@@ -364,13 +364,13 @@
                     loadingEl.innerHTML = '<div class="text-red-500 text-center p-4">Monaco editor dependencies not loaded</div>';
                 }
             }
-            
+
             // Add event listeners
             if (runBtn) runBtn.addEventListener('click', executeCode);
             if (submitBtn) submitBtn.addEventListener('click', submitSolution);
             if (clearOutputBtn) clearOutputBtn.addEventListener('click', clearOutput);
-            
-            // Handle window resize 
+
+            // Handle window resize
             window.addEventListener('resize', function() {
                 if (editor) editor.layout();
             });

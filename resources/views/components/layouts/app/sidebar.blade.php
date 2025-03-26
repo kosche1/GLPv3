@@ -2,6 +2,47 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
+        <!-- Monaco Editor -->
+        <script>
+            // Configure Monaco loader
+            window.MonacoEnvironment = {
+                getWorkerUrl: function(workerId, label) {
+                    return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+                        self.MonacoEnvironment = {
+                            baseUrl: '${window.location.origin}/js/monaco-editor/min/'
+                        };
+                        importScripts('${window.location.origin}/js/monaco-editor/min/vs/base/worker/workerMain.js');
+                    `)}`;
+                }
+            };
+        </script>
+        <script src="{{ asset('js/monaco-editor/min/vs/loader.js') }}"></script>
+        <script>
+            require.config({
+                paths: {
+                    'vs': '{{ asset('js/monaco-editor/min/vs') }}'
+                }
+            });
+
+            // Preload Monaco features for faster initialization
+            if (document.querySelector('#monaco-editor-container')) {
+                require(['vs/editor/editor.main'], function() {
+                    // Preload language contributions
+                    require([
+                        'vs/basic-languages/php/php.contribution',
+                        'vs/basic-languages/sql/sql.contribution',
+                        'vs/basic-languages/java/java.contribution',
+                        'vs/basic-languages/python/python.contribution',
+                        'vs/basic-languages/javascript/javascript.contribution',
+                        'vs/basic-languages/html/html.contribution',
+                        'vs/basic-languages/css/css.contribution'
+                    ], function() {
+                        console.log('Monaco language modules preloaded');
+                    });
+                });
+            }
+        </script>
+
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:sidebar sticky stashable class="border-r border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
@@ -15,27 +56,27 @@
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Dashboard') }}</flux:navlist.item>
                 <flux:navlist.item icon="bell" :href="route('notifications')" :current="request()->routeIs('notifications')" wire:navigate class="py-1">{{ __('Notifications') }}</flux:navlist.item>
             </flux:navlist.group>
-            
+
             <!-- Academic Resources -->
             <flux:navlist.group heading="Academic Resources" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
                 <flux:navlist.item icon="academic-cap" :href="route('courses')" :current="request()->routeIs('courses')" wire:navigate class="py-1">{{ __('Courses') }}</flux:navlist.item>
                 <flux:navlist.item icon="book-open" :href="route('learning-materials')" :current="request()->routeIs('learning-materials')" wire:navigate class="py-1">{{ __('Learning Materials') }}</flux:navlist.item>
                 <flux:navlist.item icon="document-text" :href="route('assignments')" :current="request()->routeIs('assignments')" wire:navigate class="py-1">{{ __('Challenges') }}</flux:navlist.item>
             </flux:navlist.group>
-            
+
             <!-- Student Management -->
             <flux:navlist.group heading="Student Management" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
                 <flux:navlist.item icon="user" :href="route('profile')" :current="request()->routeIs('profile')" wire:navigate class="py-1">{{ __('Profile') }}</flux:navlist.item>
                 <flux:navlist.item icon="calendar" :href="route('schedule')" :current="request()->routeIs('schedule')" wire:navigate class="py-1">{{ __('Schedule') }}</flux:navlist.item>
                 <flux:navlist.item icon="chart-bar" :href="route('grades')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Grades') }}</flux:navlist.item>
             </flux:navlist.group>
-            
+
             <!-- Communication -->
             <flux:navlist.group heading="Communication" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
                 <flux:navlist.item icon="chat-bubble-left-right" :href="route('messages')" :current="request()->routeIs('messages')" wire:navigate class="py-1">{{ __('Messages') }}</flux:navlist.item>
             <flux:navlist.item icon="users" :href="route('forums')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Forums') }}</flux:navlist.item>
             </flux:navlist.group>
-            
+
             <!-- Support & Help -->
             <flux:navlist.group heading="Support" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
                 <flux:navlist.item icon="question-mark-circle" :href="route('help-center')" :current="request()->routeIs('help-center')" wire:navigate class="py-1">{{ __('Help Center') }}</flux:navlist.item>
