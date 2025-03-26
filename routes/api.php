@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\SolutionController;
+
+Route::post('/submit-solution', [SolutionController::class, 'submit']);
 
 Route::post('/execute-python', function (Request $request) {
     return executeCode($request, 'python');
@@ -160,3 +163,12 @@ function executeCode(Request $request, string $language) {
         return response()->json(['error' => 'Internal server error: ' . $e->getMessage()], 500);
     }
 };
+
+// Debugging endpoint
+Route::get('/debug-task/{task}', function (\App\Models\Task $task) {
+    return response()->json([
+        'task' => $task,
+        'challenge' => $task->challenge,
+        'programming_language' => $task->challenge->programming_language ?? 'unknown'
+    ]);
+});

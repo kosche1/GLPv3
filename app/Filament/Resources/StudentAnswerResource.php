@@ -31,6 +31,21 @@ class StudentAnswerResource extends Resource
                 ->required(),
             Forms\Components\KeyValue::make('student_answer')
                 ->required(),
+            Forms\Components\Textarea::make('solution')
+                ->columnSpan(2)
+                ->rows(10),
+            Forms\Components\Textarea::make('output')
+                ->columnSpan(2)
+                ->rows(5),
+            Forms\Components\Select::make('status')
+                ->options([
+                    'pending' => 'Pending',
+                    'submitted' => 'Submitted',
+                    'reviewed' => 'Reviewed',
+                    'approved' => 'Approved',
+                    'rejected' => 'Rejected',
+                ])
+                ->required(),
             Forms\Components\Toggle::make('is_correct')
                 ->label('Correct'),
         ]);
@@ -46,6 +61,16 @@ class StudentAnswerResource extends Resource
                 Tables\Columns\TextColumn::make('task.name')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'gray',
+                        'submitted' => 'blue',
+                        'reviewed' => 'yellow',
+                        'approved' => 'green',
+                        'rejected' => 'red',
+                        default => 'gray',
+                    }),
                 Tables\Columns\BooleanColumn::make('is_correct')
                     ->label('Correct'),
                 Tables\Columns\TextColumn::make('created_at')
@@ -57,6 +82,14 @@ class StudentAnswerResource extends Resource
                     ->relationship('user', 'name'),
                 Tables\Filters\SelectFilter::make('task')
                     ->relationship('task', 'name'),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'submitted' => 'Submitted',
+                        'reviewed' => 'Reviewed',
+                        'approved' => 'Approved',
+                        'rejected' => 'Rejected',
+                    ]),
                 Tables\Filters\TernaryFilter::make('is_correct')
                     ->label('Correct Answers'),
             ])
