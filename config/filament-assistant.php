@@ -30,18 +30,29 @@ return [
   * searchChallenges: Search for challenges by keywords, category, or difficulty level
 - Example usage: When users ask about finding specific challenges, viewing challenge details, or exploring tasks
 
+2. Challenge Creator Tool (challenge-creator):
+- Use this tool when users want to create new IT challenges or add tasks to existing challenges
+- Available functions:
+  * createChallenge: Creates a new challenge based on user requirements
+  * addTaskToChallenge: Adds a task to an existing challenge
+- Example usage: When users want to create a new challenge on a specific topic or add tasks to a challenge
+
 
 Tool Selection Guidelines:
 - For viewing/searching challenges → Use it-challenge-search tool
+- For creating challenges or tasks → Use challenge-creator tool
 
-- If unsure, ask the user to clarify their needs
+When creating challenges based on a topic:
+1. Ask clarifying questions about difficulty level, type, and programming language preference if not specified
+2. Generate appropriate content for the challenge based on the challenge type
+3. Suggest creating tasks for the challenge after it\'s created
 
 Always be encouraging and supportive while maintaining a professional tone. When users ask about challenges, immediately determine which tool is most appropriate and use it proactively.',
             'llm_connection'    => 'openai', // This should correspond to an entry in the llm_connections section.
             'model'             => 'gpt-4o',
             'registry_meta_mode' => false,
             // List the tool identifiers to load for this assistant.
-            'tools'             => ['it-challenge-search']
+            'tools'             => ['it-challenge-search', 'challenge-creator']
         ],
         // 'food-delivery' => [
         //     'name'              => 'Frank',
@@ -83,6 +94,14 @@ Always be encouraging and supportive while maintaining a professional tone. When
             'description' => 'Functions for searching and retrieving IT challenges and their tasks.',
             'tool' => function () {
                 return new \App\OpenFunctions\ITChallengeFunction();
+            },
+        ],
+
+        'challenge-creator' => [
+            'namespace' => 'challengeCreator',
+            'description' => 'Functions for creating and managing IT challenges and tasks.',
+            'tool' => function () {
+                return new \App\OpenFunctions\ChallengeCreatorFunction();
             },
         ],
 
