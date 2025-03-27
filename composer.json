@@ -14,9 +14,11 @@
         "filament/filament": "^3.3",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "laravel/workos": "^0.2.0",
         "livewire/flux": "^2.0",
         "livewire/volt": "^1.6.7",
-        "westacks/filament-monaco-editor": "^1.1"
+        "westacks/filament-monaco-editor": "^1.1",
+        "workos/workos-php-laravel": "^4.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
 
             // Users
-            UserSeeder::class,
+            ...(!env('USE_WORKOS', false) ? [UserSeeder::class] : []),
 
             // Gamification base data
             LevelSeeder::class,
