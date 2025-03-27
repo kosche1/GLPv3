@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
 
+            // Admin users
+            AdminSeeder::class,
+
             // Users
             UserSeeder::class,
 
