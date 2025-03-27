@@ -9,6 +9,7 @@ use App\Models\Challenge;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use LevelUp\Experience\Models\Achievement;
 
 class UserSeeder extends Seeder
@@ -37,6 +38,29 @@ class UserSeeder extends Seeder
             ]
         );
         $admin->assignRole('admin');
+        
+        // Create basic experience record for admin if not exists and if applicable tables exist
+        if (\Illuminate\Support\Facades\Schema::hasTable('levels') && \Illuminate\Support\Facades\Schema::hasTable('experiences')) {
+            try {
+                // Get level 1
+                $level1 = DB::table('levels')->where('level', 1)->first();
+                
+                if ($level1) {
+                    // Create experience record for admin to prevent null errors
+                    DB::table('experiences')->updateOrInsert(
+                        ['user_id' => $admin->id],
+                        [
+                            'level_id' => $level1->id,
+                            'experience_points' => 0,
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]
+                    );
+                }
+            } catch (\Exception $e) {
+                // Silently fail if there's an issue - the error handling in the blade will take care of it
+            }
+        }
 
         // Create faculty users
         $faculty1 = User::updateOrCreate(
