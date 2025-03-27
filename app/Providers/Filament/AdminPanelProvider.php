@@ -40,7 +40,9 @@ class AdminPanelProvider extends PanelProvider
                 in: app_path("Filament/Pages"),
                 for: "App\\Filament\\Pages"
             )
-            ->pages([Pages\Dashboard::class])
+            ->pages([Pages\Dashboard::class,
+            \AssistantEngine\Filament\Chat\Pages\AssistantChat::class,
+            ])
             ->discoverWidgets(
                 in: app_path("Filament/Widgets"),
                 for: "App\\Filament\\Widgets"
