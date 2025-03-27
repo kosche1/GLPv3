@@ -19,11 +19,10 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
+    Route::view('dashboard', 'dashboard')
+        ->name('dashboard');
     Route::get('learning', [\App\Http\Controllers\LearningController::class, 'index'])->name('learning');
     Route::get('challenge/{challenge}', [\App\Http\Controllers\LearningController::class, 'show'])->name('challenge');
     Route::get('/challenges/{challenge}/tasks/{task}', [ChallengeController::class, 'showTask'])

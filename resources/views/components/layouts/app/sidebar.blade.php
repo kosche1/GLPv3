@@ -2,46 +2,6 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
-        <!-- Monaco Editor -->
-        <script>
-            // Configure Monaco loader
-            window.MonacoEnvironment = {
-                getWorkerUrl: function(workerId, label) {
-                    return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-                        self.MonacoEnvironment = {
-                            baseUrl: '${window.location.origin}/js/monaco-editor/min/'
-                        };
-                        importScripts('${window.location.origin}/js/monaco-editor/min/vs/base/worker/workerMain.js');
-                    `)}`;
-                }
-            };
-        </script>
-        <script src="{{ asset('js/monaco-editor/min/vs/loader.js') }}"></script>
-        <script>
-            require.config({
-                paths: {
-                    'vs': '{{ asset('js/monaco-editor/min/vs') }}'
-                }
-            });
-
-            // Preload Monaco features for faster initialization
-            if (document.querySelector('#monaco-editor-container')) {
-                require(['vs/editor/editor.main'], function() {
-                    // Preload language contributions
-                    require([
-                        'vs/basic-languages/php/php.contribution',
-                        'vs/basic-languages/sql/sql.contribution',
-                        'vs/basic-languages/java/java.contribution',
-                        'vs/basic-languages/python/python.contribution',
-                        'vs/basic-languages/javascript/javascript.contribution',
-                        'vs/basic-languages/html/html.contribution',
-                        'vs/basic-languages/css/css.contribution'
-                    ], function() {
-                        console.log('Monaco language modules preloaded');
-                    });
-                });
-            }
-        </script>
 
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -100,6 +60,7 @@
                     :name="auth()->user()->name"
                     :initials="auth()->user()->initials()"
                     icon-trailing="chevrons-up-down"
+                    :avatar="auth()->user()->avatar"
                 />
 
                 <flux:menu class="w-[220px]">
@@ -109,15 +70,18 @@
                                 <!-- Avatar with Level Badge -->
                                 <div class="relative mb-2">
                                     <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 ring-2 ring-white dark:ring-zinc-700">
-                                        <span class="text-lg font-bold text-white">
-                                            {{ auth()->user()->initials() }}
-                                        </span>
+                                        @if(auth()->user()->avatar)
+                                            <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}" class="h-full w-full rounded-full object-cover">
+                                        @else
+                                            <span class="text-lg font-bold text-white">
+                                                {{ auth()->user()->initials() }}
+                                            </span>
+                                        @endif
                                     </div>
                                     <div class="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white ring-2 ring-white dark:ring-zinc-700">
                                         {{ auth()->user()->getLevel() ?? 1 }}
                                     </div>
                                 </div>
-                                
                                 <!-- User Info -->
                                 <div class="mb-2 text-center">
                                     <span class="block text-base font-bold">{{ auth()->user()->name }}</span>
