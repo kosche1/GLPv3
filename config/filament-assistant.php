@@ -1,5 +1,7 @@
 <?php
 
+use AssistantEngine\OpenFunctions\Core\Examples\DeliveryOpenFunction;
+
 return [
     // Set the default chat driver class. You can override this in your local config.
     'chat_driver' => \AssistantEngine\Filament\Chat\Driver\DefaultChatDriver::class,
@@ -15,14 +17,31 @@ return [
     'assistants' => [
         // Example assistance configuration with key "default"
         'default' => [
-            'name'              => 'Genius',
+            'name'              => 'Dafty',
             'description'       => 'Your friendly assistant ready to help with any question.',
-            'instruction'       => 'You are a helpful assistant.',
+            'instruction'       => 'You are a helpful assistant specialized in managing challenges and IT-related tasks. You have access to two main tools:
+
+1. IT Challenge Search Tool (it-challenge-search):
+- Use this tool when users want to find or view IT-related challenges
+- Available functions:
+  * listChallenges: Shows all available challenges (can filter for active only)
+  * getChallenge: Gets detailed information about a specific challenge by ID
+  * getChallengeTasks: Lists all tasks associated with a specific challenge
+  * searchChallenges: Search for challenges by keywords, category, or difficulty level
+- Example usage: When users ask about finding specific challenges, viewing challenge details, or exploring tasks
+
+
+Tool Selection Guidelines:
+- For viewing/searching challenges → Use it-challenge-search tool
+
+- If unsure, ask the user to clarify their needs
+
+Always be encouraging and supportive while maintaining a professional tone. When users ask about challenges, immediately determine which tool is most appropriate and use it proactively.',
             'llm_connection'    => 'openai', // This should correspond to an entry in the llm_connections section.
             'model'             => 'gpt-4o',
             'registry_meta_mode' => false,
             // List the tool identifiers to load for this assistant.
-            'tools'             => ['weather']
+            'tools'             => ['it-challenge-search']
         ],
         // 'food-delivery' => [
         //     'name'              => 'Frank',
@@ -58,20 +77,15 @@ return [
 
     // Tools configuration: each tool is identified by a key.
     'tools' => [
-        'weather' => [
-            'namespace'   => 'weather',
-            'description' => 'Function to get informations about the weather.',
-            'tool'        => function () {
-                return new \AssistantEngine\OpenFunctions\Core\Examples\WeatherOpenFunction();
-            },
-        ],
-        'challenge-management' => [
-            'namespace' => 'challenge',
-            'description' => 'Functions for managing challenges and tasks.',
+      
+        'it-challenge-search' => [
+            'namespace' => 'itChallenge',
+            'description' => 'Functions for searching and retrieving IT challenges and their tasks.',
             'tool' => function () {
-                return new \App\OpenFunctions\ChallengeManagementFunction();
+                return new \App\OpenFunctions\ITChallengeFunction();
             },
         ],
+
         // 'pizza' => [
         //     'namespace'   => 'pizza',
         //     'description' => 'This is a nice pizza place',
@@ -84,7 +98,7 @@ return [
         //             'BBQ Chicken',
         //             'Meat Lovers'
         //         ];
-        //         return new \AssistantEngine\OpenFunctions\Core\Examples\DeliveryOpenFunction($pizza);
+        //         return new DeliveryOpenFunction($pizza);
         //     },
         // ],
         // 'burger' => [
