@@ -10,33 +10,44 @@
         </div>
 
         <!-- Filter Section -->
-        <div class="p-6 bg-neutral-800 rounded-xl border border-neutral-700">
-            <div class="grid gap-6 md:grid-cols-2">
-                <!-- Technology Category Dropdown -->
-                <div>
-                    <label for="tech_category" class="text-sm font-medium text-white mb-2 block">Technology Category</label>
-                    <select id="tech_category" class="w-full bg-neutral-700 text-emerald-400 border border-neutral-600 rounded-lg p-3 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
-                        <option value="">All Categories</option>
-                        @foreach($techCategories as $key => $category)
-                            <option value="{{ $key }}">{{ str_replace('_', ' ', ucwords($category)) }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Programming Language Dropdown -->
-                <div>
-                    <label for="programming_language" class="text-sm font-medium text-white mb-2 block">Programming Language</label>
-                    <select id="programming_language" class="w-full bg-neutral-700 text-emerald-400 border border-neutral-600 rounded-lg p-3 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
-                        <option value="">All Languages</option>
-                        <option value="PHP">PHP</option>
-                        <option value="JavaScript">JavaScript</option>
-                        <option value="Python">Python</option>
-                        <option value="Java">Java</option>
-                        <option value="C#">C#</option>
-                    </select>
-                </div>
-            </div>
+        <div class="p-6 bg-neutral-800 rounded-xl border border-neutral-700 shadow-lg">
+    <div class="grid gap-6 md:grid-cols-2">
+        <!-- Technology Category Dropdown -->
+        <div>
+            <label for="tech_category" class="text-sm font-medium text-white mb-2 block flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400 h-4 w-4">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                <span>Technology Category</span>
+            </label>
+            <select id="tech_category" class="w-full bg-neutral-700 text-emerald-400 border border-neutral-600 rounded-lg p-3 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                <option value="">All Categories</option>
+                @foreach($techCategories as $key => $category)
+                    <option value="{{ $key }}">{{ str_replace('_', ' ', ucwords($category)) }}</option>
+                @endforeach
+            </select>
         </div>
+
+        <!-- Programming Language Dropdown -->
+        <div>
+            <label for="programming_language" class="text-sm font-medium text-white mb-2 block flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400 h-4 w-4">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+                <span>Programming Language</span>
+            </label>
+            <select id="programming_language" class="w-full bg-neutral-700 text-emerald-400 border border-neutral-600 rounded-lg p-3 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                <option value="">All Languages</option>
+                <option value="PHP">PHP</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="Python">Python</option>
+                <option value="Java">Java</option>
+                <option value="C#">C#</option>
+            </select>
+        </div>
+    </div>
+</div>
 
         <!-- JavaScript for filtering -->
         <script>
