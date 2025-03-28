@@ -30,7 +30,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['auth']);
     Route::view('notifications', 'notifications')->name('notifications');
     Route::get('courses', [CourseController::class, 'index'])->name('courses');
-    Route::view('learning-materials', 'learning-materials')->name('learning-materials');
+    Route::get('learning-materials', [\App\Http\Controllers\LearningMaterialController::class, 'index'])->name('learning-materials');
     Route::view('assignments', 'assignments')->name('assignments');
     Route::view('profile', 'profile')->name('profile');
     Route::view('schedule', 'schedule')->name('schedule');

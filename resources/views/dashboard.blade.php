@@ -2,7 +2,7 @@
     <div class="flex h-full w-full flex-1 flex-col gap-6 bg-neutral-800 text-gray-100 p-6" id="app">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-medium text-gray-100">Your Gamified Dashboard</h1>
+            <h1 class="text-2xl font-medium text-gray-100">Gamified Dashboard</h1>
             {{-- Optional: Display current XP/Level briefly here --}}
         </div>
         
@@ -128,6 +128,58 @@
                          </span>
                          <span class="text-sm font-semibold text-white">{{ $creditsCompleted }}/{{ $creditsRequired }} ({{ $completionPercentage }}%)</span>
                 </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="flex flex-col items-center justify-center mb-10 text-center">
+            <div class="flex items-center gap-2 mb-2">
+                <svg class="h-6 w-6 text-orange-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 17.75L5.82802 20.995L7.00702 14.122L2.00702 9.25495L8.90702 8.25495L11.993 2.00195L15.079 8.25495L21.979 9.25495L16.979 14.122L18.158 20.995L12 17.75Z" fill="currentColor"/>
+                </svg>
+                <h2 class="text-4xl font-light">Welcome back, {{ explode(' ', auth()->user()->name)[0]}}!</h2>
+            </div>
+            <p class="text-gray-400 mb-8">Track your progress and continue your learning journey</p>
+            
+            <!-- Main Action Button -->
+            <div class="w-full max-w-3xl mx-auto mb-8">
+                <div class="relative rounded-xl bg-neutral-800 border border-neutral-700 overflow-hidden">
+                    <a href="{{ route('learning') }}" 
+                        class="block w-full p-6 text-center rounded-xl border-2 border-emerald-500 bg-emerald-500/10 
+                            transition-all duration-300 ease-out hover:scale-[1.03] hover:shadow-emerald-900/50 hover:bg-emerald-500/20 
+                            focus:outline-none focus:ring-4 focus:ring-emerald-500/50 active:scale-[0.98] 
+                            animate-pulse group relative overflow-hidden">
+                        
+                        <!-- Background effect -->
+                        <div class="absolute inset-0 bg-[radial-gradient(circle,_rgba(16,185,129,0.2)_0%,_rgba(0,0,0,0)_70%)] opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+
+                        <!-- Text -->
+                        <span class="relative text-xl font-semibold text-emerald-400 group-hover:text-emerald-300 transition-colors duration-300 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)] glow">
+                        Start Now
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+
+            <!-- Collaboration Tools (Claude-style) -->
+            <div class="w-full max-w-3xl mx-auto mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-400">Collaborate with your learning resources</span>
+                </div>
+                
+                <!-- Quick Action Buttons (Claude-style) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <a href="{{ route('courses') }}" class="flex items-center justify-center py-3 px-4 rounded-lg bg-neutral-800 border border-neutral-700 hover:bg-neutral-800/90 hover:border-neutral-600 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 transition-colors">
+                        <span class="text-gray-200">View Courses</span>
+                    </a>
+                    <a href="{{ route('assignments') }}" class="flex items-center justify-center py-3 px-4 rounded-lg bg-neutral-800 border border-neutral-700 hover:bg-neutral-800/90 hover:border-neutral-600 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 transition-colors">
+                        <span class="text-gray-200">Complete Assignments</span>
+                    </a>
+                    <a href="{{ route('grades') }}" class="flex items-center justify-center py-3 px-4 rounded-lg bg-neutral-800 border border-neutral-700 hover:bg-neutral-800/90 hover:border-neutral-600 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 transition-colors">
+                        <span class="text-gray-200">Check Grades</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -346,7 +398,7 @@
         </div>
         
                 <!-- Active Challenges -->
-                <div class="p-6 rounded-xl border border-neutral-700 bg-neutral-800 shadow-lg">
+                <div class="p-6 rounded-xl border border-neutral-700 bg-neutral-800 shadow-lg hover:border-neutral-600 transition-colors duration-300">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-medium text-gray-200 flex items-center gap-2">
                             <svg class="h-5 w-5 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path><path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0010 15c-2.796 0-5.487-.46-8-1.308z"></path></svg>
@@ -375,13 +427,13 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-gray-400 text-sm">No active challenges right now. Ready for the next one?</p>
+                        <p class="text-gray-400 text-sm">There are {{ \App\Models\Challenge::count() }} total challenges available!</p>
                         <a href="{{ route('learning') }}" class="mt-2 inline-block px-3 py-1 text-sm bg-emerald-600 hover:bg-emerald-500 rounded-md text-white transition-colors">Explore Challenges</a>
                     @endif
                 </div>
 
                 <!-- Quick Actions -->
-                 <div class="p-6 rounded-xl border border-neutral-700 bg-neutral-800 shadow-lg">
+                 {{-- <div class="p-6 rounded-xl border border-neutral-700 bg-neutral-800 shadow-lg">
                      <h3 class="text-lg font-medium text-gray-200 mb-4">Quick Actions</h3>
                      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                          <a href="{{ route('learning') }}" class="flex flex-col items-center justify-center py-3 px-2 rounded-lg bg-neutral-700/50 hover:bg-neutral-700 transition-all duration-200 text-center group transform hover:scale-105">
@@ -409,7 +461,7 @@
                              <span class="text-xs text-gray-200 group-hover:text-white transition-colors">Schedule</span>
                          </a>
                      </div>
-                 </div>
+                 </div> --}}
             </div>
 
             <!-- Right Column (Leaderboard/Achievements) -->
