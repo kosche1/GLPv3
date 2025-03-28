@@ -72,6 +72,23 @@ class User extends Authenticatable
             ->withPivot("earned_at", "is_pinned", "is_showcased")
             ->withTimestamps();
     }
+
+    /**
+     * Get the tasks assigned to the user.
+     */
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class, "user_tasks")
+            ->withPivot(
+                "progress",
+                "completed",
+                "completed_at",
+                "reward_claimed",
+                "reward_claimed_at"
+            )
+            ->withTimestamps();
+    }
+
     /**
      * Get the challenges the user is participating in.
      */
