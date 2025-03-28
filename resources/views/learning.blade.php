@@ -9,10 +9,82 @@
             </div>
         </div>
 
-        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <!-- Filter Section -->
+        <div class="p-6 bg-neutral-800 rounded-xl border border-neutral-700">
+            <div class="grid gap-6 md:grid-cols-2">
+                <!-- Technology Category Dropdown -->
+                <div>
+                    <label for="tech_category" class="text-sm font-medium text-white mb-2 block">Technology Category</label>
+                    <select id="tech_category" class="w-full bg-neutral-700 text-emerald-400 border border-neutral-600 rounded-lg p-3 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                        <option value="">All Categories</option>
+                        @foreach($techCategories as $key => $category)
+                            <option value="{{ $key }}">{{ str_replace('_', ' ', ucwords($category)) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Programming Language Dropdown -->
+                <div>
+                    <label for="programming_language" class="text-sm font-medium text-white mb-2 block">Programming Language</label>
+                    <select id="programming_language" class="w-full bg-neutral-700 text-emerald-400 border border-neutral-600 rounded-lg p-3 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                        <option value="">All Languages</option>
+                        <option value="PHP">PHP</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="Python">Python</option>
+                        <option value="Java">Java</option>
+                        <option value="C#">C#</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript for filtering -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const techCategorySelect = document.getElementById('tech_category');
+                const programmingLanguageSelect = document.getElementById('programming_language');
+                const challengeCards = document.querySelectorAll('#challenge-grid > div');
+                
+                // Function to filter challenges
+                function filterChallenges() {
+                    const selectedCategory = techCategorySelect.value;
+                    const selectedLanguage = programmingLanguageSelect.value;
+                    
+                    challengeCards.forEach(card => {
+                        const cardCategory = card.dataset.category;
+                        const cardLanguage = card.dataset.language;
+                        
+                        // For category filtering:
+                        // - If "All Categories" is selected (empty value), show all categories
+                        // - Otherwise, show cards matching the selected category ID
+                        const categoryMatch = selectedCategory === '' || cardCategory === selectedCategory;
+                        
+                        // For language filtering:
+                        // - If "All Languages" is selected (empty value), show all languages
+                        // - Otherwise, show cards matching the selected language
+                        const languageMatch = selectedLanguage === '' || cardLanguage === selectedLanguage.toLowerCase();
+                        
+                        if (categoryMatch && languageMatch) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+                
+                // Add event listeners
+                techCategorySelect.addEventListener('change', filterChallenges);
+                programmingLanguageSelect.addEventListener('change', filterChallenges);
+                
+                // Initial filter
+                filterChallenges();
+            });
+        </script>
+
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3" id="challenge-grid">
             <!-- Course Cards -->
             @foreach($challenges as $challenge)
-            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">
+            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90" data-category="{{ $challenge->category_id }}" data-language="{{ strtolower($challenge->programming_language) }}">
                 <div class="space-y-4">
                     <div class="h-40 rounded-lg bg-emerald-500/10 flex items-center justify-center overflow-hidden">
                         @if($challenge->image)
@@ -29,6 +101,7 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-sm font-medium text-emerald-400">{{ $challenge->difficulty_level }}</span>
+                        <span class="text-sm font-medium text-emerald-400">{{ $challenge->programming_language }}</span>
                         <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="text-sm font-medium text-emerald-400 hover:text-emerald-300">Start →</a>
                     </div>
                 </div>
