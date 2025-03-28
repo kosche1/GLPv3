@@ -35,39 +35,116 @@
                     </div>
                 </div>
             </div>
-            <br>
 
         <!-- Assignments Grid -->
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            @for ($i = 1; $i <= 3; $i++)
-            <div class="bg-neutral-800 rounded-lg shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-105 border border-neutral-700">
-                <div class="mb-4 flex items-center justify-between">
-                    <span class="rounded-full bg-blue-900 px-3 py-1 text-xs font-medium text-blue-200">Due in 3 days</span>
-                    <span class="text-sm text-neutral-400">Course {{ $i }}</span>
-                </div>
-                <h3 class="mb-2 text-lg font-semibold text-white">Assignment {{ $i }}</h3>
-                <p class="mb-4 text-sm text-neutral-300">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm font-medium text-neutral-300">Points: 100</span>
-                        <span class="text-sm text-neutral-400">|</span>
-                        <span class="text-sm text-neutral-400">Individual</span>
+            @if(isset($challenges) && count($challenges) > 0)
+                @foreach($challenges as $challenge)
+                    <!-- Challenge Header Card -->
+                    <div class="bg-neutral-800 rounded-lg shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700">
+                        <div class="mb-4 flex items-center justify-between">
+                            <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">{{ ucfirst($challenge->difficulty_level) }}</span>
+                            <span class="text-sm text-neutral-400">{{ str_replace('_', ' ', ucfirst($challenge->challenge_type)) }}</span>
+                        </div>
+                        <h3 class="mb-2 text-lg font-semibold text-white">{{ $challenge->name }}</h3>
+                        <p class="mb-4 text-sm text-neutral-300">{{ \Illuminate\Support\Str::limit($challenge->description, 100) }}</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                @php
+                                    $totalPoints = $challenge->tasks->sum('points_reward');
+                                @endphp
+                                <span class="text-sm font-medium text-neutral-300">Points: {{ $totalPoints }}</span>
+                                @if($challenge->time_limit)
+                                    <span class="text-sm text-neutral-400">|</span>
+                                    <span class="text-sm text-neutral-400">{{ $challenge->time_limit }} min</span>
+                                @endif
+                            </div>
+                            <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors duration-300">View Challenge</a>
+                        </div>
                     </div>
-                    <a href="#" class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300">View Details</a>
+                @endforeach
+            @endif
+
+            @if(isset($challengeTasks) && count($challengeTasks) > 0)
+                @foreach($challengeTasks as $task)
+                    <div class="bg-neutral-800 rounded-lg shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700">
+                        <div class="mb-4 flex items-center justify-between">
+                            @php
+                                $status = 'Not Started';
+                                $statusClass = 'bg-neutral-500/10 text-neutral-400';
+                                
+                                if ($task->completed) {
+                                    $status = 'Completed';
+                                    $statusClass = 'bg-emerald-500/10 text-emerald-400';
+                                } elseif ($task->progress > 0) {
+                                    $status = 'In Progress';
+                                    $statusClass = 'bg-amber-500/10 text-amber-400';
+                                }
+                                
+                                $dueText = '';
+                                if (isset($task->challenge->end_date)) {
+                                    $daysLeft = now()->diffInDays($task->challenge->end_date, false);
+                                    if ($daysLeft > 0) {
+                                        $dueText = "Due in {$daysLeft} " . Str::plural('day', $daysLeft);
+                                    } elseif ($daysLeft == 0) {
+                                        $dueText = "Due today";
+                                    } else {
+                                        $dueText = "Overdue";
+                                    }
+                                }
+                            @endphp
+                            <span class="rounded-full {{ $statusClass }} px-3 py-1 text-xs font-medium">{{ $status }}</span>
+                            @if($dueText)
+                                <span class="text-sm text-neutral-400">{{ $dueText }}</span>
+                            @endif
+                        </div>
+                        <h3 class="mb-2 text-lg font-semibold text-white">Task {{ $task->id }} - {{ $task->challenge->name }}</h3>
+                        
+                        <!-- Progress bar -->
+                        <div class="mb-4">
+                            <div class="h-1.5 w-full rounded-full bg-neutral-700">
+                                <div class="h-1.5 rounded-full bg-emerald-400" style="width: {{ $task->progress ?? 0 }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-medium text-neutral-300">Points: {{ $task->points_reward }}</span>
+                                @if($task->time_limit)
+                                    <span class="text-sm text-neutral-400">|</span>
+                                    <span class="text-sm text-neutral-400">{{ $task->time_limit }} min</span>
+                                @endif
+                            </div>
+                            <a href="{{ route('challenge.task', ['challenge' => $task->challenge, 'task' => $task]) }}" 
+                               class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors duration-300">
+                                {{ $task->completed ? 'Review' : 'Start Task' }}
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+            
+            @if((!isset($challenges) || count($challenges) == 0) && (!isset($challengeTasks) || count($challengeTasks) == 0))
+                <div class="col-span-3 flex flex-col items-center justify-center p-10 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-neutral-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    <h3 class="text-lg font-semibold text-white mb-2">No Challenges Available</h3>
+                    <p class="text-sm text-neutral-400">There are currently no challenges or tasks assigned to you.</p>
                 </div>
-            </div>
-            @endfor
+            @endif
         </div>
         
         <!-- Pagination -->
+        @if(isset($challenges) && $challenges instanceof \Illuminate\Pagination\LengthAwarePaginator || 
+            isset($challengeTasks) && $challengeTasks instanceof \Illuminate\Pagination\LengthAwarePaginator)
         <div class="mt-8 flex items-center justify-center">
-            <nav class="flex space-x-2" aria-label="Pagination">
-                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">Previous</a>
-                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 transition-colors duration-300">1</a>
-                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">2</a>
-                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">3</a>
-                <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">Next</a>
-            </nav>
+            @if(isset($challenges) && $challenges instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $challenges->links() }}
+            @elseif(isset($challengeTasks) && $challengeTasks instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                {{ $challengeTasks->links() }}
+            @endif
         </div>
+        @endif
     </div>
 </x-layouts.app>

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Challenge;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ChallengeController;
+use App\Http\Controllers\AssignmentController;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -31,7 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::view('notifications', 'notifications')->name('notifications');
     Route::get('courses', [CourseController::class, 'index'])->name('courses');
     Route::get('learning-materials', [\App\Http\Controllers\LearningMaterialController::class, 'index'])->name('learning-materials');
-    Route::view('assignments', 'assignments')->name('assignments');
+    Route::get('assignments', [\App\Http\Controllers\AssignmentController::class, 'index'])->name('assignments');
     Route::view('profile', 'profile')->name('profile');
     Route::view('schedule', 'schedule')->name('schedule');
     Route::view('grades','grades')->name('grades');
