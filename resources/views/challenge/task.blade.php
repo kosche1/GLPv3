@@ -42,7 +42,7 @@
     </head>
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
         <div class="flex justify-between items-center mb-4">
-            <h1 class="text-2xl font-bold text-white">{{ $challenge->name }} - {{ $currentTask->name }}</h1>
+            <h1 class="text-2xl font-bold text-white">{{ $challenge->name }}</h1>
             <div class="flex gap-4">
                 <a href="{{ route('challenge', $challenge) }}" class="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-emerald-500 bg-emerald-500/10 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/50 hover:bg-emerald-500/20 group">
                     <span class="text-lg font-semibold text-emerald-400 group-hover:text-emerald-300">Back to Challenge</span>

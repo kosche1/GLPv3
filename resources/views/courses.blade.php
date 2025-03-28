@@ -1,5 +1,6 @@
 <x-layouts.app>
-    <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+    <!-- <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl"> -->
+    <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg" id="app">
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-2">
@@ -89,7 +90,7 @@
         </div>
     </div>
     <!-- Pagination -->
-    <div class="mt-8 flex items-center justify-center">
+    <!-- <div class="mt-8 flex items-center justify-center">
         <nav class="flex space-x-2" aria-label="Pagination">
             <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 transition-all duration-300">Previous</a>
             <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 transition-all duration-300">1</a>
@@ -97,6 +98,6 @@
             <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 transition-all duration-300">3</a>
             <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 transition-all duration-300">Next</a>
         </nav>
-    </div>
+    </div> -->
 </x-layouts.app>
 

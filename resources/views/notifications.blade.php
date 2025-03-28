@@ -1,5 +1,6 @@
 <x-layouts.app>
-    <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+    <!-- <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl"> -->
+    <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg" id="app">
         <div class="mx-auto w-full max-w-7xl p-4 md:p-8">
             <!-- Header Section -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
