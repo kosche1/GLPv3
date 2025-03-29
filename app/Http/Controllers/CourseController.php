@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Challenge; // Import the Challenge model
+use App\Models\Challenge;
+use App\Models\Category;
 
 class CourseController extends Controller
 {
     public function index()
     {
-        $challenges = Challenge::with('tasks')->where('is_active', true)
+        $challenges = Challenge::with(['tasks', 'category'])->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
+
+        $techCategories = Category::all()->pluck('name', 'id');
 
         // Calculate total progress based on individual tasks
         $totalTasks = $challenges->sum(function ($challenge) {
@@ -24,6 +27,6 @@ class CourseController extends Controller
         $progress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
         $completedLevels = floor($progress / 25); // 4 levels, each representing 25% progress
 
-        return view('courses', compact('challenges'));
+        return view('courses', compact('challenges', 'techCategories'));
     }
 }

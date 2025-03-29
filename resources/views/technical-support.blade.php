@@ -1,6 +1,6 @@
 <x-layouts.app>
     <!-- <div class="min-h-screen bg-white dark:bg-neutral-800 p-8"> -->
-    <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg" id="app">
+    <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg">
         <div class="max-w-7xl mx-auto">
             <!-- Header Section -->
             <div class="text-center mb-12">
