@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('components.layouts.auth.card')] class extends Component {
     public string $name = '';
     public string $email = '';
     public string $password = '';
@@ -94,7 +94,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         />
 
         <div class="flex items-center justify-end">
-            <flux:button type="submit" variant="primary" class="w-full">
+        <flux:button variant="primary" type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 transition-all duration-300">
                 {{ __('Create account') }}
             </flux:button>
         </div>
