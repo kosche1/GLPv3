@@ -17,7 +17,8 @@ Route::get('/challenge/{challenge}', function (Challenge $challenge) {
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    return view('welcome');
+    $challenges = \App\Models\Challenge::orderBy('id')->take(3)->get();
+    return view('welcome', ['challenges' => $challenges]);
 })->name('home');
 
 

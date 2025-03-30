@@ -151,53 +151,33 @@
             <div id="courses" class="w-full max-w-6xl mb-20">
                 <h2 class="text-3xl font-bold text-white mb-8 text-center">Featured Courses</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Course Card 1 -->
+                    @foreach($challenges as $challenge)
                     <div class="group bg-zinc-800 rounded-xl overflow-hidden border border-neutral-700 transition-all duration-300 hover:border-emerald-500/30">
                         <div class="aspect-video bg-neutral-900 relative overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&q=80&w=800" alt="Web Development" class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"/>
-                            <div class="absolute top-2 right-2 bg-emerald-500 text-white text-sm px-2 py-1 rounded">Beginner</div>
+                            @if($challenge->image)
+                                <img src="{{ asset($challenge->image) }}" alt="{{ $challenge->name }}" class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"/>
+                            @else
+                                <div class="w-full h-full bg-emerald-500/10 flex items-center justify-center">
+                                    <svg class="w-16 h-16 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                </div>
+                            @endif
+                            <div class="absolute top-2 right-2 bg-amber-500/90 text-white text-xs font-medium px-2.5 py-1 rounded-full">{{ $challenge->difficulty_level }}</div>
                         </div>
                         <div class="p-6">
-                            <h3 class="text-lg font-semibold text-white mb-2">Web Development Fundamentals</h3>
-                            <p class="text-neutral-400 text-sm mb-4">Learn the basics of HTML, CSS, and JavaScript through interactive lessons.</p>
+                            <h3 class="text-lg font-semibold text-white mb-2">{{ $challenge->name }}</h3>
+                            <p class="text-neutral-400 text-sm mb-4">{{ $challenge->description }}</p>
                             <div class="flex items-center justify-between">
-                                <span class="text-emerald-400">12 Lessons</span>
-                                <span class="text-neutral-500">4.8 ★★★★★</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-emerald-400">{{ $challenge->points_reward }} Points</span>
+                                    <span class="text-xs px-2 py-1 rounded-full bg-blue-500/10 text-blue-400">{{ $challenge->programming_language }}</span>
+                                </div>
+                                <div class="text-emerald-400">5.0 ★★★★★</div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Course Card 2 -->
-                    <div class="group bg-zinc-800 rounded-xl overflow-hidden border border-neutral-700 transition-all duration-300 hover:border-emerald-500/30">
-                        <div class="aspect-video bg-neutral-900 relative overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&q=80&w=800" alt="Python Programming" class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"/>
-                            <div class="absolute top-2 right-2 bg-blue-500 text-white text-sm px-2 py-1 rounded">Intermediate</div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold text-white mb-2">Python Programming</h3>
-                            <p class="text-neutral-400 text-sm mb-4">Master Python programming with hands-on projects and exercises.</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-emerald-400">16 Lessons</span>
-                                <span class="text-neutral-500">4.9 ★★★★★</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Course Card 3 -->
-                    <div class="group bg-zinc-800 rounded-xl overflow-hidden border border-neutral-700 transition-all duration-300 hover:border-emerald-500/30">
-                        <div class="aspect-video bg-neutral-900 relative overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=800" alt="React Development" class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"/>
-                            <div class="absolute top-2 right-2 bg-purple-500 text-white text-sm px-2 py-1 rounded">Advanced</div>
-                        </div>
-                        <div class="p-6">
-                            <h3 class="text-lg font-semibold text-white mb-2">React Development</h3>
-                            <p class="text-neutral-400 text-sm mb-4">Build modern web applications with React and related technologies.</p>
-                            <div class="flex items-center justify-between">
-                                <span class="text-emerald-400">20 Lessons</span>
-                                <span class="text-neutral-500">4.7 ★★★★★</span>
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -250,7 +230,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     <div>
                         <h4 class="text-white font-semibold mb-4">About GLP</h4>
-                        <p class="text-neutral-400 text-sm">Empowering learners worldwide through interactive and gamified education.</p>
+                        <p class="text-neutral-400 text-sm">Empowering learners through interactive and gamified education.</p>
                     </div>
                     <div>
                         <h4 class="text-white font-semibold mb-4">Quick Links</h4>
