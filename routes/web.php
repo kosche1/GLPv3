@@ -1,11 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Livewire\Volt\Volt;
 use App\Models\Challenge;
+
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\AssignmentController;
+
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CourseController;
 
 
 
@@ -14,7 +18,8 @@ Route::get('/challenge/{challenge}', function (Challenge $challenge) {
     return view('challenge', ['challenge' => $challenge]);
 })->name('challenge');
 
-use Livewire\Volt\Volt;
+use App\Http\Controllers\ChallengeController;
+use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
 Route::get('/', function () {
     $challenges = \App\Models\Challenge::orderBy('id')->take(3)->get();
@@ -22,9 +27,15 @@ Route::get('/', function () {
 })->name('home');
 
 
-Route::middleware(['auth'])->group(function () {
+
+Route::middleware([
+    'auth',
+    env('USE_WORKOS') ? ValidateSessionWithWorkOS::class : null,
+])->group(function () {
+
     Route::view('dashboard', 'dashboard')
         ->name('dashboard');
+
     Route::get('learning', [\App\Http\Controllers\LearningController::class, 'index'])->name('learning');
     Route::get('challenge/{challenge}', [\App\Http\Controllers\LearningController::class, 'show'])->name('challenge');
     Route::get('/challenges/{challenge}/tasks/{task}', [ChallengeController::class, 'showTask'])

@@ -26,10 +26,12 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        "name", 
-        "email", 
+        "name",
+        "email",
         "password",
-        "points"
+        "points",
+        "workos_id",
+        "avatar",
     ];
 
     /**
@@ -51,6 +53,25 @@ class User extends Authenticatable
             "password" => "hashed",
         ];
     }
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (empty($user->avatar)) {
+                // Use a placeholder avatar URL if none is provided
+                // Example using ui-avatars.com which generates based on name
+                // $user->avatar = 'https://ui-avatars.com/api/?name=' . urlencode($user->name) . '&background=random&color=fff';
+                // Or a static placeholder
+                 $user->avatar = 'https://via.placeholder.com/150/771796'; // Example placeholder
+            }
+        });
+    }
+
 
     /**
      * Get the user's initials
