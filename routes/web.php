@@ -2,6 +2,11 @@
 
 use Livewire\Volt\Volt;
 use App\Models\Challenge;
+
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ChallengeController;
+use App\Http\Controllers\AssignmentController;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CourseController;
@@ -17,17 +22,20 @@ use App\Http\Controllers\ChallengeController;
 use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
 Route::get('/', function () {
-    return view('welcome');
+    $challenges = \App\Models\Challenge::orderBy('id')->take(3)->get();
+    return view('welcome', ['challenges' => $challenges]);
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+
 
 Route::middleware([
     'auth',
     env('USE_WORKOS') ? ValidateSessionWithWorkOS::class : null,
 ])->group(function () {
+
+    Route::view('dashboard', 'dashboard')
+        ->name('dashboard');
+
     Route::get('learning', [\App\Http\Controllers\LearningController::class, 'index'])->name('learning');
     Route::get('challenge/{challenge}', [\App\Http\Controllers\LearningController::class, 'show'])->name('challenge');
     Route::get('/challenges/{challenge}/tasks/{task}', [ChallengeController::class, 'showTask'])
@@ -35,8 +43,8 @@ Route::middleware([
         ->middleware(['auth']);
     Route::view('notifications', 'notifications')->name('notifications');
     Route::get('courses', [CourseController::class, 'index'])->name('courses');
-    Route::view('learning-materials', 'learning-materials')->name('learning-materials');
-    Route::view('assignments', 'assignments')->name('assignments');
+    Route::get('learning-materials', [\App\Http\Controllers\LearningMaterialController::class, 'index'])->name('learning-materials');
+    Route::get('assignments', [\App\Http\Controllers\AssignmentController::class, 'index'])->name('assignments');
     Route::view('profile', 'profile')->name('profile');
     Route::view('schedule', 'schedule')->name('schedule');
     Route::view('grades','grades')->name('grades');

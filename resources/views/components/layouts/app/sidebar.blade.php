@@ -2,46 +2,6 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
-        <!-- Monaco Editor -->
-        <script>
-            // Configure Monaco loader
-            window.MonacoEnvironment = {
-                getWorkerUrl: function(workerId, label) {
-                    return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-                        self.MonacoEnvironment = {
-                            baseUrl: '${window.location.origin}/js/monaco-editor/min/'
-                        };
-                        importScripts('${window.location.origin}/js/monaco-editor/min/vs/base/worker/workerMain.js');
-                    `)}`;
-                }
-            };
-        </script>
-        <script src="{{ asset('js/monaco-editor/min/vs/loader.js') }}"></script>
-        <script>
-            require.config({
-                paths: {
-                    'vs': '{{ asset('js/monaco-editor/min/vs') }}'
-                }
-            });
-
-            // Preload Monaco features for faster initialization
-            if (document.querySelector('#monaco-editor-container')) {
-                require(['vs/editor/editor.main'], function() {
-                    // Preload language contributions
-                    require([
-                        'vs/basic-languages/php/php.contribution',
-                        'vs/basic-languages/sql/sql.contribution',
-                        'vs/basic-languages/java/java.contribution',
-                        'vs/basic-languages/python/python.contribution',
-                        'vs/basic-languages/javascript/javascript.contribution',
-                        'vs/basic-languages/html/html.contribution',
-                        'vs/basic-languages/css/css.contribution'
-                    ], function() {
-                        console.log('Monaco language modules preloaded');
-                    });
-                });
-            }
-        </script>
 
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">

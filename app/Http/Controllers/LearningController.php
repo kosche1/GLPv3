@@ -6,15 +6,17 @@ use App\Models\Challenge;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentAnswer;
+use App\Models\Category;
 
 class LearningController extends Controller
 {
     public function index(): View
     {
-        $challenges = Challenge::with('tasks')->where('is_active', true)
+        $challenges = Challenge::with(['tasks', 'category'])->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
-        // Calculate total progress based on individual tasks
+
+        $techCategories = Category::all()->pluck('name', 'id');
         $totalTasks = $challenges->sum(function ($challenge) {
             return $challenge->tasks->count();
         });
@@ -28,7 +30,8 @@ class LearningController extends Controller
         return view('learning', [
             'challenges' => $challenges,
             'progress' => $progress,
-            'completedLevels' => $completedLevels
+            'completedLevels' => $completedLevels,
+            'techCategories' => $techCategories
         ]);
     }
 

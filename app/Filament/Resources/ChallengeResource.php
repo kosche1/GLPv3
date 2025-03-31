@@ -28,10 +28,27 @@ class ChallengeResource extends Resource
             Forms\Components\Section::make("Basic Information")->schema([
                 Forms\Components\TextInput::make("name")
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('slug', str($state)->slug())),
                 Forms\Components\Textarea::make("description")
                     ->required()
                     ->columnSpanFull(),
+                Forms\Components\Select::make("category_id")
+                    ->relationship("category", "name")
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                        ->required()
+                        ->maxLength(255)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('slug', str($state)->slug())),
+                    Forms\Components\TextInput::make('description')
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('slug')
+                        ->required()
+                        ->maxLength(255)
+                        ->unique('categories', 'slug', ignoreRecord: true),
+                    ]),
                 Forms\Components\Grid::make()
                     ->columns(2)
                     ->schema([
@@ -240,6 +257,10 @@ public static function table(Table $table): Table
     return $table
         ->columns([
             Tables\Columns\TextColumn::make("name")->searchable(),
+            Tables\Columns\TextColumn::make("category.name")
+                ->label("Category")
+                ->sortable()
+                ->searchable(),
             Tables\Columns\BadgeColumn::make("challenge_type")
                 ->label("Type")
                 ->colors([

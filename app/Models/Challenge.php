@@ -28,6 +28,7 @@ class Challenge extends Model
         "completion_criteria",
         "additional_rewards",
         "required_level",
+        "category_id",
         // IT-focused challenge types
         "challenge_type",
         "time_limit",
@@ -119,5 +120,13 @@ class Challenge extends Model
         return $this->belongsToMany(Activity::class, "challenge_activities")
             ->withPivot("required_count")
             ->withTimestamps();
+    }
+
+    /**
+     * Get the category that owns the challenge.
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

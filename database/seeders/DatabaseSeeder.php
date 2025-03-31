@@ -37,7 +37,8 @@ class DatabaseSeeder extends Seeder
             RewardSeeder::class,
             ReferralProgramSeeder::class,
 
-            // Leaderboard categories
+            // Categories and Leaderboard categories
+            CategorySeeder::class,
             LeaderboardCategorySeeder::class,
 
             // Streak activities

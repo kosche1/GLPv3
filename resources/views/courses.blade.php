@@ -1,102 +1,211 @@
 <x-layouts.app>
-    <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+    <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg">
         <!-- Header Section -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
-                <h1 class="text-2xl font-bold text-white">Courses</h1>
+                <h1 class="text-2xl font-bold text-white">My Courses</h1>
             </div>
             
             <!-- Search and Filter Section -->
             <div class="flex flex-col md:flex-row items-center gap-4">
-            <!-- Search Input -->
-            <div class="relative w-full md:w-auto">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
+                <!-- Search Input -->
+                <div class="relative w-full md:w-auto">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <input type="text" placeholder="Search courses..." 
+                        class="w-full md:min-w-[250px] rounded-lg border border-neutral-700 bg-neutral-800/80 pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all duration-300 hover:border-neutral-600">
                 </div>
-                <input type="text" placeholder="Search courses..." 
-                    class="w-full md:min-w-[250px] rounded-lg border border-neutral-700 bg-neutral-800 pl-10 pr-4 py-2 text-sm text-white placeholder-neutral-400 focus:border-neutral-600 focus:outline-none transition-all duration-300 hover:border-neutral-600">
-            </div>
 
-            <!-- Filter Dropdown -->
-            <div x-data="{ status: 'all' }">
-                <select class="w-full md:w-auto rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm text-white focus:border-neutral-600 focus:outline-none transition-all duration-300 hover:border-neutral-600" 
-                        x-model="status" 
-                        @change="$wire.setStatus(status)">
-                    <option value="all">All Courses</option>
-                    <option value="active">Active</option>
-                    <option value="completed">Completed</option>
-                    <option value="upcoming">Upcoming</option>
-                </select>
+                <!-- Filter Dropdown -->
+                <div x-data="{ status: 'all' }" class="w-full md:w-auto">
+                    <select class="w-full rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all duration-300 hover:border-neutral-600" 
+                            x-model="status" 
+                            @change="$wire.setStatus(status)">
+                        <option value="all">All Courses</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="upcoming">Upcoming</option>
+                    </select>
+                </div>
             </div>
-        </div>
-
         </div>
     
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Course Progress Overview -->
-            <div class="col-span-1 md:col-span-2 lg:col-span-3">
-                <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="p-4 bg-neutral-700/50 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-700/90">
-                            <h3 class="text-lg font-medium text-white">Current Courses</h3>
-                            <p class="text-3xl font-bold text-white mt-2">{{ $challenges->where('status', 'active')->count() }}</p>
-                            <p class="text-sm text-neutral-400">Active Enrollments</p>
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-5 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-emerald-500/10 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium text-white">Current Courses</h3>
+                        <div class="flex items-end gap-2">
+                            <p class="text-3xl font-bold text-white mt-1">{{ $challenges->where('status', 'active')->count() }}</p>
+                            <p class="text-sm text-emerald-400 mb-1">Active</p>
                         </div>
-                        <div class="p-4 bg-neutral-700/50 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-700/90">
-                            <h3 class="text-lg font-medium text-white">Average Grade</h3>
-                            <p class="text-3xl font-bold text-white mt-2">{{ $challenges->avg('grade') ?? 0 }}%</p>
-                            <p class="text-sm text-neutral-400">Across All Courses</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-5 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-emerald-500/10 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium text-white">Average Grade</h3>
+                        <div class="flex items-end gap-2">
+                            <p class="text-3xl font-bold text-white mt-1">{{ number_format($challenges->avg('grade') ?? 0, 1) }}%</p>
+                            <p class="text-sm text-emerald-400 mb-1">Overall</p>
                         </div>
-                        <div class="p-4 bg-neutral-700/50 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-700/90">
-                            <h3 class="text-lg font-medium text-white">Completion Rate</h3>
-                            <p class="text-3xl font-bold text-white mt-2">{{ $challenges->where('completed', true)->count() / $challenges->count() * 100 ?? 0 }}%</p>
-                            <p class="text-sm text-neutral-400">Overall Progress</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-5 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-emerald-500/10 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-medium text-white">Completion Rate</h3>
+                        <div class="flex items-end gap-2">
+                            <p class="text-3xl font-bold text-white mt-1">{{ number_format($challenges->where('completed', true)->count() / max(1, $challenges->count()) * 100, 1) }}%</p>
+                            <p class="text-sm text-emerald-400 mb-1">Progress</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <!-- Course Cards -->
+
+        <!-- Course Categories -->
+        <div class="flex flex-wrap gap-2 py-2">
+            @php $selectedCategory = request()->get('category', ''); @endphp
+            @foreach($techCategories as $key => $category)
+                <button 
+                    class="{{ $selectedCategory == $key ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-neutral-800 text-neutral-300 border-neutral-700 hover:bg-neutral-700/50 hover:text-white' }} px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-300"
+                    onclick="window.location.href = '{{ route("courses", ["category" => $key]) }}'">
+                    {{ str_replace('_', ' ', ucwords($category)) }}
+                </button>
+            @endforeach
+        </div>
+        
+        <!-- Course Cards -->
+        <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             @foreach($challenges as $challenge)
-            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-neutral-800 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-neutral-900/50 hover:border-neutral-600 hover:bg-neutral-800/90">
-                <div class="space-y-4">
-                    <div class="h-40 rounded-lg bg-emerald-500/10 flex items-center justify-center overflow-hidden">
-                        @if($challenge->image)
-                            <img src="{{ asset($challenge->image) }}" alt="{{ $challenge->name }}" class="object-cover w-full h-full">
-                        @else
+            <div class="group flex flex-col rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                <div class="h-44 overflow-hidden relative">
+                    @if($challenge->image)
+                        <img src="{{ asset($challenge->image) }}" alt="{{ $challenge->name }}" class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110">
+                    @else
+                        <div class="w-full h-full bg-emerald-500/10 flex items-center justify-center">
                             <svg class="w-16 h-16 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
+                        </div>
+                    @endif
+                    
+                    <!-- Status Badge -->
+                    <div class="absolute top-3 right-3">
+                        @if($challenge->status == 'active')
+                            <span class="bg-emerald-500/90 text-white text-xs font-medium px-2.5 py-1 rounded-full">Active</span>
+                        @elseif($challenge->status == 'completed')
+                            <span class="bg-blue-500/90 text-white text-xs font-medium px-2.5 py-1 rounded-full">Completed</span>
+                        @else
+                            <span class="bg-amber-500/90 text-white text-xs font-medium px-2.5 py-1 rounded-full">Available</span>
                         @endif
                     </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-white">{{ $challenge->name }}</h3>
-                        <p class="mt-2 text-sm text-neutral-400">{{ $challenge->description }}</p>
+                </div>
+                
+                <div class="p-5 flex flex-col flex-grow">
+                    <div class="flex-grow space-y-3">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">{{ $challenge->name }}</h3>
+                            <span class="text-xs font-medium text-neutral-400">{{ $challenge->duration ?? '8 weeks' }}</span>
+                        </div>
+                        
+                        <p class="text-sm text-neutral-400 line-clamp-2">{{ $challenge->description }}</p>
+                        
+                        <!-- Progress Bar for Active Courses -->
+                        @if($challenge->status == 'active')
+                        <div class="mt-3">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-neutral-400">Progress</span>
+                                <span class="text-emerald-400">{{ $challenge->progress ?? '45' }}%</span>
+                            </div>
+                            <div class="w-full bg-neutral-700 rounded-full h-1.5">
+                                <div class="bg-emerald-500 h-1.5 rounded-full" style="width: {{ $challenge->progress ?? '45' }}%"></div>
+                            </div>
+                        </div>
+                        @endif
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-emerald-400">{{ $challenge->difficulty_level }}</span>
-                        <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="text-sm font-medium text-emerald-400 hover:text-emerald-300">Start →</a>
+                    
+                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-neutral-700">
+                        <div class="flex items-center">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                {{ $challenge->difficulty_level }}
+                            </span>
+                        </div>
+                        <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors duration-300">
+                            <span>Continue</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </a>
                     </div>
                 </div>
             </div>
             @endforeach
+            
+            <!-- Empty State -->
+            @if(count($challenges) == 0)
+            <div class="col-span-1 md:col-span-2 lg:col-span-3 flex flex-col items-center justify-center p-10 bg-neutral-800/50 rounded-xl border border-neutral-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-neutral-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <h3 class="text-xl font-medium text-white mb-2">No courses found</h3>
+                <p class="text-neutral-400 text-center mb-6">You haven't enrolled in any courses yet.</p>
+                <button class="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Browse Courses</span>
+                </button>
+            </div>
+            @endif
         </div>
-    </div>
-    <!-- Pagination -->
-    <div class="mt-8 flex items-center justify-center">
-        <nav class="flex space-x-2" aria-label="Pagination">
-            <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 transition-all duration-300">Previous</a>
-            <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 transition-all duration-300">1</a>
-            <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 transition-all duration-300">2</a>
-            <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 transition-all duration-300">3</a>
-            <a href="#" class="rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm font-medium text-neutral-400 hover:bg-neutral-700 transition-all duration-300">Next</a>
-        </nav>
+        
+        <!-- Pagination -->
+        @if(count($challenges) > 0)
+        <div class="flex justify-center mt-6">
+            <nav class="flex items-center space-x-2">
+                <a href="#" class="px-3 py-1 rounded-md bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </a>
+                <a href="#" class="px-3 py-1 rounded-md bg-emerald-500 text-white">1</a>
+                <a href="#" class="px-3 py-1 rounded-md bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">2</a>
+                <a href="#" class="px-3 py-1 rounded-md bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">3</a>
+                <a href="#" class="px-3 py-1 rounded-md bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </nav>
+        </div>
+        @endif
     </div>
 </x-layouts.app>
-
