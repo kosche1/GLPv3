@@ -48,9 +48,19 @@ class TasksRelationManager extends RelationManager
                     ->valueLabel('Value')
                     ->addable()
                     ->deletable(),
-                Forms\Components\Textarea::make('answer_key')
-                    ->helperText('The correct answers for this task')
-                    ->columnSpanFull(),
+                Forms\Components\KeyValue::make('expected_output')
+                    ->keyLabel('Key')
+                    ->valueLabel('Output')
+                    ->addable()
+                    ->deletable(),
+                Forms\Components\KeyValue::make('expected_solution')
+                    ->keyLabel('Key')
+                    ->valueLabel('Solution')
+                    ->addable()
+                    ->deletable(),
+                Forms\Components\TextInput::make('order')
+                    ->numeric()
+                    ->default(0),
             ]);
     }
 
@@ -83,6 +93,15 @@ class TasksRelationManager extends RelationManager
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('order')
+                    ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('expected_output')
+                    ->limit(30)
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('expected_solution')
+                    ->limit(30)
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

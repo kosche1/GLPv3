@@ -9,7 +9,6 @@ use App\Http\Controllers\AssignmentController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CourseController;
 
 
 
@@ -18,7 +17,6 @@ Route::get('/challenge/{challenge}', function (Challenge $challenge) {
     return view('challenge', ['challenge' => $challenge]);
 })->name('challenge');
 
-use App\Http\Controllers\ChallengeController;
 use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
 Route::get('/', function () {
@@ -28,10 +26,12 @@ Route::get('/', function () {
 
 
 
-Route::middleware([
-    'auth',
-    env('USE_WORKOS') ? ValidateSessionWithWorkOS::class : null,
-])->group(function () {
+Route::middleware(
+    array_filter([
+        'auth',
+        env('USE_WORKOS') ? ValidateSessionWithWorkOS::class : null,
+    ])
+)->group(function () {
 
     Route::view('dashboard', 'dashboard')
         ->name('dashboard');
