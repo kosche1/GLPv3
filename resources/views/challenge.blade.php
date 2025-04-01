@@ -21,13 +21,13 @@
 
         <div class="grid gap-6 md:grid-cols-3">
             <!-- Challenge Details -->
-            <div class="md:col-span-2 flex flex-col p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 shadow-lg">
+            <div class="md:col-span-2 flex flex-col p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 shadow-lg">
                 <div class="space-y-6">
                     <div class="h-48 rounded-lg bg-emerald-500/10 flex items-center justify-center overflow-hidden relative group">
                         @if($challenge->image)
                             <img src="{{ asset('storage/' . $challenge->image) }}" alt="{{ $challenge->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                         @else
-                            <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-emerald-500/20 opacity-50"></div>
+                            <div class="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-emerald-500/20 opacity-50"></div>
                             <svg class="w-24 h-24 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                             </svg>
@@ -204,14 +204,14 @@
                             </h3>
                             <ul class="list-none space-y-2 text-neutral-300">
                                 <li class="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span>Complete all tasks within the challenge</span>
                                 </li>
                                 @if($challenge->time_limit)
                                     <li class="flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                         <span>Complete within {{ $challenge->time_limit }} minutes</span>
@@ -219,20 +219,20 @@
                                 @endif
                                 @if($challenge->end_date)
                                     <li class="flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                         <span>Submit before {{ $challenge->end_date->format('M d, Y H:i') }}</span>
                                     </li>
                                 @endif
                                 <li class="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span>Follow the coding guidelines</span>
                                 </li>
                                 <li class="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span>Pass all test cases</span>
@@ -244,7 +244,7 @@
             </div>
 
             <!-- Challenge Progress -->
-            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 shadow-lg">
+            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 shadow-lg">
                 <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -263,7 +263,7 @@
                             <span class="text-emerald-400">{{ $progressPercentage }}%</span>
                         </div>
                         <div class="h-2 rounded-full bg-neutral-700 overflow-hidden">
-                            <div class="h-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: {{ $progressPercentage }}%"></div>
+                            <div class="h-2 rounded-full bg-linear-to-r from-emerald-500 to-emerald-400" style="width: {{ $progressPercentage }}%"></div>
                         </div>
                     </div>
                     <div class="space-y-4">
@@ -342,7 +342,7 @@
                                 </div>
                                 <div class="ml-7">
                                     <div class="h-1.5 w-full rounded-full bg-neutral-700 overflow-hidden">
-                                        <div class="h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: {{ $task->progress ?? 0 }}%"></div>
+                                        <div class="h-1.5 rounded-full bg-linear-to-r from-emerald-500 to-emerald-400" style="width: {{ $task->progress ?? 0 }}%"></div>
                                     </div>
                                 </div>
                             </div>
@@ -392,19 +392,19 @@
                     </h3>
                     <ul class="list-none space-y-2 text-neutral-300">
                         <li class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                             <span>{{ $totalPoints }} points upon completion</span>
                         </li>
                         <li class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                             <span>{{ ucfirst($challenge->difficulty_level) }} badge for your profile</span>
                         </li>
                         <li class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                             </svg>
                             <span>Certificate of completion</span>

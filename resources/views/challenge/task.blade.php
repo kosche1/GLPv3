@@ -62,7 +62,7 @@
 
         <div class="grid gap-6 grid-cols-1 lg:grid-cols-2 h-full">
             <!-- Task Content -->
-            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 shadow-lg h-full">
+            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 shadow-lg h-full">
                 <div class="space-y-6 flex-1">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
@@ -106,7 +106,7 @@
                             </h4>
                             <div class="relative">
                                 <pre class="p-4 rounded-lg bg-neutral-900 text-neutral-300 font-mono text-sm whitespace-pre overflow-x-auto max-h-[200px] overflow-y-auto">{{ $challenge->challenge_content['buggy_code'] ?? 'No code available' }}</pre>
-                                <button class="absolute top-2 right-2 p-1 rounded bg-neutral-800 hover:bg-neutral-700 transition-colors" onclick="copyToClipboard(this)" data-content="{{ $challenge->challenge_content['buggy_code'] ?? '' }}">
+                                <button class="absolute top-2 right-2 p-1 rounded-sm bg-neutral-800 hover:bg-neutral-700 transition-colors" onclick="copyToClipboard(this)" data-content="{{ $challenge->challenge_content['buggy_code'] ?? '' }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                     </svg>
@@ -147,25 +147,25 @@
                                 <h4 class="text-emerald-400 font-medium mb-2">Debug Process</h4>
                                 <ul class="list-none space-y-2 text-neutral-300">
                                     <li class="flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                         </svg>
                                         <span>Review the code and identify the issue</span>
                                     </li>
                                     <li class="flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                         </svg>
                                         <span>Test the code with different inputs</span>
                                     </li>
                                     <li class="flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                         </svg>
                                         <span>Fix the bug with minimal changes</span>
                                     </li>
                                     <li class="flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                         </svg>
                                         <span>Verify the solution works</span>
@@ -178,7 +178,7 @@
             </div>
 
             <!-- Code Editor -->
-            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 shadow-lg h-full">
+            <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 shadow-lg h-full">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

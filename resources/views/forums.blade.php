@@ -29,7 +29,7 @@
                         </svg>
                     </div>
                     <input type="text" placeholder="Search forums..." 
-                        class="w-full rounded-lg border border-neutral-700 bg-neutral-800 pl-10 pr-4 py-2 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/30 focus:outline-none transition-all duration-300 hover:border-neutral-600">
+                        class="w-full rounded-lg border border-neutral-700 bg-neutral-800 pl-10 pr-4 py-2 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/30 focus:outline-hidden transition-all duration-300 hover:border-neutral-600">
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button class="px-3 py-1 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors">All Topics</button>
@@ -42,7 +42,7 @@
             
             <div class="mt-6 space-y-4">
                 <!-- Forum Post -->
-                <div class="bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-700 overflow-hidden shadow-sm rounded-xl transition-all duration-300 ease-in-out ">
+                <div class="bg-linear-to-br from-neutral-800 to-neutral-900 border border-neutral-700 overflow-hidden shadow-xs rounded-xl transition-all duration-300 ease-in-out ">
                     <div class="p-6">
                         <!-- Post Header -->
                         <div class="flex items-center space-x-3 mb-4">
@@ -97,7 +97,7 @@
                             <div class="flex space-x-4">
                                 <div class="h-10 w-10 rounded-full bg-neutral-700 flex items-center justify-center text-white font-medium">ME</div>
                                 <div class="flex-1">
-                                    <textarea class="w-full px-3 py-2 text-sm text-white bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring focus:ring-indigo-500/20 transition-all duration-300" rows="3" placeholder="What are your thoughts?"></textarea>
+                                    <textarea class="w-full px-3 py-2 text-sm text-white bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-hidden focus:border-indigo-500 focus:ring-3 focus:ring-indigo-500/20 transition-all duration-300" rows="3" placeholder="What are your thoughts?"></textarea>
                                     <button class="mt-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-600/20">Comment</button>
                                 </div>
                             </div>
@@ -162,7 +162,7 @@
                     Trending Topics
                 </h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="p-4 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg">
+                    <div class="p-4 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg">
                         <div class="flex justify-between items-start mb-2">
                             <span class="px-2 py-0.5 text-xs rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Question</span>
                             <span class="text-xs text-neutral-400">3 hours ago</span>
@@ -174,7 +174,7 @@
                             <span>24 comments</span>
                         </div>
                     </div>
-                    <div class="p-4 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg">
+                    <div class="p-4 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg">
                         <div class="flex justify-between items-start mb-2">
                             <span class="px-2 py-0.5 text-xs rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">Discussion</span>
                             <span class="text-xs text-neutral-400">5 hours ago</span>
@@ -186,7 +186,7 @@
                             <span>42 comments</span>
                         </div>
                     </div>
-                    <div class="p-4 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg">
+                    <div class="p-4 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg">
                         <div class="flex justify-between items-start mb-2">
                             <span class="px-2 py-0.5 text-xs rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">Resource</span>
                             <span class="text-xs text-neutral-400">1 day ago</span>

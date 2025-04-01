@@ -19,12 +19,12 @@
                         </svg>
                     </div>
                     <input type="text" placeholder="Search courses..." 
-                        class="w-full md:min-w-[250px] rounded-lg border border-neutral-700 bg-neutral-800/80 pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all duration-300 hover:border-neutral-600">
+                        class="w-full md:min-w-[250px] rounded-lg border border-neutral-700 bg-neutral-800/80 pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/50 focus:outline-hidden focus:ring-1 focus:ring-emerald-500/30 transition-all duration-300 hover:border-neutral-600">
                 </div>
 
                 <!-- Filter Dropdown -->
                 <div x-data="{ status: 'all' }" class="w-full md:w-auto">
-                    <select class="w-full rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all duration-300 hover:border-neutral-600" 
+                    <select class="w-full rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:outline-hidden focus:ring-1 focus:ring-emerald-500/30 transition-all duration-300 hover:border-neutral-600" 
                             x-model="status" 
                             @change="$wire.setStatus(status)">
                         <option value="all">All Courses</option>
@@ -38,7 +38,7 @@
     
         <!-- Stats Overview -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-5 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+            <div class="p-5 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-emerald-500/10 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -55,7 +55,7 @@
                 </div>
             </div>
             
-            <div class="p-5 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+            <div class="p-5 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-emerald-500/10 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -72,7 +72,7 @@
                 </div>
             </div>
             
-            <div class="p-5 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+            <div class="p-5 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                 <div class="flex items-center gap-4">
                     <div class="p-3 bg-emerald-500/10 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -105,7 +105,7 @@
         <!-- Course Cards -->
         <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             @foreach($challenges as $challenge)
-            <div class="group flex flex-col rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+            <div class="group flex flex-col rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                 <div class="h-44 overflow-hidden relative">
                     @if($challenge->image)
                         <img src="{{ asset($challenge->image) }}" alt="{{ $challenge->name }}" class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110">
@@ -129,8 +129,8 @@
                     </div>
                 </div>
                 
-                <div class="p-5 flex flex-col flex-grow">
-                    <div class="flex-grow space-y-3">
+                <div class="p-5 flex flex-col grow">
+                    <div class="grow space-y-3">
                         <div class="flex justify-between items-start">
                             <h3 class="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">{{ $challenge->name }}</h3>
                             <span class="text-xs font-medium text-neutral-400">{{ $challenge->duration ?? '8 weeks' }}</span>

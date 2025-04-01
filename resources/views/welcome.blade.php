@@ -85,13 +85,13 @@
             <div class="text-center mb-8 pt-20">
                 <div class="flex justify-center mb-4">
                     <div class="relative animate-float">
-                        <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full blur opacity-75 animate-pulse-slow"></div>
+                        <div class="absolute -inset-0.5 bg-linear-to-r from-emerald-500 to-blue-500 rounded-full blur-sm opacity-75 animate-pulse-slow"></div>
                         <div class="relative w-24 h-24 bg-zinc-900 rounded-full flex items-center justify-center border-2 border-emerald-500/50">
                             <x-app-logo-icon class="h-14 w-14 text-emerald-400" />
                         </div>
                     </div>
                 </div>
-                <h1 class="text-4xl sm:text-6xl font-bold text-white mb-4">Welcome to <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">GLP</span></h1>
+                <h1 class="text-4xl sm:text-6xl font-bold text-white mb-4">Welcome to <span class="text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-blue-500">GLP</span></h1>
                 <p class="text-xl text-neutral-400 max-w-2xl mx-auto mb-8">Gamified Learning Platform - Elevate your learning experience through interactive challenges and rewards</p>
                 <div class="flex flex-wrap justify-center gap-8 text-center">
                     <div class="bg-zinc-800/50 p-6 rounded-xl border border-neutral-700">
@@ -114,7 +114,7 @@
             <!-- Features Grid -->
             <div id="features" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full mb-20">
                 <!-- Feature Card 1 -->
-                <div class="group p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                <div class="group p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                     <div class="p-3 bg-emerald-500/10 rounded-lg w-14 h-14 flex items-center justify-center mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
@@ -125,7 +125,7 @@
                 </div>
 
                 <!-- Feature Card 2 -->
-                <div class="group p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                <div class="group p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                     <div class="p-3 bg-emerald-500/10 rounded-lg w-14 h-14 flex items-center justify-center mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -136,7 +136,7 @@
                 </div>
 
                 <!-- Feature Card 3 -->
-                <div class="group p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                <div class="group p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                     <div class="p-3 bg-emerald-500/10 rounded-lg w-14 h-14 flex items-center justify-center mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
@@ -186,7 +186,7 @@
                 <h2 class="text-3xl font-bold text-white mb-8 text-center">What Our Students Say</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Testimonial 1 -->
-                    <div class="p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30">
+                    <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30">
                         <div class="flex items-center mb-4">
                             <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mr-4 text-emerald-400 font-bold">JS</div>
                             <div>
@@ -199,7 +199,7 @@
                     </div>
 
                     <!-- Testimonial 2 -->
-                    <div class="p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30">
+                    <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30">
                         <div class="flex items-center mb-4">
                             <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mr-4 text-emerald-400 font-bold">AR</div>
                             <div>
@@ -215,11 +215,11 @@
 
             <!-- Newsletter -->
             <div class="w-full max-w-4xl mb-20">
-                <div class="p-8 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20">
+                <div class="p-8 rounded-2xl bg-linear-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20">
                     <h3 class="text-2xl font-bold text-white mb-4 text-center">Stay Updated</h3>
                     <p class="text-neutral-400 text-center mb-6">Subscribe to our newsletter for the latest courses, challenges, and learning tips.</p>
                     <form class="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
-                        <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-none focus:border-emerald-500"/>
+                        <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-hidden focus:border-emerald-500"/>
                         <button type="submit" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors">Subscribe</button>
                     </form>
                 </div>

@@ -8,7 +8,7 @@
                     </svg>
                     {{ __('Schedule') }}
                 </h1>
-                <div class="flex rounded-lg shadow-sm" role="group">
+                <div class="flex rounded-lg shadow-xs" role="group">
                     <button class="px-4 py-2 text-sm font-medium rounded-l-lg border bg-emerald-500 text-white border-emerald-600">
                         Weekly
                     </button>
@@ -40,7 +40,7 @@
                 </button>
             </div>
             
-            <div class="rounded-xl overflow-hidden bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-700 transition-all duration-300 hover:shadow-lg hover:shadow-neutral-900/50 hover:border-emerald-500/30">
+            <div class="rounded-xl overflow-hidden bg-linear-to-br from-neutral-800 to-neutral-900 border border-neutral-700 transition-all duration-300 hover:shadow-lg hover:shadow-neutral-900/50 hover:border-emerald-500/30">
                 <div class="divide-y divide-neutral-700">
                     <!-- Monday -->
                     <div class="p-4">

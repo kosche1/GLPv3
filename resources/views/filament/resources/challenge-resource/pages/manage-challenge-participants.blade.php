@@ -1,6 +1,6 @@
 <x-filament::page>
     <div class="space-y-6">
-        <div class="p-6 bg-white rounded-xl shadow">
+        <div class="p-6 bg-white rounded-xl shadow-sm">
             <h2 class="text-xl font-bold tracking-tight mb-4">Challenge Details</h2>
 
             <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 mb-6">
@@ -35,20 +35,20 @@
 
             <div class="flex space-x-4">
                 <a href="{{ ChallengeResource::getUrl('edit', ['record' => $challenge]) }}"
-                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-xs text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                     <x-heroicon-o-pencil class="-ml-1 mr-2 h-5 w-5 text-gray-400" />
                                     Edit Challenge
                                 </a>
 
                                 <a href="{{ ChallengeResource::getUrl('index') }}"
-                                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                   class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-xs text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                                     <x-heroicon-o-arrow-left class="-ml-1 mr-2 h-5 w-5 text-gray-400" />
                                     Back to Challenges
                                 </a>
                             </div>
                         </div>
 
-                        <div class="p-6 bg-white rounded-xl shadow">
+                        <div class="p-6 bg-white rounded-xl shadow-sm">
                             <h2 class="text-xl font-bold tracking-tight mb-4">Challenge Participants</h2>
 
                             <div class="flex justify-between items-center mb-4">
