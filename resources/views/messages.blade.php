@@ -21,7 +21,7 @@
             <!-- Search -->
             <div class="p-4 border-b border-gray-700">
                 <div class="relative">
-                    <input type="text" class="w-full bg-[#202225] text-gray-200 rounded-md py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Search conversations...">
+                    <input type="text" class="w-full bg-[#202225] text-gray-200 rounded-md py-2 pl-10 pr-4 focus:outline-hidden focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Search conversations...">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -55,7 +55,7 @@
                         </div>
                         <div class="flex items-center">
                             <p class="text-xs text-gray-400 truncate">I'm having some trouble with the project.</p>
-                            <span class="ml-1 flex-shrink-0 h-5 w-5 bg-blue-500 rounded-full flex items-center justify-center text-xs text-white">3</span>
+                            <span class="ml-1 shrink-0 h-5 w-5 bg-blue-500 rounded-full flex items-center justify-center text-xs text-white">3</span>
                         </div>
                     </div>
                 </div>
@@ -148,9 +148,9 @@
             
             <!-- Date Divider -->
             <div class="flex items-center justify-center my-4">
-                <div class="border-t border-gray-700 flex-grow"></div>
+                <div class="border-t border-gray-700 grow"></div>
                 <span class="px-3 text-xs text-gray-500 font-medium">Today</span>
-                <div class="border-t border-gray-700 flex-grow"></div>
+                <div class="border-t border-gray-700 grow"></div>
             </div>
             
             <!-- Messages -->
@@ -188,7 +188,7 @@
                 
                 <!-- Incoming Message -->
                 <div class="flex space-x-3">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-xs">JD</div>
                     </div>
                     <div class="max-w-[70%]">
@@ -211,7 +211,7 @@
                 
                 <!-- Incoming Message with Attachment -->
                 <div class="flex space-x-3">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-xs">JD</div>
                     </div>
                     <div class="max-w-[70%]">
@@ -239,7 +239,7 @@
                 <div class="flex justify-end">
                     <div class="max-w-[70%]">
                         <div class="bg-blue-500 text-white rounded-lg px-4 py-2 shadow-md group">
-                            <p class="text-sm">It looks like you need to install the dependencies. Try running <code class="bg-blue-600 px-1 rounded">npm install</code> first.</p>
+                            <p class="text-sm">It looks like you need to install the dependencies. Try running <code class="bg-blue-600 px-1 rounded-sm">npm install</code> first.</p>
                             <div class="flex justify-between items-center mt-1">
                                 <div class="flex space-x-1">
                                     <button class="text-xs text-gray-300 opacity-0 group-hover:opacity-100 hover:text-white transition-opacity">
@@ -262,7 +262,7 @@
                 
                 <!-- Typing Indicator -->
                 <div class="flex space-x-3">
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                         <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-xs">JD</div>
                     </div>
                     <div class="bg-gray-700 text-white rounded-lg px-4 py-2 shadow-md">
@@ -285,7 +285,7 @@
                     </button>
                     <div class="flex-1 relative">
                         <textarea 
-                            class="w-full rounded-lg border border-gray-600 bg-gray-700 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none min-h-[40px] max-h-[120px]" 
+                            class="w-full rounded-lg border border-gray-600 bg-gray-700 text-white px-4 py-2 focus:outline-hidden focus:ring-2 focus:ring-blue-500 resize-none min-h-[40px] max-h-[120px]" 
                             placeholder="Type your message..."
                             rows="1"
                         ></textarea>

@@ -2,7 +2,7 @@
 <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg">
         <div class="max-w-7xl mx-auto w-full">
             <!-- Profile Header -->
-            <div class="bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 mb-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+            <div class="bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 mb-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                 <div class="flex flex-col sm:flex-row items-start justify-between gap-4">
                     <div class="flex items-center space-x-4">
                         <span class="relative flex h-20 w-20 shrink-0 overflow-hidden rounded-xl">
@@ -29,7 +29,7 @@
                 <!-- Left Column -->
                 <div class="md:col-span-2 space-y-6">
                     <!-- Activity Section -->
-                    <div class="bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+                    <div class="bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                         <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -56,7 +56,7 @@
                     </div>
 
                     <!-- Achievements Section -->
-                    <div class="bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+                    <div class="bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                         <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -77,7 +77,7 @@
                     </div>
 
                     <!-- Profile Progress Bar -->
-                    <div class="bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+                    <div class="bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                         <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -104,7 +104,7 @@
                                         <span class="text-sm font-medium text-white">60%</span>
                                     </div>
                                     <div class="w-full bg-neutral-700 rounded-full h-2">
-                                        <div class="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-full" style="width: 60%;"></div>
+                                        <div class="bg-linear-to-r from-emerald-500 to-emerald-400 h-2 rounded-full" style="width: 60%;"></div>
                                     </div>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@
                 <!-- Right Column -->
                 <div class="space-y-6">
                     <!-- Stats Card -->
-                    <div class="bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+                    <div class="bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                         <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -174,7 +174,7 @@
                     </div>
 
                     <!-- Quick Actions -->
-                    <div class="bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+                    <div class="bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                         <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -212,7 +212,7 @@
                     </div>
                     
                     <!-- Learning Progress -->
-                    <div class="bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+                    <div class="bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                         <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -226,7 +226,7 @@
                                     <span class="text-xs font-medium px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">25%</span>
                                 </div>
                                 <div class="w-full bg-neutral-700 rounded-full h-2">
-                                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-full" style="width: 25%;"></div>
+                                    <div class="bg-linear-to-r from-emerald-500 to-emerald-400 h-2 rounded-full" style="width: 25%;"></div>
                                 </div>
                             </div>
                             <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
@@ -235,7 +235,7 @@
                                     <span class="text-xs font-medium px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">10%</span>
                                 </div>
                                 <div class="w-full bg-neutral-700 rounded-full h-2">
-                                    <div class="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-full" style="width: 10%;"></div>
+                                    <div class="bg-linear-to-r from-emerald-500 to-emerald-400 h-2 rounded-full" style="width: 10%;"></div>
                                 </div>
                             </div>
                             <a href="{{ route('learning') }}" class="w-full py-2 px-4 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors duration-300 text-sm font-medium flex items-center justify-center gap-2">

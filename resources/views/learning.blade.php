@@ -23,7 +23,7 @@
         </div>
 
         <!-- Filter Section -->
-        <div class="p-6 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
+        <div class="p-6 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
             <div class="grid gap-6 md:grid-cols-2">
                 <!-- Technology Category Dropdown -->
                 <div>
@@ -178,7 +178,7 @@
         <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" id="challenge-grid">
             <!-- Course Cards -->
             @foreach($challenges as $challenge)
-            <div class="group flex flex-col rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30" data-category="{{ $challenge->category_id }}" data-language="{{ strtolower($challenge->programming_language) }}">
+            <div class="group flex flex-col rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30" data-category="{{ $challenge->category_id }}" data-language="{{ strtolower($challenge->programming_language) }}">
                 <div class="h-44 overflow-hidden relative">
                     @if($challenge->image)
                         <img src="{{ asset($challenge->image) }}" alt="{{ $challenge->name }}" class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110">
@@ -198,8 +198,8 @@
                     </div>
                 </div>
                 
-                <div class="p-5 flex flex-col flex-grow">
-                    <div class="flex-grow space-y-3">
+                <div class="p-5 flex flex-col grow">
+                    <div class="grow space-y-3">
                         <div class="flex justify-between items-start">
                             <h3 class="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">{{ $challenge->name }}</h3>
                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -227,7 +227,7 @@
                     </div>
                     
                     <div class="mt-4 pt-4 border-t border-neutral-700">
-                        <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg transition-all duration-300 hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
+                        <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg transition-all duration-300 hover:bg-emerald-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
                             Start Challenge
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -255,7 +255,7 @@
         </div>
 
         <!-- Learning Path Progress -->
-        <div class="mt-4 p-6 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
+        <div class="mt-4 p-6 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div class="flex items-center gap-3">
                     <div class="p-2 bg-emerald-500/10 rounded-lg">
@@ -272,7 +272,7 @@
                     <div class="w-2 h-2 rounded-full {{ $progress > 0 ? 'bg-emerald-400' : 'bg-neutral-700' }}"></div>
                     <div class="flex-1">
                         <div class="h-2.5 rounded-full bg-neutral-700 overflow-hidden">
-                            <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: {{ $progress }}%"></div>
+                            <div class="h-full rounded-full bg-linear-to-r from-emerald-500 to-emerald-400" style="width: {{ $progress }}%"></div>
                         </div>
                     </div>
                     <span class="text-sm font-medium text-emerald-400 min-w-[45px] text-right">{{ $progress }}%</span>

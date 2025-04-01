@@ -21,13 +21,13 @@
                         </svg>
                     </div>
                     <input type="text" placeholder="Search challenges..." 
-                        class="w-full md:min-w-[250px] rounded-lg border border-neutral-700/50 bg-neutral-800/50 pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 focus:outline-none transition-all duration-300 hover:border-neutral-600">
+                        class="w-full md:min-w-[250px] rounded-lg border border-neutral-700/50 bg-neutral-800/50 pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 focus:outline-hidden transition-all duration-300 hover:border-neutral-600">
                 </div>
 
                 <!-- Filter Dropdown -->
                 <div x-data="{ status: 'all' }" class="w-full md:w-auto">
                     <div class="relative">
-                        <select class="w-full rounded-lg border border-neutral-700/50 bg-neutral-800/50 px-4 py-2.5 text-sm text-white appearance-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 focus:outline-none transition-all duration-300 hover:border-neutral-600" 
+                        <select class="w-full rounded-lg border border-neutral-700/50 bg-neutral-800/50 px-4 py-2.5 text-sm text-white appearance-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 focus:outline-hidden transition-all duration-300 hover:border-neutral-600" 
                                 x-model="status" 
                                 @change="$wire.setStatus(status)">
                             <option value="all">All Challenges</option>
@@ -46,7 +46,7 @@
         </div>
 
         <!-- Challenge Stats -->
-        <div class="mt-4 p-6 bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
+        <div class="mt-4 p-6 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div class="flex items-center gap-3">
                     <div class="p-2 bg-emerald-500/10 rounded-lg">
@@ -117,7 +117,7 @@
             @if(isset($challenges) && count($challenges) > 0)
                 @foreach($challenges as $challenge)
                     <!-- Challenge Card -->
-                    <div class="group bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+                    <div class="group bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                         <div class="mb-4 flex items-center justify-between">
                             <span class="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400 border border-emerald-500/20">{{ ucfirst($challenge->difficulty_level) }}</span>
                             <span class="text-sm text-neutral-400">{{ str_replace('_', ' ', ucfirst($challenge->challenge_type)) }}</span>
@@ -153,7 +153,7 @@
                                     <span class="text-sm font-medium text-white">{{ $totalPoints }}</span>
                                 </div>
                             </div>
-                            <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg transition-all duration-300 hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
+                            <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg transition-all duration-300 hover:bg-emerald-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
                                 View Challenge
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -166,7 +166,7 @@
 
             @if(isset($challengeTasks) && count($challengeTasks) > 0)
                 @foreach($challengeTasks as $task)
-                    <div class="group bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+                    <div class="group bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                         <div class="mb-4 flex items-center justify-between">
                             @php
                                 $status = 'Not Started';
@@ -210,7 +210,7 @@
                                 <span class="text-emerald-400">{{ $task->progress ?? 0 }}%</span>
                             </div>
                             <div class="h-1.5 w-full rounded-full bg-neutral-700 overflow-hidden">
-                                <div class="h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: {{ $task->progress ?? 0 }}%"></div>
+                                <div class="h-1.5 rounded-full bg-linear-to-r from-emerald-500 to-emerald-400" style="width: {{ $task->progress ?? 0 }}%"></div>
                             </div>
                         </div>
                         
@@ -238,7 +238,7 @@
                                 <span class="text-sm font-medium text-white">{{ $task->points_reward }}</span>
                             </div>
                             <a href="{{ route('challenge.task', ['challenge' => $task->challenge, 'task' => $task]) }}" 
-                               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg transition-all duration-300 hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
+                               class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg transition-all duration-300 hover:bg-emerald-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
                                 {{ $task->completed ? 'Review' : 'Start Task' }}
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />

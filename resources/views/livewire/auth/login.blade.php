@@ -77,7 +77,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
     <div class="text-center mb-4">
         <div class="flex justify-center">
             <div class="relative">
-                <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-full blur opacity-75 animate-pulse-slow"></div>
+                <div class="absolute -inset-0.5 bg-linear-to-r from-emerald-500 to-blue-500 rounded-full blur-sm opacity-75 animate-pulse-slow"></div>
                 <div class="relative w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center border-2 border-emerald-500/50">
                     <x-app-logo-icon class="h-10 w-10 text-emerald-400" />
                 </div>
@@ -126,7 +126,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
         <flux:checkbox wire:model="remember" label="{{ __('Remember me') }}" />
 
         <div class="flex items-center justify-end">
-        <flux:button variant="primary" type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 transition-all duration-300">
+        <flux:button variant="primary" type="submit" class="w-full bg-linear-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 transition-all duration-300">
             {{ __('Log in') }}
         </flux:button>
         </div>

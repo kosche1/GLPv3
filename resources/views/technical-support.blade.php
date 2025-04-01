@@ -1,9 +1,9 @@
 <x-layouts.app>
-    <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500/30 rounded-lg bg-gradient-to-b from-neutral-900 to-neutral-800">
+    <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500/30 rounded-lg bg-linear-to-b from-neutral-900 to-neutral-800">
         <div class="max-w-7xl mx-auto w-full">
             <!-- Enhanced Header Section with Animated Gradient -->
             <div class="text-center mb-12 relative">
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-emerald-500/10 rounded-xl blur-xl opacity-50"></div>
+                <div class="absolute inset-0 bg-linear-to-r from-blue-500/10 via-purple-500/10 to-emerald-500/10 rounded-xl blur-xl opacity-50"></div>
                 <div class="relative">
                     <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Technical Support</h1>
                     <p class="text-lg text-zinc-300 max-w-3xl mx-auto">Get expert help with your technical issues and questions</p>
@@ -13,7 +13,7 @@
             <!-- Enhanced Search Bar with Suggested Searches -->
             <div class="mb-10">
                 <div class="max-w-2xl mx-auto relative">
-                    <input type="text" id="searchInput" placeholder="Describe your technical issue..." class="w-full px-4 py-3 pl-12 rounded-lg bg-neutral-800/80 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" aria-label="Search for help">
+                    <input type="text" id="searchInput" placeholder="Describe your technical issue..." class="w-full px-4 py-3 pl-12 rounded-lg bg-neutral-800/80 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" aria-label="Search for help">
                     <div class="absolute left-3 top-3">
                         <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -50,7 +50,7 @@
                 
                 <!-- Enhanced Quick Help Categories -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                    <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                         <div class="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 inline-block mb-4">
                             <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -66,7 +66,7 @@
                         </a>
                     </div>
 
-                    <div class="p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                    <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                         <div class="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 inline-block mb-4">
                             <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
@@ -82,7 +82,7 @@
                         </a>
                     </div>
 
-                    <div class="p-6 rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                    <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                         <div class="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 inline-block mb-4">
                             <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
@@ -109,11 +109,11 @@
                     Your Support Tickets
                 </h2>
                 
-                <div class="rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 p-6 mb-8">
+                <div class="rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 p-6 mb-8">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                         <h3 class="text-lg font-semibold text-white">Recent Tickets</h3>
                         <div class="mt-3 md:mt-0">
-                            <select class="px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-sm">
+                            <select class="px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-sm">
                                 <option>All Tickets</option>
                                 <option>Open</option>
                                 <option>In Progress</option>
@@ -174,7 +174,7 @@
             </div>
 
             <!-- Enhanced Support Ticket Form -->
-            <div class="max-w-3xl mx-auto rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 p-8 mb-12 relative overflow-hidden">
+            <div class="max-w-3xl mx-auto rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 p-8 mb-12 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
                 <div class="relative z-10">
                     <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
@@ -187,12 +187,12 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="subject" class="block text-sm font-medium text-zinc-300 mb-2">Subject</label>
-                                <input type="text" id="subject" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" required>
+                                <input type="text" id="subject" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" required>
                             </div>
                             
                             <div>
                                 <label for="category" class="block text-sm font-medium text-zinc-300 mb-2">Category</label>
-                                <select id="category" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300">
+                                <select id="category" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300">
                                     <option>Technical Issue</option>
                                     <option>Account Problem</option>
                                     <option>Billing Question</option>
@@ -223,7 +223,7 @@
 
                         <div>
                             <label for="description" class="block text-sm font-medium text-zinc-300 mb-2">Description</label>
-                            <textarea rows="4" id="description" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" required placeholder="Please describe your issue in detail..."></textarea>
+                            <textarea rows="4" id="description" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" required placeholder="Please describe your issue in detail..."></textarea>
                         </div>
 
                         <div>
@@ -234,7 +234,7 @@
                                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                     <div class="flex text-sm text-neutral-400">
-                                        <label for="file-upload" class="relative cursor-pointer rounded-md font-medium text-emerald-400 hover:text-emerald-300 focus-within:outline-none">
+                                        <label for="file-upload" class="relative cursor-pointer rounded-md font-medium text-emerald-400 hover:text-emerald-300 focus-within:outline-hidden">
                                             <span>Upload files</span>
                                             <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple>
                                         </label>
@@ -248,14 +248,14 @@
                         </div>
 
                         <div class="flex items-center">
-                            <input id="notify" type="checkbox" class="h-4 w-4 text-emerald-500 focus:ring-emerald-500/50 border-neutral-700 rounded">
+                            <input id="notify" type="checkbox" class="h-4 w-4 text-emerald-500 focus:ring-emerald-500/50 border-neutral-700 rounded-sm">
                             <label for="notify" class="ml-2 block text-sm text-zinc-300">
                                 Notify me when my ticket is updated
                             </label>
                         </div>
 
                         <div>
-                            <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition duration-200 flex items-center justify-center">
+                            <button type="submit" class="w-full px-6 py-3 bg-linear-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-lg transition duration-200 flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                 </svg>
@@ -376,7 +376,7 @@
             </div>
 
             <!-- Contact Options -->
-            <div class="rounded-xl border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 p-8 relative overflow-hidden">
+            <div class="rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 p-8 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
                 <div class="relative z-10">
                     <div class="text-center mb-8">
@@ -422,7 +422,7 @@
             </div>
 
             <!-- Enhanced Toast Notification -->
-            <div id="toast" class="fixed bottom-4 right-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 flex items-center">
+            <div id="toast" class="fixed bottom-4 right-4 bg-linear-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>

@@ -66,10 +66,10 @@
                 <flux:menu class="w-[220px]">
                     <flux:menu.radio.group>
                         <div class="p-2 text-sm font-normal">
-                            <div class="flex flex-col items-center rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 p-3 dark:from-indigo-900 dark:to-purple-900">
+                            <div class="flex flex-col items-center rounded-lg bg-linear-to-br from-indigo-100 to-purple-100 p-3 dark:from-indigo-900 dark:to-purple-900">
                                 <!-- Avatar with Level Badge -->
                                 <div class="relative mb-2">
-                                    <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 ring-2 ring-white dark:ring-zinc-700">
+                                    <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-r from-indigo-500 to-purple-600 ring-2 ring-white dark:ring-zinc-700">
                                         @if(auth()->user()->avatar)
                                             <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}" class="h-full w-full rounded-full object-cover">
                                         @else
@@ -95,7 +95,7 @@
                     
                     <!-- Gamification Statistics -->
                     <div class="px-2 py-2">
-                        <div class="grid gap-3 rounded-lg bg-gradient-to-br from-neutral-50 to-neutral-100 p-3 dark:from-zinc-800 dark:to-zinc-900">
+                        <div class="grid gap-3 rounded-lg bg-linear-to-br from-neutral-50 to-neutral-100 p-3 dark:from-zinc-800 dark:to-zinc-900">
                             <!-- XP Progress Bar with Dynamic Glow -->
                             <div>
                                 @php
@@ -146,7 +146,7 @@
                                 </div>
                                 
                                 <div class="relative h-2.5 w-full overflow-hidden rounded-full bg-neutral-200 shadow-inner dark:bg-zinc-700">
-                                    <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-lg" 
+                                    <div class="h-full rounded-full bg-linear-to-r from-emerald-400 to-emerald-500 shadow-lg" 
                                         style="width: {{ min(100, max(0, $progress)) }}%; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">
                                     </div>
                                     <!-- Animated Pulse Dot -->
@@ -163,7 +163,7 @@
                             <!-- Stats Cards -->
                             <div class="grid grid-cols-2 gap-3">
                                 <!-- Achievements Card -->
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-purple-50 to-indigo-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-purple-900/30 dark:to-indigo-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-purple-50 to-indigo-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-purple-900/30 dark:to-indigo-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-purple-200 opacity-50 dark:bg-purple-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">
@@ -177,7 +177,7 @@
                                 </div>
                                 
                                 <!-- Badges Card -->
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-amber-50 to-orange-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-amber-900/30 dark:to-orange-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-amber-50 to-orange-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-amber-900/30 dark:to-orange-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-amber-200 opacity-50 dark:bg-amber-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">
@@ -193,7 +193,7 @@
                             
                             <div class="grid grid-cols-2 gap-3">
                                 <!-- Challenges Card -->
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-red-50 to-pink-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-red-900/30 dark:to-pink-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-red-50 to-pink-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-red-900/30 dark:to-pink-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-red-200 opacity-50 dark:bg-red-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">
@@ -208,7 +208,7 @@
                                 
                                 <!-- Streak Card -->
                                 @if(class_exists('\LevelUp\Experience\Models\Streak') && method_exists(auth()->user(), 'streak'))
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-sky-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-blue-900/30 dark:to-sky-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-blue-50 to-sky-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-blue-900/30 dark:to-sky-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-blue-200 opacity-50 dark:bg-blue-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">
@@ -221,7 +221,7 @@
                                     </div>
                                 </div>
                                 @else
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-green-50 to-teal-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-green-900/30 dark:to-teal-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-green-50 to-teal-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-green-900/30 dark:to-teal-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-green-200 opacity-50 dark:bg-green-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">
@@ -273,10 +273,10 @@
                 <flux:menu>
                     <flux:menu.radio.group>
                         <div class="p-2 text-sm font-normal">
-                            <div class="flex flex-col items-center rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 p-3 dark:from-indigo-900 dark:to-purple-900">
+                            <div class="flex flex-col items-center rounded-lg bg-linear-to-br from-indigo-100 to-purple-100 p-3 dark:from-indigo-900 dark:to-purple-900">
                                 <!-- Avatar with Level Badge -->
                                 <div class="relative mb-2">
-                                    <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 ring-2 ring-white dark:ring-zinc-700">
+                                    <div class="relative flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-r from-indigo-500 to-purple-600 ring-2 ring-white dark:ring-zinc-700">
                                         <span class="text-lg font-bold text-white">
                                             {{ auth()->user()->initials() }}
                                         </span>
@@ -299,7 +299,7 @@
                     
                     <!-- Gamification Statistics -->
                     <div class="px-2 py-2">
-                        <div class="grid gap-3 rounded-lg bg-gradient-to-br from-neutral-50 to-neutral-100 p-3 dark:from-zinc-800 dark:to-zinc-900">
+                        <div class="grid gap-3 rounded-lg bg-linear-to-br from-neutral-50 to-neutral-100 p-3 dark:from-zinc-800 dark:to-zinc-900">
                             <!-- XP Progress Bar with Dynamic Glow -->
                             <div>
                                 @php
@@ -350,7 +350,7 @@
                                 </div>
                                 
                                 <div class="relative h-2.5 w-full overflow-hidden rounded-full bg-neutral-200 shadow-inner dark:bg-zinc-700">
-                                    <div class="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-lg" 
+                                    <div class="h-full rounded-full bg-linear-to-r from-emerald-400 to-emerald-500 shadow-lg" 
                                         style="width: {{ min(100, max(0, $progress)) }}%; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);">
                                     </div>
                                     <!-- Animated Pulse Dot -->
@@ -367,7 +367,7 @@
                             <!-- Stats Cards -->
                             <div class="grid grid-cols-2 gap-3">
                                 <!-- Achievements Card -->
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-purple-50 to-indigo-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-purple-900/30 dark:to-indigo-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-purple-50 to-indigo-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-purple-900/30 dark:to-indigo-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-purple-200 opacity-50 dark:bg-purple-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">
@@ -381,7 +381,7 @@
                                 </div>
                                 
                                 <!-- Badges Card -->
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-amber-50 to-orange-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-amber-900/30 dark:to-orange-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-amber-50 to-orange-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-amber-900/30 dark:to-orange-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-amber-200 opacity-50 dark:bg-amber-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">
@@ -397,7 +397,7 @@
                             
                             <div class="grid grid-cols-2 gap-3">
                                 <!-- Challenges Card -->
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-red-50 to-pink-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-red-900/30 dark:to-pink-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-red-50 to-pink-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-red-900/30 dark:to-pink-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-red-200 opacity-50 dark:bg-red-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">
@@ -412,7 +412,7 @@
                                 
                                 <!-- Streak Card -->
                                 @if(class_exists('\LevelUp\Experience\Models\Streak') && method_exists(auth()->user(), 'streak'))
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-sky-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-blue-900/30 dark:to-sky-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-blue-50 to-sky-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-blue-900/30 dark:to-sky-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-blue-200 opacity-50 dark:bg-blue-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">
@@ -425,7 +425,7 @@
                                     </div>
                                 </div>
                                 @else
-                                <div class="group relative overflow-hidden rounded-lg bg-gradient-to-br from-green-50 to-teal-100 p-3 shadow-sm transition-all hover:shadow-md dark:from-green-900/30 dark:to-teal-900/30">
+                                <div class="group relative overflow-hidden rounded-lg bg-linear-to-br from-green-50 to-teal-100 p-3 shadow-xs transition-all hover:shadow-md dark:from-green-900/30 dark:to-teal-900/30">
                                     <div class="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-green-200 opacity-50 dark:bg-green-700/30"></div>
                                     <div class="relative">
                                         <div class="flex items-center justify-between">

@@ -50,7 +50,7 @@
                 <div class="flex-1 min-h-[400px] rounded-lg bg-neutral-900 border border-neutral-700">
                     <!-- Code editor component will be rendered here -->
                     <div class="h-full w-full p-4">
-                        <textarea class="w-full h-full bg-transparent text-neutral-300 font-mono text-sm focus:outline-none" placeholder="Write your code here..."></textarea>
+                        <textarea class="w-full h-full bg-transparent text-neutral-300 font-mono text-sm focus:outline-hidden" placeholder="Write your code here..."></textarea>
                     </div>
                 </div>
                 <!-- Test Results -->
