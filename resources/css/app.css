@@ -1,12 +1,12 @@
 @import "../../vendor/livewire/flux/dist/flux.css";
 @import "./loading-screen.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
 @source '../../vendor/livewire/flux/stubs/**/*.blade.php';
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Re-assign Flux's gray of choice... */
@@ -50,20 +50,6 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
-}
-
-[data-flux-field] {
-    @apply grid gap-2;
-}
-
-[data-flux-label] {
-    @apply !mb-0 !leading-tight;
-}
-
-input:focus[data-flux-control],
-textarea:focus[data-flux-control],
-select:focus[data-flux-control] {
-    @apply outline-none ring-2 ring-emerald-600 ring-offset-2 ring-offset-white dark:ring-offset-gray-900;
 }
 
 /* \[:where(&)\]:size-4 {
