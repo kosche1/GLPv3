@@ -142,7 +142,7 @@ Always be encouraging and supportive while maintaining a professional tone. When
         'options' => [
             'label' => 'Food Delivery',
             'size' => \Filament\Support\Enums\ActionSize::ExtraLarge,
-            'color' => \Filament\Support\Colors\Color::Sky,
+            'color' => \Filament\Support\Colors\Color::Emerald,
             'icon' => 'heroicon-o-chat-bubble-bottom-center-text'
         ]
     ],

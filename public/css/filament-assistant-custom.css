@@ -1,0 +1,81 @@
+/* Custom CSS for Filament Assistant */
+
+/* Comforting background pattern */
+.fa-chat-container {
+    background-image: 
+        radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.2) 2%, transparent 0%), 
+        radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.2) 2%, transparent 0%);
+    background-size: 100px 100px;
+    animation: subtle-shift 60s infinite linear;
+}
+
+@keyframes subtle-shift {
+    from { background-position: 0 0; }
+    to { background-position: 100px 100px; }
+}
+
+/* Message entrance animations */
+.fa-chat-history > div {
+    animation: message-pop-in 0.3s ease-out;
+    transform-origin: center bottom;
+}
+
+@keyframes message-pop-in {
+    0% {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Animated gradient borders */
+.fa-chat-container .bg-gradient-to-r {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Soft shadows for message bubbles */
+.fa-chat-history .shadow-md {
+    box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.1), 
+                0 2px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode enhancements */
+.dark .fa-chat-container {
+    background-image: 
+        radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.05) 2%, transparent 0%), 
+        radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.05) 2%, transparent 0%);
+}
+
+/* Custom scrollbar styling */
+.fa-chat-history {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(129, 140, 248, 0.5) transparent;
+}
+
+.fa-chat-history::-webkit-scrollbar {
+    width: 6px;
+}
+
+.fa-chat-history::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.fa-chat-history::-webkit-scrollbar-thumb {
+    background-color: rgba(129, 140, 248, 0.5);
+    border-radius: 20px;
+}
+
+/* Focus state improvements */
+.fa-chat-input input:focus {
+    box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.3);
+} 
