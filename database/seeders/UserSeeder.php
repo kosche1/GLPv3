@@ -225,13 +225,13 @@ class UserSeeder extends Seeder
 
         // Create additional student users with random progression
         for ($i = 1; $i <= 20; $i++) {
-            $points = rand(0, 2000);
+            // $points = rand(0, 2000);
             $user = User::updateOrCreate(
                 ['email' => "student{$i}@example.com"],
                 [
                     'name' => "Student {$i}",
                     'password' => Hash::make('password'),
-                    'points' => $points,
+                    // 'points' => $points,
                 ]
             );
             $user->assignRole('student');

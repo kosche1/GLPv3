@@ -255,66 +255,70 @@ class TaskSeeder extends Seeder
         // Tasks for the Python Data Analysis Challenge
         if ($pythonChallenge) {
             Task::create([
-                'name' => 'Data Cleaning and Preparation',
-                'description' => 'Clean the climate datasets by handling missing values, outliers, and standardizing formats for analysis.',
+                'name' => 'Data Loading and Cleaning',
+                'description' => 'Write a Python function to load the climate dataset from CSV and clean missing or invalid values.',
                 'points_reward' => 60,
                 'type' => 'challenge',
                 'is_active' => true,
                 'challenge_id' => $pythonChallenge->id,
                 'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_solution' => [
-                    'import pandas as pd',
-                    'import numpy as np',
-                    '',
-                    'def clean_temperature_data(df):',
-                    '    # Handle missing values',
-                    '    df = df.fillna(method="ffill")',
-                    '    # Remove outliers (values > 3 std from mean)',
-                    '    mean, std = df["temperature"].mean(), df["temperature"].std()',
-                    '    df = df[(df["temperature"] > mean - 3*std) & (df["temperature"] < mean + 3*std)]',
-                    '    # Standardize date format',
-                    '    df["date"] = pd.to_datetime(df["date"])',
-                    '    return df',
-                    '',
-                    'def standardize_datasets(temp_df, co2_df, sea_df, weather_df):',
-                    '    # Create consistent date index for all datasets',
-                    '    # Additional cleaning steps',
-                    '    # Return cleaned and aligned datasets',
-                    '    return cleaned_temp, cleaned_co2, cleaned_sea, cleaned_weather'
+                'expected_output' => [
+                    'type' => 'contains',
+                    'values' => [
+                        'loaded dataset',
+                        'missing values',
+                        'cleaned'
+                    ]
                 ],
                 'order' => 1,
             ]);
 
             Task::create([
-                'name' => 'Exploratory Data Analysis',
-                'description' => 'Conduct exploratory data analysis on the climate datasets, including statistical summaries, trend identification, and initial visualizations.',
+                'name' => 'Temperature Trend Visualization',
+                'description' => 'Create visualizations showing global temperature changes over the past century.',
                 'points_reward' => 70,
                 'type' => 'challenge',
                 'is_active' => true,
                 'challenge_id' => $pythonChallenge->id,
                 'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                'expected_output' => [
+                    'type' => 'exact_match',
+                    'value' => 'Successfully created temperature trend visualization'
+                ],
                 'order' => 2,
             ]);
 
             Task::create([
-                'name' => 'Statistical Analysis and Modeling',
-                'description' => 'Apply statistical tests and create models to analyze climate trends, including temperature increases by region and correlation with emissions.',
-                'points_reward' => 80,
+                'name' => 'CO2 Emissions Analysis',
+                'description' => 'Write functions to analyze CO2 emissions by country and identify the top contributors.',
+                'points_reward' => 75,
                 'type' => 'challenge',
                 'is_active' => true,
                 'challenge_id' => $pythonChallenge->id,
                 'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                'expected_output' => [
+                    'type' => 'regex',
+                    'pattern' => '/Top \d+ contributors: (China|United States|India|Russia|Japan)/'
+                ],
                 'order' => 3,
             ]);
 
             Task::create([
-                'name' => 'Interactive Dashboard Creation',
-                'description' => 'Build an interactive dashboard using Plotly or Dash to visualize climate change findings, allowing for filtering by region and time period.',
-                'points_reward' => 90,
+                'name' => 'Predictive Model for Future Trends',
+                'description' => 'Develop a simple predictive model to forecast temperature changes for the next decade.',
+                'points_reward' => 85,
                 'type' => 'challenge',
                 'is_active' => true,
                 'challenge_id' => $pythonChallenge->id,
                 'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                'expected_output' => [
+                    'type' => 'key_value_match',
+                    'values' => [
+                        'model_accuracy' => 0.85,
+                        'prediction_years' => 10,
+                        'status' => 'success'
+                    ]
+                ],
                 'order' => 4,
             ]);
         }
@@ -501,7 +505,6 @@ class TaskSeeder extends Seeder
             'type' => 'daily',
             'is_active' => true,
             'completion_criteria' => ['action' => 'login', 'count' => 1],
-            'additional_rewards' => null,
         ]);
 
         Task::create([
@@ -511,7 +514,6 @@ class TaskSeeder extends Seeder
             'type' => 'weekly',
             'is_active' => true,
             'completion_criteria' => ['action' => 'challenge', 'count' => 1],
-            'additional_rewards' => ['badge_id' => 2],
         ]);
 
         Task::create([
@@ -521,7 +523,6 @@ class TaskSeeder extends Seeder
             'type' => 'onetime',
             'is_active' => true,
             'completion_criteria' => ['action' => 'profile_complete', 'count' => 1],
-            'additional_rewards' => null,
         ]);
     }
 }

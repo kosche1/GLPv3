@@ -53,6 +53,37 @@ class Challenge extends Model
     ];
 
     /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::saved(function (Challenge $challenge) {
+            // After a challenge is saved, recalculate its points reward
+            // to ensure it's always up-to-date, but only if it wasn't explicitly set
+            if (!request()->has('points_reward')) {
+                $challenge->updatePointsReward();
+            }
+        });
+    }
+
+    /**
+     * Calculate and update the total points reward based on associated tasks.
+     *
+     * @return void
+     */
+    public function updatePointsReward()
+    {
+        $totalTaskPoints = $this->tasks()->sum('points_reward');
+        
+        // Only update if there are tasks and the total is different from current value
+        if ($totalTaskPoints > 0 && $totalTaskPoints != $this->points_reward) {
+            $this->update(['points_reward' => $totalTaskPoints]);
+        }
+    }
+
+    /**
      * Determine if the challenge is currently active based on dates.
      *
      * @return bool

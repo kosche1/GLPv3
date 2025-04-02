@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
             // Gamification base data
             LevelSeeder::class,
             BadgeSeeder::class,
+            AchievementSeeder::class,
             
             // Challenges must be seeded before tasks since tasks depend on challenges
             ChallengeTypeSeeder::class,

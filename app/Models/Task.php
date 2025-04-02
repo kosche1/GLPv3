@@ -23,7 +23,6 @@ class Task extends Model
         "is_active",
         "completion_criteria",
         "answer_key",
-        "additional_rewards",
         "challenge_id",
         "expected_output",
         "expected_solution",
@@ -39,7 +38,6 @@ class Task extends Model
         "is_active" => "boolean",
         "completion_criteria" => "array",
         "answer_key" => "array",
-        "additional_rewards" => "array",
         "expected_output" => "array",
         "expected_solution" => "array",
     ];
@@ -84,7 +82,70 @@ class Task extends Model
             'student_answer' => $studentAnswer
         ]);
         
-        // For output comparison tasks, check against the answer key
+        // Case 1: Check against expected_output
+        if (isset($studentAnswer['output']) && !empty($this->expected_output)) {
+            // Get student output
+            $studentOutput = $studentAnswer['output'];
+
+            // Normalize student output based on type
+            if (is_string($studentOutput)) {
+                // Remove whitespace and convert to lowercase for string comparison
+                $normalizedStudentOutput = $this->normalizeOutput($studentOutput);
+                
+                // Check if expected_output is structured or just a string
+                if (isset($this->expected_output['type']) && $this->expected_output['type'] === 'exact_match') {
+                    // For exact string matching
+                    $expectedString = $this->expected_output['value'] ?? '';
+                    return $normalizedStudentOutput === $this->normalizeOutput($expectedString);
+                }
+                else if (isset($this->expected_output['type']) && $this->expected_output['type'] === 'contains') {
+                    // For checking if output contains specific strings
+                    $expectedSubstrings = $this->expected_output['values'] ?? [];
+                    foreach ($expectedSubstrings as $substring) {
+                        if (strpos($normalizedStudentOutput, $this->normalizeOutput($substring)) === false) {
+                            return false; // If any required substring is missing, return false
+                        }
+                    }
+                    return true; // All required substrings found
+                }
+                else if (isset($this->expected_output['type']) && $this->expected_output['type'] === 'regex') {
+                    // For regex pattern matching
+                    $pattern = $this->expected_output['pattern'] ?? '';
+                    return !empty($pattern) && preg_match($pattern, $studentOutput);
+                }
+                else {
+                    // Default: try direct comparison with expected_output
+                    $expectedOutput = is_array($this->expected_output) && isset($this->expected_output['value']) 
+                        ? $this->expected_output['value'] 
+                        : json_encode($this->expected_output);
+                    
+                    return $normalizedStudentOutput === $this->normalizeOutput($expectedOutput);
+                }
+            }
+            else if (is_array($studentOutput)) {
+                // For array/structured output (like JSON)
+                // If expected_output is an array of key-value pairs to match
+                if (isset($this->expected_output['type']) && $this->expected_output['type'] === 'key_value_match') {
+                    $requiredKeyValues = $this->expected_output['values'] ?? [];
+                    foreach ($requiredKeyValues as $key => $value) {
+                        if (!isset($studentOutput[$key]) || $studentOutput[$key] != $value) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                else {
+                    // Direct comparison of arrays (order might matter)
+                    $expectedArray = is_array($this->expected_output) && isset($this->expected_output['values']) 
+                        ? $this->expected_output['values'] 
+                        : $this->expected_output;
+                    
+                    return json_encode($studentOutput) === json_encode($expectedArray);
+                }
+            }
+        }
+        
+        // Case 2: Fall back to answer_key if expected_output doesn't match or is empty
         if (isset($studentAnswer['output']) && !empty($this->answer_key)) {
             // If answer_key is an array, convert to JSON string for comparison
             $answerKeyString = is_array($this->answer_key) 
@@ -92,16 +153,38 @@ class Task extends Model
                 : $this->answer_key;
                 
             // Normalize both strings (trim whitespace, convert to lowercase)
-            $normalizedOutput = trim(strtolower($studentAnswer['output']));
-            $normalizedAnswerKey = trim(strtolower($answerKeyString));
+            $normalizedOutput = $this->normalizeOutput($studentAnswer['output']);
+            $normalizedAnswerKey = $this->normalizeOutput($answerKeyString);
             
             // Check if the normalized output matches the answer key
             return $normalizedOutput === $normalizedAnswerKey;
         }
         
-        // For other types of tasks or if no answer key is provided
-        // You might want to implement other checking logic here
-        
+        // For other types of tasks or if no expected output/answer key is provided
         return false;
+    }
+    
+    /**
+     * Normalize output for comparison
+     * 
+     * @param string $output
+     * @return string
+     */
+    private function normalizeOutput($output)
+    {
+        if (!is_string($output)) {
+            return json_encode($output);
+        }
+        
+        // Convert to lowercase, trim whitespace, and normalize newlines
+        $normalized = strtolower(trim($output));
+        
+        // Replace multiple spaces with a single space
+        $normalized = preg_replace('/\s+/', ' ', $normalized);
+        
+        // Remove any punctuation that might not matter for comparison
+        $normalized = str_replace(['.', ',', ';', ':', '!', '?'], '', $normalized);
+        
+        return $normalized;
     }
 }

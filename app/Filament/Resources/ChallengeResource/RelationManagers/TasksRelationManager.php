@@ -9,6 +9,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\Challenge;
 
 class TasksRelationManager extends RelationManager
 {
@@ -41,11 +42,6 @@ class TasksRelationManager extends RelationManager
                 Forms\Components\KeyValue::make('completion_criteria')
                     ->keyLabel('Criteria')
                     ->valueLabel('Requirement')
-                    ->addable()
-                    ->deletable(),
-                Forms\Components\KeyValue::make('additional_rewards')
-                    ->keyLabel('Reward Type')
-                    ->valueLabel('Value')
                     ->addable()
                     ->deletable(),
                 Forms\Components\KeyValue::make('expected_output')
@@ -107,7 +103,11 @@ class TasksRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->after(function ($record, $data) {
+                        // Update the challenge points after creating a task
+                        $record->challenge->updatePointsReward();
+                    }),
                 Tables\Actions\AttachAction::make()
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['name', 'description'])
@@ -117,16 +117,36 @@ class TasksRelationManager extends RelationManager
                             ->label('Tasks')
                             ->options(fn ($livewire) => $livewire->ownerRecord->tasks()->pluck('name', 'id'))
                             ->required(),
-                    ]),
+                    ])
+                    ->after(function ($record) {
+                        // Update the challenge points after attaching tasks
+                        $this->ownerRecord->updatePointsReward();
+                    }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->after(function ($record, $data) {
+                        // Update the challenge points after editing a task
+                        $record->challenge->updatePointsReward();
+                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->after(function ($record) {
+                        // Update the challenge points after deleting a task
+                        $record->challenge->updatePointsReward();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\DetachBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->after(function () {
+                            // Update the challenge points after bulk deleting tasks
+                            $this->ownerRecord->updatePointsReward();
+                        }),
+                    Tables\Actions\DetachBulkAction::make()
+                        ->after(function () {
+                            // Update the challenge points after bulk detaching tasks
+                            $this->ownerRecord->updatePointsReward();
+                        }),
                 ]),
 
             ]);
