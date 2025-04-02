@@ -52,9 +52,9 @@ class TaskResource extends Resource
                 Forms\Components\Textarea::make("answer_key")
                     ->helperText("The correct answers for this task")
                     ->columnSpanFull(),
-                Forms\Components\KeyValue::make(
-                    "additional_rewards"
-                )->helperText("Additional rewards beyond points"),
+                // Forms\Components\KeyValue::make(
+                //     "additional_rewards"
+                // )->helperText("Additional rewards beyond points"),
             ]),
         ]);
     }

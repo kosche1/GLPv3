@@ -12,4 +12,21 @@ class Experience extends BaseExperience
     /**
      * Additional relationships or extensions can be added here
      */
+
+    /**
+     * Award experience points to user from task completion
+     * 
+     * @param \App\Models\User $user
+     * @param \App\Models\Task $task
+     * @return void
+     */
+    public static function awardTaskPoints(User $user, Task $task): void
+    {
+        if ($task->points_reward > 0) {
+            $user->addPoints(
+                amount: $task->points_reward,
+                reason: "Completed task: {$task->name}"
+            );
+        }
+    }
 }
