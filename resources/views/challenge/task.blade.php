@@ -134,7 +134,7 @@
                             <p class="text-neutral-300">{{ $currentTask->description }}</p>
                         </div>
                     </div>
-                    
+                    {{-- @dd(auth()->user()->id) --}}
                     <div class="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
                         <h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -289,7 +289,7 @@
             // Store initial values - need to escape properly for JS
             const initialCode = `{!! addslashes($challenge->challenge_content['buggy_code'] ?? '') !!}`;
             const programmingLanguage = '{!! $challenge->programming_language ?? "javascript" !!}';
-
+            // const userId =;
             // Map challenge language names to Monaco language names
             const languageMap = {
                 'php': 'php',
@@ -302,7 +302,7 @@
                 'css': 'css',
                 'none': 'plaintext'
             };
-
+    
             // Normalize the language name
             let monacoLanguage = (programmingLanguage || 'plaintext').toLowerCase();
             monacoLanguage = languageMap[monacoLanguage] || 'plaintext';
@@ -395,6 +395,7 @@
                     },
                     body: JSON.stringify({
                         task_id: {{ $currentTask->id }},
+                        user_id:  {{ auth()->user()->id }},
                         student_answer: {
                             code: code,
                             output: currentOutput

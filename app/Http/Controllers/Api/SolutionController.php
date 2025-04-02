@@ -23,15 +23,17 @@ class SolutionController extends Controller
                 'request_data' => $request->all()
             ]);
             
-            // Check if user is authenticated
-            $userId = Auth::check() ? Auth::id() : null;
-
-            // If no user ID is available, use a fallback for testing
-            if (!$userId) {
-                // Get the first user from the database or use a fixed ID
-                $userId = \App\Models\User::first()->id ?? 1;
-                Log::warning('Using fallback user ID: ' . $userId);
-            }
+            // Get user ID from request instead of Auth facade
+            $validated = $request->validate([
+                'task_id' => 'required|exists:tasks,id',
+                'user_id' => 'required|exists:users,id',  // Add this validation
+                'student_answer' => 'required|array',
+                'student_answer.code' => 'required|string|max:10000',
+                'student_answer.output' => 'nullable|string'
+            ]);
+        
+            $userId = $validated['user_id'];  // Use this instead of auth()->user()->id
+        
             
             $validated = $request->validate([
                 'task_id' => 'required|exists:tasks,id',
@@ -183,10 +185,57 @@ class SolutionController extends Controller
                 
                 // Award points to the user's experience record
                 if ($pointsToAward > 0 && $user) {
+                    // First ensure the experience record exists
+                    $experienceExists = DB::table('experiences')
+                        ->where('user_id', $userId)
+                        ->exists();
+                        
+                    if (!$experienceExists) {
+                        // Get the default level (assuming level 1 is default)
+                        $defaultLevel = DB::table('levels')
+                            ->orderBy('required_experience')
+                            ->value('id');
+                            
+                        DB::table('experiences')->insert([
+                            'user_id' => $userId,
+                            'experience_points' => 0,
+                            'level_id' => $defaultLevel ?? 1, // Fallback to 1 if no levels exist
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
+                    }
+                    
+                    // Now safely increment
+                    $currentExperience = DB::table('experiences')
+                        ->where('user_id', $userId)
+                        ->value('experience_points');
+                        
                     DB::table('experiences')
                         ->where('user_id', $userId)
                         ->increment('experience_points', $pointsToAward);
-                    Log::info("Awarded $pointsToAward experience points to user $userId");
+                        
+                    $newExperience = $currentExperience + $pointsToAward;
+                    
+                    Log::info("Awarded points to experience record", [
+                        'user_id' => $userId,
+                        'points_awarded' => $pointsToAward,
+                        'previous_experience' => $currentExperience,
+                        'new_experience' => $newExperience,
+                        'source' => 'task_completion',
+                        'task_id' => $task->id
+                    ]);
+                    
+                    // Verify the update
+                    $updatedExperience = DB::table('experiences')
+                        ->where('user_id', $userId)
+                        ->value('experience_points');
+                        
+                    if ($updatedExperience != $newExperience) {
+                        Log::error("Experience points update failed", [
+                            'expected' => $newExperience,
+                            'actual' => $updatedExperience
+                        ]);
+                    }
                 }
                 
                 // Update user-challenge relationship to track progress
