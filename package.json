@@ -7,7 +7,8 @@
         "publish-monaco": "node publish-monaco.js"
     },
     "dependencies": {
-        "@tailwindcss/postcss": "^4.0.17",
+        "@tailwindcss/postcss": "^4.1.0",
+        "@tailwindcss/vite": "^4.1.0",
         "@vitejs/plugin-vue": "^5.2.3",
         "ace-builds": "^1.39.1",
         "axios": "^1.8.4",
@@ -16,7 +17,7 @@
         "laravel-vite-plugin": "^1.2.0",
         "monaco-editor": "^0.52.2",
         "postcss": "^8.5.3",
-        "tailwindcss": "^4.0.17",
+        "tailwindcss": "^4.1.0",
         "vite": "^6.2.4"
     },
     "optionalDependencies": {

@@ -365,3 +365,40 @@ ui-toast {
 .duration-500 {
     transition-duration: 500ms;
 }
+
+/* Custom animations for daily reward notifications */
+@keyframes fade-in-down {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-down {
+    animation: fade-in-down 0.5s ease-out forwards;
+    animation-delay: var(--animation-delay, 0s);
+}
+
+/* Custom animation for achievement unlocks */
+@keyframes achievement-pop {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-10px);
+    }
+    50% {
+        transform: scale(1.05) translateY(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.animate-achievement-pop {
+    animation: achievement-pop 0.7s ease-out forwards;
+    animation-delay: var(--animation-delay, 0s);
+}
