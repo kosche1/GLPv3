@@ -23,15 +23,17 @@ class SolutionController extends Controller
                 'request_data' => $request->all()
             ]);
             
-            // Check if user is authenticated
-            $userId = Auth::check() ? Auth::id() : null;
-
-            // If no user ID is available, use a fallback for testing
-            if (!$userId) {
-                // Get the first user from the database or use a fixed ID
-                $userId = \App\Models\User::first()->id ?? 1;
-                Log::warning('Using fallback user ID: ' . $userId);
-            }
+            // Get user ID from request instead of Auth facade
+            $validated = $request->validate([
+                'task_id' => 'required|exists:tasks,id',
+                'user_id' => 'required|exists:users,id',  // Add this validation
+                'student_answer' => 'required|array',
+                'student_answer.code' => 'required|string|max:10000',
+                'student_answer.output' => 'nullable|string'
+            ]);
+        
+            $userId = $validated['user_id'];  // Use this instead of auth()->user()->id
+        
             
             $validated = $request->validate([
                 'task_id' => 'required|exists:tasks,id',
@@ -98,140 +100,141 @@ class SolutionController extends Controller
             // Create the student answer record
             $studentAnswer = new StudentAnswer($data);
             
-            // Check if the answer is correct
+            // Check if the answer is correct - DEFAULT TO FALSE
             $isCorrect = false;
             try {
-                // Get the task's answer key
-                $answerKey = $task->answer_key;
+                // Get the task's expected output
+                $expectedOutput = $task->expected_output;
                 
-                // Log the answer key for debugging
-                Log::info('Checking answer with key:', [
-                    'answer_key' => $answerKey,
-                    'output' => $output,
-                    'task_id' => $task->id
-                ]);
-                
-                // If there's an answer key, compare with the output
-                if (!empty($answerKey) && !empty($output)) {
-                    // Normalize both strings for comparison
-                    $normalizedOutput = trim(strtolower($output));
-                    $normalizedAnswerKey = trim(strtolower($answerKey));
-                    
-                    // Check for exact match first
-                    $isCorrect = $normalizedOutput === $normalizedAnswerKey;
-                    
-                    // If not exact match, check if the answer key is contained within the output
-                    if (!$isCorrect) {
-                        // Convert both to strings and remove all whitespace for more flexible comparison
-                        $strippedOutput = preg_replace('/\s+/', '', $normalizedOutput);
-                        $strippedAnswerKey = preg_replace('/\s+/', '', $normalizedAnswerKey);
-                        
-                        // Check if the stripped answer key is in the stripped output
-                        $isCorrect = strpos($strippedOutput, $strippedAnswerKey) !== false;
-                        
-                        // If still not correct, try comparing just the numeric values
-                        if (!$isCorrect && is_numeric(trim($answerKey))) {
-                            // Extract numbers from output
-                            preg_match('/\d+/', $normalizedOutput, $matches);
-                            if (!empty($matches) && $matches[0] == trim($answerKey)) {
-                                $isCorrect = true;
-                            }
-                        }
-                    }
-                    
-                    // Log comparison details for debugging
-                    Log::info('Answer comparison:', [
-                        'normalized_output' => $normalizedOutput,
-                        'normalized_answer_key' => $normalizedAnswerKey,
-                        'is_correct' => $isCorrect
-                    ]);
-                    
-                    // Log the result of the comparison
-                    Log::info('Answer comparison result:', [
-                        'is_correct' => $isCorrect,
-                        'method' => 'direct comparison'
-                    ]);
-                    
-                    // If incorrect, prepare error message for execution output
-                    if (!$isCorrect) {
-                        // Append error message to the output
-                        $output .= "\n\n❌ Your solution output doesn't match the expected result. Please try again.";
-                    } else {
-                        // Append success message to the output
-                        $output .= "\n\n✅ Solution and Results are Correct. Redirecting to Challenge Page...";
-                    }
-                    $data['output'] = $output; // Update the output in the data array
+                // Convert to string if it's an array or object
+                if (is_array($expectedOutput) || is_object($expectedOutput)) {
+                    $expectedOutput = (string)json_encode($expectedOutput);
+                } elseif (is_null($expectedOutput)) {
+                    $expectedOutput = '';
                 } else {
-                    // Fall back to the task's checkAnswer method for other types of tasks
-                    $isCorrect = $task->checkAnswer([
-                        'code' => $code,
-                        'output' => $output,
-                        'language' => $language
-                    ]);
-                    
-                    // Log the result of the task's checkAnswer method
-                    Log::info('Task checkAnswer result:', [
-                        'is_correct' => $isCorrect,
-                        'method' => 'task checkAnswer'
-                    ]);
-                    
-                    // If correct, append success message
-                    if (!$isCorrect) {
-                        Log::info('Solution is incorrect, setting response message.');
-                        $message = "❌ Your solution output doesn't match the expected result. Please try again.";
-                    } else {
-                        Log::info('Solution is correct, setting response message.');
-                        $message = "✅ Solution and Results are Correct. Redirecting to Challenge Page...";
-                    }
-                    
-                    // Ensure only the correct response is returned
-                    $response = [
-                        'success' => true,
-                        'is_correct' => $isCorrect,
-                        'message' => $message
-                    ];
-                    
-                    // Only add redirect URL if the answer is correct
-                    if ($isCorrect && $challenge) {
-                        $response['redirect'] = route('challenge', $challenge->id);
-                        $response['with_message'] = true;
-                    }
-                    
-                    return response()->json($response);
-                    
+                    $expectedOutput = (string)$expectedOutput;
                 }
                 
-                // Update the student answer with the modified output
+                // Minimal processing for both strings
+                $expectedOutput = trim($expectedOutput);
+                $cleanOutput = trim($output);
+                
+                // BASIC STRING EQUALITY - Nothing more, nothing less
+                $isCorrect = ($cleanOutput === $expectedOutput) && !empty($expectedOutput) && !empty($cleanOutput);
+                
+                // NEW: Enhanced string comparison with normalization
+                $normalizedOutput = $this->normalizeString($cleanOutput);
+                $normalizedExpected = $this->normalizeString($expectedOutput);
+                $isCorrect = ($normalizedOutput === $normalizedExpected) && !empty($normalizedExpected);
+                
+                // Log everything for diagnosis
+                Log::alert('BASIC STRING COMPARISON:', [
+                    'expected_output' => $expectedOutput,
+                    'student_output' => $cleanOutput,
+                    'strings_match' => ($cleanOutput === $expectedOutput),
+                    'is_correct' => $isCorrect
+                ]);
+                
+                // Update feedback based on result
+                if ($isCorrect) {
+                    $output .= "\n\n✅ Solution and Results are Correct. Redirecting to Challenge Page...";
+                } else {
+                    $output .= "\n\n❌ Your solution output doesn't match the expected result. Please try again.";
+                    $output .= "\n\nExpected output: " . $expectedOutput;
+                }
+                
+                // Update data and student answer
+                $data['output'] = $output;
                 $studentAnswer->output = $data['output'];
                 
-                // Log the final state before saving
-                Log::info('Final state before saving:', [
-                    'is_correct' => $isCorrect,
-                    'output' => $studentAnswer->output
-                ]);
+                // Force set is_correct before saving
+                $studentAnswer->is_correct = $isCorrect;
             } catch (\Exception $e) {
                 Log::error('Error checking answer:', [
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString()
                 ]);
                 $isCorrect = false;
+                $studentAnswer->is_correct = false;
             }
             
-            $studentAnswer->is_correct = $isCorrect;
+            // Force dirty state and save
+            $studentAnswer->setAttribute('is_correct', $isCorrect);
             $studentAnswer->save();
+            
+            // FINAL DATABASE VERIFICATION: Double-check that the database has the right value
+            $savedAnswer = StudentAnswer::find($studentAnswer->id);
+            Log::alert('DATABASE VERIFICATION:', [
+                'id' => $studentAnswer->id,
+                'expected_is_correct' => $isCorrect,
+                'actual_is_correct' => $savedAnswer->is_correct
+            ]);
+            
+            // If the saved value doesn't match, force update directly in database
+            if ($savedAnswer->is_correct !== $isCorrect) {
+                Log::error('MISMATCH DETECTED - Forcing database update');
+                DB::table('student_answers')
+                    ->where('id', $studentAnswer->id)
+                    ->update(['is_correct' => $isCorrect]);
+            }
 
             // If the answer is correct, update user progress and award points
             if ($isCorrect) {
                 $user = User::find($userId);
                 $pointsToAward = $task->points_reward ?? 0;
                 
-                // Award points to the user if the points column exists
+                // Award points to the user's experience record
                 if ($pointsToAward > 0 && $user) {
-                    if (Schema::hasColumn('users', 'points')) {
-                        $user->increment('points', $pointsToAward);
-                        Log::info("Awarded $pointsToAward points to user $userId");
-                    } else {
-                        Log::warning("Could not award points: points column does not exist in users table");
+                    // First ensure the experience record exists
+                    $experienceExists = DB::table('experiences')
+                        ->where('user_id', $userId)
+                        ->exists();
+                        
+                    if (!$experienceExists) {
+                        // Get the default level (assuming level 1 is default)
+                        $defaultLevel = DB::table('levels')
+                            ->orderBy('required_experience')
+                            ->value('id');
+                            
+                        DB::table('experiences')->insert([
+                            'user_id' => $userId,
+                            'experience_points' => 0,
+                            'level_id' => $defaultLevel ?? 1, // Fallback to 1 if no levels exist
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
+                    }
+                    
+                    // Now safely increment
+                    $currentExperience = DB::table('experiences')
+                        ->where('user_id', $userId)
+                        ->value('experience_points');
+                        
+                    DB::table('experiences')
+                        ->where('user_id', $userId)
+                        ->increment('experience_points', $pointsToAward);
+                        
+                    $newExperience = $currentExperience + $pointsToAward;
+                    
+                    Log::info("Awarded points to experience record", [
+                        'user_id' => $userId,
+                        'points_awarded' => $pointsToAward,
+                        'previous_experience' => $currentExperience,
+                        'new_experience' => $newExperience,
+                        'source' => 'task_completion',
+                        'task_id' => $task->id
+                    ]);
+                    
+                    // Verify the update
+                    $updatedExperience = DB::table('experiences')
+                        ->where('user_id', $userId)
+                        ->value('experience_points');
+                        
+                    if ($updatedExperience != $newExperience) {
+                        Log::error("Experience points update failed", [
+                            'expected' => $newExperience,
+                            'actual' => $updatedExperience
+                        ]);
                     }
                 }
                 
@@ -267,12 +270,10 @@ class SolutionController extends Controller
                         if ($isCompleted && $user) {
                             $challengePoints = $challenge->points_reward ?? 0;
                             if ($challengePoints > 0) {
-                                if (Schema::hasColumn('users', 'points')) {
-                                    $user->increment('points', $challengePoints);
-                                    Log::info("Awarded $challengePoints challenge completion points to user $userId");
-                                } else {
-                                    Log::warning("Could not award challenge points: points column does not exist in users table");
-                                }
+                                DB::table('experiences')
+                                    ->where('user_id', $userId)
+                                    ->increment('experience_points', $challengePoints);
+                                Log::info("Awarded $challengePoints challenge completion experience points to user $userId");
                             }
                         }
                     } else {
@@ -299,7 +300,7 @@ class SolutionController extends Controller
                 'has_redirect' => $isCorrect && $challenge
             ]);
 
-            // Prepare response
+            // Prepare final response
             $response = [
                 'success' => true,
                 'is_correct' => $isCorrect,
@@ -331,5 +332,38 @@ class SolutionController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Helper function to find the first position where two strings differ
+     */
+    private function findFirstDifferentChar($str1, $str2) {
+        $maxLen = min(strlen($str1), strlen($str2));
+        for ($i = 0; $i < $maxLen; $i++) {
+            if ($str1[$i] !== $str2[$i]) {
+                return "Position $i: Expected '{$str1[$i]}' Got '{$str2[$i]}'";
+            }
+        }
+        if (strlen($str1) !== strlen($str2)) {
+            return "Strings match until position $maxLen, but have different lengths";
+        }
+        return "No differences found";
+    }
+
+    /**
+     * Normalize strings for comparison
+     */
+    private function normalizeString($str)
+    {
+        // Convert to lowercase
+        $str = strtolower(trim($str));
+        
+        // Remove extra whitespace
+        $str = preg_replace('/\s+/', ' ', $str);
+        
+        // Remove punctuation (optional)
+        $str = preg_replace('/[^\w\s]/', '', $str);
+        
+        return $str;
     }
 }

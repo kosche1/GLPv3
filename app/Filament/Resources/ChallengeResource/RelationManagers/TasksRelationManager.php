@@ -10,6 +10,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\Challenge;
+use App\Models\Experience;
+use App\Models\Task;
+use App\Models\User;
 
 class TasksRelationManager extends RelationManager
 {
@@ -44,11 +47,9 @@ class TasksRelationManager extends RelationManager
                     ->valueLabel('Requirement')
                     ->addable()
                     ->deletable(),
-                Forms\Components\KeyValue::make('expected_output')
-                    ->keyLabel('Key')
-                    ->valueLabel('Output')
-                    ->addable()
-                    ->deletable(),
+                Forms\Components\Textarea::make('expected_output')
+                    ->rows(3)
+                    ->maxLength(1000),
                 Forms\Components\KeyValue::make('expected_solution')
                     ->keyLabel('Key')
                     ->valueLabel('Solution')
@@ -107,6 +108,10 @@ class TasksRelationManager extends RelationManager
                     ->after(function ($record, $data) {
                         // Update the challenge points after creating a task
                         $record->challenge->updatePointsReward();
+                        
+                        // If there are users who have already completed this task
+                        // award them experience points retroactively
+                        $this->syncExperiencePointsForTask($record);
                     }),
                 Tables\Actions\AttachAction::make()
                     ->preloadRecordSelect()
@@ -121,6 +126,10 @@ class TasksRelationManager extends RelationManager
                     ->after(function ($record) {
                         // Update the challenge points after attaching tasks
                         $this->ownerRecord->updatePointsReward();
+                        
+                        // If the attached task was already completed by users
+                        // award them experience points
+                        $this->syncExperiencePointsForTask($record);
                     }),
             ])
             ->actions([
@@ -128,6 +137,12 @@ class TasksRelationManager extends RelationManager
                     ->after(function ($record, $data) {
                         // Update the challenge points after editing a task
                         $record->challenge->updatePointsReward();
+                        
+                        // If points reward was changed, update users' experience
+                        if (isset($data['points_reward']) && 
+                            $data['points_reward'] != $record->getOriginal('points_reward')) {
+                            $this->syncExperiencePointsForTask($record);
+                        }
                     }),
                 Tables\Actions\DeleteAction::make()
                     ->after(function ($record) {
@@ -150,5 +165,24 @@ class TasksRelationManager extends RelationManager
                 ]),
 
             ]);
+    }
+    
+    /**
+     * Sync experience points for users who have completed the task
+     * 
+     * @param Task $task
+     * @return void
+     */
+    protected function syncExperiencePointsForTask(Task $task): void
+    {
+        // Get all users who have completed this task
+        $completedUsers = $task->users()
+            ->wherePivot('completed', true)
+            ->get();
+            
+        // Award experience points to each user
+        foreach ($completedUsers as $user) {
+            Experience::awardTaskPoints($user, $task);
+        }
     }
 }

@@ -187,4 +187,39 @@ class Task extends Model
         
         return $normalized;
     }
+    
+    /**
+     * Mark task as completed for a user and award experience points
+     * 
+     * @param \App\Models\User $user
+     * @return bool
+     */
+    public function completeTask(User $user): bool
+    {
+        // Check if the task is already completed by the user
+        $userTask = $user->tasks()->where('task_id', $this->id)->first();
+        
+        if ($userTask && $userTask->pivot->completed) {
+            return false; // Task already completed
+        }
+        
+        // Mark the task as completed
+        $user->tasks()->syncWithoutDetaching([
+            $this->id => [
+                'completed' => true,
+                'completed_at' => now(),
+                'progress' => 100,
+            ]
+        ]);
+        
+        // Award experience points
+        Experience::awardTaskPoints($user, $this);
+        
+        // Update challenge progress if this task is part of a challenge
+        if ($this->challenge) {
+            $this->challenge->updateUserProgress($user);
+        }
+        
+        return true;
+    }
 }

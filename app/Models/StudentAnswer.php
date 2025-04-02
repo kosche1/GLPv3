@@ -57,9 +57,16 @@ class StudentAnswer extends Model
                 return;
             }
             
+            // CRITICAL: If is_correct is dirty (explicitly set), don't override it
+            if ($studentAnswer->isDirty('is_correct')) {
+                Log::alert('Skipping answer check - is_correct already set explicitly to: ' . 
+                    ($studentAnswer->is_correct ? 'TRUE' : 'FALSE'));
+                return;
+            }
+            
             try {
                 // Only check answer if task exists and we haven't already set is_correct
-                if ($studentAnswer->task && !$studentAnswer->isDirty('is_correct')) {
+                if ($studentAnswer->task) {
                     Log::info('Checking answer in StudentAnswer model', [
                         'student_answer_id' => $studentAnswer->id,
                         'task_id' => $studentAnswer->task_id
