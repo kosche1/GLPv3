@@ -13,6 +13,14 @@ use App\Models\Challenge;
 use App\Models\Experience;
 use App\Models\Task;
 use App\Models\User;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Grid;
 
 class TasksRelationManager extends RelationManager
 {
@@ -23,41 +31,113 @@ class TasksRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                Grid::make(2)->schema([
+                    TextInput::make('name')
+                        ->required()
+                        ->maxLength(255)
+                        ->columnSpan(1),
+                    TextInput::make('points_reward')
+                        ->numeric()
+                        ->required()
+                        ->columnSpan(1),
+                ]),
+                Textarea::make('description')
+                    ->rows(2)
+                    ->maxLength(500)
+                    ->columnSpanFull(),
+                RichEditor::make('instructions')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->rows(3)
-                    ->maxLength(1000),
-                Forms\Components\TextInput::make('points_reward')
-                    ->numeric()
-                    ->required(),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'coding' => 'Coding',
-                        'quiz' => 'Quiz',
-                        'project' => 'Project',
-                        'research' => 'Research',
-                    ])
-                    ->required(),
-                Forms\Components\Toggle::make('is_active')
+                    ->columnSpanFull(),
+                Grid::make(3)->schema([
+                    Select::make('submission_type')
+                        ->options([
+                            'text' => 'Text / Code / Essay',
+                            'file' => 'File Upload',
+                            'url' => 'URL',
+                            'multiple_choice' => 'Multiple Choice',
+                            'numerical' => 'Numerical',
+                        ])
+                        ->required()
+                        ->live()
+                        ->columnSpan(1),
+                    Select::make('evaluation_type')
+                        ->options(function (Forms\Get $get) {
+                            $submissionType = $get('submission_type');
+                            $options = [
+                                'manual' => 'Manual Review',
+                            ];
+                            if (in_array($submissionType, ['text', 'numerical'])) {
+                                $options['exact_match'] = 'Exact Match';
+                                $options['regex'] = 'Regex Match';
+                            }
+                            if ($submissionType === 'multiple_choice') {
+                                $options['multiple_choice'] = 'Multiple Choice Check';
+                            }
+                            if ($submissionType === 'text') {
+                            }
+                            return $options;
+                        })
+                        ->required()
+                        ->live()
+                        ->columnSpan(1),
+                    TextInput::make('order')
+                        ->numeric()
+                        ->default(0)
+                        ->columnSpan(1),
+                ]),
+
+                Forms\Components\Section::make('Evaluation Details')
+                    ->schema(function (Forms\Get $get): array {
+                        $evalType = $get('evaluation_type');
+                        return match ($evalType) {
+                            'exact_match' => [
+                                Textarea::make('evaluation_details.expected')
+                                    ->label('Expected Answer')
+                                    ->helperText('The exact string or numerical value expected.')
+                                    ->required(),
+                            ],
+                            'regex' => [
+                                TextInput::make('evaluation_details.pattern')
+                                    ->label('Regex Pattern')
+                                    ->helperText('The regular expression pattern to match against the submission.')
+                                    ->required(),
+                            ],
+                            'multiple_choice' => [
+                                Repeater::make('evaluation_details.options')
+                                    ->label('Answer Options')
+                                    ->schema([
+                                        TextInput::make('option_text')->required()->label('Option Text'),
+                                    ])
+                                    ->minItems(2)
+                                    ->addActionLabel('Add Option')
+                                    ->required(),
+                                Forms\Components\CheckboxList::make('evaluation_details.correct_indices')
+                                    ->label('Correct Option(s)')
+                                    ->options(function (Forms\Get $get) {
+                                        $options = $get('evaluation_details.options') ?? [];
+                                        $choices = [];
+                                        foreach ($options as $index => $option) {
+                                            $choices[$index] = $option['option_text'] ?: 'Option ' . ($index + 1);
+                                        }
+                                        return $choices;
+                                    })
+                                    ->helperText('Select the index (starting from 0) of the correct answer(s).')
+                                    ->required()
+                                    ->columns(1),
+                            ],
+                            'manual' => [
+                                RichEditor::make('evaluation_details.rubric')
+                                    ->label('Grading Rubric / Guidelines')
+                                    ->helperText('(Optional) Provide guidelines or a rubric for manual grading.'),
+                            ],
+                            default => [],
+                        };
+                    })
+                    ->visible(fn (Forms\Get $get) => !empty($get('evaluation_type')) && $get('evaluation_type') !== 'manual')
+                    ->columnSpanFull(),
+
+                Toggle::make('is_active')
                     ->default(true),
-                Forms\Components\KeyValue::make('completion_criteria')
-                    ->keyLabel('Criteria')
-                    ->valueLabel('Requirement')
-                    ->addable()
-                    ->deletable(),
-                Forms\Components\Textarea::make('expected_output')
-                    ->rows(3)
-                    ->maxLength(1000),
-                Forms\Components\KeyValue::make('expected_solution')
-                    ->keyLabel('Key')
-                    ->valueLabel('Solution')
-                    ->addable()
-                    ->deletable(),
-                Forms\Components\TextInput::make('order')
-                    ->numeric()
-                    ->default(0),
             ]);
     }
 
@@ -66,123 +146,117 @@ class TasksRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
+                Tables\Columns\TextColumn::make('order')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('description')
                     ->limit(50)
-                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
-                        $state = $column->getState();
-                        return $state;
-                    }),
+                    ->tooltip(fn ($state) => $state ?: 'No description'),
                 Tables\Columns\TextColumn::make('points_reward')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('type')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'coding' => 'success',
-                        'quiz' => 'info',
-                        'project' => 'warning',
-                        'research' => 'danger',
-                        default => 'gray',
-                    }),
+                Tables\Columns\BadgeColumn::make('submission_type')
+                    ->label('Submission')
+                    ->colors([
+                        'primary' => 'text',
+                        'info' => 'numerical',
+                        'success' => 'multiple_choice',
+                        'warning' => 'file',
+                        'danger' => 'url',
+                    ]),
+                Tables\Columns\BadgeColumn::make('evaluation_type')
+                    ->label('Evaluation')
+                    ->colors([
+                        'gray' => 'manual',
+                        'success' => 'exact_match',
+                        'info' => 'regex',
+                        'primary' => 'multiple_choice',
+                    ]),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('order')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('expected_output')
-                    ->limit(30)
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('expected_solution')
-                    ->limit(30)
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                // Add filters if needed, e.g., by submission_type, evaluation_type
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->after(function ($record, $data) {
-                        // Update the challenge points after creating a task
+                        // Update challenge points based on the new task
                         $record->challenge->updatePointsReward();
-                        
-                        // If there are users who have already completed this task
-                        // award them experience points retroactively
-                        $this->syncExperiencePointsForTask($record);
+
+                        // NOTE: Syncing experience points here is PREMATURE.
+                        // Points should be awarded AFTER successful evaluation of a StudentAnswer.
                     }),
                 Tables\Actions\AttachAction::make()
                     ->preloadRecordSelect()
                     ->recordSelectSearchColumns(['name', 'description'])
-                    ->form(fn (Tables\Actions\AttachAction $action): array => [
-                        Forms\Components\Select::make('records')
-                            ->multiple()
-                            ->label('Tasks')
-                            ->options(fn ($livewire) => $livewire->ownerRecord->tasks()->pluck('name', 'id'))
-                            ->required(),
-                    ])
                     ->after(function ($record) {
                         // Update the challenge points after attaching tasks
                         $this->ownerRecord->updatePointsReward();
-                        
-                        // If the attached task was already completed by users
-                        // award them experience points
-                        $this->syncExperiencePointsForTask($record);
+
+                        // NOTE: Syncing experience points here is PREMATURE.
                     }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->after(function ($record, $data) {
-                        // Update the challenge points after editing a task
+                        // Update challenge points after editing a task
                         $record->challenge->updatePointsReward();
-                        
-                        // If points reward was changed, update users' experience
-                        if (isset($data['points_reward']) && 
-                            $data['points_reward'] != $record->getOriginal('points_reward')) {
-                            $this->syncExperiencePointsForTask($record);
-                        }
+
+                        // NOTE: Syncing experience points here needs refinement.
+                        // It should likely happen when a StudentAnswer is updated to 'correct'
+                        // and the points for the task changed.
                     }),
                 Tables\Actions\DeleteAction::make()
                     ->after(function ($record) {
                         // Update the challenge points after deleting a task
                         $record->challenge->updatePointsReward();
+                        // Potentially need to revoke points if answers existed?
+                    }),
+                Tables\Actions\DetachAction::make()
+                    ->after(function ($record) {
+                        $this->ownerRecord->updatePointsReward();
                     }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->after(function () {
-                            // Update the challenge points after bulk deleting tasks
                             $this->ownerRecord->updatePointsReward();
                         }),
                     Tables\Actions\DetachBulkAction::make()
                         ->after(function () {
-                            // Update the challenge points after bulk detaching tasks
                             $this->ownerRecord->updatePointsReward();
                         }),
                 ]),
-
             ]);
     }
     
     /**
      * Sync experience points for users who have completed the task
+     * NOTE: This entire method is likely OBSOLETE or needs significant refactoring.
+     * Awarding points should be tied to StudentAnswer evaluation, not just task CRUD.
      * 
      * @param Task $task
      * @return void
      */
-    protected function syncExperiencePointsForTask(Task $task): void
-    {
-        // Get all users who have completed this task
-        $completedUsers = $task->users()
-            ->wherePivot('completed', true)
-            ->get();
-            
-        // Award experience points to each user
-        foreach ($completedUsers as $user) {
-            Experience::awardTaskPoints($user, $task);
-        }
-    }
+    // protected function syncExperiencePointsForTask(Task $task): void
+    // {
+    //     // Get all users who have successfully completed this task
+    //     $completedAnswers = $task->studentAnswers()
+    //         ->where('is_correct', true) // Or check status == 'correct'
+    //         ->with('user') // Eager load user
+    //         ->get();
+
+    //     // Award experience points to each user
+    //     foreach ($completedAnswers as $answer) {
+    //         if ($answer->user) {
+    //             Experience::awardTaskPoints($answer->user, $task); // This might award points multiple times if task is edited
+    //         }
+    //     }
+    // }
 }

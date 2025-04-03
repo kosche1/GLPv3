@@ -5,49 +5,104 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\StudentAnswerResource\Pages;
 use App\Filament\Resources\StudentAnswerResource\RelationManagers;
 use App\Models\StudentAnswer;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Enums\FiltersLayout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Filament\Forms\Components\Actions\Action;
 
 class StudentAnswerResource extends Resource
 {
     protected static ?string $model = StudentAnswer::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-document-check';
     protected static ?string $navigationGroup = 'Assessments';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Select::make('user_id')
-                ->relationship('user', 'name')
-                ->required(),
-            Forms\Components\Select::make('task_id')
-                ->relationship('task', 'name')
-                ->required(),
-            Forms\Components\KeyValue::make('student_answer')
-                ->required(),
-            Forms\Components\Textarea::make('solution')
-                ->columnSpan(2)
-                ->rows(10),
-            Forms\Components\Textarea::make('output')
-                ->columnSpan(2)
-                ->rows(5),
-            Forms\Components\Select::make('status')
-                ->options([
-                    'pending' => 'Pending',
-                    'submitted' => 'Submitted',
-                    'reviewed' => 'Reviewed',
-                    'approved' => 'Approved',
-                    'rejected' => 'Rejected',
+            Forms\Components\Section::make('Submission Details')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\Select::make('user_id')
+                        ->relationship('user', 'name')
+                        ->disabled()
+                        ->required(),
+                    Forms\Components\Select::make('task_id')
+                        ->relationship('task', 'name')
+                        ->disabled()
+                        ->required(),
+                    Forms\Components\Textarea::make('submitted_text')
+                        ->label('Submitted Text')
+                        ->rows(5)
+                        ->columnSpanFull()
+                        ->disabled(),
+                    Forms\Components\TextInput::make('submitted_file_path')
+                         ->label('Submitted File')
+                         ->columnSpan(1)
+                         ->disabled()
+                         ->suffixAction(
+                             fn (?string $state): Action =>
+                                 Action::make('download_file')
+                                     ->icon('heroicon-s-arrow-down-tray')
+                                     ->url(fn () => Storage::url($state), shouldOpenInNewTab: true)
+                                     ->visible(fn (?string $state): bool => filled($state) && Storage::exists($state)),
+                         ),
+                    Forms\Components\TextInput::make('submitted_url')
+                         ->label('Submitted URL')
+                         ->columnSpan(1)
+                         ->disabled()
+                         ->suffixAction(
+                             fn (?string $state): Action =>
+                                Action::make('visit_url')
+                                    ->icon('heroicon-s-arrow-top-right-on-square')
+                                    ->url($state, shouldOpenInNewTab: true)
+                                    ->visible(fn (?string $state): bool => filled($state)),
+                         ),
+                     Forms\Components\KeyValue::make('submitted_data')
+                         ->label('Submitted Data (JSON)')
+                         ->columnSpanFull()
+                         ->disabled(),
+                     Forms\Components\Placeholder::make('status_current')
+                        ->label('Current Status')
+                        ->content(fn (StudentAnswer $record): string => ucfirst(str_replace('_', ' ', $record->status ?? 'N/A'))),
+                ])->collapsible(),
+
+            Forms\Components\Section::make('Manual Review')
+                ->visible(fn (StudentAnswer $record): bool => $record->task?->evaluation_type === 'manual' && $record->status === 'pending_manual_evaluation')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\Toggle::make('is_correct')
+                        ->label('Is Correct?')
+                        ->required(),
+                    Forms\Components\TextInput::make('score')
+                        ->label('Score Awarded')
+                        ->numeric()
+                        ->helperText(fn(StudentAnswer $record) => 'Max score for this task: ' . $record->task?->points_reward)
+                        ->minValue(0)
+                        ->required(),
+                    Forms\Components\Textarea::make('feedback')
+                        ->label('Feedback for Student')
+                        ->rows(4)
+                        ->columnSpanFull(),
+                     Forms\Components\Placeholder::make('evaluated_at_info')
+                        ->label('Evaluated At')
+                        ->content(fn (StudentAnswer $record): ?string => $record->evaluated_at?->diffForHumans() . ' (' . $record->evaluated_at?->format('Y-m-d H:i') . ')')
+                        ->visible(fn (StudentAnswer $record): bool => !empty($record->evaluated_at)),
+                     Forms\Components\Placeholder::make('evaluated_by_info')
+                        ->label('Evaluated By')
+                        ->content(fn (StudentAnswer $record): ?string => $record->evaluator?->name)
+                        ->visible(fn (StudentAnswer $record): bool => !empty($record->evaluated_by)),
                 ])
-                ->required(),
-            Forms\Components\Toggle::make('is_correct')
-                ->label('Correct'),
         ]);
     }
 
@@ -60,45 +115,73 @@ class StudentAnswerResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('task.name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->wrap(),
+                 Tables\Columns\TextColumn::make('task.evaluation_type')
+                    ->label('Evaluation Type')
+                    ->badge()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'gray',
-                        'submitted' => 'blue',
-                        'reviewed' => 'yellow',
-                        'approved' => 'green',
-                        'rejected' => 'red',
+                        'submitted' => 'warning',
+                        'pending_manual_evaluation' => 'info',
+                        'evaluated' => 'success',
+                        'evaluation_error' => 'danger',
                         default => 'gray',
-                    }),
-                Tables\Columns\BooleanColumn::make('is_correct')
-                    ->label('Correct'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    })
+                    ->formatStateUsing(fn (string $state): string => ucfirst(str_replace('_', ' ', $state)))
                     ->sortable(),
+                Tables\Columns\IconColumn::make('is_correct')
+                    ->label('Correct')
+                    ->boolean()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('score')
+                    ->sortable()
+                    ->placeholder('-'),
+                Tables\Columns\TextColumn::make('evaluated_at')
+                    ->dateTime('Y-m-d H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('evaluator.name')
+                    ->label('Evaluated By')
+                    ->sortable()
+                    ->placeholder('N/A')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime('Y-m-d H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                 Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime('Y-m-d H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('user')
-                    ->relationship('user', 'name'),
-                Tables\Filters\SelectFilter::make('task')
-                    ->relationship('task', 'name'),
+                 Filter::make('needs_manual_review')
+                    ->label('Needs Manual Review')
+                    ->query(fn (Builder $query): Builder => $query->where('status', 'pending_manual_evaluation'))
+                    ->default(),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'pending' => 'Pending',
                         'submitted' => 'Submitted',
-                        'reviewed' => 'Reviewed',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
-                    ]),
+                        'pending_manual_evaluation' => 'Pending Manual Evaluation',
+                        'evaluated' => 'Evaluated',
+                        'evaluation_error' => 'Evaluation Error',
+                    ])->multiple(),
+                Tables\Filters\SelectFilter::make('task_evaluation_type')
+                    ->label('Task Evaluation Type')
+                    ->relationship('task', 'evaluation_type', fn (Builder $query) => $query->selectRaw('DISTINCT evaluation_type')->whereNotNull('evaluation_type'))
+                    ->getOptionLabelFromRecordUsing(fn ($record) => ucfirst($record?->evaluation_type ?? 'Unknown')),
                 Tables\Filters\TernaryFilter::make('is_correct')
                     ->label('Correct Answers'),
-            ])
+            ], layout: FiltersLayout::AboveContent)
+             ->persistFiltersInSession()
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label('Review / Edit'),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
@@ -113,7 +196,6 @@ class StudentAnswerResource extends Resource
     {
         return [
             'index' => Pages\ListStudentAnswers::route('/'),
-            'create' => Pages\CreateStudentAnswer::route('/create'),
             'edit' => Pages\EditStudentAnswer::route('/{record}/edit'),
         ];
     }
