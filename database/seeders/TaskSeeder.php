@@ -28,20 +28,12 @@ class TaskSeeder extends Seeder
                 'name' => 'SQL Injection Prevention',
                 'description' => 'Fix the SQL injection vulnerability in the searchUsers function by implementing parameterized queries.',
                 'points_reward' => 50,
-                'type' => 'challenge',
+                'instructions' => 'Please follow standard procedures for fixing SQL injection.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $securityChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_solution' => [
-                    'function searchUsers($query) {',
-                    '    global $db;',
-                    '    $stmt = $db->prepare("SELECT * FROM users WHERE username LIKE ?");',
-                    '    $searchParam = "%$query%";',
-                    '    $stmt->bind_param("s", $searchParam);',
-                    '    $stmt->execute();',
-                    '    return $stmt->get_result();',
-                    '}'
-                ],
+                
                 'order' => 1,
             ]);
 
@@ -49,22 +41,12 @@ class TaskSeeder extends Seeder
                 'name' => 'CSRF Token Implementation',
                 'description' => 'Enhance the login form with CSRF protection by adding a token to prevent cross-site request forgery attacks.',
                 'points_reward' => 60,
-                'type' => 'challenge',
+                'instructions' => 'Implement CSRF token using standard Laravel methods.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $securityChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_solution' => [
-                    'function renderLoginForm() {',
-                    '    $csrf_token = bin2hex(random_bytes(32));',
-                    '    $_SESSION["csrf_token"] = $csrf_token;',
-                    '    echo \'<form method="POST" action="/login.php">\';',
-                    '    echo \'<input type="hidden" name="csrf_token" value="\' . $csrf_token . \'">\';',
-                    '    echo \'<input type="text" name="username" placeholder="Username">\';',
-                    '    echo \'<input type="password" name="password" placeholder="Password">\';',
-                    '    echo \'<button type="submit">Login</button>\';',
-                    '    echo \'</form>\';',
-                    '}'
-                ],
+                
                 'order' => 2,
             ]);
 
@@ -72,17 +54,12 @@ class TaskSeeder extends Seeder
                 'name' => 'XSS Prevention',
                 'description' => 'Update the displayUserProfile function to sanitize user data before output to prevent cross-site scripting attacks.',
                 'points_reward' => 70,
-                'type' => 'challenge',
+                'instructions' => 'Sanitize user inputs to prevent XSS.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $securityChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_solution' => [
-                    'function displayUserProfile($userData) {',
-                    '    echo \'<h2>Welcome back, \' . htmlspecialchars($userData[\'name\'], ENT_QUOTES, \'UTF-8\') . \'</h2>\';',
-                    '    echo \'<div>Bio: \' . htmlspecialchars($userData[\'bio\'], ENT_QUOTES, \'UTF-8\') . \'</div>\';',
-                    '    echo \'<div>Website: \' . htmlspecialchars($userData[\'website\'], ENT_QUOTES, \'UTF-8\') . \'</div>\';',
-                    '}'
-                ],
+                
                 'order' => 3,
             ]);
 
@@ -90,23 +67,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Secure Password Reset',
                 'description' => 'Implement a secure password reset function that uses password hashing and doesn\'t email plaintext passwords.',
                 'points_reward' => 80,
-                'type' => 'challenge',
+                'instructions' => 'Ensure password reset follows security best practices.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $securityChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_solution' => [
-                    'function resetPassword($email) {',
-                    '    global $db;',
-                    '    $token = bin2hex(random_bytes(32));',
-                    '    $expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));',
-                    '    $stmt = $db->prepare("UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE email = ?");',
-                    '    $stmt->bind_param("sss", $token, $expiry, $email);',
-                    '    $stmt->execute();',
-                    '    $reset_link = "https://example.com/reset-password.php?token=" . $token;',
-                    '    mail($email, "Password Reset", "Click the following link to reset your password: " . $reset_link);',
-                    '    return true;',
-                    '}'
-                ],
+                
                 'order' => 4,
             ]);
         }
@@ -117,10 +83,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Data Preprocessing',
                 'description' => 'Implement functions to clean and preprocess the raw user data and product data for use in the recommendation algorithm.',
                 'points_reward' => 60,
-                'type' => 'challenge',
+                'instructions' => 'Clean and prepare the provided dataset.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $algorithmChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 1,
             ]);
 
@@ -128,10 +96,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Similarity Calculation',
                 'description' => 'Develop a function that calculates similarity scores between products based on their attributes and usage patterns.',
                 'points_reward' => 70,
-                'type' => 'challenge',
+                'instructions' => 'Implement a product similarity calculation function.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $algorithmChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 2,
             ]);
 
@@ -139,10 +109,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Collaborative Filtering Implementation',
                 'description' => 'Create a collaborative filtering component that identifies patterns in user purchasing behaviors to make recommendations.',
                 'points_reward' => 80,
-                'type' => 'challenge',
+                'instructions' => 'Build the collaborative filtering mechanism.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $algorithmChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 3,
             ]);
 
@@ -150,10 +122,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Hybrid Recommendation System',
                 'description' => 'Combine content-based and collaborative filtering approaches into a hybrid system that delivers personalized recommendations.',
                 'points_reward' => 90,
-                'type' => 'challenge',
+                'instructions' => 'Develop a hybrid recommendation engine.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $algorithmChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 4,
             ]);
         }
@@ -164,10 +138,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Medical Records Schema Design',
                 'description' => 'Design the tables for storing patient medical records, including visit history, diagnoses, and treatment plans.',
                 'points_reward' => 70,
-                'type' => 'challenge',
+                'instructions' => 'Provide the SQL schema design.',
+                'submission_type' => 'file',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $databaseChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 1,
             ]);
 
@@ -175,10 +151,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Prescription Management System',
                 'description' => 'Implement the database schema and stored procedures for managing medication prescriptions, dosages, and refills.',
                 'points_reward' => 80,
-                'type' => 'challenge',
+                'instructions' => 'Implement the prescription management schema and procedures.',
+                'submission_type' => 'file',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $databaseChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 2,
             ]);
 
@@ -186,10 +164,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Billing and Insurance Integration',
                 'description' => 'Design the tables and relationships for the billing system that integrates with insurance providers.',
                 'points_reward' => 90,
-                'type' => 'challenge',
+                'instructions' => 'Design the billing and insurance integration schema.',
+                'submission_type' => 'file',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $databaseChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 3,
             ]);
 
@@ -197,10 +177,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Reporting and Analytics Views',
                 'description' => 'Create SQL views and functions for generating reports and analytics dashboards for hospital administration.',
                 'points_reward' => 110,
-                'type' => 'challenge',
+                'instructions' => 'Create necessary SQL views and functions for reporting.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $databaseChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 4,
             ]);
         }
@@ -211,10 +193,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Main Dashboard Wireframe',
                 'description' => 'Create wireframes for the main portfolio dashboard showing layout for key financial metrics and portfolio overview.',
                 'points_reward' => 55,
-                'type' => 'challenge',
+                'instructions' => 'Submit wireframes for the main dashboard.',
+                'submission_type' => 'url',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $uiChallenge->id,
-                'completion_criteria' => ['action' => 'design_submission', 'count' => 1],
+                
                 'order' => 1,
             ]);
 
@@ -222,10 +206,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Asset Allocation Visualization',
                 'description' => 'Design the data visualization components for displaying asset allocation, including charts and interactive elements.',
                 'points_reward' => 70,
-                'type' => 'challenge',
+                'instructions' => 'Design visualizations for asset allocation.',
+                'submission_type' => 'url',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $uiChallenge->id,
-                'completion_criteria' => ['action' => 'design_submission', 'count' => 1],
+                
                 'order' => 2,
             ]);
 
@@ -233,10 +219,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Mobile Responsive Design',
                 'description' => 'Create the responsive design specifications for the dashboard on mobile devices, ensuring all critical information is accessible.',
                 'points_reward' => 75,
-                'type' => 'challenge',
+                'instructions' => 'Provide mobile responsive design specifications.',
+                'submission_type' => 'file',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $uiChallenge->id,
-                'completion_criteria' => ['action' => 'design_submission', 'count' => 1],
+                
                 'order' => 3,
             ]);
 
@@ -244,10 +232,12 @@ class TaskSeeder extends Seeder
                 'name' => 'UI Component Style Guide',
                 'description' => 'Develop a comprehensive style guide for all UI components including typography, colors, form elements, and interactions.',
                 'points_reward' => 75,
-                'type' => 'challenge',
+                'instructions' => 'Submit the UI component style guide.',
+                'submission_type' => 'file',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $uiChallenge->id,
-                'completion_criteria' => ['action' => 'design_submission', 'count' => 1],
+                
                 'order' => 4,
             ]);
         }
@@ -258,18 +248,13 @@ class TaskSeeder extends Seeder
                 'name' => 'Data Loading and Cleaning',
                 'description' => 'Write a Python function to load the climate dataset from CSV and clean missing or invalid values.',
                 'points_reward' => 60,
-                'type' => 'challenge',
+                'instructions' => 'Implement Python function for data loading and cleaning.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $pythonChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_output' => [
-                    'type' => 'contains',
-                    'values' => [
-                        'loaded dataset',
-                        'missing values',
-                        'cleaned'
-                    ]
-                ],
+                
+                
                 'order' => 1,
             ]);
 
@@ -277,14 +262,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Temperature Trend Visualization',
                 'description' => 'Create visualizations showing global temperature changes over the past century.',
                 'points_reward' => 70,
-                'type' => 'challenge',
+                'instructions' => 'Generate temperature trend visualizations.',
+                'submission_type' => 'file',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $pythonChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_output' => [
-                    'type' => 'exact_match',
-                    'value' => 'Successfully created temperature trend visualization'
-                ],
+                
                 'order' => 2,
             ]);
 
@@ -292,14 +275,12 @@ class TaskSeeder extends Seeder
                 'name' => 'CO2 Emissions Analysis',
                 'description' => 'Write functions to analyze CO2 emissions by country and identify the top contributors.',
                 'points_reward' => 75,
-                'type' => 'challenge',
+                'instructions' => 'Implement Python functions for CO2 analysis.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $pythonChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_output' => [
-                    'type' => 'regex',
-                    'pattern' => '/Top \d+ contributors: (China|United States|India|Russia|Japan)/'
-                ],
+                
                 'order' => 3,
             ]);
 
@@ -307,18 +288,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Predictive Model for Future Trends',
                 'description' => 'Develop a simple predictive model to forecast temperature changes for the next decade.',
                 'points_reward' => 85,
-                'type' => 'challenge',
+                'instructions' => 'Build a predictive model for temperature trends.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $pythonChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_output' => [
-                    'type' => 'key_value_match',
-                    'values' => [
-                        'model_accuracy' => 0.85,
-                        'prediction_years' => 10,
-                        'status' => 'success'
-                    ]
-                ],
+                
                 'order' => 4,
             ]);
         }
@@ -329,37 +304,12 @@ class TaskSeeder extends Seeder
                 'name' => 'API Project Setup and Entity Modeling',
                 'description' => 'Set up a Spring Boot project and define JPA entities for the inventory management system, including relationships between models.',
                 'points_reward' => 65,
-                'type' => 'challenge',
+                'instructions' => 'Set up the project and define JPA entities.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $javaChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_solution' => [
-                    '// Product.java',
-                    '@Entity',
-                    '@Table(name = "products")',
-                    'public class Product {',
-                    '    @Id',
-                    '    @GeneratedValue(strategy = GenerationType.IDENTITY)',
-                    '    private Long id;',
-                    '',
-                    '    @Column(nullable = false)',
-                    '    private String name;',
-                    '',
-                    '    private String description;',
-                    '',
-                    '    @Column(nullable = false)',
-                    '    private BigDecimal price;',
-                    '',
-                    '    @ManyToOne',
-                    '    @JoinColumn(name = "category_id")',
-                    '    private Category category;',
-                    '',
-                    '    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)',
-                    '    private List<InventoryItem> inventoryItems;',
-                    '',
-                    '    // Getters, setters, constructors',
-                    '}'
-                ],
+                
                 'order' => 1,
             ]);
 
@@ -367,10 +317,12 @@ class TaskSeeder extends Seeder
                 'name' => 'REST Controller Implementation',
                 'description' => 'Create REST controllers with CRUD endpoints for products, inventory, and warehouses following REST best practices.',
                 'points_reward' => 75,
-                'type' => 'challenge',
+                'instructions' => 'Implement REST controllers for the API.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $javaChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+               
                 'order' => 2,
             ]);
 
@@ -378,10 +330,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Service Layer and Business Logic',
                 'description' => 'Implement the service layer with business logic for inventory management, including validation and transaction processing.',
                 'points_reward' => 85,
-                'type' => 'challenge',
+                'instructions' => 'Implement the service layer and business logic.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $javaChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 3,
             ]);
 
@@ -389,10 +343,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Security and Documentation Implementation',
                 'description' => 'Configure Spring Security for role-based authentication and add Swagger/OpenAPI documentation for all endpoints.',
                 'points_reward' => 95,
-                'type' => 'challenge',
+                'instructions' => 'Implement security and API documentation.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $javaChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 4,
             ]);
         }
@@ -403,63 +359,12 @@ class TaskSeeder extends Seeder
                 'name' => 'CMS Models and Migration Setup',
                 'description' => 'Create the database models, migrations, and relationships for content types, users, and media.',
                 'points_reward' => 60,
-                'type' => 'challenge',
+                'instructions' => 'Set up CMS models and migrations.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $phpChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
-                'expected_solution' => [
-                    '// Article.php',
-                    'class Article extends Model',
-                    '{',
-                    '    use HasFactory;',
-                    '',
-                    '    protected $fillable = [',
-                    '        "title",',
-                    '        "slug",',
-                    '        "content",',
-                    '        "excerpt",',
-                    '        "featured_image",',
-                    '        "status",',
-                    '        "published_at",',
-                    '        "expires_at",',
-                    '        "author_id",',
-                    '        "seo_title",',
-                    '        "seo_description",',
-                    '        "seo_keywords"',
-                    '    ];',
-                    '',
-                    '    protected $casts = [',
-                    '        "published_at" => "datetime",',
-                    '        "expires_at" => "datetime"',
-                    '    ];',
-                    '',
-                    '    public function author()',
-                    '    {',
-                    '        return $this->belongsTo(User::class, "author_id");',
-                    '    }',
-                    '',
-                    '    public function categories()',
-                    '    {',
-                    '        return $this->belongsToMany(Category::class);',
-                    '    }',
-                    '',
-                    '    public function tags()',
-                    '    {',
-                    '        return $this->belongsToMany(Tag::class);',
-                    '    }',
-                    '',
-                    '    // Scope for published articles',
-                    '    public function scopePublished($query)',
-                    '    {',
-                    '        return $query->where("status", "published")',
-                    '            ->where("published_at", "<=", now())',
-                    '            ->where(function ($q) {',
-                    '                $q->whereNull("expires_at")',
-                    '                  ->orWhere("expires_at", ">", now());',
-                    '            });',
-                    '    }',
-                    '}'
-                ],
+                
                 'order' => 1,
             ]);
 
@@ -467,10 +372,12 @@ class TaskSeeder extends Seeder
                 'name' => 'User Authentication and Authorization',
                 'description' => 'Implement user authentication with role-based permissions for content management (Admin, Editor, Author, Subscriber).',
                 'points_reward' => 70,
-                'type' => 'challenge',
+                'instructions' => 'Implement user authentication and authorization.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'automated',
                 'is_active' => true,
                 'challenge_id' => $phpChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 2,
             ]);
 
@@ -478,10 +385,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Content Management Controllers',
                 'description' => 'Create controllers and views for content creation, editing, publishing, and scheduling with media uploads.',
                 'points_reward' => 80,
-                'type' => 'challenge',
+                'instructions' => 'Implement content management controllers and views.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $phpChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 3,
             ]);
 
@@ -489,10 +398,12 @@ class TaskSeeder extends Seeder
                 'name' => 'Frontend Display and SEO Features',
                 'description' => 'Build the public-facing content display with search functionality, SEO features, and a responsive design.',
                 'points_reward' => 90,
-                'type' => 'challenge',
+                'instructions' => 'Implement frontend display and SEO features.',
+                'submission_type' => 'code',
+                'evaluation_type' => 'manual',
                 'is_active' => true,
                 'challenge_id' => $phpChallenge->id,
-                'completion_criteria' => ['action' => 'code_submission', 'count' => 1],
+                
                 'order' => 4,
             ]);
         }
@@ -502,27 +413,33 @@ class TaskSeeder extends Seeder
             'name' => 'Daily Check-in',
             'description' => 'Check in to the application once per day',
             'points_reward' => 10,
-            'type' => 'daily',
+            'instructions' => 'Simply log in daily.',
+            'submission_type' => 'automatic',
+            'evaluation_type' => 'automated',
             'is_active' => true,
-            'completion_criteria' => ['action' => 'login', 'count' => 1],
+            
         ]);
 
         Task::create([
             'name' => 'Weekly Challenge',
             'description' => 'Complete a difficult weekly challenge',
             'points_reward' => 50,
-            'type' => 'weekly',
+            'instructions' => 'Complete the designated weekly challenge.',
+            'submission_type' => 'automatic',
+            'evaluation_type' => 'automated',
             'is_active' => true,
-            'completion_criteria' => ['action' => 'challenge', 'count' => 1],
+           
         ]);
 
         Task::create([
             'name' => 'Profile Setup',
             'description' => 'Complete your user profile',
             'points_reward' => 20,
-            'type' => 'onetime',
+            'instructions' => 'Fill out all fields in your user profile.',
+            'submission_type' => 'automatic',
+            'evaluation_type' => 'automated',
             'is_active' => true,
-            'completion_criteria' => ['action' => 'profile_complete', 'count' => 1],
+            
         ]);
     }
 }

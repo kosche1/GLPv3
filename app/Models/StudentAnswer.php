@@ -14,16 +14,24 @@ class StudentAnswer extends Model
     protected $fillable = [
         'user_id',
         'task_id',
-        'student_answer',
-        'solution',
-        'output',
+        'submitted_text',
+        'submitted_file_path',
+        'submitted_url',
+        'submitted_data',
         'status',
-        'is_correct'
+        'is_correct',
+        'score',
+        'feedback',
+        'evaluated_at',
+        'evaluated_by',
+        'completed_at'
     ];
 
     protected $casts = [
-        'student_answer' => 'array',
-        'is_correct' => 'boolean'
+        'is_correct' => 'boolean',
+        'submitted_data' => 'array',
+        'evaluated_at' => 'datetime',
+        'completed_at' => 'datetime'
     ];
 
     public function user()
@@ -35,73 +43,22 @@ class StudentAnswer extends Model
     {
         return $this->belongsTo(Task::class);
     }
-    
+
+    public function evaluator()
+    {
+        return $this->belongsTo(User::class, 'evaluated_by');
+    }
+
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($studentAnswer) {
-            // Set default values if not provided
-            if (Schema::hasColumn('student_answers', 'is_correct') && !isset($studentAnswer->is_correct)) {
-                $studentAnswer->is_correct = false;
-            }
-            
             if (!isset($studentAnswer->status)) {
-                $studentAnswer->status = 'pending';
+                $studentAnswer->status = 'submitted';
             }
-        });
-
-        static::saving(function ($studentAnswer) {
-            // Only proceed if the is_correct column exists
-            if (!Schema::hasColumn('student_answers', 'is_correct')) {
-                return;
-            }
-            
-            // CRITICAL: If is_correct is dirty (explicitly set), don't override it
-            if ($studentAnswer->isDirty('is_correct')) {
-                Log::alert('Skipping answer check - is_correct already set explicitly to: ' . 
-                    ($studentAnswer->is_correct ? 'TRUE' : 'FALSE'));
-                return;
-            }
-            
-            try {
-                // Only check answer if task exists and we haven't already set is_correct
-                if ($studentAnswer->task) {
-                    Log::info('Checking answer in StudentAnswer model', [
-                        'student_answer_id' => $studentAnswer->id,
-                        'task_id' => $studentAnswer->task_id
-                    ]);
-                    
-                    // Check if student_answer column exists
-                    $hasStudentAnswerColumn = Schema::hasColumn('student_answers', 'student_answer');
-                    
-                    if ($hasStudentAnswerColumn && isset($studentAnswer->student_answer)) {
-                        $studentAnswer->is_correct = $studentAnswer->task->checkAnswer($studentAnswer->student_answer);
-                    } else {
-                        // Create a temporary student_answer array from solution and output
-                        $tempStudentAnswer = [
-                            'code' => $studentAnswer->solution ?? '',
-                            'output' => $studentAnswer->output ?? '',
-                            'language' => 'python' // Default language
-                        ];
-                        $studentAnswer->is_correct = $studentAnswer->task->checkAnswer($tempStudentAnswer);
-                    }
-                    
-                    Log::info('Answer checked', [
-                        'is_correct' => $studentAnswer->is_correct
-                    ]);
-                }
-            } catch (\Exception $e) {
-                // Log the error but don't prevent saving
-                Log::error('Error checking answer in StudentAnswer model:', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                    'student_answer_id' => $studentAnswer->id ?? 'new',
-                    'task_id' => $studentAnswer->task_id ?? null
-                ]);
-                
-                // Set is_correct to false on error
-                $studentAnswer->is_correct = false;
+            if (!isset($studentAnswer->is_correct)) {
+                $studentAnswer->is_correct = null;
             }
         });
     }

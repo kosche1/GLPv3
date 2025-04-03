@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Challenge;
 use App\Models\Category;
+use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -20,19 +21,19 @@ class ChallengeTypeSeeder extends Seeder
         // ======= IT/COMPUTER SCIENCE CHALLENGES =======
 
         // 1. Debugging Challenge - Security Vulnerability Assessment
-        Challenge::create([
+        $securityChallenge = Challenge::create([
             "name" => "Web Security Vulnerability Assessment",
             "description" =>
                 "Identify and fix common security vulnerabilities in a web application including XSS, CSRF, and SQL injection vulnerabilities.",
             "start_date" => Carbon::now(),
             "end_date" => Carbon::now()->addDays(10),
-            "points_reward" => 250,
+            "points_reward" => 0,
             "difficulty_level" => "intermediate",
             "is_active" => true,
             "max_participants" => 50,
             "required_level" => 4,
             "challenge_type" => "debugging",
-            "time_limit" => 120, // 2 hours
+            "time_limit" => 120,
             "programming_language" => "php",
             "tech_category" => "security",
             "category_id" => $categories["computer-science"] ?? null,
@@ -48,20 +49,71 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
+        // Add Tasks for the Security Challenge
+        Task::create([
+            'challenge_id' => $securityChallenge->id,
+            'name' => 'Fix SQL Injection Vulnerability',
+            'description' => 'Correct the searchUsers function.',
+            'instructions' => 'Refactor the `searchUsers` function provided in the challenge content to use prepared statements (parameterized queries) to prevent SQL injection. Submit the corrected PHP code snippet.',
+            'points_reward' => 60,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check for use of prepared statements (e.g., PDO or MySQLi) and correct parameter binding.']),
+            'order' => 1,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $securityChallenge->id,
+            'name' => 'Implement CSRF Protection',
+            'description' => 'Add CSRF token to the login form.',
+            'instructions' => "Modify the `renderLoginForm` function to include a hidden input field containing a unique CSRF token. Explain how the token would be generated and validated on the server-side (you don't need to write the server-side validation code, just explain the process). Submit the modified `renderLoginForm` function code and the explanation.",
+            'points_reward' => 70,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check for inclusion of hidden input for CSRF token and a reasonable explanation of generation/validation.']),
+            'order' => 2,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $securityChallenge->id,
+            'name' => 'Prevent XSS Attack',
+            'description' => 'Sanitize user data in displayUserProfile.',
+            'instructions' => 'Update the `displayUserProfile` function to properly sanitize the `name`, `bio`, and `website` fields before outputting them to prevent Cross-Site Scripting (XSS) attacks. Use appropriate PHP functions (e.g., `htmlspecialchars`). Submit the corrected PHP code snippet.',
+            'points_reward' => 60,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check for use of functions like htmlspecialchars() on user-provided data before echoing.']),
+            'order' => 3,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $securityChallenge->id,
+            'name' => 'Secure Password Reset',
+            'description' => 'Improve the password reset function.',
+            'instructions' => 'Identify the security flaws in the `resetPassword` function. Describe how you would improve it using secure practices like password hashing (e.g., `password_hash()`) and secure token generation instead of emailing plain text passwords. Submit your explanation.',
+            'points_reward' => 60,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check for identification of flaws (plaintext password, insecure query) and suggestion of secure alternatives (hashing, tokens).']),
+            'order' => 4,
+            'is_active' => true,
+        ]);
+        $securityChallenge->updatePointsReward();
+
         // 2. Algorithm Challenge - E-commerce Recommendation Engine
-        Challenge::create([
+        $algoChallenge = Challenge::create([
             "name" => "Product Recommendation Algorithm",
             "description" =>
                 "Design and implement a recommendation algorithm for an e-commerce website based on user purchase history and browsing patterns.",
             "start_date" => Carbon::now(),
             "end_date" => Carbon::now()->addDays(14),
-            "points_reward" => 300,
+            "points_reward" => 0,
             "difficulty_level" => "advanced",
             "is_active" => true,
             "max_participants" => 30,
             "required_level" => 6,
             "challenge_type" => "algorithm",
-            "time_limit" => 180, // 3 hours
+            "time_limit" => 180,
             "programming_language" => "python",
             "tech_category" => "data_science",
             "category_id" => $categories["computer-science"] ?? null,
@@ -76,22 +128,61 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
+        // Add Tasks for Algorithm Challenge
+        Task::create([
+            'challenge_id' => $algoChallenge->id,
+            'name' => 'Algorithm Design Document',
+            'description' => 'Outline your chosen recommendation approach.',
+            'instructions' => 'Submit a document (PDF or Markdown text) outlining the specific recommendation algorithm(s) you plan to implement (e.g., user-based collaborative filtering, item-based collaborative filtering, content-based filtering, hybrid approach). Describe the key steps, data preprocessing required, similarity metrics, and how you will combine different factors. Justify your choices.',
+            'points_reward' => 100,
+            'submission_type' => 'file',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Evaluate clarity of design, appropriateness of chosen algorithms, justification, and completeness of the description.']),
+            'order' => 1,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $algoChallenge->id,
+            'name' => 'Code Implementation',
+            'description' => 'Implement the recommendation algorithm in Python.',
+            'instructions' => 'Submit your Python code implementation as a .py file or a link to a Git repository (e.g., GitHub, GitLab). Your code should include functions to load data, preprocess it, calculate recommendations based on your design document, and output the top 5 recommendations for a given user ID. Ensure your code is well-commented and follows good programming practices.',
+            'points_reward' => 150,
+            'submission_type' => 'url',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Evaluate code correctness based on design doc, efficiency, readability, commenting, and adherence to Python best practices. Bonus for including unit tests.']),
+            'order' => 2,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $algoChallenge->id,
+            'name' => 'Results Analysis & Explanation',
+            'description' => 'Explain the recommendations for a sample user.',
+            'instructions' => "Run your algorithm for User ID 12345 (from the example). Submit the list of 5 recommended ProductIDs. Additionally, provide a brief explanation (text submission) for why each product was recommended based on your algorithm's logic and the user's history/browsing data.",
+            'points_reward' => 50,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check if the generated recommendations match the expected output logic (even if exact IDs differ slightly based on implementation). Evaluate the clarity and logical consistency of the explanation for each recommendation.']),
+            'order' => 3,
+            'is_active' => true,
+        ]);
+        $algoChallenge->updatePointsReward();
+
         // ======= MATHEMATICS CHALLENGES =======
 
         // 8. Calculus Challenge
-        Challenge::create([
+        $calculusChallenge = Challenge::create([
             "name" => "Calculus Integration and Applications",
             "description" =>
                 "Solve complex integration problems and apply calculus to real-world physics and engineering scenarios.",
             "start_date" => Carbon::now(),
             "end_date" => Carbon::now()->addDays(14),
-            "points_reward" => 280,
+            "points_reward" => 0,
             "difficulty_level" => "advanced",
             "is_active" => true,
             "max_participants" => 40,
             "required_level" => 5,
             "challenge_type" => "problem_solving",
-            "time_limit" => 120, // 2 hours
+            "time_limit" => 120,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["mathematics"] ?? null,
@@ -108,35 +199,68 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
-        // 9. Statistics and Probability Challenge
-        Challenge::create([
-            "name" => "Statistical Analysis and Probability",
-            "description" =>
-                "Apply statistical methods and probability theory to analyze data and solve real-world problems.",
-            "start_date" => Carbon::now(),
-            "end_date" => Carbon::now()->addDays(10),
-            "points_reward" => 220,
-            "difficulty_level" => "intermediate",
-            "is_active" => true,
-            "max_participants" => 50,
-            "required_level" => 3,
-            "challenge_type" => "problem_solving",
-            "time_limit" => 90, // 1.5 hours
-            "programming_language" => "none",
-            "tech_category" => "none",
-            "category_id" => $categories["mathematics"] ?? null,
-            "challenge_content" => [
-                "problem_statement" =>
-                    "This challenge tests your understanding of probability theory, statistical analysis, and data interpretation. You will work with datasets, calculate probabilities, and draw statistical conclusions from the data.",
-                "sections" => [
-                    "Part 1: Probability Theory\n1. A drawer contains 6 red socks, 4 blue socks, and 8 black socks. If you randomly select 2 socks without replacement, what is the probability that they form a matching pair?\n2. A manufacturing process has a 3% defect rate. If 20 items are randomly selected, what is the probability that at least one is defective?\n3. Three fair dice are rolled. What is the probability that the sum of the faces is at least 15?",
-                    "Part 2: Statistical Analysis\nThe following data represents the test scores of 30 students in a mathematics exam:\n78, 85, 92, 65, 70, 88, 82, 79, 95, 76, 80, 81, 87, 90, 64, 73, 84, 83, 77, 91, 94, 68, 86, 75, 72, 67, 89, 93, 71, 74\n\n1. Calculate the mean, median, and mode of the dataset.\n2. Calculate the standard deviation and variance.\n3. Construct a box plot and identify any outliers.\n4. Assuming the data follows a normal distribution, what percentage of students scored above 85?",
-                    "Part 3: Hypothesis Testing\nA researcher claims that a new teaching method improves student performance. In a controlled experiment, 50 students using the traditional method had a mean score of 72 with a standard deviation of 8. Another group of 45 students using the new method had a mean score of 75 with a standard deviation of 7.\n\n1. Formulate appropriate null and alternative hypotheses.\n2. Conduct a hypothesis test at a 5% significance level.\n3. Interpret your results and draw a conclusion about the effectiveness of the new teaching method.",
-                ],
-                "evaluation_criteria" =>
-                    "Your solutions will be evaluated on correct application of probability rules, accuracy of statistical calculations, appropriate use of statistical methods, clear representation of data, and proper interpretation of statistical results. Show all work, including formulas used and step-by-step calculations.",
-            ],
+        // Add Tasks for Calculus Challenge
+        Task::create([
+            'challenge_id' => $calculusChallenge->id,
+            'name' => 'Part 1: Indefinite Integrals',
+            'description' => 'Solve the four indefinite integrals.',
+            'instructions' => 'Solve the four indefinite integrals listed in Part 1 of the challenge description. Show your step-by-step work for each, clearly indicating the integration technique used (e.g., substitution, integration by parts, partial fractions). Submit your solutions as text or an uploaded document (PDF).',
+            'points_reward' => 100,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check for correct application of techniques, accuracy of integration, inclusion of constant of integration (+C), and clear work.']),
+            'order' => 1,
+            'is_active' => true,
         ]);
+        Task::create([
+            'challenge_id' => $calculusChallenge->id,
+            'name' => 'Part 2: Applications - Area',
+            'description' => 'Calculate the area.',
+            'instructions' => 'Calculate the area specified in Part 2, Problem 1. Set up the definite integral and show the evaluation steps. Submit the final numerical answer and your work.',
+            'points_reward' => 40,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check correct integral setup, limits of integration, evaluation, and final answer (Area = 9).']),
+            'order' => 2,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $calculusChallenge->id,
+            'name' => 'Part 2: Applications - Volume',
+            'description' => 'Calculate the volume of rotation.',
+            'instructions' => 'Calculate the volume specified in Part 2, Problem 2 (rotation about x-axis). Use the appropriate method (disk/washer) and show the integral setup and evaluation. Submit the final numerical answer and your work.',
+            'points_reward' => 50,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check correct method (disk), integral setup (π ∫[f(x)]² dx), limits, evaluation, and final answer (Volume = 32π/5).']),
+            'order' => 3,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $calculusChallenge->id,
+            'name' => 'Part 2: Applications - Distance Traveled',
+            'description' => 'Calculate the total distance.',
+            'instructions' => 'Calculate the total distance traveled by the particle as described in Part 2, Problem 3. Remember that total distance requires considering intervals where velocity is negative (∫|v(t)| dt). Show your work.',
+            'points_reward' => 50,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check identification of intervals where v(t) changes sign, correct setup of integrals for each interval (using absolute value or splitting), evaluation, and final distance.']),
+            'order' => 4,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $calculusChallenge->id,
+            'name' => 'Part 3: Real-world Application',
+            'description' => 'Calculate total widgets produced.',
+            'instructions' => 'Set up and evaluate the definite integral to find the total number of widgets produced during the first 8 hours, as described in Part 3. Show the integral setup and evaluation steps.',
+            'points_reward' => 40,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Check correct integral setup (∫ R(t) dt), limits (0 to 8), evaluation, and final answer.']),
+            'order' => 5,
+            'is_active' => true,
+        ]);
+        $calculusChallenge->updatePointsReward();
 
         // ======= SCIENCE CHALLENGES =======
 
@@ -153,7 +277,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 45,
             "required_level" => 4,
             "challenge_type" => "problem_solving",
-            "time_limit" => 120, // 2 hours
+            "time_limit" => 120,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["physics"] ?? null,
@@ -183,7 +307,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 40,
             "required_level" => 3,
             "challenge_type" => "problem_solving",
-            "time_limit" => 90, // 1.5 hours
+            "time_limit" => 90,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["chemistry"] ?? null,
@@ -213,7 +337,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 45,
             "required_level" => 3,
             "challenge_type" => "problem_solving",
-            "time_limit" => 100, // 1.67 hours
+            "time_limit" => 100,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["biology"] ?? null,
@@ -233,19 +357,19 @@ class ChallengeTypeSeeder extends Seeder
         // ======= HUMANITIES CHALLENGES =======
 
         // 13. History Challenge
-        Challenge::create([
+        $historyChallenge = Challenge::create([
             "name" => "World War II: Critical Analysis",
             "description" =>
                 "Analyze key events, decisions, and consequences of World War II through primary sources and historical perspectives.",
             "start_date" => Carbon::now(),
             "end_date" => Carbon::now()->addDays(15),
-            "points_reward" => 240,
+            "points_reward" => 0,
             "difficulty_level" => "intermediate",
             "is_active" => true,
             "max_participants" => 50,
             "required_level" => 3,
             "challenge_type" => "essay",
-            "time_limit" => 150, // 2.5 hours
+            "time_limit" => 150,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["history"] ?? null,
@@ -262,6 +386,51 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
+        // Add Tasks for History Challenge
+        Task::create([
+            'challenge_id' => $historyChallenge->id,
+            'name' => 'Part 1: Document Analysis',
+            'description' => 'Analyze the four primary source documents.',
+            'instructions' => "For each of the four primary source documents listed in Part 1, provide an analysis covering: a) Historical context, b) Author's purpose and audience, c) Significance. Submit your analysis as a single text entry or an uploaded document.",
+            'points_reward' => 80,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Evaluate depth of analysis, accuracy of context, understanding of purpose/audience, and assessment of significance for each document.']),
+            'order' => 1,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $historyChallenge->id,
+            'name' => 'Part 2: Historical Analysis Essay',
+            'description' => 'Write the main essay on ideology vs. practicality.',
+            'instructions' => 'Write a well-structured essay addressing the question in Part 2: \"To what extent were the Allied and Axis powers\' decisions during World War II shaped by ideological factors versus practical military and economic considerations?\" Follow all essay requirements outlined in the challenge description. Submit your essay as text or an uploaded document.',
+            'points_reward' => 100,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['rubric' => [
+                'Thesis Statement' => 15,
+                'Argumentation & Evidence' => 35,
+                'Analysis (Ideology vs Practicality)' => 30,
+                'Structure & Clarity' => 10,
+                'Addressing Counterarguments' => 10
+            ]]),
+            'order' => 2,
+            'is_active' => true,
+        ]);
+        Task::create([
+            'challenge_id' => $historyChallenge->id,
+            'name' => 'Part 3: Historical Interpretation',
+            'description' => 'Analyze interpretations of Cold War origins.',
+            'instructions' => 'Write a response addressing the prompt in Part 3 regarding the origins of the Cold War. Summarize two contrasting interpretations, evaluate their evidence, discuss their evolution, and present your conclusion. Submit your response as text or an uploaded document.',
+            'points_reward' => 60,
+            'submission_type' => 'text',
+            'evaluation_type' => 'manual',
+            'evaluation_details' => json_encode(['guidelines' => 'Evaluate understanding of historical interpretations, ability to summarize and evaluate evidence, analysis of historiography, and strength of conclusion.']),
+            'order' => 3,
+            'is_active' => true,
+        ]);
+        $historyChallenge->updatePointsReward();
+
         // 14. Literature Challenge
         Challenge::create([
             "name" => "Literary Analysis and Comparative Literature",
@@ -275,7 +444,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 45,
             "required_level" => 3,
             "challenge_type" => "essay",
-            "time_limit" => 120, // 2 hours
+            "time_limit" => 120,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["literature"] ?? null,
@@ -305,7 +474,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 45,
             "required_level" => 2,
             "challenge_type" => "problem_solving",
-            "time_limit" => 100, // 1.67 hours
+            "time_limit" => 100,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["geography"] ?? null,
@@ -337,7 +506,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 60,
             "required_level" => 2,
             "challenge_type" => "essay",
-            "time_limit" => 120, // 2 hours
+            "time_limit" => 120,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["english"] ?? null,
@@ -367,7 +536,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 40,
             "required_level" => 3,
             "challenge_type" => "language",
-            "time_limit" => 120, // 2 hours
+            "time_limit" => 120,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["languages"] ?? null,
@@ -399,7 +568,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 35,
             "required_level" => 4,
             "challenge_type" => "problem_solving",
-            "time_limit" => 150, // 2.5 hours
+            "time_limit" => 150,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["economics"] ?? null,
@@ -429,7 +598,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 40,
             "required_level" => 3,
             "challenge_type" => "research",
-            "time_limit" => 135, // 2.25 hours
+            "time_limit" => 135,
             "programming_language" => "none",
             "tech_category" => "none",
             "category_id" => $categories["psychology"] ?? null,
@@ -461,7 +630,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 35,
             "required_level" => 3,
             "challenge_type" => "creative",
-            "time_limit" => 180, // 3 hours
+            "time_limit" => 180,
             "programming_language" => "none",
             "tech_category" => "digital_media",
             "category_id" => $categories["technology"] ?? null,
@@ -491,7 +660,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 40,
             "required_level" => 3,
             "challenge_type" => "data_visualization",
-            "time_limit" => 150, // 2.5 hours
+            "time_limit" => 150,
             "programming_language" => "any",
             "tech_category" => "data_science",
             "category_id" => $categories["technology"] ?? null,
@@ -521,7 +690,7 @@ class ChallengeTypeSeeder extends Seeder
             "max_participants" => 25,
             "required_level" => 5,
             "challenge_type" => "database",
-            "time_limit" => 240, // 4 hours
+            "time_limit" => 240,
             "programming_language" => "sql",
             "tech_category" => "healthcare_it",
             "category_id" => $categories["computer-science"] ?? null,
@@ -543,13 +712,13 @@ class ChallengeTypeSeeder extends Seeder
                 "Design an intuitive and visually appealing financial analytics dashboard for investment portfolio tracking and analysis.",
             "start_date" => Carbon::now(),
             "end_date" => Carbon::now()->addDays(14),
-            "points_reward" => 275,
+            "points_reward" => 0,
             "difficulty_level" => "intermediate",
             "is_active" => true,
             "max_participants" => 40,
             "required_level" => 3,
             "challenge_type" => "ui_design",
-            "time_limit" => 150, // 2.5 hours
+            "time_limit" => 150,
             "programming_language" => "none",
             "tech_category" => "fintech",
             "category_id" => $categories["computer-science"] ?? null,
