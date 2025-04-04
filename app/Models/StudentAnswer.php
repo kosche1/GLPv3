@@ -14,17 +14,11 @@ class StudentAnswer extends Model
     protected $fillable = [
         'user_id',
         'task_id',
-        'submitted_text',
-        'submitted_file_path',
-        'submitted_url',
-        'submitted_data',
+        'output',
         'status',
         'is_correct',
         'score',
-        'feedback',
-        'evaluated_at',
-        'evaluated_by',
-        'completed_at'
+        'submitted_text'
     ];
 
     protected $casts = [

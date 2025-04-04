@@ -7,6 +7,7 @@ use App\Models\StudentAnswer;
 use App\Models\User;
 use App\Models\Task;
 use App\Models\Challenge;
+use App\Models\Experience;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -22,7 +23,7 @@ class SolutionController extends Controller
             Log::info('Solution submission request data:', [
                 'request_data' => $request->all()
             ]);
-            
+
             // Get user ID from request instead of Auth facade
             $validated = $request->validate([
                 'task_id' => 'required|exists:tasks,id',
@@ -31,10 +32,10 @@ class SolutionController extends Controller
                 'student_answer.code' => 'required|string|max:10000',
                 'student_answer.output' => 'nullable|string'
             ]);
-        
+
             $userId = $validated['user_id'];  // Use this instead of auth()->user()->id
-        
-            
+
+
             $validated = $request->validate([
                 'task_id' => 'required|exists:tasks,id',
                 'student_answer' => 'required|array',
@@ -45,10 +46,10 @@ class SolutionController extends Controller
             // Get the code and output from the request
             $code = $validated['student_answer']['code'];
             $output = $validated['student_answer']['output'] ?? '';
-            
+
             // Get the task and challenge
             $task = Task::with('challenge')->find($validated['task_id']);
-            
+
             if (!$task) {
                 Log::error('Task not found:', ['task_id' => $validated['task_id']]);
                 return response()->json([
@@ -56,22 +57,22 @@ class SolutionController extends Controller
                     'message' => 'Task not found'
                 ], 404);
             }
-            
+
             $challenge = $task->challenge;
-            
+
             if (!$challenge) {
                 Log::error('Challenge not found for task:', ['task_id' => $validated['task_id']]);
                 $language = 'python'; // Default fallback
             } else {
                 $language = $challenge->programming_language ?? 'python';
             }
-            
+
             // Check if the task has already been completed by this user
             $existingCorrectAnswer = StudentAnswer::where('user_id', $userId)
                 ->where('task_id', $task->id)
                 ->where('is_correct', true)
                 ->exists();
-                
+
             if ($existingCorrectAnswer) {
                 return response()->json([
                     'success' => true,
@@ -82,13 +83,12 @@ class SolutionController extends Controller
                     'with_message' => true
                 ]);
             }
-            
+
             // Create data array based on available columns
             $data = [
                 'user_id' => $userId,
                 'task_id' => $task->id,
-                'solution' => $code,
-                'output' => $output,
+                'submitted_text' => $output, // Store execution output in submitted_text column
                 'status' => 'submitted',
                 'student_answer' => [
                     'code' => $code,
@@ -96,45 +96,64 @@ class SolutionController extends Controller
                     'output' => $output
                 ]
             ];
-            
+
             // Create the student answer record
             $studentAnswer = new StudentAnswer($data);
-            
+
             // Check if the answer is correct - DEFAULT TO FALSE
             $isCorrect = false;
             try {
-                // Get the task's expected output
-                $expectedOutput = $task->expected_output;
-                
-                // Convert to string if it's an array or object
-                if (is_array($expectedOutput) || is_object($expectedOutput)) {
-                    $expectedOutput = (string)json_encode($expectedOutput);
-                } elseif (is_null($expectedOutput)) {
-                    $expectedOutput = '';
+                // First check if the task has evaluation_type 'exact_match'
+                if ($task->evaluation_type === 'exact_match') {
+                    // Get the expected answer from evaluation_details
+                    $evaluationDetails = $task->evaluation_details;
+                    if (is_array($evaluationDetails) && isset($evaluationDetails['expected'])) {
+                        $expectedAnswer = trim($evaluationDetails['expected']);
+                        $cleanOutput = trim($output);
+                        $isCorrect = ($cleanOutput === $expectedAnswer) && !empty($expectedAnswer) && !empty($cleanOutput);
+
+                        // Log the comparison
+                        Log::info('Exact match comparison:', [
+                            'expected_answer' => $expectedAnswer,
+                            'submitted_output' => $cleanOutput,
+                            'is_correct' => $isCorrect
+                        ]);
+                    }
                 } else {
-                    $expectedOutput = (string)$expectedOutput;
+                    // Fallback to expected_output
+                    // Get the task's expected output
+                    $expectedOutput = $task->expected_output;
+
+                    // Convert to string if it's an array or object
+                    if (is_array($expectedOutput) || is_object($expectedOutput)) {
+                        $expectedOutput = (string)json_encode($expectedOutput);
+                    } elseif (is_null($expectedOutput)) {
+                        $expectedOutput = '';
+                    } else {
+                        $expectedOutput = (string)$expectedOutput;
+                    }
+
+                    // Minimal processing for both strings
+                    $expectedOutput = trim($expectedOutput);
+                    $cleanOutput = trim($output);
+
+                    // BASIC STRING EQUALITY - Nothing more, nothing less
+                    $isCorrect = ($cleanOutput === $expectedOutput) && !empty($expectedOutput) && !empty($cleanOutput);
+
+                    // NEW: Enhanced string comparison with normalization
+                    $normalizedOutput = $this->normalizeString($cleanOutput);
+                    $normalizedExpected = $this->normalizeString($expectedOutput);
+                    $isCorrect = ($normalizedOutput === $normalizedExpected) && !empty($normalizedExpected);
                 }
-                
-                // Minimal processing for both strings
-                $expectedOutput = trim($expectedOutput);
-                $cleanOutput = trim($output);
-                
-                // BASIC STRING EQUALITY - Nothing more, nothing less
-                $isCorrect = ($cleanOutput === $expectedOutput) && !empty($expectedOutput) && !empty($cleanOutput);
-                
-                // NEW: Enhanced string comparison with normalization
-                $normalizedOutput = $this->normalizeString($cleanOutput);
-                $normalizedExpected = $this->normalizeString($expectedOutput);
-                $isCorrect = ($normalizedOutput === $normalizedExpected) && !empty($normalizedExpected);
-                
+
                 // Log everything for diagnosis
-                Log::alert('BASIC STRING COMPARISON:', [
-                    'expected_output' => $expectedOutput,
-                    'student_output' => $cleanOutput,
-                    'strings_match' => ($cleanOutput === $expectedOutput),
+                Log::alert('ANSWER COMPARISON RESULT:', [
+                    'task_id' => $task->id,
+                    'evaluation_type' => $task->evaluation_type,
+                    'student_output' => $cleanOutput ?? '',
                     'is_correct' => $isCorrect
                 ]);
-                
+
                 // Update feedback based on result
                 if ($isCorrect) {
                     $output .= "\n\n✅ Solution and Results are Correct. Redirecting to Challenge Page...";
@@ -142,11 +161,11 @@ class SolutionController extends Controller
                     $output .= "\n\n❌ Your solution output doesn't match the expected result. Please try again.";
                     $output .= "\n\nExpected output: " . $expectedOutput;
                 }
-                
+
                 // Update data and student answer
-                $data['output'] = $output;
-                $studentAnswer->output = $data['output'];
-                
+                $data['submitted_text'] = $output;
+                $studentAnswer->submitted_text = $data['submitted_text'];
+
                 // Force set is_correct before saving
                 $studentAnswer->is_correct = $isCorrect;
             } catch (\Exception $e) {
@@ -157,11 +176,11 @@ class SolutionController extends Controller
                 $isCorrect = false;
                 $studentAnswer->is_correct = false;
             }
-            
+
             // Force dirty state and save
             $studentAnswer->setAttribute('is_correct', $isCorrect);
             $studentAnswer->save();
-            
+
             // FINAL DATABASE VERIFICATION: Double-check that the database has the right value
             $savedAnswer = StudentAnswer::find($studentAnswer->id);
             Log::alert('DATABASE VERIFICATION:', [
@@ -169,7 +188,7 @@ class SolutionController extends Controller
                 'expected_is_correct' => $isCorrect,
                 'actual_is_correct' => $savedAnswer->is_correct
             ]);
-            
+
             // If the saved value doesn't match, force update directly in database
             if ($savedAnswer->is_correct !== $isCorrect) {
                 Log::error('MISMATCH DETECTED - Forcing database update');
@@ -178,73 +197,32 @@ class SolutionController extends Controller
                     ->update(['is_correct' => $isCorrect]);
             }
 
-            // If the answer is correct, update user progress and award points
-            if ($isCorrect) {
+            // If the answer is correct and the task has evaluation_type 'exact_match', update user progress and award points
+            if ($isCorrect && $task->evaluation_type === 'exact_match') {
                 $user = User::find($userId);
                 $pointsToAward = $task->points_reward ?? 0;
-                
+
                 // Award points to the user's experience record
                 if ($pointsToAward > 0 && $user) {
-                    // First ensure the experience record exists
-                    $experienceExists = DB::table('experiences')
-                        ->where('user_id', $userId)
-                        ->exists();
-                        
-                    if (!$experienceExists) {
-                        // Get the default level (assuming level 1 is default)
-                        $defaultLevel = DB::table('levels')
-                            ->orderBy('required_experience')
-                            ->value('id');
-                            
-                        DB::table('experiences')->insert([
-                            'user_id' => $userId,
-                            'experience_points' => 0,
-                            'level_id' => $defaultLevel ?? 1, // Fallback to 1 if no levels exist
-                            'created_at' => now(),
-                            'updated_at' => now()
-                        ]);
-                    }
-                    
-                    // Now safely increment
-                    $currentExperience = DB::table('experiences')
-                        ->where('user_id', $userId)
-                        ->value('experience_points');
-                        
-                    DB::table('experiences')
-                        ->where('user_id', $userId)
-                        ->increment('experience_points', $pointsToAward);
-                        
-                    $newExperience = $currentExperience + $pointsToAward;
-                    
-                    Log::info("Awarded points to experience record", [
+                    // Use the Experience model to award points
+                    Experience::awardTaskPoints($user, $task);
+
+                    Log::info("Awarded points to experience record using Experience model", [
                         'user_id' => $userId,
                         'points_awarded' => $pointsToAward,
-                        'previous_experience' => $currentExperience,
-                        'new_experience' => $newExperience,
                         'source' => 'task_completion',
-                        'task_id' => $task->id
+                        'task_id' => $task->id,
+                        'evaluation_type' => 'exact_match'
                     ]);
-                    
-                    // Verify the update
-                    $updatedExperience = DB::table('experiences')
-                        ->where('user_id', $userId)
-                        ->value('experience_points');
-                        
-                    if ($updatedExperience != $newExperience) {
-                        Log::error("Experience points update failed", [
-                            'expected' => $newExperience,
-                            'actual' => $updatedExperience
-                        ]);
-                    }
                 }
-                
+
                 // Update user-challenge relationship to track progress
                 if ($challenge) {
                     $userChallenge = DB::table('user_challenges')
                         ->where('user_id', $userId)
                         ->where('challenge_id', $challenge->id)
                         ->first();
-                    
+
                     if ($userChallenge) {
                         // Update existing record
                         $totalTasks = $challenge->tasks()->count();
@@ -253,10 +231,10 @@ class SolutionController extends Controller
                             ->where('is_correct', true)
                             ->distinct('task_id')
                             ->count();
-                        
+
                         $progress = $totalTasks > 0 ? ($completedTasks / $totalTasks) * 100 : 0;
                         $isCompleted = $completedTasks >= $totalTasks;
-                        
+
                         DB::table('user_challenges')
                             ->where('user_id', $userId)
                             ->where('challenge_id', $challenge->id)
@@ -265,7 +243,7 @@ class SolutionController extends Controller
                                 'status' => $isCompleted ? 'completed' : 'in_progress',
                                 'completed_at' => $isCompleted ? now() : null
                             ]);
-                            
+
                         // If challenge is completed, award additional points
                         if ($isCompleted && $user) {
                             $challengePoints = $challenge->points_reward ?? 0;
@@ -294,8 +272,8 @@ class SolutionController extends Controller
             Log::info('Sending response:', [
                 'success' => true,
                 'is_correct' => $isCorrect,
-                'message' => $isCorrect 
-                    ? 'Your solution is correct!' 
+                'message' => $isCorrect
+                    ? 'Your solution is correct!'
                     : 'Your solution output doesn\'t match the expected result. Please try again.',
                 'has_redirect' => $isCorrect && $challenge
             ]);
@@ -304,11 +282,11 @@ class SolutionController extends Controller
             $response = [
                 'success' => true,
                 'is_correct' => $isCorrect,
-                'message' => $isCorrect 
-                    ? 'Your solution is correct!' 
+                'message' => $isCorrect
+                    ? 'Your solution is correct!'
                     : 'Your solution output doesn\'t match the expected result. Please try again.'
             ];
-            
+
             // Only add redirect URL if the answer is correct
             if ($isCorrect && $challenge) {
                 $response['redirect'] = route('challenge', $challenge->id);
@@ -325,7 +303,7 @@ class SolutionController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to submit solution: ' . $e->getMessage(),
@@ -357,13 +335,13 @@ class SolutionController extends Controller
     {
         // Convert to lowercase
         $str = strtolower(trim($str));
-        
+
         // Remove extra whitespace
         $str = preg_replace('/\s+/', ' ', $str);
-        
+
         // Remove punctuation (optional)
         $str = preg_replace('/[^\w\s]/', '', $str);
-        
+
         return $str;
     }
 }
