@@ -168,12 +168,12 @@
                     </svg>
                     <h3 class="text-xl font-semibold text-white mb-2">No Learning Materials Available</h3>
                     <p class="text-neutral-400 text-center mb-6">There are currently no learning materials in this category.</p>
-                    <button class="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
+                    {{-- <button class="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                         </svg>
                         <span>Upload Materials</span>
-                    </button>
+                    </button> --}}
                 </div>
             @endif
         </div>
