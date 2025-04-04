@@ -96,6 +96,12 @@ class ChallengeResource extends Resource
                     "algorithm" => "Algorithm Challenge",
                     "database" => "Database Challenge",
                     "ui_design" => "UI/UX Challenge",
+                    "problem_solving" => "Problem Solving Challenge",
+                    "essay" => "Essay Challenge",
+                    "language" => "Language Challenge",
+                    "research" => "Research Challenge",
+                    "creative" => "Creative Challenge",
+                    "data_visualization" => "Data Visualization Challenge",
                 ])
                 ->default("coding_challenge")
                 ->reactive()
@@ -236,6 +242,30 @@ class ChallengeResource extends Resource
                             ->label("Evaluation Criteria")
                             ->required()
                             ->hint('Describe the evaluation criteria for the UI/UX challenge.')
+                            ->columnSpanFull(),
+                    ],
+
+                    // Add cases for other common challenge types based on seeder structure
+                    "problem_solving",
+                    "essay",
+                    "language",
+                    "research",
+                    "creative",
+                    "data_visualization" => [
+                        Forms\Components\Textarea::make("challenge_content.problem_statement")
+                            ->label("Problem Statement / Task Overview")
+                            ->required()
+                            ->hint('Describe the main goal or problem the user needs to address.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.sections")
+                            ->label("Detailed Instructions / Sections / Requirements")
+                            ->required()
+                            ->hint('Provide detailed steps, parts, specific requirements, or different sections of the challenge.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.evaluation_criteria")
+                            ->label("Evaluation Criteria")
+                            ->required()
+                            ->hint('How will the submission be evaluated?')
                             ->columnSpanFull(),
                     ],
 

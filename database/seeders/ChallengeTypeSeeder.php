@@ -294,6 +294,72 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
+        // Add Tasks for Physics Challenge
+        $physicsChallenge = Challenge::where('name', 'Physics of Motion and Energy')->first(); // Re-fetch to ensure we have the ID
+        if ($physicsChallenge) {
+            Task::create([
+                'challenge_id' => $physicsChallenge->id,
+                'name' => 'Part 1: Kinematics - Upward Throw',
+                'description' => 'Solve the kinematics problem for the ball thrown upward (max height, time to ground, final velocity).',
+                'instructions' => "Solve Part 1, Problem 1 (a, b, c) using kinematic equations. Show all steps and calculations. Use g = 9.8 m/s². Submit your work and final answers.",
+                'points_reward' => 70,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check application of kinematic equations, correct formulas, steps, units, and final answers.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $physicsChallenge->id,
+                'name' => 'Part 1: Dynamics - Inclined Plane',
+                'description' => 'Calculate acceleration and normal force for the block on the frictionless inclined plane.',
+                'instructions' => "Solve Part 1, Problem 2. Draw a free-body diagram, apply Newton's second law, and calculate the acceleration and the normal force. Show all work. Submit your diagram, calculations, and final answers.",
+                'points_reward' => 50,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check free-body diagram, application of Newton\'s laws, vector components, and final answers with units.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $physicsChallenge->id,
+                'name' => 'Part 2: Energy - Roller Coaster',
+                'description' => 'Apply energy conservation to calculate speeds and analyze energy loss for the roller coaster.',
+                'instructions' => "Solve Part 2, Problem 1 (a, b, c). Use the principle of conservation of energy for (a) and (b). For (c), calculate energy lost to friction and the coefficient if applicable. Show all work. Submit your calculations and answers.",
+                'points_reward' => 80,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check application of conservation of energy (PE + KE), calculation of work done by friction, and coefficient of friction. Verify steps and units.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+             Task::create([
+                'challenge_id' => $physicsChallenge->id,
+                'name' => 'Part 2: Energy - Spring Launch',
+                'description' => 'Calculate the maximum height reached by a ball launched by a compressed spring.',
+                'instructions' => "Solve Part 2, Problem 2. Use conservation of energy (elastic potential energy to gravitational potential energy). Show your setup and calculations. Submit your work and final answer.",
+                'points_reward' => 60, // Reduced from original total
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check application of conservation of energy (elastic PE to gravitational PE), correct formulas, calculation, and final answer with units.']),
+                'order' => 4,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $physicsChallenge->id,
+                'name' => 'Part 3: Rotational Motion - Rolling Cylinder',
+                'description' => 'Calculate linear acceleration and minimum friction coefficient for a cylinder rolling down an incline.',
+                'instructions' => "Solve Part 3, Problem 1 (a, b). Apply principles of rotational dynamics and energy conservation for rolling motion. Show free-body diagram, equations of motion (linear and rotational), and calculations. Submit your work and answers.",
+                'points_reward' => 90, // Adjusted points
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check application of rotational dynamics (torque, moment of inertia), energy conservation for rolling, condition for rolling without slipping (a = αR), friction calculation, and final answers with units.']),
+                'order' => 5,
+                'is_active' => true,
+            ]);
+            $physicsChallenge->updatePointsReward(); // Update total points based on tasks
+        }
+
         // 11. Chemistry Challenge
         Challenge::create([
             "name" => "Chemical Reactions and Stoichiometry",
@@ -324,6 +390,72 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
+        // Add Tasks for Chemistry Challenge
+        $chemistryChallenge = Challenge::where('name', 'Chemical Reactions and Stoichiometry')->first();
+        if ($chemistryChallenge) {
+            Task::create([
+                'challenge_id' => $chemistryChallenge->id,
+                'name' => 'Part 1: Balancing Equations',
+                'description' => 'Balance the five chemical equations provided in Part 1.',
+                'instructions' => 'Balance each of the 5 chemical equations listed in Part 1. Ensure the number of atoms for each element is the same on both sides. Submit the balanced equations.',
+                'points_reward' => 50, // 10 points each
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual', // Could potentially be automated with specific formatting rules
+                'evaluation_details' => json_encode(['guidelines' => 'Check coefficients for correctness in all 5 equations.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $chemistryChallenge->id,
+                'name' => 'Part 2: Stoichiometry - CO2 Production',
+                'description' => 'Calculate the mass of CO₂ produced from the reaction of CaCO₃ with HCl.',
+                'instructions' => 'Solve Part 2, Problem 1. Calculate the molar mass of CaCO₃, convert grams to moles, use the stoichiometry of the balanced equation to find moles of CO₂, and convert moles of CO₂ to grams. Show all work and units.',
+                'points_reward' => 40,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check molar mass calculations, mole conversions, stoichiometric ratio usage, and final mass calculation with units.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $chemistryChallenge->id,
+                'name' => 'Part 2: Stoichiometry - Limiting Reagent & Yield',
+                'description' => 'Determine the limiting reagent, theoretical yield, and percent yield for the reaction of Al and Cl₂.',
+                'instructions' => 'Solve Part 2, Problem 2 (a, b, c). Calculate moles of Al and Cl₂, determine the limiting reagent, calculate the theoretical yield of AlCl₃ in grams based on the limiting reagent, and calculate the percent yield using the actual yield provided. Show all calculations.',
+                'points_reward' => 70,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check mole calculations, correct identification of limiting reagent, correct theoretical yield calculation, and correct percent yield calculation.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $chemistryChallenge->id,
+                'name' => 'Part 3: Solution Chemistry - Dilution',
+                'description' => 'Calculate how to prepare a diluted H₂SO₄ solution from a concentrated stock solution.',
+                'instructions' => 'Solve Part 3, Problem 1. Calculate the molarity of the stock solution using its percentage by mass and density. Then use the dilution formula (M1V1 = M2V2) to find the volume of stock solution needed. Describe the steps to prepare the final solution. Show all calculations.',
+                'points_reward' => 40,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check calculation of stock solution molarity, correct use of dilution formula, calculation of required volume, and description of preparation steps.']),
+                'order' => 4,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $chemistryChallenge->id,
+                'name' => 'Part 3: Solution Chemistry - Buffer pH',
+                'description' => 'Calculate the pH of the buffer solution prepared by mixing acetic acid and sodium acetate.',
+                'instructions' => 'Solve Part 3, Problem 2. Calculate the initial moles of acetic acid and sodium acetate. Use the Henderson-Hasselbalch equation (pH = pKa + log([A-]/[HA])) to calculate the pH of the buffer. Use the provided Ka value. Show all calculations.',
+                'points_reward' => 40,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check calculation of moles, calculation of pKa, correct application of Henderson-Hasselbalch equation, and final pH value.']),
+                'order' => 5,
+                'is_active' => true,
+            ]);
+            $chemistryChallenge->updatePointsReward();
+        }
+
         // 12. Biology Challenge
         Challenge::create([
             "name" => "Cellular Processes and Genetics",
@@ -353,6 +485,84 @@ class ChallengeTypeSeeder extends Seeder
                     "Your responses will be evaluated on scientific accuracy, completeness of explanations, correct application of biological principles, proper use of terminology, and logical organization of ideas. For genetic problems, show all work including genotypes, phenotypes, and probability calculations.",
             ],
         ]);
+
+        // Add Tasks for Biology Challenge
+        $biologyChallenge = Challenge::where('name', 'Cellular Processes and Genetics')->first();
+        if ($biologyChallenge) {
+            Task::create([
+                'challenge_id' => $biologyChallenge->id,
+                'name' => 'Part 1: Mitosis vs Meiosis Comparison',
+                'description' => 'Compare and contrast mitosis and meiosis based on the given criteria.',
+                'instructions' => "Address Part 1, Problem 1 (a, b, c, d). Provide clear and accurate comparisons for purpose, number of divisions, daughter cell characteristics, and significance. Submit your written comparison.",
+                'points_reward' => 50,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate accuracy and completeness of comparison across all four points (a-d). Check clarity and use of correct terminology.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $biologyChallenge->id,
+                'name' => 'Part 1: ATP Production Explanation',
+                'description' => 'Describe the role of ATP and explain aerobic/anaerobic respiration processes for ATP production.',
+                'instructions' => "Address Part 1, Problem 2. Explain ATP's role, describe the main stages of aerobic respiration (glycolysis, Krebs cycle, oxidative phosphorylation) and anaerobic respiration (fermentation), including locations and approximate ATP yields. Submit your explanation.",
+                'points_reward' => 50,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check accuracy of ATP role, description of respiration pathways, locations (cytoplasm, mitochondria), and relative ATP yields.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $biologyChallenge->id,
+                'name' => 'Part 2: Dihybrid Cross Problem',
+                'description' => 'Solve the pea plant dihybrid cross genetics problem.',
+                'instructions' => "Address Part 2, Problem 1 (a, b, c, d). Write parent genotypes, determine possible gametes, construct the Punnett square, and calculate the probability of offspring with yellow, wrinkled seeds. Show all work. Submit your genotypes, gametes, Punnett square, and probability.",
+                'points_reward' => 50,
+                'submission_type' => 'text', // Could potentially upload an image of the Punnett square
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check correctness of genotypes, gametes, Punnett square construction, and final probability calculation (should be 3/16 or 18.75%).']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $biologyChallenge->id,
+                'name' => 'Part 2: X-Linked Inheritance Problem',
+                'description' => 'Solve the colorblindness X-linked recessive inheritance problem.',
+                'instructions' => "Address Part 2, Problem 2 (a, b, c). Determine parent genotypes, calculate the probability of their first son being colorblind, and the probability of their first daughter being colorblind. Use standard notation for X-linked traits. Show your work. Submit genotypes and probabilities.",
+                'points_reward' => 40,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check correctness of parent genotypes (e.g., XcXc and XCY), and probabilities (Son: 100%, Daughter: 0%).']),
+                'order' => 4,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $biologyChallenge->id,
+                'name' => 'Part 3: Transcription and Translation',
+                'description' => 'Transcribe and translate the given DNA sequence into a polypeptide.',
+                'instructions' => "Address Part 3, Problem 1. Transcribe the DNA sequence (5'-ATGCCAGACTTAGCAAAG-3') into mRNA, then use a standard genetic code table to translate the mRNA sequence into the corresponding amino acid sequence (polypeptide). Assume the sequence starts with the start codon. Submit the mRNA sequence and the amino acid sequence.",
+                'points_reward' => 40,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual', // Could be automated with a specific genetic code table
+                'evaluation_details' => json_encode(['guidelines' => 'Check correct transcription (A->U, T->A, G->C, C->G) and translation based on standard genetic code (e.g., mRNA: AUG CCA GAC UUA GCA AAG -> Polypeptide: Met-Pro-Asp-Leu-Ala-Lys).']),
+                'order' => 5,
+                'is_active' => true,
+            ]);
+             Task::create([
+                'challenge_id' => $biologyChallenge->id,
+                'name' => 'Part 3: DNA Replication Explanation',
+                'description' => 'Describe the process of DNA replication, including enzymes and strand differences.',
+                'instructions' => "Address Part 3, Problem 2. Describe DNA replication, mentioning key enzymes (helicase, primase, DNA polymerase, ligase), the 5' to 3' synthesis direction, and the difference between leading and lagging strand replication (Okazaki fragments). Submit your explanation.",
+                'points_reward' => 50, // Adjusted points
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check accuracy and completeness of explanation, mentioning key enzymes, directionality, leading/lagging strands, and Okazaki fragments.']),
+                'order' => 6,
+                'is_active' => true,
+            ]);
+            $biologyChallenge->updatePointsReward();
+        }
 
         // ======= HUMANITIES CHALLENGES =======
 
@@ -461,6 +671,48 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
+        // Add Tasks for Literature Challenge
+        $literatureChallenge = Challenge::where('name', 'Literary Analysis and Comparative Literature')->first();
+        if ($literatureChallenge) {
+            Task::create([
+                'challenge_id' => $literatureChallenge->id,
+                'name' => "Part 1: Close Reading of Joyce's 'The Dead'",
+                'description' => "Analyze the provided excerpt from James Joyce's 'The Dead'.",
+                'instructions' => "Write a close reading analysis of the final passage of Joyce's 'The Dead'. Address imagery, symbolism, language, themes, narrative perspective/tone, and how the conclusion creates meaning. Submit your analysis (approx. 300-500 words).",
+                'points_reward' => 70,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate depth of analysis on specified literary elements, connection to themes, understanding of narrative technique, and clarity of writing.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $literatureChallenge->id,
+                'name' => 'Part 2: Comparative Analysis Essay',
+                'description' => 'Write a comparative essay on one of the provided pairs of texts.',
+                'instructions' => "Choose ONE pair of texts (A, B, or C) and write a comparative essay addressing the requirements outlined in Part 2. Develop a clear thesis, use textual evidence, analyze context, discuss similarities/differences, and draw conclusions. Submit your essay (approx. 800-1000 words).",
+                'points_reward' => 80,
+                'submission_type' => 'text', // Or file upload
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate strength of thesis, quality of comparison, use of textual evidence from both works, contextual analysis, argumentation, structure, and writing clarity.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $literatureChallenge->id,
+                'name' => 'Part 3: Literary Movement Analysis',
+                'description' => 'Analyze one literary movement from the list provided.',
+                'instructions' => "Select ONE literary movement from the list. Write a response describing its characteristics and context, analyzing how two representative works exemplify it, and evaluating its influence. Submit your analysis (approx. 400-600 words).",
+                'points_reward' => 70,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate understanding of the chosen movement, accuracy of characteristics/context, quality of analysis of representative works, assessment of influence, and clarity.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            $literatureChallenge->updatePointsReward();
+        }
+
         // 15. Geography Challenge
         Challenge::create([
             "name" => "Global Geography and Human-Environment Interaction",
@@ -490,6 +742,60 @@ class ChallengeTypeSeeder extends Seeder
                     "Your responses will be evaluated on geographical accuracy, spatial analysis skills, appropriate use of geographical terminology, ability to interpret data and maps, understanding of human-environment relationships, and evidence-based reasoning. Maps, diagrams, and data visualizations should be clearly labeled and properly referenced.",
             ],
         ]);
+
+        // Add Tasks for Geography Challenge
+        $geographyChallenge = Challenge::where('name', 'Global Geography and Human-Environment Interaction')->first();
+        if ($geographyChallenge) {
+            Task::create([
+                'challenge_id' => $geographyChallenge->id,
+                'name' => 'Part 1: Physical Geography - Climate Analysis',
+                'description' => 'Analyze climate data for four locations (Köppen classification, influencing factors, climate change impact).',
+                'instructions' => "Address Part 1, Problem 1 (a, b, c). Assume climate data/diagrams are provided externally. Identify Köppen types, explain factors, and predict climate change effects. Submit your analysis.",
+                'points_reward' => 50,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate correct Köppen classification, understanding of climate controls, and plausible climate change impact prediction based on location/type.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $geographyChallenge->id,
+                'name' => 'Part 1: Physical Geography - Topographic Map Analysis',
+                'description' => 'Analyze a topographic map (identify landforms, calculate gradient, determine best route).',
+                'instructions' => "Address Part 1, Problem 2 (a, b, c). Assume a topographic map is provided externally. Identify landforms, calculate gradient between X and Y, and justify the best road route between P and Q. Submit your analysis and calculations.",
+                'points_reward' => 50,
+                'submission_type' => 'text', // Could include file upload for annotated map
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate correct landform identification/formation, accurate gradient calculation, and well-justified route selection considering terrain and environmental factors.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $geographyChallenge->id,
+                'name' => 'Part 2: Human Geography Case Study',
+                'description' => 'Analyze demographic, economic, and urban data for Country Z and compare with another country.',
+                'instructions' => "Address Part 2 (Problems 1-5). Assume data for Country Z is provided. Analyze transitions, urbanization, challenges, propose solutions, and compare with another country. Submit your comprehensive analysis.",
+                'points_reward' => 60,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate depth of analysis of demographic/economic/urban trends, identification of challenges, feasibility of solutions, and quality of comparison with another country.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+             Task::create([
+                'challenge_id' => $geographyChallenge->id,
+                'name' => 'Part 3: Global Issues Analysis and Map',
+                'description' => 'Analyze a chosen global issue (patterns, factors, interconnections, approaches) and create a map.',
+                'instructions' => "Address Part 3 (Problems 1-5). Choose ONE global issue. Analyze its geography, contributing factors, global interconnections, and contrasting approaches. Create a simple GIS-style map visualizing an aspect of the issue. Submit your analysis and map (as file upload or embedded image).",
+                'points_reward' => 50, // Adjusted points
+                'submission_type' => 'file', // For the map primarily, analysis can be text
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate depth of geographical analysis of the chosen issue, understanding of interconnections, assessment of approaches, and clarity/relevance of the submitted map.']),
+                'order' => 4,
+                'is_active' => true,
+            ]);
+            $geographyChallenge->updatePointsReward();
+        }
 
         // ======= LANGUAGE ARTS CHALLENGES =======
 
@@ -523,6 +829,48 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
+        // Add Tasks for Essay Writing Challenge
+        $essayChallenge = Challenge::where('name', 'Argumentative Essay: Contemporary Issues')->first();
+        if ($essayChallenge) {
+             Task::create([
+                'challenge_id' => $essayChallenge->id,
+                'name' => 'Essay Outline and Annotated Bibliography',
+                'description' => 'Submit an outline for your argumentative essay and an annotated bibliography of your sources.',
+                'instructions' => "Choose ONE essay topic. Create a detailed outline including your thesis, main arguments (with planned evidence), counterarguments, and conclusion structure. Also, provide an annotated bibliography for at least four credible sources, briefly summarizing each and explaining its relevance. Submit as a single document.",
+                'points_reward' => 50,
+                'submission_type' => 'file', // Or text
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate clarity and completeness of the outline structure, logical flow of arguments, and quality/relevance of sources and annotations in the bibliography.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $essayChallenge->id,
+                'name' => 'Argumentative Essay Submission',
+                'description' => 'Submit the full argumentative essay based on your chosen topic and outline.',
+                'instructions' => "Write the full argumentative essay (1000-1250 words) following the requirements: clear thesis, supported arguments, refuted counterarguments, evidence from 4+ sources, conclusion, and proper MLA or APA citation. Submit the final essay.",
+                'points_reward' => 100,
+                'submission_type' => 'file', // Or text
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate based on the main criteria: thesis, argumentation, evidence, organization, counterarguments, mechanics, style, citation, and persuasiveness.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $essayChallenge->id,
+                'name' => 'Writing Process Reflection',
+                'description' => 'Submit a short reflection on your essay writing process.',
+                'instructions' => "Write a short reflection (200-250 words) discussing your writing process for this essay. Mention challenges you faced (e.g., research, structuring arguments, finding sources) and how you addressed them. Submit your reflection.",
+                'points_reward' => 50,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate the thoughtfulness and insightfulness of the reflection on the writing process, including challenges and strategies.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            $essayChallenge->updatePointsReward();
+        }
+
         // 17. Foreign Language Challenge
         Challenge::create([
             "name" => "Spanish Language Communication Skills",
@@ -552,6 +900,48 @@ class ChallengeTypeSeeder extends Seeder
                     "Tu trabajo será evaluado en función de tu comprensión de textos en español, precisión gramatical, riqueza de vocabulario, claridad de expresión, conocimiento cultural, capacidad analítica, y organización coherente de ideas. Se valorará el uso de un español natural y fluido, con atención al registro apropiado según el contexto.",
             ],
         ]);
+
+        // Add Tasks for Foreign Language Challenge (Spanish)
+        $languageChallenge = Challenge::where('name', 'Spanish Language Communication Skills')->first();
+        if ($languageChallenge) {
+            Task::create([
+                'challenge_id' => $languageChallenge->id,
+                'name' => 'Parte 1: Comprensión de Lectura',
+                'description' => 'Responder a preguntas sobre un texto en español acerca de la diversidad lingüística.',
+                'instructions' => "Lee el texto proporcionado en la Parte 1 y responde a las 5 preguntas en español. Asegúrate de que tus respuestas demuestren comprensión del texto. Envía tus respuestas.",
+                'points_reward' => 60,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluar la comprensión del texto basada en las respuestas a las preguntas, y la corrección gramatical/vocabulario en español.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $languageChallenge->id,
+                'name' => 'Parte 2: Expresión Escrita (Ensayo)',
+                'description' => 'Escribir un ensayo en español sobre uno de los temas propuestos.',
+                'instructions' => "Elige UNO de los temas (A, B, o C) y escribe un ensayo en español (350-450 palabras) siguiendo los requisitos: introducción con tesis, argumentos con ejemplos, conclusión, y uso correcto de gramática/vocabulario. Envía tu ensayo.",
+                'points_reward' => 80,
+                'submission_type' => 'text', // Or file
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluar la estructura del ensayo, claridad de la tesis, desarrollo de argumentos, corrección gramatical, riqueza de vocabulario, cohesión y coherencia en español.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $languageChallenge->id,
+                'name' => 'Parte 3: Análisis Cultural (Festivales)',
+                'description' => 'Analizar imágenes de festivales hispanohablantes y responder a preguntas en español.',
+                'instructions' => "Observa las imágenes de festivales proporcionadas (asume que son externas). Completa las 5 tareas en español: identifica los festivales/países, describe elementos culturales, compara/contrasta, explica su reflejo cultural/histórico, y elige uno para participar explicando por qué. Envía tu análisis.",
+                'points_reward' => 80,
+                'submission_type' => 'text', // Could include file upload if images need referencing
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluar el conocimiento cultural sobre los festivales, la capacidad de descripción y comparación, el análisis de la significancia cultural, y la corrección/fluidez del español usado.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            $languageChallenge->updatePointsReward();
+        }
 
         // ======= SOCIAL STUDIES CHALLENGES =======
 
@@ -585,6 +975,60 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
+        // Add Tasks for Economics Challenge
+        $economicsChallenge = Challenge::where('name', 'Economic Analysis and Policy Evaluation')->first();
+        if ($economicsChallenge) {
+             Task::create([
+                'challenge_id' => $economicsChallenge->id,
+                'name' => 'Part 1: Micro - Market Structure & Elasticity',
+                'description' => 'Analyze the smartphone industry market structure and calculate price elasticity.',
+                'instructions' => "Address Part 1, Problem 1 (a, b, c, d). Assume smartphone industry data is provided. Determine market structure, analyze its effects, calculate PED, and evaluate antitrust policies. Submit your analysis and calculations.",
+                'points_reward' => 60,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate correct identification of market structure, analysis of impact, accurate PED calculation and interpretation, and reasoned evaluation of policy.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+             Task::create([
+                'challenge_id' => $economicsChallenge->id,
+                'name' => 'Part 1: Micro - Production & Cost Analysis',
+                'description' => "Analyze a firm's costs, determine profit-maximizing output, and assess minimum wage impact.",
+                'instructions' => "Address Part 1, Problem 2 (a, b, c, d). Assume cost/revenue data is provided. Calculate MC, ATC, MR, find profit-max output (MR=MC), analyze minimum wage impact on costs/output, and recommend production level. Show calculations. Submit your analysis.",
+                'points_reward' => 60,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate correct calculation of costs/revenue, identification of profit-max output, logical analysis of minimum wage impact, and justified production recommendation.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $economicsChallenge->id,
+                'name' => 'Part 2: Macro - Stagflation Policy Evaluation',
+                'description' => 'Analyze causes of stagflation in Country X and evaluate policy options.',
+                'instructions' => "Address Part 2 (a, b, c, d). Assume Country X data is provided. Analyze causes of stagflation, evaluate fiscal, monetary, and supply-side policies, recommend a comprehensive approach, and explain sectoral effects. Submit your analysis and recommendations.",
+                'points_reward' => 70,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate understanding of stagflation causes, thorough evaluation of policy options (effectiveness, trade-offs), justification for recommended policy mix, and analysis of sectoral impacts.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $economicsChallenge->id,
+                'name' => 'Part 3: International - Trade Policy Case Study',
+                'description' => 'Analyze trade policy options for developing Country Y and recommend a strategy.',
+                'instructions' => "Address Part 3 (1, 2, 3). Analyze benefits/costs of import substitution, export orientation, and strategic trade policy for Country Y. Evaluate impacts on growth, poverty, environment, and vulnerability. Recommend a justified trade strategy. Submit your analysis.",
+                'points_reward' => 60,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate depth of analysis of trade policy options, assessment of multifaceted impacts, and reasoned justification for the recommended trade strategy based on Country Y context.']),
+                'order' => 4,
+                'is_active' => true,
+            ]);
+            $economicsChallenge->updatePointsReward();
+        }
+
         // 19. Psychology Challenge
         Challenge::create([
             "name" => "Psychological Research and Analysis",
@@ -614,6 +1058,48 @@ class ChallengeTypeSeeder extends Seeder
                     "Your work will be evaluated on understanding of psychological concepts and theories, application of research methods, ethical considerations, data analysis skills, critical thinking, integration of multiple perspectives, evidence-based reasoning, and clarity of communication. Responses should demonstrate both breadth and depth of psychological knowledge.",
             ],
         ]);
+
+        // Add Tasks for Psychology Challenge
+        $psychologyChallenge = Challenge::where('name', 'Psychological Research and Analysis')->first();
+        if ($psychologyChallenge) {
+            Task::create([
+                'challenge_id' => $psychologyChallenge->id,
+                'name' => 'Part 1: Research Design Proposal',
+                'description' => 'Design a psychological research study for one of the given questions.',
+                'instructions' => "Choose ONE research question. Design a study including: question/hypothesis, variables, participants, method (justified), procedure, data analysis plan, ethical considerations/solutions, and limitations/confounds. Submit your detailed research design.",
+                'points_reward' => 80,
+                'submission_type' => 'text', // Or file
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate clarity of research question/hypothesis, appropriateness of method, detail in procedure, soundness of analysis plan, thoroughness of ethical considerations, and identification of limitations.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $psychologyChallenge->id,
+                'name' => 'Part 2: Data Analysis and Interpretation',
+                'description' => 'Analyze provided therapy effectiveness data, create visualizations, and interpret results.',
+                'instructions' => "Assume therapy dataset is provided. Analyze it to answer questions (a-d) regarding effectiveness, demographics, adherence, and long-term outcomes. Create visual representations (e.g., graphs). Write an interpretation summarizing findings, relating to theory, discussing implications, and limitations. Submit analysis, visualizations (file upload/link), and interpretation.",
+                'points_reward' => 80,
+                'submission_type' => 'file', // For visualizations + text analysis
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate accuracy of data analysis, appropriateness/clarity of visualizations, depth of interpretation, connection to theory, clinical implications, and identification of limitations.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $psychologyChallenge->id,
+                'name' => 'Part 3: Application of Theories (Scenario Analysis)',
+                'description' => 'Analyze one of the scenarios using three different psychological perspectives.',
+                'instructions' => "Choose ONE scenario (A, B, or C). Analyze it from THREE different psychological perspectives. Explain how each interprets causes, recommend interventions from each, evaluate strengths/limitations of each approach for the scenario, and suggest an integrated approach. Submit your multi-perspective analysis.",
+                'points_reward' => 70,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate understanding and application of three distinct psychological perspectives, quality of analysis of causes/interventions, critical evaluation of approaches, and coherence of the integrated approach.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            $psychologyChallenge->updatePointsReward();
+        }
 
         // ======= TECHNOLOGICAL LITERACY CHALLENGES =======
 
@@ -647,6 +1133,48 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
+        // Add Tasks for Digital Media Production Challenge
+        $digitalMediaChallenge = Challenge::where('name', 'Digital Storytelling and Multimedia Production')->first();
+        if ($digitalMediaChallenge) {
+            Task::create([
+                'challenge_id' => $digitalMediaChallenge->id,
+                'name' => 'Project Planning Documentation',
+                'description' => 'Submit the planning documents for your digital storytelling project.',
+                'instructions' => "Choose ONE theme. Submit the required planning documents: concept statement, storyboard/outline, script/narration text, and target audience analysis/goals. Submit as a single PDF.",
+                'points_reward' => 70,
+                'submission_type' => 'file',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate clarity of concept, completeness and coherence of storyboard/outline, quality of script, and thoughtfulness of audience analysis.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $digitalMediaChallenge->id,
+                'name' => 'Digital Story Production',
+                'description' => 'Submit the final 3-5 minute digital story.',
+                'instructions' => "Produce the final digital story based on your plan, integrating at least three media types. Ensure good technical quality and design. Submit the video file (.mp4, .mov) or interactive HTML package.",
+                'points_reward' => 130,
+                'submission_type' => 'file', // Or URL if hosted
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate narrative effectiveness, creativity, technical execution (audio/visual quality, editing), integration of media, design, originality, and adherence to brief.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $digitalMediaChallenge->id,
+                'name' => 'Reflection and Analysis',
+                'description' => 'Submit a written reflection and analysis of your digital storytelling project.',
+                'instructions' => "Write a reflection (300-400 words) explaining your creative choices, how media supported the narrative, challenges faced, and application of digital media principles. Submit your written reflection.",
+                'points_reward' => 70,
+                'submission_type' => 'text',
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate depth of reflection on creative choices, process challenges, and connection to digital media theory/principles.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            $digitalMediaChallenge->updatePointsReward();
+        }
+
         // 21. Data Visualization Challenge
         Challenge::create([
             "name" => "Public Health Data Visualization",
@@ -677,60 +1205,170 @@ class ChallengeTypeSeeder extends Seeder
             ],
         ]);
 
-        // Continue with existing challenges from the original seeder
-        Challenge::create([
-            "name" => "Database Challenge - Hospital Management System",
-            "description" =>
-                "Design and implement a comprehensive database for a modern hospital management system that handles patients, staff, appointments, and medical records.",
-            "start_date" => Carbon::now(),
-            "end_date" => Carbon::now()->addDays(21),
-            "points_reward" => 350,
-            "difficulty_level" => "advanced",
-            "is_active" => true,
-            "max_participants" => 25,
-            "required_level" => 5,
-            "challenge_type" => "database",
-            "time_limit" => 240,
-            "programming_language" => "sql",
-            "tech_category" => "healthcare_it",
-            "category_id" => $categories["computer-science"] ?? null,
-            "challenge_content" => [
-                "scenario" =>
-                    "A large hospital is modernizing its IT infrastructure and needs a robust database design for its new Hospital Management System. The system must track patients, doctors, nurses, appointments, medical records, prescriptions, billing, insurance claims, and inventory while ensuring data integrity, security, and compliance with healthcare regulations.",
-                "schema" =>
-                    "-- Existing partial schema (needs to be extended):\n\nCREATE TABLE patients (\n  patient_id INT PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  date_of_birth DATE,\n  gender VARCHAR(10),\n  contact_number VARCHAR(15),\n  email VARCHAR(100),\n  address TEXT,\n  emergency_contact VARCHAR(100),\n  blood_type VARCHAR(5),\n  registration_date DATE\n);\n\nCREATE TABLE staff (\n  staff_id INT PRIMARY KEY,\n  first_name VARCHAR(50),\n  last_name VARCHAR(50),\n  role VARCHAR(50),\n  department VARCHAR(50),\n  contact_number VARCHAR(15),\n  email VARCHAR(100),\n  hire_date DATE\n);\n\nCREATE TABLE appointments (\n  appointment_id INT PRIMARY KEY,\n  patient_id INT,\n  staff_id INT,\n  appointment_date DATETIME,\n  purpose VARCHAR(200),\n  status VARCHAR(20),\n  FOREIGN KEY (patient_id) REFERENCES patients(patient_id),\n  FOREIGN KEY (staff_id) REFERENCES staff(staff_id)\n);",
-                "tasks" =>
-                    "1. Design additional tables for medical records, prescriptions, billing, insurance, and inventory with appropriate relationships.\n2. Create appropriate indexes to optimize query performance.\n3. Implement constraints to ensure data integrity (e.g., valid medication dosages, appointment scheduling rules).\n4. Design and implement stored procedures for common operations (appointment scheduling, prescription management).\n5. Implement views for different stakeholders (doctor view, nurse view, billing department view).\n6. Create a data access layer with proper security controls for HIPAA compliance.",
-                "sample_data" =>
-                    "-- Sample patient data\nINSERT INTO patients VALUES (1001, 'John', 'Smith', '1975-05-15', 'Male', '555-123-4567', 'john.smith@email.com', '123 Main St, Anytown, USA', 'Mary Smith: 555-987-6543', 'O+', '2022-01-10');\nINSERT INTO patients VALUES (1002, 'Jane', 'Doe', '1988-09-23', 'Female', '555-234-5678', 'jane.doe@email.com', '456 Oak Ave, Somewhere, USA', 'Robert Doe: 555-876-5432', 'AB-', '2022-02-15');\n\n-- Sample staff data\nINSERT INTO staff VALUES (101, 'David', 'Miller', 'Doctor', 'Cardiology', '555-111-2222', 'david.miller@hospital.org', '2020-03-15');\nINSERT INTO staff VALUES (102, 'Sarah', 'Johnson', 'Nurse', 'Emergency', '555-333-4444', 'sarah.johnson@hospital.org', '2021-06-10');\nINSERT INTO staff VALUES (103, 'Michael', 'Brown', 'Doctor', 'Neurology', '555-555-6666', 'michael.brown@hospital.org', '2019-11-05');\n\n-- Sample appointment data\nINSERT INTO appointments VALUES (5001, 1001, 101, '2023-03-15 10:30:00', 'Routine checkup', 'Completed');\nINSERT INTO appointments VALUES (5002, 1002, 103, '2023-03-16 14:45:00', 'Migraine consultation', 'Scheduled');\nINSERT INTO appointments VALUES (5003, 1001, 101, '2023-04-20 11:15:00', 'Follow-up', 'Scheduled');",
-            ],
-        ]);
+        // Add Tasks for Data Visualization Challenge
+        $dataVisChallenge = Challenge::where('name', 'Public Health Data Visualization')->first();
+        if ($dataVisChallenge) {
+             Task::create([
+                'challenge_id' => $dataVisChallenge->id,
+                'name' => 'Part 1: Data Exploration and Preparation',
+                'description' => 'Explore, clean, analyze, and prepare the provided COVID-19 vaccination dataset.',
+                'instructions' => "Assume 'covid_vaccination_data.csv' is provided. Perform steps 1-5: explore, clean, preliminary analysis, prepare data for visualization, and document the process/findings. Submit your documented process and findings (e.g., Jupyter notebook, R Markdown, or text document with code snippets).",
+                'points_reward' => 60,
+                'submission_type' => 'file', // Or text with code
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate thoroughness of exploration, appropriateness of cleaning steps, quality of preliminary analysis, data preparation logic, and clarity of documentation.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $dataVisChallenge->id,
+                'name' => 'Part 2: Visualizations for Different Audiences',
+                'description' => 'Create three distinct visualizations tailored for technical, policy, and public audiences.',
+                'instructions' => "Create the three visualizations specified in Part 2 for the different audiences, using the prepared data. Focus on tailoring the complexity, message, and design for each audience. Submit the visualizations (e.g., image files, links to interactive plots) along with brief justifications for your design choices for each.",
+                'points_reward' => 90, // 30 points each
+                'submission_type' => 'file', // Or URL
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate appropriateness of visualization type, clarity, design effectiveness, and tailoring for each specified audience (technical, policy, public). Check justification.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $dataVisChallenge->id,
+                'name' => 'Part 3: Interactive Dashboard Mockup/Prototype',
+                'description' => 'Design a mockup or prototype of an interactive dashboard integrating multiple visualizations.',
+                'instructions' => "Design a mockup/prototype (e.g., using Figma, Balsamiq, or even a well-described document with sketches) of the interactive dashboard described in Part 3. Include layout, visualization types, filtering ideas, context, and a user guide. Submit the mockup/prototype file or link, and the user guide.",
+                'points_reward' => 90,
+                'submission_type' => 'file', // Or URL
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate dashboard design principles (layout, clarity), choice of visualizations, interactivity features, context provided, usability, and quality of user guide.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            $dataVisChallenge->updatePointsReward();
+        }
 
-        Challenge::create([
-            "name" => "UI/UX Challenge - Financial Dashboard Design",
-            "description" =>
-                "Design an intuitive and visually appealing financial analytics dashboard for investment portfolio tracking and analysis.",
-            "start_date" => Carbon::now(),
-            "end_date" => Carbon::now()->addDays(14),
-            "points_reward" => 0,
-            "difficulty_level" => "intermediate",
-            "is_active" => true,
-            "max_participants" => 40,
-            "required_level" => 3,
-            "challenge_type" => "ui_design",
-            "time_limit" => 150,
-            "programming_language" => "none",
-            "tech_category" => "fintech",
-            "category_id" => $categories["computer-science"] ?? null,
-            "challenge_content" => [
-                "design_brief" =>
-                    "A leading investment firm is developing a new web-based platform for their clients to track and analyze their investment portfolios. They need a modern, intuitive dashboard that displays complex financial data in an accessible way. The dashboard should cater to both casual investors and financial professionals, with appropriate data visualization, filtering options, and customization features.\n\nThe dashboard must include portfolio overview, asset allocation, performance metrics, market trends, transaction history, and alert notifications. It should also offer responsive design for mobile and tablet access.",
-                "requirements" =>
-                    "1. Create wireframes for the main dashboard view and at least 2 detailed secondary screens.\n2. Design high-fidelity mockups with a consistent color scheme and typography.\n3. Include data visualization components (charts, graphs) for financial metrics.\n4. Design intuitive navigation and filtering mechanisms.\n5. Include both light and dark mode versions.\n6. Implement responsive layouts for desktop, tablet, and mobile views.\n7. Consider accessibility requirements for color contrast and readability.\n8. Create a style guide documenting UI components, colors, typography, and usage guidelines.",
-                "evaluation_criteria" =>
-                    "Designs will be judged on visual appeal, usability, information architecture, accessibility, originality, and technical feasibility. Special attention will be given to how complex financial data is represented in a user-friendly manner, and how the design accommodates both novice and expert users.",
-            ],
-        ]);
+        // Existing Database Challenge (Hospital Management)
+        $databaseHospitalChallenge = Challenge::where('name', 'Database Challenge - Hospital Management System')->first();
+        if ($databaseHospitalChallenge) {
+             // Extract tasks from challenge_content and create Task models
+            Task::create([
+                'challenge_id' => $databaseHospitalChallenge->id,
+                'name' => 'Design Medical Records, Prescriptions, Billing, Insurance, Inventory Tables',
+                'description' => 'Extend the provided schema to include tables for medical records, prescriptions, billing, insurance, and inventory, establishing appropriate relationships.',
+                'instructions' => 'Provide the SQL `CREATE TABLE` statements for the required additional tables (MedicalRecords, Prescriptions, Billing, Insurance, InventoryItems, etc.). Ensure foreign keys are correctly defined to link tables (e.g., Prescriptions to Patients and Staff, Billing to Patients and Appointments).',
+                'points_reward' => 80,
+                'submission_type' => 'text', // SQL Code
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check for completeness of required tables, appropriate column types, primary/foreign key definitions, and logical relationships between tables.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $databaseHospitalChallenge->id,
+                'name' => 'Implement Indexes and Constraints',
+                'description' => 'Create appropriate indexes for performance and implement data integrity constraints.',
+                'instructions' => 'Add necessary indexes (e.g., on foreign keys, frequently queried columns like patient names, appointment dates). Implement constraints (e.g., CHECK constraints for dosages, UNIQUE constraints where needed, NOT NULL constraints). Provide the SQL `CREATE INDEX` and `ALTER TABLE ... ADD CONSTRAINT` statements.',
+                'points_reward' => 70,
+                'submission_type' => 'text', // SQL Code
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check for logical index creation on relevant columns and implementation of meaningful constraints to ensure data integrity.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $databaseHospitalChallenge->id,
+                'name' => 'Create Stored Procedures',
+                'description' => 'Implement stored procedures for common operations like appointment scheduling and prescription management.',
+                'instructions' => 'Write SQL stored procedures for: 1) Scheduling a new appointment (checking for conflicts). 2) Adding a new prescription for a patient. Ensure procedures handle inputs and perform necessary insertions/updates.',
+                'points_reward' => 80,
+                'submission_type' => 'text', // SQL Code
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check procedures for correct SQL logic, parameter handling, error checking (optional but good), and successful execution of intended database operations.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $databaseHospitalChallenge->id,
+                'name' => 'Create Views for Stakeholders',
+                'description' => 'Implement SQL views for different user roles (Doctor, Nurse, Billing).',
+                'instructions' => 'Create SQL views: 1) `DoctorPatientView` showing doctor\'s upcoming appointments and associated patient details. 2) `NurseShiftView` showing patients assigned to a nurse for a specific shift/ward (requires adding shift/ward info or making assumptions). 3) `BillingSummaryView` showing patient appointment costs and insurance status. Provide the `CREATE VIEW` statements.',
+                'points_reward' => 60,
+                'submission_type' => 'text', // SQL Code
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Check views for correct joining of tables and selection of relevant columns appropriate for each stakeholder role.']),
+                'order' => 4,
+                'is_active' => true,
+            ]);
+            // Note: Task 6 (Data access layer) is more about application code, harder to represent as a pure SQL task. Could be a conceptual task.
+             Task::create([
+                'challenge_id' => $databaseHospitalChallenge->id,
+                'name' => 'Data Access Security Concept',
+                'description' => 'Describe how you would implement security controls for HIPAA compliance in the data access layer.',
+                'instructions' => 'Explain the strategies and techniques you would use in an application layer (e.g., using an ORM, backend framework) to enforce access controls based on user roles (Doctor, Nurse, Admin, Patient) to comply with HIPAA principles like minimum necessary access. Focus on the concepts, not specific code.',
+                'points_reward' => 60,
+                'submission_type' => 'text', // Explanation
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate the understanding of role-based access control, principles of least privilege, and HIPAA considerations applied to database access patterns from an application perspective.']),
+                'order' => 5,
+                'is_active' => true,
+            ]);
+            $databaseHospitalChallenge->updatePointsReward();
+        }
+
+        // Existing UI/UX Challenge (Financial Dashboard)
+        $uiUxChallenge = Challenge::where('name', 'UI/UX Challenge - Financial Dashboard Design')->first();
+         if ($uiUxChallenge) {
+            // Extract tasks from challenge_content and create Task models
+            Task::create([
+                'challenge_id' => $uiUxChallenge->id,
+                'name' => 'Dashboard Wireframes (Main + 2 Secondary)',
+                'description' => 'Create wireframes for the main dashboard view and two detailed secondary screens (e.g., Asset Details, Transaction History).',
+                'instructions' => 'Submit wireframes showing layout, content areas, key UI elements, and navigation flow for the main dashboard and two other important screens. Focus on structure and information hierarchy. Submit as image files or link to prototyping tool (e.g., Figma, Balsamiq).',
+                'points_reward' => 70,
+                'submission_type' => 'file', // Or URL
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate clarity, information architecture, logical flow, and completeness of wireframes for the required screens.']),
+                'order' => 1,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $uiUxChallenge->id,
+                'name' => 'High-Fidelity Mockups (Light & Dark Mode)',
+                'description' => 'Design high-fidelity mockups for the main dashboard screen, including data visualizations, in both light and dark modes.',
+                'instructions' => 'Create visually detailed mockups for the main dashboard screen, incorporating color scheme, typography, data visualization components (charts/graphs), and navigation. Provide both light and dark mode versions. Submit as image files or link.',
+                'points_reward' => 80,
+                'submission_type' => 'file', // Or URL
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate visual appeal, consistency, usability, clarity of data visualization, and successful implementation of both light and dark modes.']),
+                'order' => 2,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $uiUxChallenge->id,
+                'name' => 'Responsive Design Mockups (Tablet & Mobile)',
+                'description' => 'Create mockups showing the responsive design of the main dashboard for tablet and mobile views.',
+                'instructions' => 'Design how the main dashboard layout and components adapt to typical tablet and mobile screen sizes. Focus on maintaining usability and accessibility of key information. Submit as image files or link.',
+                'points_reward' => 70,
+                'submission_type' => 'file', // Or URL
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate effective adaptation of layout, navigation, and content for smaller screens, ensuring usability and accessibility.']),
+                'order' => 3,
+                'is_active' => true,
+            ]);
+            Task::create([
+                'challenge_id' => $uiUxChallenge->id,
+                'name' => 'UI Style Guide',
+                'description' => 'Create a style guide documenting UI components, colors, typography, and usage guidelines.',
+                'instructions' => 'Develop a style guide that documents the key visual elements of your design: color palette, typography (fonts, sizes, weights), iconography, button styles, form elements, spacing rules, etc. Submit as a PDF or link.',
+                'points_reward' => 80,
+                'submission_type' => 'file', // Or URL
+                'evaluation_type' => 'manual',
+                'evaluation_details' => json_encode(['guidelines' => 'Evaluate completeness, clarity, consistency, and usefulness of the style guide for developers implementing the design.']),
+                'order' => 4,
+                'is_active' => true,
+            ]);
+            $uiUxChallenge->updatePointsReward();
+        }
     }
 
     /**
