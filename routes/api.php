@@ -3,15 +3,31 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SolutionController;
+use App\Http\Controllers\Api\TextSolutionController;
 
+// Existing routes
 Route::post('/submit-solution', [SolutionController::class, 'submit']);
-
 Route::post('/execute-python', function (Request $request) {
     return executeCode($request, 'python');
 });
-
 Route::post('/execute-java', function (Request $request) {
     return executeCode($request, 'java');
+});
+
+// New route for text-based solutions
+Route::post('/submit-text-solution', [TextSolutionController::class, 'submit'])
+    ->name('api.submit-text-solution');
+    // Removed auth middleware for testing
+
+// Debugging route for text solutions
+Route::get('/test-text-solution', function() {
+    return response()->json(['message' => 'Text solution route is working']);
+});
+
+// Direct route to TextSolutionController - this is the one that works
+Route::post('/direct-text-solution', function(Request $request) {
+    $controller = new \App\Http\Controllers\Api\TextSolutionController();
+    return $controller->submit($request);
 });
 
 if (!function_exists('executeCode')) {
@@ -174,3 +190,4 @@ Route::get('/debug-task/{task}', function (\App\Models\Task $task) {
         'programming_language' => $task->challenge->programming_language ?? 'unknown'
     ]);
 });
+

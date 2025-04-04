@@ -1,5 +1,6 @@
 <x-layouts.app>
     <head>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <script>
             // Configure Monaco loader
             window.MonacoEnvironment = {
@@ -36,6 +37,140 @@
                     ], function() {
                         console.log('Monaco language modules preloaded');
                     });
+                });
+            }
+
+            // Add handler for non-coding challenges
+            const answerInput = document.getElementById('answer-input');
+            const submitBtn = document.getElementById('submit-solution');
+
+            if (answerInput && submitBtn) {
+                submitBtn.addEventListener('click', function() {
+                    const answer = answerInput.value.trim();
+
+                    if (!answer) {
+                        // Show error message
+                        const messageContainer = document.getElementById('submission-message');
+                        const messageText = document.getElementById('message-text');
+
+                        if (messageContainer && messageText) {
+                            messageContainer.classList.remove('hidden');
+                            messageContainer.classList.add('bg-amber-500/10', 'border-amber-500/20');
+                            messageText.classList.add('text-amber-400');
+                            messageText.textContent = 'Please enter your answer before submitting.';
+                        }
+                        return;
+                    }
+
+                    // Log the submission URL and data
+                    const submitUrl = '/api/direct-text-solution';
+                    console.log('Submitting to:', submitUrl);
+                    console.log('Submission data:', {
+                        task_id: {{ $currentTask->id }},
+                        user_id: {{ auth()->user()->id }},
+                        student_answer: {
+                            submitted_text: answer,
+                            output: answer
+                        }
+                    });
+
+                    // Use the direct submission route that's working
+                    console.log('Submitting answer to:', submitUrl);
+
+                    try {
+                        console.log('Starting fetch request...');
+                        fetch(submitUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            task_id: {{ $currentTask->id }},
+                            user_id: {{ auth()->user()->id }},
+                            student_answer: {
+                                submitted_text: answer,
+                                output: answer
+                            }
+                        })
+                    })
+                    .then(response => {
+                        console.log('Response received:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Response data:', data);
+                        if (data.success) {
+                            // Show appropriate message based on status
+                            const messageContainer = document.getElementById('submission-message');
+                            const messageText = document.getElementById('message-text');
+
+                            if (messageContainer && messageText) {
+                                messageContainer.classList.remove('hidden');
+                                messageContainer.classList.add('bg-emerald-500/10', 'border-emerald-500/20');
+                                messageText.classList.add('text-emerald-400');
+                                messageText.textContent = data.message;
+                            }
+
+                            // If pending review, maybe disable the submit button
+                            if (data.status === 'pending_review') {
+                                submitBtn.disabled = true;
+                                submitBtn.textContent = 'Answer Submitted - Pending Review';
+                            }
+
+                            // Redirect to challenge page after a short delay
+                            setTimeout(() => {
+                                window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
+                            }, 1500);
+                        } else {
+                            // Show error message
+                            const messageContainer = document.getElementById('submission-message');
+                            const messageText = document.getElementById('message-text');
+
+                            if (messageContainer && messageText) {
+                                messageContainer.classList.remove('hidden');
+                                messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                                messageText.classList.add('text-red-400');
+                                messageText.textContent = data.message || 'Failed to submit answer';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error submitting answer:', error);
+                        console.error('Error details:', error.stack || 'No stack trace available');
+                        // Try to get more detailed error information
+                        let errorMessage = 'Failed to submit answer. Please try again.';
+                        if (error.response && error.response.data && error.response.data.message) {
+                            errorMessage = error.response.data.message;
+                        }
+
+                        // Show error message
+                        const messageContainer = document.getElementById('submission-message');
+                        const messageText = document.getElementById('message-text');
+
+                        if (messageContainer && messageText) {
+                            messageContainer.classList.remove('hidden');
+                            messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                            messageText.classList.add('text-red-400');
+                            messageText.textContent = errorMessage;
+                        }
+                    });
+                    } catch (error) {
+                        console.error('Critical error in fetch operation:', error);
+                        console.error('Error details:', error.stack || 'No stack trace available');
+
+                        // Show error message
+                        const messageContainer = document.getElementById('submission-message');
+                        const messageText = document.getElementById('message-text');
+
+                        if (messageContainer && messageText) {
+                            messageContainer.classList.remove('hidden');
+                            messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                            messageText.classList.add('text-red-400');
+                            messageText.textContent = 'A critical error occurred while submitting your answer. Please try again.';
+                        }
+                    }
                 });
             }
         </script>
@@ -85,7 +220,7 @@
                             {{ ucfirst($challenge->programming_language ?? 'Code') }}
                         </span>
                     </div>
-                    
+
                     <div class="space-y-4">
                         <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
                             <h4 class="font-medium text-white mb-2 flex items-center gap-2">
@@ -96,7 +231,7 @@
                             </h4>
                             <p class="text-neutral-300">{{ $challenge->challenge_content['scenario'] ?? 'No scenario available' }}</p>
                         </div>
-                        
+
                         <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
                             <h4 class="font-medium text-white mb-2 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -113,7 +248,7 @@
                                 </button>
                             </div>
                         </div>
-                        
+
                         <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
                             <h4 class="font-medium text-white mb-2 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -123,7 +258,7 @@
                             </h4>
                             <p class="text-neutral-300">{{ $challenge->challenge_content['current_behavior'] ?? 'Not specified' }}</p>
                         </div>
-                        
+
                         <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
                             <h4 class="font-medium text-white mb-2 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -184,8 +319,15 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                         </svg>
-                        Your Solution
+                        Your Answer
                     </h2>
+                    @php
+                        $categoryName = $challenge->category->name; // Assuming the category name is stored in the 'name' column
+                        $codingCategories = ['Computer Science', 'Web Development', 'Mobile Development'];
+                        $showRunCode = in_array($categoryName, $codingCategories);
+                    @endphp
+
+                    @if($showRunCode)
                     <button id="run-code-btn" class="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-sm text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -193,14 +335,10 @@
                         </svg>
                         Run Code
                     </button>
+                    @endif
                 </div>
 
-                @php
-                    $categoryName = $challenge->category->name; // Assuming the category name is stored in the 'name' column
-                    $codingCategories = ['Computer Science', 'Web Development', 'Mobile Development'];
-                @endphp
-
-                @if(in_array($categoryName, $codingCategories))
+                @if($showRunCode)
                     <!-- Monaco Editor Container -->
                     <div class="flex-1 relative min-h-[400px] rounded-lg overflow-hidden border border-neutral-700" id="monaco-editor-container">
                         <div id="monaco-loading" class="absolute inset-0 flex items-center justify-center bg-neutral-900">
@@ -233,19 +371,177 @@
                 @else
                     <!-- Text Area for non-coding challenges -->
                     <div class="flex-1">
-                        <textarea id="answer-input" 
-                            class="w-full h-48 p-4 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"
-                            placeholder="Type your answer here..."></textarea>
+                        @php
+                            $evaluationType = $currentTask->evaluation_type ?? 'manual';
+                            $evaluationDetails = $currentTask->evaluation_details ?? [];
+                        @endphp
+
+                        @if($evaluationType === 'multiple_choice')
+                            <div class="space-y-3">
+                                @foreach($evaluationDetails['options'] ?? [] as $index => $option)
+                                    <label class="flex items-center space-x-3">
+                                        <input type="checkbox"
+                                               name="answer_options[]"
+                                               value="{{ $index }}"
+                                               class="form-checkbox rounded border-neutral-700 bg-neutral-800 text-emerald-500 focus:ring-emerald-500/50">
+                                        <span class="text-white">{{ $option }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @else
+                            <textarea id="answer-input"
+                                class="w-full h-48 p-4 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"
+                                placeholder="Type your answer here..."></textarea>
+                        @endif
                     </div>
                 @endif
+
+                <!-- Message container for submission status -->
+                <div id="submission-message" class="mt-4 p-3 rounded-lg border hidden">
+                    <p id="message-text" class="text-center font-medium"></p>
+                </div>
 
                 <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <button id="submit-solution" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        Submit Solution
+                        Submit Answer
                     </button>
+
+                    <script>
+                        // Add handler for non-coding challenges
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const answerInput = document.getElementById('answer-input');
+                            const submitBtn = document.getElementById('submit-solution');
+                            const evaluationType = '{{ $currentTask->evaluation_type ?? "manual" }}';
+
+                            // We'll use the submitSolution function defined in the main script
+                            // This event listener will be replaced by our main script
+                                    let submittedAnswer;
+
+                                    if (evaluationType === 'multiple_choice') {
+                                        // Gather selected checkboxes for multiple choice
+                                        const selectedOptions = Array.from(document.querySelectorAll('input[name="answer_options[]"]:checked'))
+                                            .map(checkbox => checkbox.value);
+                                        submittedAnswer = selectedOptions.join(',');
+                                    } else {
+                                        // Get text input for other types
+                                        submittedAnswer = answerInput ? answerInput.value.trim() : '';
+                                    }
+
+                                    // Log the answer for debugging
+                                    console.log('Submitting answer:', submittedAnswer);
+
+                                    if (!submittedAnswer) {
+                                        // Show error message
+                                        const messageContainer = document.getElementById('submission-message');
+                                        const messageText = document.getElementById('message-text');
+
+                                        if (messageContainer && messageText) {
+                                            messageContainer.classList.remove('hidden');
+                                            messageContainer.classList.add('bg-amber-500/10', 'border-amber-500/20');
+                                            messageText.classList.add('text-amber-400');
+                                            messageText.textContent = 'Please enter your answer before submitting.';
+                                        }
+                                        return;
+                                    }
+
+                                    // Disable submit button to prevent double submission
+                                    submitBtn.disabled = true;
+                                    submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Submitting...';
+
+                                    // Log the submission URL and data
+                                    const submitUrl = '/api/direct-text-solution';
+                                    console.log('Submitting to:', submitUrl);
+                                    console.log('Submission data:', {
+                                        task_id: {{ $currentTask->id }},
+                                        user_id: {{ auth()->user()->id }},
+                                        student_answer: {
+                                            submitted_text: submittedAnswer,
+                                            output: submittedAnswer
+                                        }
+                                    });
+
+                                    // Use the direct submission route that's working
+                                    console.log('Submitting answer to:', submitUrl);
+
+                                    try {
+                                        console.log('Starting fetch request...');
+                                        fetch(submitUrl, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                                            'Accept': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            task_id: {{ $currentTask->id }},
+                                            user_id: {{ auth()->user()->id }},
+                                            student_answer: {
+                                                submitted_text: submittedAnswer,
+                                                output: submittedAnswer
+                                            }
+                                        })
+                                    })
+                                    .then(response => {
+                                        console.log('Response received:', response.status);
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        console.log('Response data:', data);
+                                        if (data.success) {
+                                            console.log('Answer submitted successfully');
+
+                                            // Always redirect to the challenge page after successful submission
+                                            window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
+                                        } else {
+                                            console.error('Failed to submit answer:', data.message);
+                                            // Re-enable button on failure
+                                            submitBtn.disabled = false;
+                                            submitBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Submit Answer';
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error submitting answer:', error);
+                                        console.error('Error details:', error.stack || 'No stack trace available');
+
+                                        // Show error message
+                                        const messageContainer = document.getElementById('submission-message');
+                                        const messageText = document.getElementById('message-text');
+
+                                        if (messageContainer && messageText) {
+                                            messageContainer.classList.remove('hidden');
+                                            messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                                            messageText.classList.add('text-red-400');
+                                            messageText.textContent = 'Error submitting answer. Please try again.';
+                                        }
+                                        // Re-enable button on error
+                                        submitBtn.disabled = false;
+                                        submitBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Submit Answer';
+                                    });
+                                    } catch (error) {
+                                        console.error('Critical error in fetch operation:', error);
+                                        console.error('Error details:', error.stack || 'No stack trace available');
+
+                                        // Show error message
+                                        const messageContainer = document.getElementById('submission-message');
+                                        const messageText = document.getElementById('message-text');
+
+                                        if (messageContainer && messageText) {
+                                            messageContainer.classList.remove('hidden');
+                                            messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                                            messageText.classList.add('text-red-400');
+                                            messageText.textContent = 'A critical error occurred while submitting your answer. Please try again.';
+                                        }
+                                        // Re-enable button on error
+                                        submitBtn.disabled = false;
+                                        submitBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Submit Answer';
+                                    }
+                                });
+                            }
+                        });
+                    </script>
                     @if($nextTask)
                         <a href="{{ route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) }}" class="w-full py-3 px-4 rounded-xl bg-blue-500 hover:bg-blue-600 transition-colors duration-300 text-white font-semibold text-center flex items-center justify-center gap-2">
                             <span>Next Task</span>
@@ -318,7 +614,7 @@
                 'css': 'css',
                 'none': 'plaintext'
             };
-    
+
             // Normalize the language name
             let monacoLanguage = (programmingLanguage || 'plaintext').toLowerCase();
             monacoLanguage = languageMap[monacoLanguage] || 'plaintext';
@@ -392,18 +688,22 @@
 
             // Submit solution function
             function submitSolution() {
-                if (!editor) {
-                    console.error('Editor not initialized');
-                    return;
-                }
+                // Check if we're in a coding challenge with an editor
+                if (document.getElementById('monaco-editor-container')) {
+                    if (!editor) {
+                        console.error('Editor not initialized');
+                        alert('Editor not initialized. Please try again in a moment.');
+                        return;
+                    }
 
-                const code = editor.getValue();
-                const currentOutput = lastExecutionOutput;
+                    const code = editor.getValue();
+                    const currentOutput = lastExecutionOutput;
 
-                clearOutput();
-                displayOutput('Submitting solution...', false);
+                    clearOutput();
+                    displayOutput('Submitting solution...', false);
 
-                fetch('/api/submit-solution', {
+                    // Use the direct submission endpoint
+                    fetch('/api/direct-text-solution', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -414,7 +714,8 @@
                         user_id:  {{ auth()->user()->id }},
                         student_answer: {
                             code: code,
-                            output: currentOutput
+                            output: currentOutput,
+                            submitted_text: currentOutput // Store execution output in submitted_text
                         }
                     })
                 })
@@ -440,24 +741,15 @@
                     if (data.success) {
                         if (data.is_correct) {
                             displayOutput('✅ Your answer is correct! Solution and Results are Correct.', false);
-                            displayOutput('Redirecting to Challenge Page...', false);
-
-                            if (data.redirect) {
-                                setTimeout(() => {
-                                    if (data.with_message) {
-                                        const redirectUrl = new URL(data.redirect);
-                                        const params = new URLSearchParams(redirectUrl.search);
-                                        params.append('message', 'Task completed successfully!');
-                                        redirectUrl.search = params.toString();
-                                        window.location.href = redirectUrl.toString();
-                                    } else {
-                                        window.location.href = data.redirect;
-                                    }
-                                }, 3000);
-                            }
                         } else {
-                            displayOutput('❌ Your solution output doesn\'t match the expected result. Please try again.', true);
+                            displayOutput('Solution submitted successfully.', false);
                         }
+
+                        // Always redirect to the challenge page after submission
+                        displayOutput('Redirecting to Challenge Page...', false);
+                        setTimeout(() => {
+                            window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
+                        }, 1500);
                     } else {
                         displayOutput(data.message || 'Failed to submit solution', true);
                     }
@@ -465,8 +757,96 @@
                 .catch(error => {
                     clearOutput();
                     console.error('Submission error:', error);
-                    displayOutput(`Error submitting solution: ${error.message}`, true);
+                    displayOutput(`Error submitting solution. Please try again.`, true);
+                    // No alert, just log the error
                 });
+                } else {
+                    // Handle non-coding challenges (text input)
+                    const answerInput = document.getElementById('answer-input');
+                    if (!answerInput) {
+                        console.error('Answer input not found');
+                        // No alert, just log the error
+                        return;
+                    }
+
+                    const submittedAnswer = answerInput.value.trim();
+
+                    if (!submittedAnswer) {
+                        console.error('Empty answer submitted');
+                        // No alert, just log the error
+                        return;
+                    }
+
+                    console.log('Submitting text answer:', submittedAnswer);
+
+                    // Use the direct submission endpoint
+                    fetch('/api/direct-text-solution', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            task_id: {{ $currentTask->id }},
+                            user_id: {{ auth()->user()->id }},
+                            student_answer: {
+                                submitted_text: submittedAnswer,
+                                output: submittedAnswer
+                            }
+                        })
+                    })
+                    .then(response => {
+                        console.log('Response received:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Response data:', data);
+                        if (data.success) {
+                            // Show success message
+                            const messageContainer = document.getElementById('submission-message');
+                            const messageText = document.getElementById('message-text');
+
+                            if (messageContainer && messageText) {
+                                messageContainer.classList.remove('hidden');
+                                messageContainer.classList.add('bg-emerald-500/10', 'border-emerald-500/20');
+                                messageText.classList.add('text-emerald-400');
+                                messageText.textContent = data.message;
+                            }
+
+                            // Redirect to challenge page after a short delay
+                            setTimeout(() => {
+                                window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
+                            }, 1500);
+                        } else {
+                            // Show error message
+                            const messageContainer = document.getElementById('submission-message');
+                            const messageText = document.getElementById('message-text');
+
+                            if (messageContainer && messageText) {
+                                messageContainer.classList.remove('hidden');
+                                messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                                messageText.classList.add('text-red-400');
+                                messageText.textContent = data.message || 'Failed to submit answer';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error submitting answer:', error);
+                        console.error('Error details:', error.stack || 'No stack trace available');
+
+                        // Show error message
+                        const messageContainer = document.getElementById('submission-message');
+                        const messageText = document.getElementById('message-text');
+
+                        if (messageContainer && messageText) {
+                            messageContainer.classList.remove('hidden');
+                            messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                            messageText.classList.add('text-red-400');
+                            messageText.textContent = 'Failed to submit answer. Please try again.';
+                        }
+                    });
+                }
             }
 
             // Initialize Monaco editor directly (simpler approach than before)
@@ -540,12 +920,25 @@
             if (submitBtn) submitBtn.addEventListener('click', submitSolution);
             if (clearOutputBtn) clearOutputBtn.addEventListener('click', clearOutput);
 
+            // Make sure the submit button always uses our submitSolution function
+            document.querySelectorAll('#submit-solution').forEach(btn => {
+                // Remove any existing click listeners
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+
+                // Add our submitSolution function
+                newBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    submitSolution();
+                });
+            });
+
             // Handle window resize
             window.addEventListener('resize', function() {
                 if (editor) editor.layout();
             });
         });
+
     </script>
 </x-layouts.app>
-
-

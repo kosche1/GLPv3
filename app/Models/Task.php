@@ -23,6 +23,7 @@ class Task extends Model
         "submission_type",
         "evaluation_type",
         "evaluation_details",
+        "expected_output",
         "is_active",
         "challenge_id",
         "order"
@@ -36,6 +37,7 @@ class Task extends Model
     protected $casts = [
         "is_active" => "boolean",
         "evaluation_details" => "array",
+        "expected_output" => "array",
     ];
 
     /**
@@ -111,3 +113,5 @@ class Task extends Model
         return true;
     }
 }
+
+
