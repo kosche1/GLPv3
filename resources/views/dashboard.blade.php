@@ -13,55 +13,6 @@
             </div>
         </div>
         
-        <!-- Notifications Section -->
-        <div class="space-y-3">
-            <!-- Daily Reward Notification -->
-            @if(session('daily_reward_message'))
-                <div class="rounded-xl bg-emerald-900/30 border border-emerald-500/50 p-4 mb-2 relative animate-fade-in-down">
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0 mt-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3 flex-1">
-                            <p class="text-sm text-emerald-300 font-medium">
-                                {{ session('daily_reward_message') }}
-                            </p>
-                        </div>
-                    </div>
-                    <button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-emerald-400 hover:text-emerald-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-            @endif
-            
-            <!-- Achievement Notification -->
-            @if(session('achievement_message'))
-                <div class="rounded-xl bg-purple-900/30 border border-purple-500/50 p-4 mb-2 relative animate-achievement-pop" style="--animation-delay: 0.3s;">
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0 mt-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                            </svg>
-                        </div>
-                        <div class="ml-3 flex-1">
-                            <p class="text-sm text-purple-300 font-medium">
-                                {{ session('achievement_message') }}
-                            </p>
-                        </div>
-                    </div>
-                    <button type="button" onclick="this.parentElement.remove()" class="absolute top-4 right-4 text-purple-400 hover:text-purple-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-            @endif
-        </div>
-        
         @php
             $user = auth()->user();
             $currentLevel = $user->getLevel();
@@ -114,17 +65,17 @@
             <!-- Left Column (Profile + Stats) -->
             <div class="lg:col-span-8 space-y-6">
                 <!-- Profile Card with Stats -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-xs shadow-xl overflow-hidden">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden">
                     <div class="relative p-6">
                         <!-- Decorative Background Elements -->
-                        <div class="absolute top-0 right-0 w-64 h-64 bg-linear-to-bl from-emerald-500/10 to-transparent rounded-full blur-2xl -z-10"></div>
-                        <div class="absolute bottom-0 left-0 w-48 h-48 bg-linear-to-tr from-purple-500/10 to-transparent rounded-full blur-2xl -z-10"></div>
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-full blur-2xl -z-10"></div>
+                        <div class="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-500/10 to-transparent rounded-full blur-2xl -z-10"></div>
                         
                         <div class="flex flex-col md:flex-row md:items-center gap-6">
                             <!-- Avatar & Welcome -->
                             <div class="flex items-center gap-4">
                                 <div class="relative">
-                                    <div class="w-20 h-20 rounded-2xl bg-linear-to-br from-emerald-500 to-green-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
+                                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
                                         {{ $user->initials() }}
                                     </div>
                                     <div class="absolute -bottom-1 -right-1 bg-neutral-800 rounded-full p-1 shadow-lg">
@@ -189,8 +140,8 @@
                                 </div>
                                 <span class="text-xs text-gray-400">{{ number_format($currentPoints) }} / {{ number_format($pointsForNextLevel) }} XP</span>
                             </div>
-                            <div class="w-full h-3 bg-neutral-700/50 rounded-full overflow-hidden backdrop-blur-xs">
-                                <div class="h-full bg-linear-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500 ease-out relative" style="width: {{ $progressPercentage }}%">
+                            <div class="w-full h-3 bg-neutral-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+                                <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500 ease-out relative" style="width: {{ $progressPercentage }}%">
                                     <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0)_75%)] bg-[length:200%_100%] animate-shimmer"></div>
                                 </div>
                             </div>
@@ -202,7 +153,7 @@
                 </div>
                 
                 <!-- Activity Graph -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-xs shadow-xl overflow-hidden" style="min-height: 350px; height: 400px;">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden" style="min-height: 350px; height: 400px;">
                     <div class="p-6 h-full">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-bold text-white flex items-center gap-2">
@@ -214,11 +165,11 @@
                             <div class="flex items-center gap-2">
                                 <div class="text-xs text-gray-400">Less</div>
                                 <div class="flex items-center gap-1">
-                                    <div class="h-3 w-3 rounded-xs bg-neutral-700" title="No activity"></div>
-                                    <div class="h-3 w-3 rounded-xs bg-emerald-900" title="Low activity"></div>
-                                    <div class="h-3 w-3 rounded-xs bg-emerald-700" title="Medium activity"></div>
-                                    <div class="h-3 w-3 rounded-xs bg-emerald-500" title="High activity"></div>
-                                    <div class="h-3 w-3 rounded-xs bg-emerald-300" title="Very high activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-neutral-700" title="No activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-emerald-900" title="Low activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-emerald-700" title="Medium activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-emerald-500" title="High activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-emerald-300" title="Very high activity"></div>
                                 </div>
                                 <div class="text-xs text-gray-400">More</div>
                             </div>
@@ -232,7 +183,7 @@
                 </div>
                 
                 <!-- Active Challenges -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-xs shadow-xl overflow-hidden">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold text-white flex items-center gap-2">
@@ -260,7 +211,7 @@
                                             </span>
                                         </div>
                                         <div class="w-full bg-neutral-700/50 rounded-full h-2 overflow-hidden">
-                                            <div class="bg-linear-to-r from-orange-500 to-yellow-500 h-2 rounded-full transition-all duration-300 relative" style="width: {{ $challenge->pivot->progress ?? 0 }}%">
+                                            <div class="bg-gradient-to-r from-orange-500 to-yellow-500 h-2 rounded-full transition-all duration-300 relative" style="width: {{ $challenge->pivot->progress ?? 0 }}%">
                                                 <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0)_75%)] bg-[length:200%_100%] animate-shimmer"></div>
                                             </div>
                                         </div>
@@ -273,7 +224,7 @@
                         @else
                             <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-6 text-center">
                                 <p class="text-gray-400 text-sm mb-3">There are {{ \App\Models\Challenge::count() }} total challenges available!</p>
-                                <a href="{{ route('learning') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
+                                <a href="{{ route('learning') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
                                     Explore Challenges
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -284,7 +235,7 @@
                     </div>
                 </div>
                 <!-- Personalized Recommendations -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-xs shadow-xl overflow-hidden mt-6">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden mt-6">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold text-white flex items-center gap-2">
@@ -297,9 +248,9 @@
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="rounded-xl bg-linear-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 p-4 hover:from-pink-500/30 hover:to-purple-500/30 transition-colors group">
+                            <div class="rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 p-4 hover:from-pink-500/30 hover:to-purple-500/30 transition-colors group">
                                 <div class="flex items-start gap-3">
-                                    <div class="w-12 h-12 rounded-lg bg-pink-500/30 flex items-center justify-center shrink-0">
+                                    <div class="w-12 h-12 rounded-lg bg-pink-500/30 flex items-center justify-center flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400" viewBox="0 0 20 20" fill="currentColor">
                                             <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
                                         </svg>
@@ -323,9 +274,9 @@
                                 </div>
                             </div>
                             
-                            <div class="rounded-xl bg-linear-to-br from-blue-500/20 to-teal-500/20 border border-blue-500/30 p-4 hover:from-blue-500/30 hover:to-teal-500/30 transition-colors group">
+                            <div class="rounded-xl bg-gradient-to-br from-blue-500/20 to-teal-500/20 border border-blue-500/30 p-4 hover:from-blue-500/30 hover:to-teal-500/30 transition-colors group">
                                 <div class="flex items-start gap-3">
-                                    <div class="w-12 h-12 rounded-lg bg-blue-500/30 flex items-center justify-center shrink-0">
+                                    <div class="w-12 h-12 rounded-lg bg-blue-500/30 flex items-center justify-center flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
                                         </svg>
@@ -351,7 +302,7 @@
                         </div>
                         
                         <div class="mt-4 text-center">
-                            <a href="{{ route('courses') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
+                            <a href="{{ route('courses') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
                                 View All Recommendations
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -365,10 +316,10 @@
             <!-- Right Column (Leaderboard + Achievements) -->
             <div class="lg:col-span-4 space-y-6">
                 <!-- Main Action Button -->
-                <div class="rounded-2xl border border-emerald-500/50 bg-emerald-500/10 backdrop-blur-xs shadow-xl overflow-hidden">
+                <div class="rounded-2xl border border-emerald-500/50 bg-emerald-500/10 backdrop-blur-sm shadow-xl overflow-hidden">
                     <a href="{{ route('learning') }}" class="block p-6 text-center relative group">
                         <!-- Background effect -->
-                        <div class="absolute inset-0 bg-linear-to-br from-emerald-500/20 to-teal-500/10 opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-500/10 opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
                         <div class="absolute inset-0 bg-[radial-gradient(circle,_rgba(16,185,129,0.3)_0%,_rgba(0,0,0,0)_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         
                         <!-- Icon -->
@@ -386,7 +337,7 @@
                         
                         <!-- Button -->
                         <div class="mt-4 relative">
-                            <span class="inline-flex items-center justify-center px-4 py-2 text-sm bg-linear-to-r from-emerald-600 to-teal-600 group-hover:from-emerald-500 group-hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
+                            <span class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 group-hover:from-emerald-500 group-hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
                                 Explore Now
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -407,7 +358,7 @@
                     <a href="{{ route('assignments') }}" class="rounded-xl bg-neutral-800/50 border border-neutral-800 p-3 flex flex-col items-center justify-center hover:bg-neutral-800 hover:border-neutral-700 transition-colors shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400 mb-1" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                         </svg>
                         <span class="text-xs text-gray-300">Assignments</span>
                     </a>
@@ -421,7 +372,7 @@
                 </div>
                 
                 <!-- Leaderboard -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-xs shadow-xl overflow-hidden">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden">
                     <div class="p-6">
                         <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -433,10 +384,10 @@
                             @forelse($leaderboardData->take(5) as $index => $entry)
                                 @php $rank = $index + 1; @endphp
                                 <div class="flex items-center p-3 rounded-xl {{ $entry->user->id === $user->id ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-neutral-700/20 border border-neutral-700/50' }}">
-                                    <div class="w-8 h-8 shrink-0 rounded-full flex items-center justify-center {{ $rank == 1 ? 'bg-yellow-500/20 text-yellow-400' : ($rank == 2 ? 'bg-gray-300/20 text-gray-300' : ($rank == 3 ? 'bg-orange-500/20 text-orange-400' : 'bg-neutral-600/20 text-gray-400')) }}">
+                                    <div class="w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center {{ $rank == 1 ? 'bg-yellow-500/20 text-yellow-400' : ($rank == 2 ? 'bg-gray-300/20 text-gray-300' : ($rank == 3 ? 'bg-orange-500/20 text-orange-400' : 'bg-neutral-600/20 text-gray-400')) }}">
                                         {{ $rank }}
                                     </div>
-                                    <div class="ml-3 grow">
+                                    <div class="ml-3 flex-grow">
                                         <div class="flex justify-between items-center">
                                             <span class="font-medium text-gray-100 truncate">{{ $entry->user->name }}</span>
                                             <span class="text-xs font-mono bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300">{{ number_format($entry->experience->experience_points ?? 0) }}</span>
@@ -444,7 +395,7 @@
                                         <div class="flex items-center mt-1">
                                             <div class="text-xs text-gray-400">Level {{ $entry->experience->level_id }}</div>
                                             <div class="ml-2 w-full bg-neutral-700/50 rounded-full h-1.5 overflow-hidden">
-                                                <div class="bg-linear-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full" style="width: 70%"></div>
+                                                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full" style="width: 70%"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -458,10 +409,10 @@
                             @if($userRank && $userRank > 5)
                                 <div class="mt-2 pt-2 border-t border-dashed border-neutral-700">
                                     <div class="flex items-center p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-                                        <div class="w-8 h-8 shrink-0 rounded-full bg-neutral-600/20 flex items-center justify-center text-gray-400">
+                                        <div class="w-8 h-8 flex-shrink-0 rounded-full bg-neutral-600/20 flex items-center justify-center text-gray-400">
                                             {{ $userRank }}
                                         </div>
-                                        <div class="ml-3 grow">
+                                        <div class="ml-3 flex-grow">
                                             <div class="flex justify-between items-center">
                                                 <span class="font-medium text-gray-100 truncate">{{ $user->name }}</span>
                                                 <span class="text-xs font-mono bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300">{{ number_format($currentPoints) }}</span>
@@ -469,7 +420,7 @@
                                             <div class="flex items-center mt-1">
                                                 <div class="text-xs text-gray-400">Level {{ $currentLevel }}</div>
                                                 <div class="ml-2 w-full bg-neutral-700/50 rounded-full h-1.5 overflow-hidden">
-                                                    <div class="bg-linear-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full" style="width: {{ $progressPercentage }}%"></div>
+                                                    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full" style="width: {{ $progressPercentage }}%"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -481,7 +432,7 @@
                 </div>
                 
                 <!-- Achievements -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-xs shadow-xl overflow-hidden">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden">
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold text-white flex items-center gap-2">
@@ -517,7 +468,7 @@
                         @else
                             <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-6 text-center">
                                 <p class="text-gray-400 text-sm mb-3">No achievements earned yet. Keep learning and complete challenges!</p>
-                                <!-- <a href="{{ route('learning') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-lg text-white transition-colors shadow-lg shadow-purple-900/30">
+                                <!-- <a href="{{ route('learning') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-lg text-white transition-colors shadow-lg shadow-purple-900/30">
                                     Start Earning
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -687,12 +638,12 @@
                                 if (activityLevel >= 4) bgColor = 'bg-emerald-300'; // Cap at level 4 color
                                 
                                 weekCol.innerHTML += `
-                                    <div class="h-4 w-4 rounded-xs ${bgColor} transition-colors duration-150"
+                                    <div class="h-4 w-4 rounded-sm ${bgColor} transition-colors duration-150"
                                          title="${currentDay.toDateString()}: ${activityLevel} contribution${activityLevel !== 1 ? 's' : ''}">
                                     </div>`;
                             } else {
                                 // Render an empty placeholder for days outside the range or future days within the grid
-                                weekCol.innerHTML += '<div class="h-4 w-4 rounded-xs bg-neutral-800"></div>'; // Use background color for empty
+                                weekCol.innerHTML += '<div class="h-4 w-4 rounded-sm bg-neutral-800"></div>'; // Use background color for empty
                             }
                         }
                     }

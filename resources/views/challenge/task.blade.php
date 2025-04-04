@@ -177,7 +177,7 @@
                 </div>
             </div>
 
-            <!-- Code Editor -->
+            <!-- Solution Field -->
             <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 shadow-lg h-full">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold text-white flex items-center gap-2">
@@ -186,43 +186,59 @@
                         </svg>
                         Your Solution
                     </h2>
-                    <div class="flex items-center gap-2">
-                        <button id="run-code-btn" class="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-sm text-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Run Code
-                        </button>
-                    </div>
+                    <button id="run-code-btn" class="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-sm text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Run Code
+                    </button>
                 </div>
-                <div class="flex-1 relative min-h-[400px] rounded-lg overflow-hidden border border-neutral-700" id="monaco-editor-container">
-                    <div id="monaco-loading" class="absolute inset-0 flex items-center justify-center bg-neutral-900">
-                        <div class="flex flex-col items-center">
-                            <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-emerald-400 mb-2"></div>
-                            <span class="text-sm text-neutral-400">Loading editor...</span>
+
+                @php
+                    $categoryName = $challenge->category->name; // Assuming the category name is stored in the 'name' column
+                    $codingCategories = ['Computer Science', 'Web Development', 'Mobile Development'];
+                @endphp
+
+                @if(in_array($categoryName, $codingCategories))
+                    <!-- Monaco Editor Container -->
+                    <div class="flex-1 relative min-h-[400px] rounded-lg overflow-hidden border border-neutral-700" id="monaco-editor-container">
+                        <div id="monaco-loading" class="absolute inset-0 flex items-center justify-center bg-neutral-900">
+                            <div class="flex flex-col items-center">
+                                <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-emerald-400 mb-2"></div>
+                                <span class="text-sm text-neutral-400">Loading editor...</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div id="code-output" class="mt-4 p-4 rounded-xl bg-neutral-900 border border-neutral-700 hidden">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-sm font-medium text-white flex items-center gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Execution Output
-                        </h3>
-                        <button id="clear-output-btn" class="text-sm text-neutral-500 hover:text-neutral-400 transition-colors duration-300 flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Clear
-                        </button>
+                    <!-- Output Container -->
+                    <div id="code-output" class="mt-4 p-4 rounded-xl bg-neutral-900 border border-neutral-700 hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-medium text-white flex items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Execution Output
+                            </h3>
+                            <button id="clear-output-btn" class="text-sm text-neutral-500 hover:text-neutral-400 transition-colors duration-300 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Clear
+                            </button>
+                        </div>
+                        <div id="output-content" class="font-mono text-sm whitespace-pre-wrap break-words overflow-x-auto max-h-[200px] overflow-y-auto p-3 bg-neutral-800 rounded-lg">
+                            <!-- Output will be displayed here -->
+                        </div>
                     </div>
-                    <div id="output-content" class="font-mono text-sm whitespace-pre-wrap break-words overflow-x-auto max-h-[200px] overflow-y-auto p-3 bg-neutral-800 rounded-lg">
-                        <!-- Output will be displayed here -->
+                @else
+                    <!-- Text Area for non-coding challenges -->
+                    <div class="flex-1">
+                        <textarea id="answer-input" 
+                            class="w-full h-48 p-4 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"
+                            placeholder="Type your answer here..."></textarea>
                     </div>
-                </div>
+                @endif
+
                 <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <button id="submit-solution" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -531,3 +547,5 @@
         });
     </script>
 </x-layouts.app>
+
+
