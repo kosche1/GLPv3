@@ -5,7 +5,7 @@
                 {{ session('message') }}
             </div>
         @endif
-        
+
         @if(session('error'))
             <div class="p-4 mb-4 rounded-lg bg-red-500/20 border border-red-500 text-red-400">
                 {{ session('error') }}
@@ -24,7 +24,7 @@
         <!-- Challenge Progress -->
         <div class="p-6 rounded-xl border border-neutral-700 bg-neutral-800 mb-4">
             <h2 class="text-xl font-semibold text-white mb-4">Your Progress</h2>
-            
+
             @php
                 $totalTasks = $challenge->tasks->count();
                 $completedTasks = Auth::user()->studentAnswers()
@@ -34,9 +34,9 @@
                     ->count();
                 $progress = $totalTasks > 0 ? ($completedTasks / $totalTasks) * 100 : 0;
             @endphp
-            
+
             <x-progress-bar :progress="$progress" />
-            
+
             <div class="mt-2 text-neutral-300">
                 <span class="font-medium">{{ $completedTasks }} of {{ $totalTasks }} tasks completed</span>
                 @if($completedTasks >= $totalTasks && $totalTasks > 0)
@@ -97,6 +97,14 @@
                                 ->where('task_id', $task->id)
                                 ->where('is_correct', true)
                                 ->exists();
+
+                            // Check if the user has submitted any answer for this task
+                            $hasSubmission = \App\Models\StudentAnswer::where('user_id', Auth::id())
+                                ->where('task_id', $task->id)
+                                ->exists();
+
+                            // For task unlocking, consider a task completed if it has any submission
+                            $previousTaskCompleted = $isCompleted || $hasSubmission;
                         @endphp
                         <div class="p-4 rounded-lg border {{ $isCompleted ? 'border-emerald-500 bg-emerald-900/20' : 'border-neutral-700 bg-neutral-900' }} transition-all duration-300 hover:border-neutral-600">
                             <div class="flex justify-between items-center">
@@ -129,6 +137,13 @@
                                             </svg>
                                             Completed
                                         </span>
+                                    @elseif($hasSubmission)
+                                        <span class="px-4 py-2 rounded-lg bg-neutral-700 text-neutral-400 font-medium cursor-not-allowed">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            Submitted
+                                        </span>
                                     @else
                                         <a href="{{ route('challenge.task', ['challenge' => $challenge, 'task' => $task]) }}" class="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-medium">
                                             Start Task
@@ -152,11 +167,11 @@
             // Remove the message parameter from the URL without refreshing
             const newUrl = window.location.pathname;
             window.history.replaceState({}, document.title, newUrl);
-            
+
             // Force a refresh after a short delay to ensure the task list is updated
             setTimeout(() => {
                 window.location.reload();
             }, 100);
         }
     });
-</script> 
+</script>

@@ -40,6 +40,16 @@ class StudentAnswerObserver
             Log::info("StudentAnswer ID: {$studentAnswer->id} updated to status 'submitted'. Triggering evaluation.");
             $this->evaluationService->evaluate($studentAnswer);
         }
+
+        // Check if the answer was marked as correct through manual evaluation
+        if ($studentAnswer->isDirty('is_correct') && $studentAnswer->is_correct &&
+            $studentAnswer->status === 'evaluated') {
+
+            Log::info("StudentAnswer ID: {$studentAnswer->id} marked as correct through manual evaluation.");
+
+            // Note: We're not awarding points here because it's handled in the EditStudentAnswer page
+            // This is just for logging purposes
+        }
     }
 
     /**

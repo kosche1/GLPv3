@@ -74,7 +74,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Quick Filter Tags -->
             <div class="mt-5 flex flex-wrap gap-2">
                 <button class="bg-emerald-500/10 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-medium border border-emerald-500/20 hover:bg-emerald-500/20 transition-all duration-300">
@@ -102,27 +102,27 @@
                 const programmingLanguageSelect = document.getElementById('programming_language');
                 const challengeCards = document.querySelectorAll('#challenge-grid > div');
                 const resultCount = document.getElementById('result-count');
-                
+
                 // Function to filter challenges
                 function filterChallenges() {
                     const selectedCategory = techCategorySelect.value;
                     const selectedLanguage = programmingLanguageSelect.value;
                     let visibleCount = 0;
-                    
+
                     challengeCards.forEach(card => {
                         const cardCategory = card.dataset.category;
                         const cardLanguage = card.dataset.language;
-                        
+
                         // For category filtering:
                         // - If "All Categories" is selected (empty value), show all categories
                         // - Otherwise, show cards matching the selected category ID
                         const categoryMatch = selectedCategory === '' || cardCategory === selectedCategory;
-                        
+
                         // For language filtering:
                         // - If "All Languages" is selected (empty value), show all languages
                         // - Otherwise, show cards matching the selected language
                         const languageMatch = selectedLanguage === '' || cardLanguage === selectedLanguage.toLowerCase();
-                        
+
                         if (categoryMatch && languageMatch) {
                             card.style.display = 'flex';
                             visibleCount++;
@@ -130,12 +130,12 @@
                             card.style.display = 'none';
                         }
                     });
-                    
+
                     // Update result count
                     if (resultCount) {
                         resultCount.textContent = visibleCount;
                     }
-                    
+
                     // Show/hide empty state
                     const emptyState = document.getElementById('empty-results');
                     if (emptyState) {
@@ -146,11 +146,11 @@
                         }
                     }
                 }
-                
+
                 // Add event listeners
                 techCategorySelect.addEventListener('change', filterChallenges);
                 programmingLanguageSelect.addEventListener('change', filterChallenges);
-                
+
                 // Initial filter
                 filterChallenges();
             });
@@ -189,15 +189,27 @@
                             </svg>
                         </div>
                     @endif
-                    
+
                     <!-- Language Badge -->
                     <div class="absolute top-3 right-3">
                         <span class="bg-neutral-800/90 text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full border border-emerald-500/20">
                             {{ $challenge->programming_language }}
                         </span>
                     </div>
+
+                    <!-- Completed Badge -->
+                    @if(in_array($challenge->id, $completedChallenges ?? []))
+                    <div class="absolute top-3 left-3">
+                        <span class="bg-emerald-500/90 text-white text-xs font-medium px-2.5 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Completed
+                        </span>
+                    </div>
+                    @endif
                 </div>
-                
+
                 <div class="p-5 flex flex-col grow">
                     <div class="grow space-y-3">
                         <div class="flex justify-between items-start">
@@ -206,9 +218,9 @@
                                 {{ $challenge->difficulty_level }}
                             </span>
                         </div>
-                        
+
                         <p class="text-sm text-neutral-400 line-clamp-2">{{ $challenge->description }}</p>
-                        
+
                         <!-- Course Info -->
                         <div class="grid grid-cols-2 gap-2 mt-3">
                             <div class="flex items-center gap-1.5 text-xs text-neutral-400">
@@ -225,10 +237,14 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mt-4 pt-4 border-t border-neutral-700">
-                        <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg transition-all duration-300 hover:bg-emerald-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
-                            Start Challenge
+                        <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white {{ in_array($challenge->id, $completedChallenges ?? []) ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-500' }} rounded-lg transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
+                            @if(in_array($challenge->id, $completedChallenges ?? []))
+                                View Course
+                            @else
+                                Start Challenge
+                            @endif
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
@@ -238,7 +254,7 @@
             </div>
             @endforeach
         </div>
-        
+
         <!-- Empty Results State -->
         <div id="empty-results" class="hidden flex flex-col items-center justify-center p-10 bg-neutral-800/50 rounded-xl border border-neutral-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-neutral-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -266,18 +282,18 @@
                     <h2 class="text-lg font-semibold text-white">Your Learning Path</h2>
                 </div>
             </div>
-            
+
             <div class="space-y-6">
                 <div class="flex items-center gap-4">
                     <div class="w-2 h-2 rounded-full {{ $progress > 0 ? 'bg-emerald-400' : 'bg-neutral-700' }}"></div>
                     <div class="flex-1">
                         <div class="h-2.5 rounded-full bg-neutral-700 overflow-hidden">
-                            <div class="h-full rounded-full bg-linear-to-r from-emerald-500 to-emerald-400" style="width: {{ $progress }}%"></div>
+                            <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: {{ $progress }}%"></div>
                         </div>
                     </div>
                     <span class="text-sm font-medium text-emerald-400 min-w-[45px] text-right">{{ $progress }}%</span>
                 </div>
-                
+
                 <div class="grid grid-cols-4 gap-4 text-sm">
                     @php
                         $levels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];

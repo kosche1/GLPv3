@@ -255,7 +255,24 @@
                     <div class="space-y-2">
                         @php
                             $totalTasks = $challenge->tasks->count();
-                            $completedTasks = $challenge->tasks->where('completed', true)->count();
+
+                            // Count both completed tasks and tasks with submissions
+                            $completedTasks = 0;
+                            foreach ($challenge->tasks as $task) {
+                                if ($task->completed) {
+                                    $completedTasks++;
+                                } else {
+                                    // Check if the user has submitted any answer for this task
+                                    $hasSubmission = \App\Models\StudentAnswer::where('user_id', Auth::id())
+                                        ->where('task_id', $task->id)
+                                        ->exists();
+
+                                    if ($hasSubmission) {
+                                        $completedTasks++;
+                                    }
+                                }
+                            }
+
                             $progressPercentage = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
                         @endphp
                         <div class="flex justify-between items-center text-sm">
@@ -263,7 +280,7 @@
                             <span class="text-emerald-400">{{ $progressPercentage }}%</span>
                         </div>
                         <div class="h-2 rounded-full bg-neutral-700 overflow-hidden">
-                            <div class="h-2 rounded-full bg-linear-to-r from-emerald-500 to-emerald-400" style="width: {{ $progressPercentage }}%"></div>
+                            <div class="h-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: {{ $progressPercentage }}%"></div>
                         </div>
                     </div>
                     <div class="space-y-4">
@@ -275,7 +292,11 @@
                                 <span>{{ $challenge->tasks->count() }} Tasks Available</span>
                             </div>
                             @php
+                                // Initialize previousTaskCompleted as true for the first task
                                 $previousTaskCompleted = true; // First task is always accessible
+
+                                // For tracking task completion status
+                                $taskCompletionStatus = [];
                             @endphp
                             @foreach($challenge->tasks as $task)
                             <div class="space-y-2 p-3 rounded-lg {{ $previousTaskCompleted ? 'bg-neutral-800/50 border border-neutral-700 hover:border-emerald-500/30 hover:bg-neutral-800 transition-all duration-300' : 'bg-neutral-800/30 border border-neutral-700/50' }}">
@@ -303,13 +324,29 @@
                                                 </div>
                                             </div>
                                             @if($previousTaskCompleted)
-                                                <a href="{{ route('challenge.task', ['challenge' => $challenge, 'task' => $task]) }}" 
-                                                   class="px-6 py-1.5 text-sm font-medium rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white transition-colors duration-300 flex items-center gap-1.5">
-                                                    {{ $task->completed ? 'Review' : 'Start' }}
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                    </svg>
-                                                </a>
+                                                @php
+                                                    // Check if the user has submitted any answer for this task
+                                                    $hasSubmission = \App\Models\StudentAnswer::where('user_id', Auth::id())
+                                                        ->where('task_id', $task->id)
+                                                        ->exists();
+                                                @endphp
+
+                                                @if($hasSubmission)
+                                                    <span class="px-6 py-1.5 text-sm font-medium rounded-lg bg-neutral-700 text-neutral-400 cursor-not-allowed flex items-center gap-1.5">
+                                                        Submitted
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    </span>
+                                                @else
+                                                    <a href="{{ route('challenge.task', ['challenge' => $challenge, 'task' => $task]) }}"
+                                                       class="px-6 py-1.5 text-sm font-medium rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white transition-colors duration-300 flex items-center gap-1.5">
+                                                        {{ $task->completed ? 'Review' : 'Start' }}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                        </svg>
+                                                    </a>
+                                                @endif
                                             @else
                                                 <span class="px-3 py-1.5 text-sm font-medium rounded-lg bg-neutral-700/50 text-neutral-400 cursor-not-allowed flex items-center gap-1.5">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -322,13 +359,23 @@
                                         <div class="flex items-center gap-2 mt-1">
                                             @php
                                                 $status = 'Not Started';
+
+                                                // Check if the task has a submission
+                                                $hasSubmission = \App\Models\StudentAnswer::where('user_id', Auth::id())
+                                                    ->where('task_id', $task->id)
+                                                    ->exists();
+
                                                 if ($task->completed) {
                                                     $status = 'Completed';
+                                                } elseif ($hasSubmission) {
+                                                    $status = 'Submitted';
                                                 } elseif ($task->progress > 0) {
                                                     $status = 'In Progress';
                                                 }
+
                                                 $statusColor = match($status) {
                                                     'Completed' => 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+                                                    'Submitted' => 'text-blue-400 bg-blue-500/10 border-blue-500/20',
                                                     'In Progress' => 'text-amber-400 bg-amber-500/10 border-amber-500/20',
                                                     default => 'text-neutral-400 bg-neutral-500/10 border-neutral-500/20'
                                                 };
@@ -336,18 +383,34 @@
                                             <span class="text-xs px-2 py-0.5 rounded-full {{ $statusColor }} border">{{ $status }}</span>
                                             @if($status === 'In Progress')
                                                 <span class="text-xs text-neutral-400">({{ $task->progress }}% done)</span>
+                                            @elseif($status === 'Submitted')
+                                                <span class="text-xs text-blue-400">(100% done)</span>
                                             @endif
                                         </div>
                                     </div>
                                 </div>
                                 <div class="ml-7">
                                     <div class="h-1.5 w-full rounded-full bg-neutral-700 overflow-hidden">
-                                        <div class="h-1.5 rounded-full bg-linear-to-r from-emerald-500 to-emerald-400" style="width: {{ $task->progress ?? 0 }}%"></div>
+                                        @php
+                                            // Check if the task has a submission
+                                            $taskHasSubmission = \App\Models\StudentAnswer::where('user_id', Auth::id())
+                                                ->where('task_id', $task->id)
+                                                ->exists();
+
+                                            // If the task has a submission, show 100% progress
+                                            $taskProgress = $task->completed || $taskHasSubmission ? 100 : ($task->progress ?? 0);
+                                        @endphp
+                                        <div class="h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400" style="width: {{ $taskProgress }}%"></div>
                                     </div>
                                 </div>
                             </div>
                             @php
-                                $previousTaskCompleted = $task->completed;
+                                // Check if the task is completed OR has a submission (for manual review tasks)
+                                $hasSubmission = \App\Models\StudentAnswer::where('user_id', Auth::id())
+                                    ->where('task_id', $task->id)
+                                    ->exists();
+
+                                $previousTaskCompleted = $task->completed || $hasSubmission;
                             @endphp
                             @endforeach
                         @else
@@ -381,7 +444,7 @@
                         @endif
                     </div>
                 </div>
-                
+
                 <!-- Challenge Rewards -->
                 <div class="mt-6 p-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
                     <h3 class="text-base font-semibold text-white mb-3 flex items-center gap-2">

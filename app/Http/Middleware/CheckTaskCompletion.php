@@ -18,21 +18,20 @@ class CheckTaskCompletion
     public function handle(Request $request, Closure $next): Response
     {
         $task = $request->route('task');
-        
+
         if ($task && Auth::check()) {
-            // Check if the task has already been completed by this user
-            $isCompleted = StudentAnswer::where('user_id', Auth::id())
+            // Check if the task has already been submitted by this user (any submission, not just correct ones)
+            $hasSubmission = StudentAnswer::where('user_id', Auth::id())
                 ->where('task_id', $task->id)
-                ->where('is_correct', true)
                 ->exists();
-                
-            if ($isCompleted) {
+
+            if ($hasSubmission) {
                 // Redirect to the challenge page with a message
                 return redirect()->route('challenge', $task->challenge_id)
-                    ->with('message', 'You have already completed this task!');
+                    ->with('message', 'You have already submitted an answer for this task!');
             }
         }
-        
+
         return $next($request);
     }
-} 
+}

@@ -20,27 +20,27 @@ class ChallengeController extends Controller
             return back()
                 ->with('error', 'Task not found in this challenge');
         }
-        
-        $isCompleted = Auth::user()->studentAnswers()
+
+        // Check if the user has submitted any answer for this task (not just correct ones)
+        $hasSubmission = Auth::user()->studentAnswers()
             ->where('task_id', $task->id)
-            ->where('is_correct', true)
             ->exists();
-        
-        if ($isCompleted) {
+
+        if ($hasSubmission) {
             return back()
-                ->with('message', 'You have already completed this task!');
+                ->with('message', 'You have already submitted an answer for this task!');
         }
-        
+
         $tasks = $challenge->tasks()->orderBy('order')->get();
         $currentTaskIndex = $tasks->search(function($item) use ($task) {
             return $item->id === $task->id;
         });
-        
+
         $previousTask = $currentTaskIndex > 0 ? $tasks[$currentTaskIndex - 1] : null;
         $nextTask = $currentTaskIndex < $tasks->count() - 1 ? $tasks[$currentTaskIndex + 1] : null;
-        
+
         $currentTask = $task;
-        
+
         return view('challenge.task', compact('challenge', 'currentTask', 'previousTask', 'nextTask'));
     }
-} 
+}
