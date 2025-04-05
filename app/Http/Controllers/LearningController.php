@@ -17,12 +17,63 @@ class LearningController extends Controller
             ->get();
 
         $techCategories = Category::all()->pluck('name', 'id');
+
+        // Calculate overall progress
         $totalTasks = $challenges->sum(function ($challenge) {
             return $challenge->tasks->count();
         });
-        $completedTasks = $challenges->sum(function ($challenge) {
-            return $challenge->tasks->where('is_completed', true)->count();
-        });
+
+        $completedTasks = 0;
+        $completedChallenges = [];
+        $challengeFeedback = [];
+
+        // Check which challenges are completed by the current user
+        if (Auth::check()) {
+            foreach ($challenges as $challenge) {
+                $challengeTasks = $challenge->tasks;
+                $totalChallengeTasks = $challengeTasks->count();
+
+                if ($totalChallengeTasks > 0) {
+                    // Count completed tasks for this challenge
+                    $completedChallengeTasks = 0;
+                    $feedbackForChallenge = [];
+
+                    foreach ($challengeTasks as $task) {
+                        // Check if the task has a submission or is completed
+                        $studentAnswer = StudentAnswer::where('user_id', Auth::id())
+                            ->where('task_id', $task->id)
+                            ->first();
+
+                        $hasSubmission = $studentAnswer !== null;
+
+                        if ($task->completed || $hasSubmission) {
+                            $completedChallengeTasks++;
+                            $completedTasks++;
+
+                            // Check if there's feedback for this task
+                            if ($hasSubmission && !empty($studentAnswer->feedback)) {
+                                $feedbackForChallenge[] = [
+                                    'task_name' => $task->name,
+                                    'feedback' => $studentAnswer->feedback,
+                                    'is_correct' => $studentAnswer->is_correct,
+                                    'score' => $studentAnswer->score,
+                                ];
+                            }
+                        }
+                    }
+
+                    // If all tasks in the challenge are completed, mark the challenge as completed
+                    if ($completedChallengeTasks >= $totalChallengeTasks) {
+                        $completedChallenges[] = $challenge->id;
+
+                        // If there's feedback for this challenge, store it
+                        if (!empty($feedbackForChallenge)) {
+                            $challengeFeedback[$challenge->id] = $feedbackForChallenge;
+                        }
+                    }
+                }
+            }
+        }
 
         $progress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
         $completedLevels = floor($progress / 25); // 4 levels, each representing 25% progress
@@ -31,7 +82,9 @@ class LearningController extends Controller
             'challenges' => $challenges,
             'progress' => $progress,
             'completedLevels' => $completedLevels,
-            'techCategories' => $techCategories
+            'techCategories' => $techCategories,
+            'completedChallenges' => $completedChallenges,
+            'challengeFeedback' => $challengeFeedback
         ]);
     }
 
@@ -39,7 +92,7 @@ class LearningController extends Controller
     {
         // Get all tasks for this challenge
         $tasks = $challenge->tasks()->orderBy('order')->get();
-        
+
         // Check which tasks are completed by the current user
         $completedTaskIds = [];
         if (Auth::check()) {
@@ -49,7 +102,7 @@ class LearningController extends Controller
                 ->pluck('task_id')
                 ->toArray();
         }
-        
+
         return view('challenge', [
             'challenge' => $challenge,
             'tasks' => $tasks,

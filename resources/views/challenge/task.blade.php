@@ -176,6 +176,8 @@
         </script>
     </head>
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
+        <!-- Hidden element to store next task URL -->
+        <div id="next-task-url" class="hidden" data-url="{{ $nextTask ? route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) : '' }}"></div>
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="p-2 bg-emerald-500/10 rounded-lg">
@@ -451,6 +453,42 @@
                                     submitBtn.disabled = true;
                                     submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Submitting...';
 
+                                    // Get the evaluation type directly from the task data
+                                    const taskEvalType = '{{ $currentTask->evaluation_type ?? "manual" }}';
+                                    console.log('Text submission - Current evaluation type:', taskEvalType);
+                                    console.log('Text submission - Answer content:', submittedAnswer);
+
+                                    // Check for errors in the submitted text
+                                    const hasTextErrors = submittedAnswer.includes('ERROR') ||
+                                                      submittedAnswer.toLowerCase().includes('error') ||
+                                                      submittedAnswer.includes('Exception') ||
+                                                      submittedAnswer.toLowerCase().includes('exception');
+
+                                    console.log('Text submission - Has errors:', hasTextErrors);
+                                    console.log('Text submission - Is exact match:', taskEvalType === 'exact_match');
+
+                                    // Check if this is an Exact Match evaluation and if there's an error in the output
+                                    if (taskEvalType === 'exact_match' && hasTextErrors) {
+                                        console.log('BLOCKING TEXT SUBMISSION: Exact match with errors detected');
+
+                                        // Show error message
+                                        const messageContainer = document.getElementById('submission-message');
+                                        const messageText = document.getElementById('message-text');
+
+                                        if (messageContainer && messageText) {
+                                            messageContainer.classList.remove('hidden');
+                                            messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                                            messageText.classList.add('text-red-400');
+                                            messageText.textContent = 'Cannot submit solution with errors. Please fix your answer and try again.';
+                                        }
+
+                                        // Re-enable button
+                                        submitBtn.disabled = false;
+                                        submitBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>Submit Answer';
+
+                                        return;
+                                    }
+
                                     // Log the submission URL and data
                                     const submitUrl = '/api/direct-text-solution';
                                     console.log('Submitting to:', submitUrl);
@@ -493,8 +531,17 @@
                                         if (data.success) {
                                             console.log('Answer submitted successfully');
 
-                                            // Always redirect to the challenge page after successful submission
-                                            window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
+                                            // Get the next task URL
+                                            const nextTaskUrl = '{{ $nextTask ? route("challenge.task", ["challenge" => $challenge, "task" => $nextTask]) : "" }}';
+
+                                            if (nextTaskUrl) {
+                                                console.log('Redirecting to next task...');
+                                                window.location.href = nextTaskUrl;
+                                            } else {
+                                                // Redirect to the challenge page if there's no next task
+                                                console.log('Redirecting to challenge page...');
+                                                window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
+                                            }
                                         } else {
                                             console.error('Failed to submit answer:', data.message);
                                             // Re-enable button on failure
@@ -698,6 +745,40 @@
 
                     const code = editor.getValue();
                     const currentOutput = lastExecutionOutput;
+                    // Get the evaluation type directly from the task data
+                    const evaluationType = '{{ $currentTask->evaluation_type ?? "manual" }}';
+                    console.log('Current evaluation type:', evaluationType);
+                    console.log('Current output:', currentOutput);
+
+                    // Check for errors in the output
+                    const hasErrors = currentOutput.includes('ERROR') ||
+                                     currentOutput.toLowerCase().includes('error') ||
+                                     currentOutput.includes('Exception') ||
+                                     currentOutput.toLowerCase().includes('exception');
+
+                    console.log('Has errors:', hasErrors);
+                    console.log('Is exact match:', evaluationType === 'exact_match');
+
+                    // Check if this is an Exact Match evaluation and if there's an error in the output
+                    if (evaluationType === 'exact_match' && hasErrors) {
+                        console.log('BLOCKING SUBMISSION: Exact match with errors detected');
+
+                        clearOutput();
+                        displayOutput('Cannot submit solution with errors. Please fix your code and run it again before submitting.', true);
+
+                        // Show error message in the submission message container
+                        const messageContainer = document.getElementById('submission-message');
+                        const messageText = document.getElementById('message-text');
+
+                        if (messageContainer && messageText) {
+                            messageContainer.classList.remove('hidden');
+                            messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                            messageText.classList.add('text-red-400');
+                            messageText.textContent = 'Cannot submit solution with errors. Please fix your code and run it again.';
+                        }
+
+                        return;
+                    }
 
                     clearOutput();
                     displayOutput('Submitting solution...', false);
@@ -745,11 +826,21 @@
                             displayOutput('Solution submitted successfully.', false);
                         }
 
-                        // Always redirect to the challenge page after submission
-                        displayOutput('Redirecting to Challenge Page...', false);
-                        setTimeout(() => {
-                            window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
-                        }, 1500);
+                        // Get the next task URL
+                        const nextTaskUrl = '{{ $nextTask ? route("challenge.task", ["challenge" => $challenge, "task" => $nextTask]) : "" }}';
+
+                        if (nextTaskUrl) {
+                            displayOutput('Redirecting to Next Task...', false);
+                            setTimeout(() => {
+                                window.location.href = nextTaskUrl;
+                            }, 1500);
+                        } else {
+                            // Redirect to the challenge page if there's no next task
+                            displayOutput('Redirecting to Challenge Page...', false);
+                            setTimeout(() => {
+                                window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
+                            }, 1500);
+                        }
                     } else {
                         displayOutput(data.message || 'Failed to submit solution', true);
                     }

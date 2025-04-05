@@ -4,8 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
+
 
 class StudentAnswer extends Model
 {
@@ -18,7 +17,13 @@ class StudentAnswer extends Model
         'status',
         'is_correct',
         'score',
-        'submitted_text'
+        'submitted_text',
+        'submitted_file_path',
+        'submitted_url',
+        'submitted_data',
+        'feedback',
+        'evaluated_at',
+        'evaluated_by'
     ];
 
     protected $casts = [
@@ -53,6 +58,13 @@ class StudentAnswer extends Model
             }
             if (!isset($studentAnswer->is_correct)) {
                 $studentAnswer->is_correct = null;
+            }
+        });
+
+        static::updating(function ($studentAnswer) {
+            // If the status is being changed to 'evaluated', set the evaluated_at timestamp
+            if ($studentAnswer->isDirty('status') && $studentAnswer->status === 'evaluated' && !$studentAnswer->evaluated_at) {
+                $studentAnswer->evaluated_at = now();
             }
         });
     }

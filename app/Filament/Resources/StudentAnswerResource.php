@@ -83,7 +83,13 @@ class StudentAnswerResource extends Resource
                 ->schema([
                     Forms\Components\Toggle::make('is_correct')
                         ->label('Is Correct?')
-                        ->required(),
+                        ->required()
+                        ->afterStateUpdated(function ($state, callable $set) {
+                            // If marked as correct, set status to 'evaluated'
+                            if ($state) {
+                                $set('status', 'evaluated');
+                            }
+                        }),
                     Forms\Components\TextInput::make('score')
                         ->label('Score Awarded')
                         ->numeric()
@@ -94,7 +100,12 @@ class StudentAnswerResource extends Resource
                         ->label('Feedback for Student')
                         ->rows(4)
                         ->columnSpanFull(),
-                     Forms\Components\Placeholder::make('evaluated_at_info')
+                    Forms\Components\Hidden::make('status')
+                        ->default('evaluated'),
+                    Forms\Components\Hidden::make('evaluated_at')
+                        ->default(now()->toDateTimeString()),
+                    // We'll set evaluated_by in the afterSave hook
+                    Forms\Components\Placeholder::make('evaluated_at_info')
                         ->label('Evaluated At')
                         ->content(fn (StudentAnswer $record): ?string => $record->evaluated_at?->diffForHumans() . ' (' . $record->evaluated_at?->format('Y-m-d H:i') . ')')
                         ->visible(fn (StudentAnswer $record): bool => !empty($record->evaluated_at)),

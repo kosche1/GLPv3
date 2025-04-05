@@ -57,7 +57,7 @@ class TextSolutionController extends Controller
 
             // Verify task exists
             try {
-                Task::findOrFail($taskId);
+                $task = Task::findOrFail($taskId);
             } catch (\Exception $e) {
                 return response()->json([
                     'success' => false,
@@ -65,8 +65,40 @@ class TextSolutionController extends Controller
                 ], 400);
             }
 
-            // Get the task to check if the answer is correct
-            $task = Task::findOrFail($taskId);
+            // Check if this is an Exact Match evaluation type and if there are errors in the submitted text
+            if ($task->evaluation_type === 'exact_match') {
+                // Check for error indicators in the submitted text
+                $errorPatterns = [
+                    '/ERROR/i',
+                    '/error/i',
+                    '/Exception/i',
+                    '/exception/i'
+                ];
+
+                $hasErrors = false;
+                foreach ($errorPatterns as $pattern) {
+                    if (preg_match($pattern, $submittedText)) {
+                        $hasErrors = true;
+                        break;
+                    }
+                }
+
+                if ($hasErrors) {
+                    Log::info('Blocking submission with errors for Exact Match task:', [
+                        'task_id' => $taskId,
+                        'user_id' => $userId,
+                        'evaluation_type' => $task->evaluation_type,
+                        'has_errors' => $hasErrors
+                    ]);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot submit solution with errors. Please fix your code and try again.'
+                    ], 400);
+                }
+            }
+
+            // We already have the task object from earlier
 
             // Check if the answer is correct by comparing with expected answer
             $isCorrect = false;

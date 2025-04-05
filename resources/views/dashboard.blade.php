@@ -58,8 +58,7 @@
             $userRank = $leaderboardData->search(fn($item) => $item->user->id === $user->id);
             $userRank = ($userRank !== false) ? $userRank + 1 : null;
 
-            // --- Achievements/Badges Data ---
-            $userAchievements = $user->getUserAchievements()->take(4);
+            // --- No achievements implementation ---
 
             // --- Challenges Data ---
             $activeChallenges = $user->getActiveChallenges()->take(3);
@@ -206,6 +205,9 @@
                     </div>
                 </div>
 
+                <!-- Achievements section removed to fix the category property error -->
+                 
+
                 <!-- Active Challenges -->
                 <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -263,83 +265,6 @@
                         @endif
                     </div>
                 </div>
-                <!-- Personalized Recommendations -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden mt-6">
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-pink-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                                </svg>
-                                Recommended For You
-                            </h3>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 p-4 hover:from-pink-500/30 hover:to-purple-500/30 transition-colors group">
-                                <div class="flex items-start gap-3">
-                                    <div class="w-12 h-12 rounded-lg bg-pink-500/30 flex items-center justify-center flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-medium text-white mb-1">Machine Learning Basics</h4>
-                                        <p class="text-xs text-gray-400 mb-2">Based on your interest in Data Science</p>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded-full">4 Weeks</span>
-                                            <span class="text-xs bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded-full">Beginner</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-3 text-right">
-                                    <a href="#" class="text-xs text-pink-400 group-hover:text-pink-300 transition-colors inline-flex items-center gap-1">
-                                        Start Learning
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div class="rounded-xl bg-gradient-to-br from-blue-500/20 to-teal-500/20 border border-blue-500/30 p-4 hover:from-blue-500/30 hover:to-teal-500/30 transition-colors group">
-                                <div class="flex items-start gap-3">
-                                    <div class="w-12 h-12 rounded-lg bg-blue-500/30 flex items-center justify-center flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-medium text-white mb-1">Advanced JavaScript</h4>
-                                        <p class="text-xs text-gray-400 mb-2">Continue your web development journey</p>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">3 Weeks</span>
-                                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">Intermediate</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-3 text-right">
-                                    <a href="#" class="text-xs text-blue-400 group-hover:text-blue-300 transition-colors inline-flex items-center gap-1">
-                                        Start Learning
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-center">
-                            <a href="{{ route('courses') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
-                                View All Recommendations
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Right Column (Leaderboard + Achievements) -->
@@ -383,7 +308,7 @@
                 </div>
 
                 <!-- Quick Links -->
-                <div class="grid grid-cols-3 gap-3">
+                <!-- <div class="grid grid-cols-3 gap-3">
                     <a href="{{ route('courses') }}" class="rounded-xl bg-neutral-800/50 border border-neutral-800 p-3 flex flex-col items-center justify-center hover:bg-neutral-800 hover:border-blue-500/30 transition-all duration-300 shadow-lg group relative overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         <div class="absolute -inset-1 bg-blue-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
@@ -425,6 +350,65 @@
                             <span class="text-xs text-gray-300 group-hover:text-yellow-300 transition-colors duration-300">Grades</span>
                         </div>
                     </a>
+                </div> -->
+
+                <!-- Badges -->
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300 mt-6">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-blue-500/20 rounded-full blur-sm opacity-70"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-white bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Badges</span>
+                            </h3>
+                        </div>
+                        @if(isset($userBadges) && $userBadges->isNotEmpty())
+                            <div class="grid grid-cols-3 gap-3">
+                                @foreach($userBadges as $badge)
+                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-3 flex flex-col items-center justify-center hover:bg-neutral-700/30 hover:border-blue-500/30 transition-all transform hover:scale-105 group relative overflow-hidden" title="{{ $badge->description }}">
+                                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        <div class="absolute -inset-1 bg-blue-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+                                        <div class="relative z-10">
+                                            @if($badge->image)
+                                                <div class="relative mb-2">
+                                                    <div class="absolute -inset-1 bg-blue-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                    <img src="{{ asset($badge->image) }}" alt="{{ $badge->name }}" class="h-12 w-12 object-contain relative">
+                                                </div>
+                                            @else
+                                                <div class="relative mb-2">
+                                                    <div class="absolute -inset-1 bg-blue-500/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                    <div class="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 flex items-center justify-center relative overflow-hidden group-hover:border-blue-500/50 transition-colors duration-300">
+                                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.2),transparent_50%)] opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400 relative z-10" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            <p class="text-xs text-gray-200 font-medium text-center leading-tight group-hover:text-white transition-colors duration-300">{{ $badge->name }}</p>
+                                            <p class="text-xs text-gray-400 text-center mt-1">{{ $badge->pivot && $badge->pivot->earned_at ? (is_string($badge->pivot->earned_at) ? date('M d, Y', strtotime($badge->pivot->earned_at)) : $badge->pivot->earned_at->format('M d, Y')) : 'N/A' }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="flex flex-col items-center justify-center p-6 bg-neutral-800/30 rounded-xl border border-neutral-700/50">
+                                <div class="h-16 w-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <p class="text-gray-300 text-center mb-1">No badges earned yet</p>
+                                <p class="text-sm text-gray-500 text-center">Keep leveling up to earn badges!</p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
                 <!-- Leaderboard -->
@@ -458,7 +442,7 @@
                                             <span class="text-xs font-mono bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300 border border-neutral-700/50 group-hover:border-neutral-600/50 transition-colors duration-300">{{ number_format($entry->experience->experience_points ?? 0) }}</span>
                                         </div>
                                         <div class="flex items-center mt-1">
-                                            <div class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">Level {{ $entry->experience->level_id }}</div>
+                                            <div class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">Level {{ $entry->experience->level_id ?? 1 }}</div>
                                             <div class="ml-2 w-full bg-neutral-800/80 rounded-full h-1.5 overflow-hidden backdrop-blur-sm border border-neutral-700/50 shadow-inner">
                                                 <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full relative" style="width: 70%">
                                                     <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0)_75%)] bg-[length:200%_100%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
@@ -497,70 +481,6 @@
                                 </div>
                             @endif
                         </div>
-                    </div>
-                </div>
-
-                <!-- Achievements -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
-                    <div class="p-6 relative z-10">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <div class="relative">
-                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-70"></div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                                    </svg>
-                                </div>
-                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-fuchsia-400">Achievements</span>
-                            </h3>
-                            <a href="#" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 hover:bg-neutral-800 hover:border-purple-500/30 transition-all duration-300">
-                                View All
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        </div>
-                        @if($userAchievements->isNotEmpty())
-                            <div class="grid grid-cols-2 gap-3">
-                                @foreach($userAchievements as $achievement)
-                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-3 flex flex-col items-center justify-center hover:bg-neutral-700/30 hover:border-purple-500/30 transition-all transform hover:scale-105 group relative overflow-hidden" title="{{ $achievement->description }}">
-                                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                        <div class="absolute -inset-1 bg-purple-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                        <div class="relative z-10">
-                                            @if($achievement->image)
-                                                <div class="relative mb-2">
-                                                    <div class="absolute -inset-1 bg-purple-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                    <img src="{{ $achievement->image }}" alt="{{ $achievement->name }}" class="h-12 w-12 object-contain relative">
-                                                </div>
-                                            @else
-                                                <div class="relative mb-2">
-                                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                    <div class="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 flex items-center justify-center relative overflow-hidden group-hover:border-purple-500/50 transition-colors duration-300">
-                                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.2),transparent_50%)] opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400 relative z-10" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                            <p class="text-xs text-gray-200 font-medium text-center leading-tight group-hover:text-white transition-colors duration-300">{{ $achievement->name }}</p>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-6 text-center">
-                                <p class="text-gray-400 text-sm mb-3">No achievements earned yet. Keep learning and complete challenges!</p>
-                                <!-- <a href="{{ route('learning') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-lg text-white transition-colors shadow-lg shadow-purple-900/30">
-                                    Start Earning
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </a> -->
-                            </div>
-                        @endif
                     </div>
                 </div>
             </div>

@@ -35,19 +35,20 @@ Route::middleware(
     ])
 )->group(function () {
 
-    Route::view('dashboard', 'dashboard')
+    Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
         ->name('dashboard');
 
     Route::get('learning', [\App\Http\Controllers\LearningController::class, 'index'])->name('learning');
     Route::get('challenge/{challenge}', [\App\Http\Controllers\LearningController::class, 'show'])->name('challenge');
     Route::get('/challenges/{challenge}/tasks/{task}', [ChallengeController::class, 'showTask'])
         ->name('challenge.task')
-        ->middleware(['auth']);
+        ->middleware(['auth', \App\Http\Middleware\CheckTaskCompletion::class]);
     Route::view('notifications', 'notifications')->name('notifications');
     Route::get('courses', [CourseController::class, 'index'])->name('courses');
     Route::get('learning-materials', [\App\Http\Controllers\LearningMaterialController::class, 'index'])->name('learning-materials');
     Route::get('assignments', [\App\Http\Controllers\AssignmentController::class, 'index'])->name('assignments');
     Route::get('profile', [\App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
+    Route::get('feedback', [\App\Http\Controllers\FeedbackController::class, 'index'])->name('feedback');
     Route::get('schedule', [ScheduleController::class, 'index'])->name('schedule');
     Route::view('grades','grades')->name('grades');
     Route::view('messages','messages')->name('messages');
