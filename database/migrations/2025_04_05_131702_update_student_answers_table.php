@@ -16,11 +16,11 @@ return new class extends Migration
             if (!Schema::hasColumn('student_answers', 'solution')) {
                 $table->text('solution')->nullable();
             }
-            
+
             if (!Schema::hasColumn('student_answers', 'output')) {
                 $table->text('output')->nullable();
             }
-            
+
             if (!Schema::hasColumn('student_answers', 'status')) {
                 $table->string('status')->default('pending');
             }
@@ -36,4 +36,4 @@ return new class extends Migration
             $table->dropColumn(['solution', 'output', 'status']);
         });
     }
-}; 
+};

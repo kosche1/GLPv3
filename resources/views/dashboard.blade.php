@@ -1,18 +1,23 @@
 <x-layouts.app>
-    <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg">
+    <div class="relative flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg overflow-hidden backdrop-blur-sm">
+        <!-- Optimized Background Elements - Single Element -->
+        <!-- <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.05),transparent_70%)]" style="background-size: 24px 24px;"></div> -->
         <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-white">GLP - Gamified Dashboard</h1>
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-400">{{ date('l, F j, Y') }}</span>
-                <div class="h-6 w-6 rounded-full bg-emerald-500 flex items-center justify-center">
+        <div class="flex justify-between items-center mb-6 relative">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-1 bg-gradient-to-b from-emerald-400 to-emerald-600 rounded-full"></div>
+                <h1 class="text-2xl font-bold text-white tracking-tight">GLP - Gamified Dashboard</h1>
+            </div>
+            <div class="flex items-center gap-3 bg-neutral-800/50 px-4 py-1.5 rounded-full border border-neutral-700/50 shadow-lg backdrop-blur-sm">
+                <span class="text-sm text-gray-300 font-medium">{{ date('l, F j, Y') }}</span>
+                <div class="h-6 w-6 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
                 </div>
             </div>
         </div>
-        
+
         @php
             $user = auth()->user();
             $currentLevel = $user->getLevel();
@@ -32,10 +37,10 @@
             $achievement = \App\Models\StudentAchievement::getLatestScore($user->id);
             $score = $achievement ? number_format($achievement->score, 2) : '0.00';
             $scoreChange = $achievement ? $achievement->score_change : 0;
-            
+
             $attendancePercentage = \App\Models\StudentAttendance::getAttendancePercentage($user->id);
             $attendanceChange = \App\Models\StudentAttendance::getAttendanceChange($user->id);
-            
+
             $credits = \App\Models\StudentCredit::getCreditsInfo($user->id);
             $creditsCompleted = $credits ? $credits->credits_completed : 0;
             $creditsRequired = $credits ? ($credits->credits_required ?: 120) : 120;
@@ -65,135 +70,159 @@
             <!-- Left Column (Profile + Stats) -->
             <div class="lg:col-span-8 space-y-6">
                 <!-- Profile Card with Stats -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden">
-                    <div class="relative p-6">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="relative p-6 z-10">
                         <!-- Decorative Background Elements -->
                         <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-full blur-2xl -z-10"></div>
                         <div class="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-500/10 to-transparent rounded-full blur-2xl -z-10"></div>
-                        
+                        <div class="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(16,185,129,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(16,185,129,0.01)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20"></div>
+
                         <div class="flex flex-col md:flex-row md:items-center gap-6">
                             <!-- Avatar & Welcome -->
                             <div class="flex items-center gap-4">
                                 <div class="relative">
-                                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-                                        {{ $user->initials() }}
+                                    <div class="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.25),transparent_50%)] opacity-70"></div>
+                                        <div class="relative z-10">{{ $user->initials() }}</div>
+                                        <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0)_75%)] bg-[length:250%_250%] animate-pulse-slow opacity-50"></div>
                                     </div>
                                     <div class="absolute -bottom-1 -right-1 bg-neutral-800 rounded-full p-1 shadow-lg">
-                                        <div class="bg-emerald-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                                        <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                                             {{ $currentLevel }}
                                         </div>
                                     </div>
                                 </div>
                                 <div>
-                                    <h2 class="text-2xl font-bold text-white">Welcome back, {{ explode(' ', $user->name)[0] }}!</h2>
+                                    <h2 class="text-2xl font-bold text-white tracking-tight">Welcome back, <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">{{ explode(' ', $user->name)[0] }}</span>!</h2>
                                     <p class="text-gray-400">You're making great progress</p>
                                 </div>
                             </div>
-                            
+
                             <!-- Stats Cards -->
                             <div class="grid grid-cols-3 gap-4 md:ml-auto">
-                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col items-center justify-center">
-                                    <div class="text-yellow-400 mb-1">
+                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col items-center justify-center relative group hover:border-yellow-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="absolute -inset-1 bg-yellow-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+                                    <div class="text-yellow-400 mb-1 relative z-10">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                         </svg>
                                     </div>
-                                    <span class="text-xs text-gray-400">Score</span>
-                                    <span class="text-white font-bold">{{ $score }}</span>
-                                    <span class="text-xs {{ $scoreChange >= 0 ? 'text-green-400' : 'text-red-400' }}">
+                                    <span class="text-xs text-gray-400 relative z-10">Score</span>
+                                    <span class="text-white font-bold relative z-10 text-lg">{{ $score }}</span>
+                                    <span class="text-xs {{ $scoreChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10">
                                         {{ $scoreChange >= 0 ? '+' : '' }}{{ number_format($scoreChange, 2) }}
                                     </span>
                                 </div>
-                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col items-center justify-center">
-                                    <div class="text-blue-400 mb-1">
+                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col items-center justify-center relative group hover:border-blue-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="absolute -inset-1 bg-blue-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+                                    <div class="text-blue-400 mb-1 relative z-10">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
                                         </svg>
                                     </div>
-                                    <span class="text-xs text-gray-400">Attendance</span>
-                                    <span class="text-white font-bold">{{ $attendancePercentage }}%</span>
-                                    <span class="text-xs {{ $attendanceChange >= 0 ? 'text-green-400' : 'text-red-400' }}">
+                                    <span class="text-xs text-gray-400 relative z-10">Attendance</span>
+                                    <span class="text-white font-bold relative z-10 text-lg">{{ $attendancePercentage }}%</span>
+                                    <span class="text-xs {{ $attendanceChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10">
                                         {{ $attendanceChange >= 0 ? '+' : '' }}{{ $attendanceChange }}%
                                     </span>
                                 </div>
-                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col items-center justify-center">
-                                    <div class="text-purple-400 mb-1">
+                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col items-center justify-center relative group hover:border-purple-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="absolute -inset-1 bg-purple-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+                                    <div class="text-purple-400 mb-1 relative z-10">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                             <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804v-10A7.968 7.968 0 0014.5 4z" />
                                         </svg>
                                     </div>
-                                    <span class="text-xs text-gray-400">Credits</span>
-                                    <span class="text-white font-bold">{{ $completionPercentage }}%</span>
-                                    <span class="text-xs text-gray-400">{{ $creditsCompleted }}/{{ $creditsRequired }}</span>
+                                    <span class="text-xs text-gray-400 relative z-10">Credits</span>
+                                    <span class="text-white font-bold relative z-10 text-lg">{{ $completionPercentage }}%</span>
+                                    <span class="text-xs text-gray-400 relative z-10">{{ $creditsCompleted }}/{{ $creditsRequired }}</span>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- XP Progress Bar -->
-                        <div class="mt-6">
+                        <div class="mt-6 relative">
                             <div class="flex justify-between items-end mb-2">
                                 <div class="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
-                                    </svg>
-                                    <span class="text-sm font-medium text-emerald-400">Level {{ $currentLevel }} Progress</span>
+                                    <div class="relative">
+                                        <div class="absolute -inset-1 bg-emerald-500/20 rounded-full blur-sm animate-pulse-slow"></div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Level {{ $currentLevel }} Progress</span>
                                 </div>
-                                <span class="text-xs text-gray-400">{{ number_format($currentPoints) }} / {{ number_format($pointsForNextLevel) }} XP</span>
+                                <span class="text-xs text-gray-300 font-mono bg-neutral-800/80 px-2 py-0.5 rounded-full">{{ number_format($currentPoints) }} / {{ number_format($pointsForNextLevel) }} XP</span>
                             </div>
-                            <div class="w-full h-3 bg-neutral-700/50 rounded-full overflow-hidden backdrop-blur-sm">
-                                <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500 ease-out relative" style="width: {{ $progressPercentage }}%">
-                                    <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0)_75%)] bg-[length:200%_100%] animate-shimmer"></div>
-                                </div>
+                            <div class="w-full h-3 bg-neutral-800/80 rounded-full overflow-hidden border border-neutral-700/50">
+                                <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full" style="width: {{ $progressPercentage }}%"></div>
                             </div>
-                            <p class="text-right text-xs text-gray-400 mt-1">
-                                {{ number_format($xpToNextLevel) }} XP to Level {{ $currentLevel + 1 }}
-                            </p>
+                            <div class="flex justify-between mt-1">
+                                <span class="text-xs text-gray-500">Level {{ $currentLevel }}</span>
+                                <span class="text-xs text-gray-400">{{ number_format($xpToNextLevel) }} XP to Level {{ $currentLevel + 1 }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Activity Graph -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden" style="min-height: 350px; height: 400px;">
-                    <div class="p-6 h-full">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300" style="min-height: 350px; height: 400px;">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(16,185,129,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(16,185,129,0.01)_1px,transparent_1px)] bg-[size:20px_20px] opacity-10"></div>
+                    <div class="p-6 h-full relative z-10">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                Your Activity
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-emerald-500/20 rounded-full blur-sm opacity-70"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Your Activity</span>
                             </h3>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner">
                                 <div class="text-xs text-gray-400">Less</div>
                                 <div class="flex items-center gap-1">
-                                    <div class="h-3 w-3 rounded-sm bg-neutral-700" title="No activity"></div>
-                                    <div class="h-3 w-3 rounded-sm bg-emerald-900" title="Low activity"></div>
-                                    <div class="h-3 w-3 rounded-sm bg-emerald-700" title="Medium activity"></div>
-                                    <div class="h-3 w-3 rounded-sm bg-emerald-500" title="High activity"></div>
-                                    <div class="h-3 w-3 rounded-sm bg-emerald-300" title="Very high activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-neutral-700 shadow-inner" title="No activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-emerald-900 shadow-inner" title="Low activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-emerald-700 shadow-inner" title="Medium activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-emerald-500 shadow-inner" title="High activity"></div>
+                                    <div class="h-3 w-3 rounded-sm bg-emerald-300 shadow-inner" title="Very high activity"></div>
                                 </div>
                                 <div class="text-xs text-gray-400">More</div>
                             </div>
                         </div>
-                        <div class="overflow-x-auto h-[calc(100%-3rem)]">
+                        <div class="overflow-x-auto h-[calc(100%-3rem)] bg-neutral-800/30 rounded-xl border border-neutral-700/30 p-3">
                             <div class="contribution-calendar min-w-[700px] h-full">
                                 <div id="contributionGraph" class="mt-2 w-full h-[calc(100%-0.5rem)]"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Active Challenges -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden">
-                    <div class="p-6">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-orange-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="p-6 relative z-10">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
-                                    <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0010 15c-2.796 0-5.487-.46-8-1.308z" />
-                                </svg>
-                                Active Challenges
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-orange-500/20 rounded-full blur-sm opacity-70"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
+                                        <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0010 15c-2.796 0-5.487-.46-8-1.308z" />
+                                    </svg>
+                                </div>
+                                <span class="text-white bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400">Active Challenges</span>
                             </h3>
-                            <a href="{{ route('learning') }}" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1">
+                            <a href="{{ route('learning') }}" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 hover:bg-neutral-800 hover:border-emerald-500/30 transition-all duration-300">
                                 View All
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
@@ -203,21 +232,21 @@
                         @if($activeChallenges->isNotEmpty())
                             <div class="space-y-4">
                                 @foreach($activeChallenges as $challenge)
-                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-4 hover:bg-neutral-700/30 transition-colors">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="font-medium text-white">{{ $challenge->name }}</span>
-                                            <span class="text-xs font-semibold px-2 py-1 rounded-full {{ ($challenge->pivot->progress ?? 0) >= 100 ? 'bg-green-500/20 text-green-400' : 'bg-orange-500/20 text-orange-400' }}">
-                                                {{ $challenge->pivot->progress ?? 0 }}% Complete
-                                            </span>
-                                        </div>
-                                        <div class="w-full bg-neutral-700/50 rounded-full h-2 overflow-hidden">
-                                            <div class="bg-gradient-to-r from-orange-500 to-yellow-500 h-2 rounded-full transition-all duration-300 relative" style="width: {{ $challenge->pivot->progress ?? 0 }}%">
-                                                <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.2)_50%,rgba(255,255,255,0)_75%)] bg-[length:200%_100%] animate-shimmer"></div>
+                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-4 hover:bg-neutral-700/30 hover:border-orange-500/30 transition-colors duration-200 group relative overflow-hidden">
+                                        <div class="relative z-10">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <span class="font-medium text-white">{{ $challenge->name }}</span>
+                                                <span class="text-xs font-semibold px-2 py-1 rounded-full {{ ($challenge->pivot->progress ?? 0) >= 100 ? 'bg-green-500/20 text-green-400 group-hover:bg-green-500/30' : 'bg-orange-500/20 text-orange-400 group-hover:bg-orange-500/30' }} transition-colors duration-300">
+                                                    {{ $challenge->pivot->progress ?? 0 }}% Complete
+                                                </span>
                                             </div>
+                                            <div class="w-full bg-neutral-800/80 rounded-full h-2 overflow-hidden border border-neutral-700/50">
+                                                <div class="bg-gradient-to-r from-orange-500 to-yellow-500 h-2 rounded-full" style="width: {{ $challenge->pivot->progress ?? 0 }}%"></div>
+                                            </div>
+                                            @if($challenge->description)
+                                                <p class="text-xs text-gray-400 mt-2">{{ Str::limit($challenge->description, 100) }}</p>
+                                            @endif
                                         </div>
-                                        @if($challenge->description)
-                                            <p class="text-xs text-gray-400 mt-2">{{ Str::limit($challenge->description, 100) }}</p>
-                                        @endif
                                     </div>
                                 @endforeach
                             </div>
@@ -246,7 +275,7 @@
                                 Recommended For You
                             </h3>
                         </div>
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div class="rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 p-4 hover:from-pink-500/30 hover:to-purple-500/30 transition-colors group">
                                 <div class="flex items-start gap-3">
@@ -273,7 +302,7 @@
                                     </a>
                                 </div>
                             </div>
-                            
+
                             <div class="rounded-xl bg-gradient-to-br from-blue-500/20 to-teal-500/20 border border-blue-500/30 p-4 hover:from-blue-500/30 hover:to-teal-500/30 transition-colors group">
                                 <div class="flex items-start gap-3">
                                     <div class="w-12 h-12 rounded-lg bg-blue-500/30 flex items-center justify-center flex-shrink-0">
@@ -300,7 +329,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="mt-4 text-center">
                             <a href="{{ route('courses') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
                                 View All Recommendations
@@ -312,90 +341,128 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Right Column (Leaderboard + Achievements) -->
             <div class="lg:col-span-4 space-y-6">
                 <!-- Main Action Button -->
-                <div class="rounded-2xl border border-emerald-500/50 bg-emerald-500/10 backdrop-blur-sm shadow-xl overflow-hidden">
+                <div class="rounded-2xl border border-emerald-500/50 bg-emerald-500/10 backdrop-blur-sm shadow-xl overflow-hidden relative">
+                    <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(16,185,129,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(16,185,129,0.01)_1px,transparent_1px)] bg-[size:16px_16px] opacity-20"></div>
                     <a href="{{ route('learning') }}" class="block p-6 text-center relative group">
                         <!-- Background effect -->
                         <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-500/10 opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
                         <div class="absolute inset-0 bg-[radial-gradient(circle,_rgba(16,185,129,0.3)_0%,_rgba(0,0,0,0)_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        
+                        <div class="absolute -inset-1 bg-emerald-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+
                         <!-- Icon -->
                         <div class="relative mb-3">
-                            <div class="w-16 h-16 mx-auto rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+                            <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-emerald-500/30 to-teal-500/30 border border-emerald-500/50 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative overflow-hidden">
+                                <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.25),transparent_50%)] opacity-70"></div>
+                                <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0)_75%)] bg-[length:250%_250%] animate-pulse-slow opacity-50"></div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400 relative z-10" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                         </div>
-                        
+
                         <!-- Text -->
-                        <h3 class="text-xl font-bold text-emerald-400 mb-1 relative">Start Learning</h3>
-                        <p class="text-sm text-gray-400 relative">Start your journey to success</p>
-                        
+                        <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mb-1 relative">Start Learning</h3>
+                        <p class="text-sm text-gray-400 relative group-hover:text-gray-300 transition-colors duration-300">Start your journey to success</p>
+
                         <!-- Button -->
                         <div class="mt-4 relative">
-                            <span class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 group-hover:from-emerald-500 group-hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
-                                Explore Now
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                            <span class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 group-hover:from-emerald-500 group-hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30 relative overflow-hidden">
+                                <span class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0)_75%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></span>
+                                <span class="relative z-10 flex items-center">Explore Now
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
                             </span>
                         </div>
                     </a>
                 </div>
-                
+
                 <!-- Quick Links -->
                 <div class="grid grid-cols-3 gap-3">
-                    <a href="{{ route('courses') }}" class="rounded-xl bg-neutral-800/50 border border-neutral-800 p-3 flex flex-col items-center justify-center hover:bg-neutral-800 hover:border-neutral-700 transition-colors shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400 mb-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
-                        </svg>
-                        <span class="text-xs text-gray-300">Courses</span>
+                    <a href="{{ route('courses') }}" class="rounded-xl bg-neutral-800/50 border border-neutral-800 p-3 flex flex-col items-center justify-center hover:bg-neutral-800 hover:border-blue-500/30 transition-all duration-300 shadow-lg group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute -inset-1 bg-blue-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+                        <div class="relative z-10">
+                            <div class="relative mb-1">
+                                <div class="absolute -inset-1 bg-blue-500/20 rounded-full blur-sm opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
+                                </svg>
+                            </div>
+                            <span class="text-xs text-gray-300 group-hover:text-blue-300 transition-colors duration-300">Courses</span>
+                        </div>
                     </a>
-                    <a href="{{ route('assignments') }}" class="rounded-xl bg-neutral-800/50 border border-neutral-800 p-3 flex flex-col items-center justify-center hover:bg-neutral-800 hover:border-neutral-700 transition-colors shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400 mb-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-xs text-gray-300">Assignments</span>
+                    <a href="{{ route('assignments') }}" class="rounded-xl bg-neutral-800/50 border border-neutral-800 p-3 flex flex-col items-center justify-center hover:bg-neutral-800 hover:border-purple-500/30 transition-all duration-300 shadow-lg group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute -inset-1 bg-purple-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+                        <div class="relative z-10">
+                            <div class="relative mb-1">
+                                <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <span class="text-xs text-gray-300 group-hover:text-purple-300 transition-colors duration-300">Assignments</span>
+                        </div>
                     </a>
-                    <a href="{{ route('grades') }}" class="rounded-xl bg-neutral-800/50 border border-neutral-800 p-3 flex flex-col items-center justify-center hover:bg-neutral-800 hover:border-neutral-700 transition-colors shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400 mb-1" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-xs text-gray-300">Grades</span>
+                    <a href="{{ route('grades') }}" class="rounded-xl bg-neutral-800/50 border border-neutral-800 p-3 flex flex-col items-center justify-center hover:bg-neutral-800 hover:border-yellow-500/30 transition-all duration-300 shadow-lg group relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute -inset-1 bg-yellow-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+                        <div class="relative z-10">
+                            <div class="relative mb-1">
+                                <div class="absolute -inset-1 bg-yellow-500/20 rounded-full blur-sm opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <span class="text-xs text-gray-300 group-hover:text-yellow-300 transition-colors duration-300">Grades</span>
+                        </div>
                     </a>
                 </div>
-                
+
                 <!-- Leaderboard -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden">
-                    <div class="p-6">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(234,179,8,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/0 via-yellow-500/5 to-yellow-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="p-6 relative z-10">
                         <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                            </svg>
-                            Leaderboard
+                            <div class="relative">
+                                <div class="absolute -inset-1 bg-yellow-500/20 rounded-full blur-sm opacity-70"></div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                </svg>
+                            </div>
+                            <span class="text-white bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-400">Leaderboard</span>
                         </h3>
                         <div class="space-y-2">
                             @forelse($leaderboardData->take(5) as $index => $entry)
                                 @php $rank = $index + 1; @endphp
-                                <div class="flex items-center p-3 rounded-xl {{ $entry->user->id === $user->id ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-neutral-700/20 border border-neutral-700/50' }}">
-                                    <div class="w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center {{ $rank == 1 ? 'bg-yellow-500/20 text-yellow-400' : ($rank == 2 ? 'bg-gray-300/20 text-gray-300' : ($rank == 3 ? 'bg-orange-500/20 text-orange-400' : 'bg-neutral-600/20 text-gray-400')) }}">
-                                        {{ $rank }}
+                                <div class="flex items-center p-3 rounded-xl {{ $entry->user->id === $user->id ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/15' : 'bg-neutral-700/20 border border-neutral-700/50 hover:bg-neutral-700/30' }} transition-all duration-300 group relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0)_75%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+                                    <div class="w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center relative {{ $rank == 1 ? 'bg-yellow-500/20 text-yellow-400' : ($rank == 2 ? 'bg-gray-300/20 text-gray-300' : ($rank == 3 ? 'bg-orange-500/20 text-orange-400' : 'bg-neutral-600/20 text-gray-400')) }}">
+                                        @if($rank <= 3)
+                                            <div class="absolute inset-0 rounded-full {{ $rank == 1 ? 'bg-yellow-500/10' : ($rank == 2 ? 'bg-gray-300/10' : 'bg-orange-500/10') }} animate-pulse-slow"></div>
+                                        @endif
+                                        <span class="relative z-10 font-bold">{{ $rank }}</span>
                                     </div>
-                                    <div class="ml-3 flex-grow">
+                                    <div class="ml-3 flex-grow relative z-10">
                                         <div class="flex justify-between items-center">
-                                            <span class="font-medium text-gray-100 truncate">{{ $entry->user->name }}</span>
-                                            <span class="text-xs font-mono bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300">{{ number_format($entry->experience->experience_points ?? 0) }}</span>
+                                            <span class="font-medium text-gray-100 truncate group-hover:text-white transition-colors duration-300">{{ $entry->user->name }}</span>
+                                            <span class="text-xs font-mono bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300 border border-neutral-700/50 group-hover:border-neutral-600/50 transition-colors duration-300">{{ number_format($entry->experience->experience_points ?? 0) }}</span>
                                         </div>
                                         <div class="flex items-center mt-1">
-                                            <div class="text-xs text-gray-400">Level {{ $entry->experience->level_id }}</div>
-                                            <div class="ml-2 w-full bg-neutral-700/50 rounded-full h-1.5 overflow-hidden">
-                                                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full" style="width: 70%"></div>
+                                            <div class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">Level {{ $entry->experience->level_id }}</div>
+                                            <div class="ml-2 w-full bg-neutral-800/80 rounded-full h-1.5 overflow-hidden backdrop-blur-sm border border-neutral-700/50 shadow-inner">
+                                                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full relative" style="width: 70%">
+                                                    <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0)_75%)] bg-[length:200%_100%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -405,21 +472,23 @@
                                     Leaderboard data is currently unavailable.
                                 </div>
                             @endforelse
-                            
+
                             @if($userRank && $userRank > 5)
                                 <div class="mt-2 pt-2 border-t border-dashed border-neutral-700">
-                                    <div class="flex items-center p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-                                        <div class="w-8 h-8 flex-shrink-0 rounded-full bg-neutral-600/20 flex items-center justify-center text-gray-400">
-                                            {{ $userRank }}
+                                    <div class="flex items-center p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/15 transition-all duration-300 group relative overflow-hidden">
+                                        <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0)_75%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                        <div class="w-8 h-8 flex-shrink-0 rounded-full bg-neutral-600/20 flex items-center justify-center text-gray-400 relative">
+                                            <span class="relative z-10 font-bold">{{ $userRank }}</span>
                                         </div>
-                                        <div class="ml-3 flex-grow">
+                                        <div class="ml-3 flex-grow relative z-10">
                                             <div class="flex justify-between items-center">
-                                                <span class="font-medium text-gray-100 truncate">{{ $user->name }}</span>
-                                                <span class="text-xs font-mono bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300">{{ number_format($currentPoints) }}</span>
+                                                <span class="font-medium text-gray-100 truncate group-hover:text-white transition-colors duration-300">{{ $user->name }}</span>
+                                                <span class="text-xs font-mono bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300 border border-emerald-500/30 group-hover:border-emerald-500/50 transition-colors duration-300">{{ number_format($currentPoints) }}</span>
                                             </div>
                                             <div class="flex items-center mt-1">
-                                                <div class="text-xs text-gray-400">Level {{ $currentLevel }}</div>
-                                                <div class="ml-2 w-full bg-neutral-700/50 rounded-full h-1.5 overflow-hidden">
+                                                <div class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">Level {{ $currentLevel }}</div>
+                                                <div class="ml-2 w-full bg-neutral-800/80 rounded-full h-1.5 overflow-hidden border border-neutral-700/50">
                                                     <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full" style="width: {{ $progressPercentage }}%"></div>
                                                 </div>
                                             </div>
@@ -430,18 +499,23 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Achievements -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden">
-                    <div class="p-6">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="p-6 relative z-10">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                                </svg>
-                                Achievements
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-70"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                    </svg>
+                                </div>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-fuchsia-400">Achievements</span>
                             </h3>
-                            <a href="#" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1">
+                            <a href="#" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 hover:bg-neutral-800 hover:border-purple-500/30 transition-all duration-300">
                                 View All
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
@@ -451,17 +525,28 @@
                         @if($userAchievements->isNotEmpty())
                             <div class="grid grid-cols-2 gap-3">
                                 @foreach($userAchievements as $achievement)
-                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-3 flex flex-col items-center justify-center hover:bg-neutral-700/30 transition-all transform hover:scale-105" title="{{ $achievement->description }}">
-                                        @if($achievement->image)
-                                            <img src="{{ $achievement->image }}" alt="{{ $achievement->name }}" class="h-12 w-12 mb-2 object-contain">
-                                        @else
-                                            <div class="h-12 w-12 mb-2 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        @endif
-                                        <p class="text-xs text-gray-200 font-medium text-center leading-tight">{{ $achievement->name }}</p>
+                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-3 flex flex-col items-center justify-center hover:bg-neutral-700/30 hover:border-purple-500/30 transition-all transform hover:scale-105 group relative overflow-hidden" title="{{ $achievement->description }}">
+                                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        <div class="absolute -inset-1 bg-purple-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+                                        <div class="relative z-10">
+                                            @if($achievement->image)
+                                                <div class="relative mb-2">
+                                                    <div class="absolute -inset-1 bg-purple-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                    <img src="{{ $achievement->image }}" alt="{{ $achievement->name }}" class="h-12 w-12 object-contain relative">
+                                                </div>
+                                            @else
+                                                <div class="relative mb-2">
+                                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                    <div class="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 flex items-center justify-center relative overflow-hidden group-hover:border-purple-500/50 transition-colors duration-300">
+                                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.2),transparent_50%)] opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400 relative z-10" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            <p class="text-xs text-gray-200 font-medium text-center leading-tight group-hover:text-white transition-colors duration-300">{{ $achievement->name }}</p>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -481,198 +566,139 @@
             </div>
         </div>
     </div>
-    
+
     <script>
-        // IMPORTANT: The generateData() function currently uses random data.
-        // Replace this with a function that fetches actual user activity data,
-        // possibly via an API call to the backend (e.g., fetching Audit logs or task completions).
+        // Optimized contribution graph with reduced DOM manipulation and better performance
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM Content Loaded for Contribution Graph');
             // Configuration
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']; // Only showing weekdays
-            
-            // Generate a year of data (for demo purposes)
+            const days = ['Mon', 'Wed', 'Fri']; // Only showing weekdays
+
+            // Generate a smaller dataset (6 months instead of 12) to reduce DOM elements
             function generateData() {
-                console.log('Generating demo contribution data');
                 const data = {};
                 const now = new Date();
-                const currentYear = now.getFullYear();
-                
-                // Start from approx 12 months ago
+
+                // Start from approx 6 months ago instead of 12
                 const startDate = new Date(now);
-                startDate.setMonth(now.getMonth() - 11);
+                startDate.setMonth(now.getMonth() - 5);
                 startDate.setDate(1);
-                
-                // Generate random activity data for each day up to today
+
+                // Generate random activity data with fewer data points
                 let currentDate = new Date(startDate);
                 while (currentDate <= now) {
                     // Only include weekdays (Mon=1 to Fri=5)
                     const dayOfWeek = currentDate.getDay();
                     if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-                        const dateStr = currentDate.toISOString().split('T')[0];
-                        // Skew towards lower activity levels
-                        const randomActivity = Math.floor(Math.pow(Math.random(), 1.5) * 5);
-                        data[dateStr] = randomActivity;
+                        // Only include every other day to reduce data points by 50%
+                        if (currentDate.getDate() % 2 === 0) {
+                            const dateStr = currentDate.toISOString().split('T')[0];
+                            // Simpler random calculation
+                            const randomActivity = Math.floor(Math.random() * 4);
+                            data[dateStr] = randomActivity;
+                        }
                     }
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
-                console.log(`Generated ${Object.keys(data).length} demo data points`);
                 return data;
             }
-            
-            // Create the contribution graph
+
+            // Create the contribution graph with optimized rendering
             function createContributionGraph() {
-                console.log('Creating contribution graph');
                 const graphContainer = document.getElementById('contributionGraph');
-                
-                if (!graphContainer) {
-                    console.error('Graph container #contributionGraph not found!');
-                    return;
-                }
-                
+
+                if (!graphContainer) return;
+
                 const graphData = generateData();
                 if (Object.keys(graphData).length === 0) {
-                    console.warn('No data available for contribution graph.');
                     graphContainer.innerHTML = '<p class="text-gray-400 text-sm">No activity data to display.</p>';
                     return;
                 }
-                
+
                 // Clear existing content
                 graphContainer.innerHTML = '';
-                
-                // Create month labels row
-                const monthsRow = document.createElement('div');
-                monthsRow.className = 'flex text-xs text-gray-500 mb-1 pl-8'; // Added padding to align with days
-                
+
                 // Get the start and end dates from data
                 const dates = Object.keys(graphData).sort();
-                const startDate = new Date(dates[0] + 'T00:00:00Z'); // Use UTC to avoid timezone issues
+                const startDate = new Date(dates[0] + 'T00:00:00Z');
                 const endDate = new Date(dates[dates.length - 1] + 'T00:00:00Z');
 
-                // Add month labels dynamically based on weeks
-                let currentMonth = -1;
-                let weekCount = 0;
-                let monthElements = [];
-                let tempDate = new Date(startDate);
-                // Align start date to the previous Monday
-                tempDate.setDate(tempDate.getDate() - (tempDate.getDay() + 6) % 7);
-
-                while (tempDate <= endDate) {
-                    const month = tempDate.getMonth();
-                    if (month !== currentMonth) {
-                        // Only add month label if it's not the very first week (looks cleaner)
-                        if (weekCount > 1) {
-                            monthElements.push(`<div class="w-[${(weekCount) * 16 + (weekCount-1)*4}px] text-left">${months[month]}</div>`); // Approx width: (weeks * (cell_width + gap))
-                        } else if (monthElements.length === 0 && weekCount === 1) {
-                             // Handle first month label specially if it starts mid-graph
-                             monthElements.push(`<div class="w-[16px] text-left">${months[month]}</div>`);
-                        }
-                        currentMonth = month;
-                        weekCount = 0; // Reset week count for the new month
-                    }
-                    // Increment date by 7 days (a week)
-                    tempDate.setDate(tempDate.getDate() + 7);
-                    weekCount++;
+                // Create simplified month labels
+                let monthsHTML = '<div class="flex text-xs text-gray-500 mb-1 pl-8">';
+                for (let i = 0; i < 6; i++) { // Fixed number of months
+                    const monthIndex = (startDate.getMonth() + i) % 12;
+                    monthsHTML += `<div class="flex-1 text-left">${months[monthIndex]}</div>`;
                 }
-                // Add the last month label segment
-                if (weekCount > 0) {
-                     monthElements.push(`<div class="flex-1 text-left">${months[currentMonth]}</div>`);
-                }
+                monthsHTML += '</div>';
 
-                monthsRow.innerHTML = monthElements.join('');
-                graphContainer.appendChild(monthsRow);
-                
-
-                // Create the main grid (days + weeks)
-                const grid = document.createElement('div');
-                grid.className = 'flex h-[calc(100%-1rem)]'; // Adjust height accounting for month labels
-                
-                // Create day labels column (Mon, Wed, Fri)
-                const daysCol = document.createElement('div');
-                daysCol.className = 'flex flex-col w-8 text-xs text-gray-500 justify-between py-0.5 pr-2'; // Adjusted padding
-                daysCol.innerHTML = `
-                    <div class="h-4"></div>
-                    <div class="h-4">${days[0]}</div> {{-- Mon --}}
-                    <div class="h-4"></div>
-                    <div class="h-4">${days[2]}</div> {{-- Wed --}}
-                    <div class="h-4"></div>
-                    <div class="h-4">${days[4]}</div> {{-- Fri --}}
-                    <div class="h-4"></div>
+                // Create simplified grid
+                let gridHTML = `
+                <div class="flex h-[calc(100%-1rem)]">
+                    <div class="flex flex-col w-8 text-xs text-gray-500 justify-between py-0.5 pr-2">
+                        <div class="h-4"></div>
+                        <div class="h-4">${days[0]}</div>
+                        <div class="h-4"></div>
+                        <div class="h-4">${days[1]}</div>
+                        <div class="h-4"></div>
+                        <div class="h-4">${days[2]}</div>
+                        <div class="h-4"></div>
+                    </div>
+                    <div class="flex flex-1 gap-1 overflow-hidden">
                 `;
-                grid.appendChild(daysCol);
-                
-                // Create the weeks container
-                const weeksContainer = document.createElement('div');
-                weeksContainer.className = 'flex flex-1 gap-1 overflow-hidden'; // Added overflow hidden
 
-                // Calculate number of weeks needed (including partial weeks)
-                let iterDate = new Date(startDate);
-                // Align start date to the previous Monday for grid start
-                iterDate.setDate(iterDate.getDate() - (iterDate.getDay() + 6) % 7);
-                const gridEndDate = new Date(endDate);
-                // Align end date to the next Sunday for grid end
-                gridEndDate.setDate(gridEndDate.getDate() + (7 - gridEndDate.getDay()) % 7);
+                // Generate a fixed number of weeks (26 weeks = ~6 months)
+                const weeksToShow = 26;
 
+                for (let week = 0; week < weeksToShow; week++) {
+                    gridHTML += '<div class="flex flex-col gap-1 w-4">';
 
-                // Create week columns and day cells
-                while (iterDate <= gridEndDate) {
-                    const weekCol = document.createElement('div');
-                    weekCol.className = 'flex flex-col gap-1 w-4'; // w-4 + gap-1 = 20px total width per week
+                    // Generate 5 days per week (Mon-Fri)
+                    for (let day = 0; day < 5; day++) {
+                        // Randomly assign activity levels for visual effect
+                        const activityLevel = Math.floor(Math.random() * 5);
 
-                    for (let dayIndex = 0; dayIndex < 7; dayIndex++) { // Iterate through all 7 days
-                        const currentDay = new Date(iterDate);
-                        currentDay.setDate(iterDate.getDate() + dayIndex);
+                        let bgColor = 'bg-neutral-700'; // Default: No activity
+                        if (activityLevel === 1) bgColor = 'bg-emerald-900';
+                        if (activityLevel === 2) bgColor = 'bg-emerald-700';
+                        if (activityLevel === 3) bgColor = 'bg-emerald-500';
+                        if (activityLevel >= 4) bgColor = 'bg-emerald-300';
 
-                        // Only render cells for Mon-Fri
-                        if (dayIndex >= 1 && dayIndex <= 5) {
-                            // Check if the day is within the actual data range and not in the future
-                            if (currentDay >= startDate && currentDay <= new Date() && currentDay <= endDate) {
-                                const dateStr = currentDay.toISOString().split('T')[0];
-                                const activityLevel = graphData[dateStr] || 0;
-                                
-                                let bgColor = 'bg-neutral-700'; // Default: No activity
-                                if (activityLevel === 1) bgColor = 'bg-emerald-900';
-                                if (activityLevel === 2) bgColor = 'bg-emerald-700';
-                                if (activityLevel === 3) bgColor = 'bg-emerald-500';
-                                if (activityLevel >= 4) bgColor = 'bg-emerald-300'; // Cap at level 4 color
-                                
-                                weekCol.innerHTML += `
-                                    <div class="h-4 w-4 rounded-sm ${bgColor} transition-colors duration-150"
-                                         title="${currentDay.toDateString()}: ${activityLevel} contribution${activityLevel !== 1 ? 's' : ''}">
-                                    </div>`;
-                            } else {
-                                // Render an empty placeholder for days outside the range or future days within the grid
-                                weekCol.innerHTML += '<div class="h-4 w-4 rounded-sm bg-neutral-800"></div>'; // Use background color for empty
-                            }
-                        }
-                    }
-                    // Only add the week column if it contains Mon-Fri cells
-                    if (weekCol.innerHTML.includes('<div')) {
-                        weeksContainer.appendChild(weekCol);
+                        gridHTML += `<div class="h-4 w-4 rounded-sm ${bgColor}"></div>`;
                     }
 
-                    // Move to the next week
-                    iterDate.setDate(iterDate.getDate() + 7);
+                    gridHTML += '</div>';
                 }
-                
-                grid.appendChild(weeksContainer);
-                graphContainer.appendChild(grid);
-                console.log('Contribution graph creation completed');
+
+                gridHTML += '</div></div>';
+
+                // Set the HTML all at once to minimize DOM operations
+                graphContainer.innerHTML = monthsHTML + gridHTML;
             }
-            
-            createContributionGraph();
+
+            // Use requestAnimationFrame to ensure the graph renders after the page layout is complete
+            requestAnimationFrame(createContributionGraph);
         });
     </script>
-    
+
     <style>
-        /* Add shimmer animation for progress bars */
+        /* Optimized animations with reduced performance impact */
         @keyframes shimmer {
             0% { background-position: 200% 0; }
             100% { background-position: 0 0; }
         }
         .animate-shimmer {
-            animation: shimmer 2s infinite linear;
+            animation: shimmer 3s infinite linear;
+            will-change: background-position;
+        }
+
+        /* Optimized pulse animation with fewer keyframes */
+        @keyframes pulse-slow {
+            50% { opacity: 1; }
+        }
+        .animate-pulse-slow {
+            opacity: 0.7;
+            animation: pulse-slow 4s infinite ease-in-out;
+            will-change: opacity;
         }
     </style>
 </x-layouts.app>

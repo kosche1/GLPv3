@@ -326,4 +326,28 @@ class User extends Authenticatable
     {
         return $this->hasMany(StudentAnswer::class);
     }
+
+    /**
+     * Get the forum topics created by the user.
+     */
+    public function forumTopics()
+    {
+        return $this->hasMany(ForumTopic::class);
+    }
+
+    /**
+     * Get the forum comments created by the user.
+     */
+    public function forumComments()
+    {
+        return $this->hasMany(ForumComment::class);
+    }
+
+    /**
+     * Get the forum likes created by the user.
+     */
+    public function forumLikes()
+    {
+        return $this->hasMany(ForumLike::class);
+    }
 }

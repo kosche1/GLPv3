@@ -29,11 +29,11 @@ class DatabaseSeeder extends Seeder
             LevelSeeder::class,
             BadgeSeeder::class,
             AchievementSeeder::class,
-            
+
             // Challenges must be seeded before tasks since tasks depend on challenges
             ChallengeTypeSeeder::class,
             TaskSeeder::class,
-            
+
             DailyRewardTierSeeder::class,
             RewardSeeder::class,
             ReferralProgramSeeder::class,
@@ -41,6 +41,9 @@ class DatabaseSeeder extends Seeder
             // Categories and Leaderboard categories
             CategorySeeder::class,
             LeaderboardCategorySeeder::class,
+
+            // Forum categories
+            ForumCategorySeeder::class,
 
             // Streak activities
             StreakActivitySeeder::class,
@@ -53,6 +56,7 @@ class DatabaseSeeder extends Seeder
             UserStreakSeeder::class,
             ReferralSeeder::class,
             LeaderboardEntrySeeder::class,
+            StudentGradeSeeder::class,
         ]);
     }
 }
