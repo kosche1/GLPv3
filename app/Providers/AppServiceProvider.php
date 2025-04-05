@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Models\StudentAnswer;
 use App\Observers\StudentAnswerObserver;
+use Livewire\Livewire;
+use App\Livewire\GradesComponent;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         StudentAnswer::observe(StudentAnswerObserver::class);
+
+        // Register Livewire components
+        Livewire::component('grades-component', GradesComponent::class);
     }
 }
 
