@@ -96,6 +96,27 @@ class TextSolutionController extends Controller
                         'message' => 'Cannot submit solution with errors. Please fix your code and try again.'
                     ], 400);
                 }
+
+                // For exact_match, also check if the expected output is defined and verify the submission matches it
+                $evaluationDetails = $task->evaluation_details;
+                if (is_array($evaluationDetails) && isset($evaluationDetails['expected'])) {
+                    $expectedAnswer = trim($evaluationDetails['expected']);
+
+                    // If the submitted text doesn't match the expected answer, reject it
+                    if (trim($submittedText) !== $expectedAnswer) {
+                        Log::info('Blocking submission that doesn\'t match expected output for Exact Match task:', [
+                            'task_id' => $taskId,
+                            'user_id' => $userId,
+                            'expected' => $expectedAnswer,
+                            'submitted' => trim($submittedText)
+                        ]);
+
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Your solution doesn\'t match the expected output. Please check your code and try again.'
+                        ], 400);
+                    }
+                }
             }
 
             // We already have the task object from earlier

@@ -164,14 +164,14 @@
                     <span id="result-count">{{ count($challenges) }}</span> results
                 </span>
             </div>
-            <div class="flex items-center gap-2">
+            <!-- <div class="flex items-center gap-2">
                 <span class="text-sm text-neutral-400">Sort by:</span>
                 <select class="bg-neutral-800 text-white border border-neutral-700 rounded-lg px-3 py-1.5 text-sm focus:ring-emerald-500/30 focus:border-emerald-500 transition-all">
                     <option>Newest</option>
                     <option>Popularity</option>
                     <option>Rating</option>
                 </select>
-            </div>
+            </div> -->
         </div>
 
         <!-- Course Grid -->

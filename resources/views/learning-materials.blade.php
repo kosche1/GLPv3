@@ -10,29 +10,54 @@
                 </div>
                 <h1 class="text-2xl font-bold text-white">{{ __('Learning Materials') }}</h1>
             </div>
-            
+
             <!-- Search and Filter Section -->
-            <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                <div class="relative w-full sm:w-auto">
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <!-- Search Input -->
+                <div class="relative w-full md:w-auto">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
-                    <input type="text" placeholder="Search materials..." 
-                        class="w-full sm:w-64 rounded-lg border border-neutral-700/50 bg-neutral-800/50 pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 focus:outline-hidden transition-all duration-300 hover:border-neutral-600">
+                    <input type="text" id="material-search" placeholder="Search materials..."
+                        class="w-full md:min-w-[250px] rounded-lg border border-neutral-700 bg-neutral-800/80 pl-10 pr-4 py-2.5 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/50 focus:outline-hidden focus:ring-1 focus:ring-emerald-500/30 transition-all duration-300 hover:border-neutral-600">
                 </div>
-                <div class="relative w-full sm:w-auto">
-                    <select class="w-full appearance-none rounded-lg border border-neutral-700/50 bg-neutral-800/50 px-4 py-2.5 text-sm text-white focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 focus:outline-hidden transition-all duration-300 hover:border-neutral-600">
-                        <option value="all">All Materials</option>
-                        <option value="pdf">PDF</option>
-                        <option value="video">Video</option>
-                        <option value="document">Document</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
+
+                <!-- Filter Dropdown -->
+                <div class="w-full md:w-auto">
+                    <div class="relative">
+                        <select id="material-type-filter" class="w-full rounded-lg border border-neutral-700 bg-neutral-800/80 px-4 py-2.5 text-sm text-white appearance-none focus:border-emerald-500/50 focus:outline-hidden focus:ring-1 focus:ring-emerald-500/30 transition-all duration-300 hover:border-neutral-600">
+                            <option value="all">All Materials</option>
+                            <option value="pdf">PDF</option>
+                            <option value="doc">Documents</option>
+                            <option value="video">Videos</option>
+                            <option value="ppt">Presentations</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sort Dropdown -->
+                <div class="w-full md:w-auto">
+                    <div class="relative">
+                        <select id="material-sort" class="w-full rounded-lg border border-neutral-700/50 bg-neutral-800/50 px-4 py-2.5 text-sm text-white appearance-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30 focus:outline-hidden transition-all duration-300 hover:border-neutral-600">
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="name-asc">Name (A-Z)</option>
+                            <option value="name-desc">Name (Z-A)</option>
+                            <option value="size-asc">Size (Small to Large)</option>
+                            <option value="size-desc">Size (Large to Small)</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -55,15 +80,6 @@
                     {{ $materials->count() }} results
                 </span>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-neutral-400">Sort by:</span>
-                <select class="bg-neutral-800 text-white border border-neutral-700 rounded-lg px-3 py-1.5 text-sm focus:ring-emerald-500/30 focus:border-emerald-500 transition-all">
-                    <option>Newest</option>
-                    <option>Oldest</option>
-                    <option>Name (A-Z)</option>
-                    <option>Size</option>
-                </select>
-            </div>
         </div>
 
         <!-- Learning Materials Grid -->
@@ -73,10 +89,41 @@
                 <div class="group bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                     <div class="relative h-40 overflow-hidden bg-neutral-700">
                         @php
-                            $extension = strtolower(pathinfo($material->file_name, PATHINFO_EXTENSION));
+                            // Get the file extension from the file_path instead of file_name
+                            $extension = strtolower(pathinfo($material->file_path, PATHINFO_EXTENSION));
+
+                            // If extension is empty or not recognized, try to determine from file_name
+                            if (empty($extension) || $extension === 'tmp') {
+                                $extension = strtolower(pathinfo($material->file_name, PATHINFO_EXTENSION));
+
+                                // If still not recognized, try to determine from file_type
+                                if (empty($extension) || $extension === 'tmp') {
+                                    // Map MIME types to extensions
+                                    $mimeToExt = [
+                                        'application/pdf' => 'pdf',
+                                        'application/msword' => 'doc',
+                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+                                        'application/vnd.ms-excel' => 'xls',
+                                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+                                        'application/vnd.ms-powerpoint' => 'ppt',
+                                        'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'pptx',
+                                        'video/mp4' => 'mp4',
+                                        'video/x-msvideo' => 'avi',
+                                        'video/quicktime' => 'mov'
+                                    ];
+
+                                    if (isset($mimeToExt[$material->file_type])) {
+                                        $extension = $mimeToExt[$material->file_type];
+                                    } else {
+                                        // If we still can't determine the extension, use a default value
+                                        $extension = 'file'; // Generic file type instead of 'tmp'
+                                    }
+                                }
+                            }
+
                             $iconClass = 'text-emerald-400';
                             $bgClass = 'bg-emerald-500/10';
-                            
+
                             if (in_array($extension, ['pdf'])) {
                                 $iconClass = 'text-red-400';
                                 $bgClass = 'bg-red-500/10';
@@ -94,7 +141,7 @@
                                 $bgClass = 'bg-purple-500/10';
                             }
                         @endphp
-                        
+
                         <div class="absolute inset-0 flex items-center justify-center {{ $bgClass }}">
                             @if(in_array($extension, ['pdf']))
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 {{ $iconClass }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -114,7 +161,7 @@
                                 </svg>
                             @endif
                         </div>
-                        
+
                         <!-- File Type Badge -->
                         <div class="absolute top-3 right-3">
                             <span class="rounded-full {{ $bgClass }} px-3 py-1 text-xs font-medium {{ $iconClass }} border border-{{ explode('-', $iconClass)[1] }}-500/20">
@@ -122,11 +169,11 @@
                             </span>
                         </div>
                     </div>
-                    
+
                     <div class="p-5">
                         <h3 class="mb-2 text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">{{ $material->title }}</h3>
                         <p class="mb-4 text-sm text-neutral-400">{{ Str::limit($material->description, 80, '...') }}</p>
-                        
+
                         <!-- File Info -->
                         <div class="grid grid-cols-2 gap-2 mb-4">
                             <div class="flex items-center gap-1.5 text-xs text-neutral-400">
@@ -142,7 +189,7 @@
                                 <span>{{ number_format($material->file_size / 1024 / 1024, 1) }} MB</span>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-center justify-between pt-4 border-t border-neutral-700">
                             <a href="{{ asset('storage/' . $material->file_path) }}" target="_blank" class="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
