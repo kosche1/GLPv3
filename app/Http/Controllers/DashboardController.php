@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Services\BadgeService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
@@ -16,11 +15,18 @@ class DashboardController extends Controller
     }
 
     /**
-     * Display the dashboard.
+     * Display the dashboard or redirect based on user role.
+     *
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function index(): View
+    public function index()
     {
         $user = Auth::user();
+
+        // Redirect faculty users to the teacher dashboard
+        if ($user->hasRole('faculty')) {
+            return redirect('/teacher');
+        }
 
         // Check and award level-based badges
         $this->badgeService->checkAndAwardLevelBadges($user);
