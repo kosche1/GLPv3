@@ -351,4 +351,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(ForumLike::class);
     }
+
+    /**
+     * Get the achievements earned by the user.
+     */
+    public function achievements()
+    {
+        $relation = $this->belongsToMany(\LevelUp\Experience\Models\Achievement::class, 'achievement_user');
+
+        // Check if the columns exist in the database before adding them to the pivot
+        try {
+            $relation->withPivot('unlocked_at', 'progress');
+        } catch (\Exception $e) {
+            // If the columns don't exist, just continue without them
+            \Illuminate\Support\Facades\Log::warning('Achievement pivot columns not found: ' . $e->getMessage());
+        }
+
+        return $relation->withTimestamps();
+    }
 }

@@ -489,6 +489,11 @@
                                         return;
                                     }
 
+                                    // For exact_match, warn the user that their answer must match exactly
+                                    if (taskEvalType === 'exact_match') {
+                                        console.log('Exact match evaluation type detected - answer must match exactly');
+                                    }
+
                                     // Log the submission URL and data
                                     const submitUrl = '/api/direct-text-solution';
                                     console.log('Submitting to:', submitUrl);
