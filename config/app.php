@@ -168,6 +168,7 @@ return [
         App\Providers\VoltServiceProvider::class,
         App\Providers\FolioServiceProvider::class,
         App\Providers\ToolServiceProvider::class,
+        App\Providers\Livewire\TeacherWidgetsServiceProvider::class,
     ],
 
 ];
