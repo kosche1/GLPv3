@@ -17,6 +17,7 @@
         "laravel/workos": "^0.2.0",
         "livewire/flux": "^2.0",
         "livewire/volt": "^1.6.7",
+        "tomatophp/filament-users": "^2.0",
         "westacks/filament-monaco-editor": "^1.1",
         "workos/workos-php-laravel": "^4.1"
     },

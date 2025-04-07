@@ -56,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 FilamentAssistantPlugin::make(),
+                \TomatoPHP\FilamentUsers\FilamentUsersPlugin::make(),
             ])
 
             ->middleware([
