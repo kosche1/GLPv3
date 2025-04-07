@@ -11,12 +11,18 @@ class FeedbackController extends Controller
 {
     public function index(): View
     {
-        // Get all feedback for the current user
-        $feedbackItems = StudentAnswer::where('user_id', Auth::id())
-            ->whereNotNull('feedback')
-            ->where('feedback', '!=', '')
+        // Get all feedback for the current user, excluding exact match evaluations
+        $feedbackItems = StudentAnswer::where('student_answers.user_id', Auth::id())
+            ->whereNotNull('student_answers.feedback')
+            ->where('student_answers.feedback', '!=', '')
+            ->join('tasks', 'student_answers.task_id', '=', 'tasks.id')
+            ->where(function($query) {
+                $query->where('tasks.evaluation_type', '!=', 'exact_match')
+                      ->orWhereNull('tasks.evaluation_type');
+            })
+            ->select('student_answers.*')
             ->with(['task', 'task.challenge', 'evaluator'])
-            ->orderBy('evaluated_at', 'desc')
+            ->orderBy('student_answers.evaluated_at', 'desc')
             ->get();
 
         // Group feedback by challenge

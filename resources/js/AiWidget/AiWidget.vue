@@ -27,7 +27,7 @@ const messages = reactive([
     {
         id: 'welcome',
         sender: 'ai',
-        content: 'Hello! I\'m your AI assistant powered by Prism. How can I help you today? 🌟',
+        content: 'Hello! I\'m DAFTY, your AI assistant powered by GLP. How can I help you today? 🌟',
         timestamp: new Date(Date.now() - 60000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         streaming: false
     }
@@ -225,7 +225,7 @@ onMounted(() => {
                     <!-- Streaming message -->
                     <div v-else class="flex gap-4 items-start max-w-[90%]">
                         <div class="flex aspect-square size-10 shrink-0 items-center justify-center rounded-md bg-accent-content text-accent-foreground">
-                            <span class="text-sm font-medium">AI</span>
+                            <span class="text-sm font-medium">DAF</span>
                         </div>
                         <div class="space-y-1">
                             <div class="bg-zinc-100 dark:bg-zinc-700/50 rounded-2xl rounded-tl-none p-4">

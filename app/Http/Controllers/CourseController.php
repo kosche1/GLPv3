@@ -12,7 +12,7 @@ class CourseController extends Controller
     {
         $challenges = Challenge::with(['tasks', 'category'])->where('is_active', true)
             ->orderBy('required_level', 'asc')
-            ->get();
+            ->paginate(9); // Show 9 courses per page
 
         $techCategories = Category::all()->pluck('name', 'id');
 

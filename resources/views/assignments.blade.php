@@ -133,12 +133,25 @@
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             @if(isset($tasks) && count($tasks) > 0)
                 @foreach($tasks as $task)
+                    @php
+                        $categoryType = 'standard';
+                        $submissionType = strtolower($task->submission_type ?? 'standard');
+
+                        if (strpos($submissionType, 'code') !== false || strpos(strtolower($task->name), 'code') !== false || strpos(strtolower($task->description), 'coding') !== false) {
+                            $categoryType = 'coding';
+                        } elseif (strpos($submissionType, 'quiz') !== false || strpos($submissionType, 'multiple_choice') !== false || strpos(strtolower($task->name), 'quiz') !== false) {
+                            $categoryType = 'quiz';
+                        } elseif (strpos($submissionType, 'project') !== false || strpos(strtolower($task->name), 'project') !== false || strpos(strtolower($task->description), 'project') !== false) {
+                            $categoryType = 'project';
+                        }
+                    @endphp
                     <div class="task-card group bg-gradient-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20"
                          data-name="{{ strtolower($task->name) }}"
                          data-description="{{ strtolower($task->description) }}"
                          data-challenge="{{ strtolower($task->challenge->name) }}"
                          data-submission-type="{{ strtolower($task->submission_type ?? 'standard') }}"
-                         data-difficulty="{{ strtolower($task->challenge->difficulty_level) }}">
+                         data-difficulty="{{ strtolower($task->challenge->difficulty_level) }}"
+                         data-category="{{ $categoryType }}">
                         <div class="mb-4 flex items-center justify-between">
                             @php
                                 $status = 'Not Started';
@@ -409,13 +422,8 @@
                     // Check if task matches category
                     let matchesCategory = activeCategory === 'all';
                     if (!matchesCategory) {
-                        if (activeCategory === 'coding' && (submissionType.includes('code') || taskName.includes('code') || taskDescription.includes('code'))) {
-                            matchesCategory = true;
-                        } else if (activeCategory === 'quiz' && (submissionType.includes('quiz') || taskName.includes('quiz') || taskDescription.includes('quiz') || submissionType.includes('multiple_choice'))) {
-                            matchesCategory = true;
-                        } else if (activeCategory === 'project' && (submissionType.includes('project') || taskName.includes('project') || taskDescription.includes('project'))) {
-                            matchesCategory = true;
-                        } else if (activeCategory === 'assignment' && (submissionType.includes('assignment') || taskName.includes('assignment') || taskDescription.includes('assignment'))) {
+                        const taskCategory = card.dataset.category || '';
+                        if (taskCategory === activeCategory) {
                             matchesCategory = true;
                         }
                     }
