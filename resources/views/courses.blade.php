@@ -221,25 +221,11 @@
         </div>
 
         <!-- Pagination -->
-        <!-- @if(count($challenges) > 0)
-        <div class="flex justify-center mt-6">
-            <nav class="flex items-center space-x-2">
-                <a href="#" class="px-3 py-1 rounded-md bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </a>
-                <a href="#" class="px-3 py-1 rounded-md bg-emerald-500 text-white">1</a>
-                <a href="#" class="px-3 py-1 rounded-md bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">2</a>
-                <a href="#" class="px-3 py-1 rounded-md bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">3</a>
-                <a href="#" class="px-3 py-1 rounded-md bg-neutral-800 text-neutral-400 hover:bg-neutral-700 hover:text-white transition-colors duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
-            </nav>
+        @if($challenges instanceof \Illuminate\Pagination\LengthAwarePaginator)
+        <div class="mt-8 flex items-center justify-center">
+            {{ $challenges->links() }}
         </div>
-        @endif -->
+        @endif
     </div>
     <!-- JavaScript for filtering and sorting courses -->
     <script>
@@ -330,6 +316,17 @@
                         emptyState.style.display = '';
                     } else {
                         emptyState.style.display = 'none';
+                    }
+                }
+
+                // Handle pagination visibility
+                const paginationContainer = document.querySelector('.mt-8.flex.items-center.justify-center');
+                if (paginationContainer) {
+                    // Hide pagination when filtering/searching
+                    if (searchTerm || statusValue !== 'all' || activeCategory !== 'all') {
+                        paginationContainer.style.display = 'none';
+                    } else {
+                        paginationContainer.style.display = '';
                     }
                 }
             }

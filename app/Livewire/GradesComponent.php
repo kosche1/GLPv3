@@ -28,37 +28,62 @@ class GradesComponent extends Component
 
     public function mount()
     {
-        $this->loadStudentData();
         $this->loadCourses();
+        $this->loadStudentData();
     }
 
     public function loadStudentData()
     {
         $userId = Auth::id();
 
-        // Get credits information
-        $creditInfo = StudentCredit::getCreditsInfo($userId);
-        if ($creditInfo) {
-            $this->creditsCompleted = $creditInfo->credits_completed;
-            $this->creditsRequired = $creditInfo->credits_required;
-            $this->completionPercentage = $creditInfo->completion_percentage;
+        // Calculate GPA and credits from current courses
+        $totalPoints = 0;
+        $totalCredits = 0;
+        $completedCredits = 0;
+
+        foreach ($this->courses as $course) {
+            $credits = $course['credits'];
+
+            // Only include courses with actual grades (not "No Grade")
+            if ($course['grade'] !== 'No Grade') {
+                $gradePoints = $this->getGradePoints($course['grade']);
+                $totalPoints += ($gradePoints * $credits);
+                $totalCredits += $credits;
+
+                // Count completed credits
+                if ($course['status'] === 'Completed') {
+                    $completedCredits += $credits;
+                }
+            }
         }
 
-        // Get GPA information (using StudentAchievement as a proxy for GPA)
-        $latestScore = StudentAchievement::getLatestScore($userId);
-        if ($latestScore) {
-            $this->currentGPA = number_format($latestScore->score, 2);
-            $this->gpaChange = number_format($latestScore->score_change, 2);
+        // Calculate current GPA
+        $this->currentGPA = $totalCredits > 0 ?
+            number_format($totalPoints / $totalCredits, 2) :
+            0.00;
 
-            // Calculate cumulative GPA (slightly higher for demonstration)
-            $this->cumulativeGPA = number_format(min($latestScore->score + 0.07, 4.0), 2);
+        // Get previous GPA for comparison
+        $previousGPA = StudentAchievement::getLatestScore($userId);
+        $this->gpaChange = $previousGPA ?
+            number_format($this->currentGPA - $previousGPA->score, 2) :
+            0.00;
 
-            // Calculate last semester GPA
-            $this->lastSemesterGPA = number_format(max($this->currentGPA - $this->gpaChange, 0), 2);
+        // Calculate cumulative GPA (weighted average of current and previous)
+        $previousCredits = StudentCredit::where('user_id', $userId)->value('credits_completed') ?? 0;
+        $previousPoints = $previousGPA ? ($previousGPA->score * $previousCredits) : 0;
 
-            // Calculate GPA progress percentage
-            $this->gpaProgressPercentage = min(round(($this->currentGPA / $this->targetGPA) * 100), 100);
-        }
+        $totalCumulativeCredits = $previousCredits + $totalCredits;
+        $this->cumulativeGPA = $totalCumulativeCredits > 0 ?
+            number_format(($previousPoints + $totalPoints) / $totalCumulativeCredits, 2) :
+            0.00;
+
+        // Update credits information
+        $this->creditsCompleted = $completedCredits;
+        $this->creditsRequired = 120; // Your standard requirement
+        $this->completionPercentage = round(($completedCredits / $this->creditsRequired) * 100, 2);
+
+        // Calculate GPA progress percentage
+        $this->gpaProgressPercentage = min(round(($this->currentGPA / $this->targetGPA) * 100), 100);
     }
 
     public function loadCourses()
@@ -97,7 +122,7 @@ class GradesComponent extends Component
             $courses[] = [
                 'name' => $challenge->name,
                 'code' => $this->generateCourseCode($challenge->name),
-                'credits' => rand(2, 4), // Random credits for demonstration
+                'credits' => $this->getCreditsForChallenge($challenge), // Use deterministic credits
                 'grade' => $letterGrade,
                 'status' => $status
             ];
@@ -153,4 +178,43 @@ class GradesComponent extends Component
     {
         return view('livewire.grades-component');
     }
+
+    private function getGradePoints($grade)
+    {
+        return match($grade) {
+            'A+' => 4.0,
+            'A'  => 4.0,
+            'A-' => 3.7,
+            'B+' => 3.3,
+            'B'  => 3.0,
+            'B-' => 2.7,
+            'C+' => 2.3,
+            'C'  => 2.0,
+            'C-' => 1.7,
+            'D+' => 1.3,
+            'D'  => 1.0,
+            'D-' => 0.7,
+            'F'  => 0.0,
+            default => 0.0,
+        };
+    }
+
+    /**
+     * Get a deterministic credit value for a challenge
+     * This ensures the same challenge always gets the same credit value
+     */
+    private function getCreditsForChallenge($challenge)
+    {
+        // Use the challenge ID to determine credits (between 2-4)
+        // This ensures the same challenge always gets the same credit value
+        if ($challenge->id % 3 === 0) {
+            return 4; // Advanced courses (divisible by 3)
+        } elseif ($challenge->id % 2 === 0) {
+            return 3; // Intermediate courses (divisible by 2 but not 3)
+        } else {
+            return 2; // Basic courses (not divisible by 2 or 3)
+        }
+    }
 }
+
+

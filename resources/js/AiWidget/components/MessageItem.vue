@@ -11,7 +11,7 @@ defineProps({
   <!-- AI Message -->
   <div v-if="message.sender === 'ai'" class="flex gap-4 items-start max-w-[90%]">
     <div class="flex aspect-square size-10 shrink-0 items-center justify-center rounded-md bg-accent-content text-accent-foreground">
-      <span class="text-sm font-medium">AI</span>
+      <span class="text-sm font-medium">DAF</span>
     </div>
     <div class="space-y-1">
       <div :class="[

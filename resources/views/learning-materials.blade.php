@@ -64,12 +64,12 @@
         </div>
 
         <!-- Material Categories -->
-        <div class="flex flex-wrap gap-2 py-2">
-            <button class="bg-emerald-500/10 text-emerald-400 px-4 py-1.5 rounded-full text-sm font-medium border border-emerald-500/20 hover:bg-emerald-500/20 transition-all duration-300">All</button>
-            <button class="bg-neutral-800 text-neutral-300 px-4 py-1.5 rounded-full text-sm font-medium border border-neutral-700 hover:bg-neutral-700/50 hover:text-white transition-all duration-300">PDF</button>
-            <button class="bg-neutral-800 text-neutral-300 px-4 py-1.5 rounded-full text-sm font-medium border border-neutral-700 hover:bg-neutral-700/50 hover:text-white transition-all duration-300">Video</button>
-            <button class="bg-neutral-800 text-neutral-300 px-4 py-1.5 rounded-full text-sm font-medium border border-neutral-700 hover:bg-neutral-700/50 hover:text-white transition-all duration-300">Document</button>
-            <button class="bg-neutral-800 text-neutral-300 px-4 py-1.5 rounded-full text-sm font-medium border border-neutral-700 hover:bg-neutral-700/50 hover:text-white transition-all duration-300">Presentation</button>
+        <div class="flex flex-wrap gap-2 py-2" id="material-filters">
+            <button id="filter-all" class="bg-emerald-500/10 text-emerald-400 px-4 py-1.5 rounded-full text-sm font-medium border border-emerald-500/20 hover:bg-emerald-500/20 transition-all duration-300">All</button>
+            <button id="filter-pdf" class="bg-neutral-800 text-neutral-300 px-4 py-1.5 rounded-full text-sm font-medium border border-neutral-700 hover:bg-neutral-700/50 hover:text-white transition-all duration-300">PDF</button>
+            <button id="filter-video" class="bg-neutral-800 text-neutral-300 px-4 py-1.5 rounded-full text-sm font-medium border border-neutral-700 hover:bg-neutral-700/50 hover:text-white transition-all duration-300">Video</button>
+            <button id="filter-doc" class="bg-neutral-800 text-neutral-300 px-4 py-1.5 rounded-full text-sm font-medium border border-neutral-700 hover:bg-neutral-700/50 hover:text-white transition-all duration-300">Document</button>
+            <button id="filter-ppt" class="bg-neutral-800 text-neutral-300 px-4 py-1.5 rounded-full text-sm font-medium border border-neutral-700 hover:bg-neutral-700/50 hover:text-white transition-all duration-300">Presentation</button>
         </div>
 
         <!-- Results Header -->
@@ -86,61 +86,73 @@
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             @if($materials->count() > 0)
                 @foreach($materials as $material)
-                <div class="group bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20">
+                @php
+                    // Get the file extension from the file_path instead of file_name
+                    $extension = strtolower(pathinfo($material->file_path, PATHINFO_EXTENSION));
+
+                    // If extension is empty or not recognized, try to determine from file_name
+                    if (empty($extension) || $extension === 'tmp') {
+                        $extension = strtolower(pathinfo($material->file_name, PATHINFO_EXTENSION));
+
+                        // If still not recognized, try to determine from file_type
+                        if (empty($extension) || $extension === 'tmp') {
+                            // Map MIME types to extensions
+                            $mimeToExt = [
+                                'application/pdf' => 'pdf',
+                                'application/msword' => 'doc',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+                                'application/vnd.ms-excel' => 'xls',
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+                                'application/vnd.ms-powerpoint' => 'ppt',
+                                'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'pptx',
+                                'video/mp4' => 'mp4',
+                                'video/x-msvideo' => 'avi',
+                                'video/quicktime' => 'mov'
+                            ];
+
+                            if (isset($mimeToExt[$material->file_type])) {
+                                $extension = $mimeToExt[$material->file_type];
+                            } else {
+                                // If we still can't determine the extension, use a default value
+                                $extension = 'file'; // Generic file type instead of 'tmp'
+                            }
+                        }
+                    }
+
+                    $iconClass = 'text-emerald-400';
+                    $bgClass = 'bg-emerald-500/10';
+
+                    if (in_array($extension, ['pdf'])) {
+                        $iconClass = 'text-red-400';
+                        $bgClass = 'bg-red-500/10';
+                    } elseif (in_array($extension, ['doc', 'docx'])) {
+                        $iconClass = 'text-blue-400';
+                        $bgClass = 'bg-blue-500/10';
+                    } elseif (in_array($extension, ['xls', 'xlsx'])) {
+                        $iconClass = 'text-green-400';
+                        $bgClass = 'bg-green-500/10';
+                    } elseif (in_array($extension, ['ppt', 'pptx'])) {
+                        $iconClass = 'text-amber-400';
+                        $bgClass = 'bg-amber-500/10';
+                    } elseif (in_array($extension, ['mp4', 'avi', 'mov'])) {
+                        $iconClass = 'text-purple-400';
+                        $bgClass = 'bg-purple-500/10';
+                    }
+
+                    // Determine the material type for filtering
+                    $materialType = 'other';
+                    if (in_array($extension, ['pdf'])) {
+                        $materialType = 'pdf';
+                    } elseif (in_array($extension, ['mp4', 'avi', 'mov'])) {
+                        $materialType = 'video';
+                    } elseif (in_array($extension, ['doc', 'docx'])) {
+                        $materialType = 'doc';
+                    } elseif (in_array($extension, ['ppt', 'pptx'])) {
+                        $materialType = 'ppt';
+                    }
+                @endphp
+                <div class="material-card group bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20" data-type="{{ $materialType }}">
                     <div class="relative h-40 overflow-hidden bg-neutral-700">
-                        @php
-                            // Get the file extension from the file_path instead of file_name
-                            $extension = strtolower(pathinfo($material->file_path, PATHINFO_EXTENSION));
-
-                            // If extension is empty or not recognized, try to determine from file_name
-                            if (empty($extension) || $extension === 'tmp') {
-                                $extension = strtolower(pathinfo($material->file_name, PATHINFO_EXTENSION));
-
-                                // If still not recognized, try to determine from file_type
-                                if (empty($extension) || $extension === 'tmp') {
-                                    // Map MIME types to extensions
-                                    $mimeToExt = [
-                                        'application/pdf' => 'pdf',
-                                        'application/msword' => 'doc',
-                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
-                                        'application/vnd.ms-excel' => 'xls',
-                                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
-                                        'application/vnd.ms-powerpoint' => 'ppt',
-                                        'application/vnd.openxmlformats-officedocument.presentationml.presentation' => 'pptx',
-                                        'video/mp4' => 'mp4',
-                                        'video/x-msvideo' => 'avi',
-                                        'video/quicktime' => 'mov'
-                                    ];
-
-                                    if (isset($mimeToExt[$material->file_type])) {
-                                        $extension = $mimeToExt[$material->file_type];
-                                    } else {
-                                        // If we still can't determine the extension, use a default value
-                                        $extension = 'file'; // Generic file type instead of 'tmp'
-                                    }
-                                }
-                            }
-
-                            $iconClass = 'text-emerald-400';
-                            $bgClass = 'bg-emerald-500/10';
-
-                            if (in_array($extension, ['pdf'])) {
-                                $iconClass = 'text-red-400';
-                                $bgClass = 'bg-red-500/10';
-                            } elseif (in_array($extension, ['doc', 'docx'])) {
-                                $iconClass = 'text-blue-400';
-                                $bgClass = 'bg-blue-500/10';
-                            } elseif (in_array($extension, ['xls', 'xlsx'])) {
-                                $iconClass = 'text-green-400';
-                                $bgClass = 'bg-green-500/10';
-                            } elseif (in_array($extension, ['ppt', 'pptx'])) {
-                                $iconClass = 'text-amber-400';
-                                $bgClass = 'bg-amber-500/10';
-                            } elseif (in_array($extension, ['mp4', 'avi', 'mov'])) {
-                                $iconClass = 'text-purple-400';
-                                $bgClass = 'bg-purple-500/10';
-                            }
-                        @endphp
 
                         <div class="absolute inset-0 flex items-center justify-center {{ $bgClass }}">
                             @if(in_array($extension, ['pdf']))
@@ -224,5 +236,112 @@
                 </div>
             @endif
         </div>
+
+        <!-- Pagination -->
+        @if($materials instanceof \Illuminate\Pagination\LengthAwarePaginator)
+        <div class="mt-8 flex items-center justify-center">
+            {{ $materials->links() }}
+        </div>
+        @endif
     </div>
+
+    <!-- JavaScript for filtering materials -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('#material-filters button');
+            const materialCards = document.querySelectorAll('.material-card');
+            const searchInput = document.getElementById('material-search');
+            const typeFilter = document.getElementById('material-type-filter');
+            const sortSelect = document.getElementById('material-sort');
+            const resultsCount = document.querySelector('.bg-emerald-500\/10.text-emerald-400.px-2\\.5.py-1.rounded-full.text-xs.font-medium');
+
+            let activeFilter = 'all';
+
+            // Function to filter materials
+            function filterMaterials() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const typeValue = typeFilter.value;
+                let visibleCount = 0;
+
+                materialCards.forEach(card => {
+                    // Get material data
+                    const materialType = card.dataset.type;
+                    const materialTitle = card.querySelector('h3')?.textContent.toLowerCase() || '';
+                    const materialDescription = card.querySelector('p')?.textContent.toLowerCase() || '';
+
+                    // Check if material matches search and filter criteria
+                    const matchesSearch = materialTitle.includes(searchTerm) || materialDescription.includes(searchTerm);
+                    const matchesTypeFilter = typeValue === 'all' || materialType === typeValue;
+                    const matchesButtonFilter = activeFilter === 'all' || materialType === activeFilter;
+
+                    // Show or hide based on filters
+                    if (matchesSearch && matchesTypeFilter && matchesButtonFilter) {
+                        card.style.display = '';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Update results count
+                if (resultsCount) {
+                    resultsCount.textContent = `${visibleCount} results`;
+                }
+
+                // Handle pagination visibility
+                const paginationContainer = document.querySelector('.mt-8.flex.items-center.justify-center');
+                if (paginationContainer) {
+                    // Hide pagination when filtering/searching
+                    if (searchTerm || typeValue !== 'all' || activeFilter !== 'all') {
+                        paginationContainer.style.display = 'none';
+                    } else {
+                        paginationContainer.style.display = '';
+                    }
+                }
+
+                // Show/hide empty state
+                const emptyState = document.querySelector('.col-span-full');
+                if (emptyState) {
+                    if (visibleCount === 0) {
+                        emptyState.style.display = '';
+                    } else {
+                        emptyState.style.display = 'none';
+                    }
+                }
+            }
+
+            // Handle filter button clicks
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
+                        btn.classList.add('bg-neutral-800', 'text-neutral-300', 'border-neutral-700');
+                    });
+
+                    // Add active class to clicked button
+                    this.classList.remove('bg-neutral-800', 'text-neutral-300', 'border-neutral-700');
+                    this.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
+
+                    // Get filter type from button id
+                    activeFilter = this.id.replace('filter-', '');
+
+                    // Filter materials
+                    filterMaterials();
+                });
+            });
+
+            // Add event listeners for search and dropdown filters
+            searchInput.addEventListener('input', filterMaterials);
+            typeFilter.addEventListener('change', filterMaterials);
+            sortSelect.addEventListener('change', function() {
+                // Sort functionality would go here
+                // For now, just re-filter to maintain consistency
+                filterMaterials();
+            });
+
+            // Initial filter
+            filterMaterials();
+        });
+    </script>
 </x-layouts.app>

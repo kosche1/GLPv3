@@ -13,10 +13,10 @@ defineEmits(['toggle-fullscreen', 'close'])
   <div class="flex items-center justify-between p-4 bg-zinc-50 border-b border-zinc-200 dark:bg-zinc-900 dark:border-zinc-700 sticky top-0 z-10">
     <div class="flex items-center space-x-3">
       <div class="flex aspect-square size-10 items-center justify-center rounded-md bg-accent-content text-accent-foreground">
-        <span class="font-semibold text-accent-foreground">AI</span>
+        <span class="font-semibold text-accent-foreground">DAF</span>
       </div>
       <div>
-        <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">AI Assistant</h3>
+        <h3 class="font-semibold text-zinc-900 dark:text-zinc-100">DAFTY, your AI Assistant</h3>
         <p class="text-sm text-zinc-500 dark:text-zinc-400">Always here to help</p>
       </div>
     </div>
