@@ -17,6 +17,7 @@ class Task extends Model
      */
     protected $fillable = [
         "name",
+        "title",
         "description",
         "instructions",
         "points_reward",
@@ -25,6 +26,7 @@ class Task extends Model
         "evaluation_details",
         "expected_output",
         "is_active",
+        "due_date",
         "challenge_id",
         "order"
     ];
@@ -38,6 +40,7 @@ class Task extends Model
         "is_active" => "boolean",
         "evaluation_details" => "array",
         "expected_output" => "array",
+        "due_date" => "date",
     ];
 
     /**
