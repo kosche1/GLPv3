@@ -89,4 +89,12 @@ Route::get('/debug-task-status/{task}', function (\App\Models\Task $task) {
     ]);
 })->middleware('auth');
 
+// AI Chat routes
+Route::get('/ai/stream', [\App\Http\Controllers\AiStreamController::class, 'stream'])->name('ai.stream');
+
+// Level-up Data Demo
+Route::get('/level-up-data-demo', function () {
+    return view('level-up-data-demo');
+})->name('level-up-data-demo');
+
 require __DIR__.'/auth.php';
