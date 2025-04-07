@@ -167,6 +167,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\VoltServiceProvider::class,
         App\Providers\FolioServiceProvider::class,
+        App\Providers\ToolServiceProvider::class,
     ],
 
 ];

@@ -16,5 +16,7 @@
         </div>
     <flux:main>
         {{ $slot }}
+
+        @livewire('AiWidget')
     </flux:main>
 </x-layouts.app.sidebar>
