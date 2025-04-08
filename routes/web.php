@@ -118,6 +118,11 @@ Route::get('/debug-task-status/{task}', function (\App\Models\Task $task) {
 // AI Chat routes
 Route::get('/ai/stream', [\App\Http\Controllers\AiStreamController::class, 'stream'])->name('ai.stream');
 
+// Activity data for dashboard
+Route::get('/api/user-activity', [\App\Http\Controllers\ActivityController::class, 'getUserActivityData'])
+    ->name('api.user-activity')
+    ->middleware('auth');
+
 // Level-up Data Demo
 Route::get('/level-up-data-demo', function () {
     return view('level-up-data-demo');
