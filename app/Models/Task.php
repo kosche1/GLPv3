@@ -5,10 +5,49 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
+use App\Models\User;
 
 class Task extends Model
 {
     use HasFactory;
+    use LogsActivity;
+
+    /**
+     * Get the options for logging activity.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'name',
+                'title',
+                'description',
+                'instructions',
+                'points_reward',
+                'submission_type',
+                'evaluation_type',
+                'evaluation_details',
+                'expected_output',
+                'is_active',
+                'due_date',
+                'challenge_id',
+                'order',
+            ])
+            ->useLogName('Task')
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        // Set the log_name to the user's name if the causer is a user
+        if ($activity->causer && $activity->causer instanceof User) {
+            $activity->log_name = $activity->causer->name;
+        }
+    }
 
     /**
      * The attributes that are mass assignable.

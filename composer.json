@@ -18,7 +18,9 @@
         "laravel/workos": "^0.2.0",
         "livewire/flux": "^2.0",
         "livewire/volt": "^1.6.7",
+        "noxoua/filament-activity-log": "^2.1",
         "prism-php/prism": "^0.58.0",
+        "spatie/laravel-activitylog": "^4.10",
         "tomatophp/filament-users": "^2.0",
         "westacks/filament-monaco-editor": "^1.1",
         "workos/workos-php-laravel": "^4.1"

@@ -4,11 +4,50 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
+use App\Models\User;
 
 
 class StudentAnswer extends Model
 {
     use HasFactory;
+    use LogsActivity;
+
+    /**
+     * Get the options for logging activity.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'user_id',
+                'task_id',
+                'output',
+                'status',
+                'is_correct',
+                'score',
+                'submitted_text',
+                'submitted_file_path',
+                'submitted_url',
+                'submitted_data',
+                'feedback',
+                'evaluated_at',
+                'evaluated_by',
+            ])
+            ->useLogName('Student Answer')
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        // Set the log_name to the user's name if the causer is a user
+        if ($activity->causer && $activity->causer instanceof User) {
+            $activity->log_name = $activity->causer->name;
+        }
+    }
 
     protected $fillable = [
         'user_id',
