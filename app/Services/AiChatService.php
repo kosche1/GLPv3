@@ -63,10 +63,9 @@ class AiChatService
                 ->using($provider, $model)
                 ->withMessages($messages)
                 ->usingTemperature(0.7)
+                ->withMaxSteps(3)
+                ->withTools([$this->levelUpDataTool])
                 ->withMaxTokens(1000);
-
-            // Add the LevelUpDataTool
-            // The tool is registered via its constructor, so we don't need to add it here
 
             if ($shouldStream) {
                 // Handle streaming response
@@ -139,10 +138,9 @@ class AiChatService
                 ->using($provider, $model)
                 ->withMessages($messages)
                 ->usingTemperature(0.7)
+                ->withMaxSteps(3)
+                ->withTools([$this->levelUpDataTool])
                 ->withMaxTokens(1000);
-
-            // Add the LevelUpDataTool
-            // The tool is registered via its constructor, so we don't need to add it here
 
             // Return the stream
             return $prismRequest->asStream();
@@ -175,19 +173,17 @@ class AiChatService
         $provider = $providerInfo[0]; // Extract just the provider
         $isGemini = strtolower($provider) === strtolower(Provider::Gemini->value);
 
-        // System message handling - Gemini doesn't support SystemMessage type
-        $systemContent = 'You are a helpful AI assistant with access to the user\'s gamification data. ' .
-            'IMPORTANT: When users ask about their level, XP, experience points, or leaderboard position, you MUST use the level_up_data tool. ' .
-            'The level_up_data tool has these functions:\n' .
-            '1. get_user_level - Shows the user\'s current level and XP\n' .
-            '2. get_user_experience - Shows detailed experience history\n' .
-            '3. get_leaderboard - Shows the top users ranked by XP\n\n' .
-            'Example questions that require using the level_up_data tool:\n' .
-            '- "What level am I?"\n' .
-            '- "How many XP do I have?"\n' .
-            '- "Show me the leaderboard"\n' .
-            '- "How much more XP do I need to level up?"\n\n' .
-            'NEVER respond with "I don\'t have access to your level information" - instead, use the level_up_data tool.';
+        // System message handling
+        $systemContent = "You are an AI assistant. You have access to a tool called 'level_up_data'.\n" .
+            "**MUST USE TOOL:** When asked about the user's level, XP, experience, achievements, streaks, or leaderboard, you **MUST** use the 'level_up_data' tool.\n" .
+            "Available query types for 'level_up_data':\n" .
+            "- get_user_level: User's level and XP.\n" .
+            "- get_user_experience: Detailed XP history.\n" .
+            "- get_user_achievements: User's achievements (unlocked and progress).\n" .
+            "- get_user_streaks: User's activity streaks.\n" .
+            "- get_leaderboard: Top users by XP (optional 'limit').\n" .
+            "Examples: \"What level am I?\" -> use 'get_user_level'. \"My achievements?\" -> use 'get_user_achievements'. \"Leaderboard\" -> use 'get_leaderboard'.\n" .
+            "Do **NOT** say you cannot access this information. Use the tool.";
 
         if ($isGemini) {
             // For Gemini, add the system content as part of the first user message
