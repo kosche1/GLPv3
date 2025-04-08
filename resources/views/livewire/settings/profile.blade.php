@@ -9,6 +9,8 @@ use Livewire\Volt\Component;
 new class extends Component {
     public string $name = '';
     public string $email = '';
+    public string $bio = '';
+    public string $skills = '';
 
     /**
      * Mount the component.
@@ -17,6 +19,8 @@ new class extends Component {
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->bio = Auth::user()->bio ?? '';
+        $this->skills = Auth::user()->skills ?? '';
     }
 
     /**
@@ -37,6 +41,9 @@ new class extends Component {
                 'max:255',
                 Rule::unique(User::class)->ignore($user->id)
             ],
+
+            'bio' => ['nullable', 'string', 'max:1000'],
+            'skills' => ['nullable', 'string', 'max:500'],
         ]);
 
         $user->fill($validated);
@@ -72,7 +79,7 @@ new class extends Component {
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <x-settings.layout heading="{{ __('Profile') }}" subheading="{{ __('Update your name and email address') }}">
+    <x-settings.layout heading="{{ __('Profile') }}" subheading="{{ __('Update your profile information and customize your public profile') }}">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
             <flux:input wire:model="name" label="{{ __('Name') }}" type="text" name="name" required autofocus autocomplete="name" />
 
@@ -99,6 +106,16 @@ new class extends Component {
                         @endif
                     </div>
                 @endif
+            </div>
+
+            <div>
+                <flux:textarea wire:model="bio" label="{{ __('About Me') }}" name="bio" rows="4" placeholder="{{ __('Tell us a bit about yourself...') }}" />
+                <p class="mt-1 text-sm text-neutral-500">{{ __('Share your background, interests, or anything else you want others to know about you.') }}</p>
+            </div>
+
+            <div>
+                <flux:textarea wire:model="skills" label="{{ __('Skills & Interests') }}" name="skills" rows="3" placeholder="{{ __('Programming languages, technologies, hobbies...') }}" />
+                <p class="mt-1 text-sm text-neutral-500">{{ __('List your technical skills, areas of expertise, or topics you\'re interested in learning more about.') }}</p>
             </div>
 
             <div class="flex items-center gap-4">

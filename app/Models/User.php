@@ -33,6 +33,8 @@ class User extends Authenticatable
         "points",
         "workos_id",
         "avatar",
+        "bio",
+        "skills",
     ];
 
     /**
