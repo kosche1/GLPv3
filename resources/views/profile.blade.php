@@ -40,50 +40,71 @@
                     <div class="bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.01] hover:border-emerald-500/30 hover:shadow-emerald-900/20">
                         <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                             </svg>
-                            {{ __('Recent Activity') }}
+                            {{ __('Completed Challenges') }}
                         </h2>
-                        <div class="space-y-4">
+                        <div>
                             @if($recentActivities->isEmpty())
                                 <div class="flex flex-col items-center justify-center py-8 text-center">
                                     <div class="rounded-full bg-neutral-800 p-4 mb-4 border border-neutral-700">
                                         <svg class="w-8 h-8 text-neutral-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V19.5a2.25 2.25 0 002.25 2.25h.75"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                                         </svg>
                                     </div>
-                                    <h3 class="text-sm font-medium text-white">{{ __('No recent activity') }}</h3>
-                                    <p class="mt-2 text-sm text-neutral-400">{{ __('Your recent activities will appear here') }}</p>
-                                    <a href="{{ route('learning') }}" class="mt-4 px-4 py-2 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors duration-300 text-sm font-medium flex items-center gap-2">
+                                    <h3 class="text-sm font-medium text-white">{{ __('No completed challenges') }}</h3>
+                                    <p class="mt-2 text-sm text-neutral-400">{{ __('Your completed challenges will appear here') }}</p>
+                                    <a href="{{ route('learning') }}" class="mt-4 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition-all duration-300 text-sm font-medium flex items-center justify-center gap-2">
+                                        <span>Explore Challenges</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                         </svg>
-                                        <span>Start Learning</span>
                                     </a>
                                 </div>
                             @else
-                                <div class="space-y-4">
-                                    @foreach($recentActivities as $activity)
-                                        <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700 flex items-start gap-3">
-                                            <div class="p-2 rounded-lg bg-emerald-500/10 mt-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
-                                            <div class="flex-1">
-                                                <p class="text-sm text-white">{{ $activity->description }}</p>
-                                                <div class="flex items-center justify-between mt-2">
-                                                    <span class="text-xs text-neutral-400">{{ $activity->created_at->diffForHumans() }}</span>
-                                                    <span class="text-xs font-medium px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">+{{ $activity->points_changed }} XP</span>
+                                <!-- Scrollable container for completed challenges -->
+                                <div class="max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-emerald-500 scrollbar-track-neutral-800 scrollbar-thumb-rounded-full scrollbar-track-rounded-full">
+                                    <div class="space-y-4 pb-2">
+                                        @foreach($recentActivities as $activity)
+                                            <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700 hover:border-emerald-500/30 transition-all duration-300 hover:bg-neutral-800 flex items-start gap-3">
+                                                <div class="p-2 rounded-lg bg-emerald-500/10 mt-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <div class="flex justify-between items-start">
+                                                        <h3 class="text-sm text-white font-medium">{{ $activity->name }}</h3>
+                                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-emerald-500/90 text-white border border-emerald-500/20 flex items-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            Completed
+                                                        </span>
+                                                    </div>
+                                                    <p class="text-xs text-neutral-400 mt-1 line-clamp-2">{{ $activity->description }}</p>
+                                                    <div class="flex items-center justify-between mt-2">
+                                                        <span class="text-xs text-neutral-400 flex items-center gap-1.5">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                            {{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}
+                                                        </span>
+                                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-800/90 text-emerald-400 border border-emerald-500/20">
+                                                            {{ $activity->programming_language ?? 'PHP' }}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
-                                    <a href="{{ route('learning') }}" class="w-full py-2 px-4 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors duration-300 text-sm font-medium flex items-center justify-center gap-2">
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <a href="{{ route('learning') }}" class="w-full py-2.5 px-4 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 transition-all duration-300 text-sm font-medium flex items-center justify-center gap-2">
+                                        <span>View All Challenges</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                         </svg>
-                                        <span>Continue Learning</span>
                                     </a>
                                 </div>
                             @endif
@@ -139,7 +160,7 @@
                                         </div>
                                         <h3 class="text-sm font-medium text-white">{{ $badge->name }}</h3>
                                         <p class="mt-1 text-xs text-neutral-400">{{ $badge->description }}</p>
-                                        <span class="mt-2 text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-300 border border-neutral-600/20">{{ $badge->pivot->earned_at->format('M d, Y') }}</span>
+                                        <span class="mt-2 text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-300 border border-neutral-600/20">{{ \Carbon\Carbon::parse($badge->earned_at)->format('M d, Y') }}</span>
                                     </div>
                                 @endforeach
                             @endif
@@ -221,9 +242,12 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
                                             </svg>
                                         </div>
-                                        <span class="text-sm text-neutral-300">{{ __('Courses Enrolled') }}</span>
+                                        <span class="text-sm text-neutral-300">{{ __('Challenges Completed') }}</span>
                                     </div>
-                                    <span class="text-lg font-semibold text-white">{{ $enrolledCourses }}</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg font-semibold text-white">{{ $completedChallenges }}</span>
+                                        <span class="text-xs text-neutral-400">({{ $totalChallenges > 0 ? round(($completedChallenges / $totalChallenges) * 100) : 0 }}%)</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
@@ -234,9 +258,9 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                                             </svg>
                                         </div>
-                                        <span class="text-sm text-neutral-300">{{ __('Challenges Completed') }}</span>
+                                        <span class="text-sm text-neutral-300">{{ __('Tasks Completed') }}</span>
                                     </div>
-                                    <span class="text-lg font-semibold text-white">{{ $completedChallenges }}</span>
+                                    <span class="text-lg font-semibold text-white">{{ $completedTasks }}</span>
                                 </div>
                             </div>
                             <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">

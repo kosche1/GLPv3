@@ -15,3 +15,33 @@
 <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/src-noconflict/theme-monokai.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/src-noconflict/snippets/python.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/css/ace.min.css" rel="stylesheet">
+
+<!-- Custom Scrollbar Styles -->
+<style>
+    /* Custom scrollbar styles */
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: #1f2937;
+        border-radius: 10px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #10b981;
+        border-radius: 10px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background: #0d9488;
+    }
+
+    .scrollbar-thumb-rounded-full::-webkit-scrollbar-thumb {
+        border-radius: 9999px;
+    }
+
+    .scrollbar-track-rounded-full::-webkit-scrollbar-track {
+        border-radius: 9999px;
+    }
+</style>
