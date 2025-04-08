@@ -1,5 +1,5 @@
 <x-layouts.app>
-   
+
     <div class="relative flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg overflow-hidden backdrop-blur-sm">
         <!-- Optimized Background Elements - Single Element -->
         <!-- <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,rgba(16,185,129,0.05),transparent_70%)]" style="background-size: 24px 24px;"></div> -->
@@ -560,49 +560,39 @@
     </div>
 
     <script>
-        // Optimized contribution graph with reduced DOM manipulation and better performance
+        // Dynamic contribution graph with real activity data
         document.addEventListener('DOMContentLoaded', function() {
             // Configuration
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const days = ['Mon', 'Wed', 'Fri']; // Only showing weekdays
 
-            // Generate a smaller dataset (6 months instead of 12) to reduce DOM elements
-            function generateData() {
-                const data = {};
-                const now = new Date();
-
-                // Start from approx 6 months ago instead of 12
-                const startDate = new Date(now);
-                startDate.setMonth(now.getMonth() - 5);
-                startDate.setDate(1);
-
-                // Generate random activity data with fewer data points
-                let currentDate = new Date(startDate);
-                while (currentDate <= now) {
-                    // Only include weekdays (Mon=1 to Fri=5)
-                    const dayOfWeek = currentDate.getDay();
-                    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-                        // Only include every other day to reduce data points by 50%
-                        if (currentDate.getDate() % 2 === 0) {
-                            const dateStr = currentDate.toISOString().split('T')[0];
-                            // Simpler random calculation
-                            const randomActivity = Math.floor(Math.random() * 4);
-                            data[dateStr] = randomActivity;
-                        }
+            // Fetch real activity data from the API
+            async function fetchActivityData() {
+                try {
+                    const response = await fetch('/api/user-activity');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch activity data');
                     }
-                    currentDate.setDate(currentDate.getDate() + 1);
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching activity data:', error);
+                    return { activity_data: {} };
                 }
-                return data;
             }
 
-            // Create the contribution graph with optimized rendering
-            function createContributionGraph() {
+            // Create the contribution graph with real data
+            async function createContributionGraph() {
                 const graphContainer = document.getElementById('contributionGraph');
-
                 if (!graphContainer) return;
 
-                const graphData = generateData();
-                if (Object.keys(graphData).length === 0) {
+                // Show loading state
+                graphContainer.innerHTML = '<div class="flex items-center justify-center h-full"><div class="animate-pulse text-gray-400">Loading activity data...</div></div>';
+
+                // Fetch real activity data
+                const activityResponse = await fetchActivityData();
+                const activityData = activityResponse.activity_data || {};
+
+                if (Object.keys(activityData).length === 0) {
                     graphContainer.innerHTML = '<p class="text-gray-400 text-sm">No activity data to display.</p>';
                     return;
                 }
@@ -610,20 +600,29 @@
                 // Clear existing content
                 graphContainer.innerHTML = '';
 
-                // Get the start and end dates from data
-                const dates = Object.keys(graphData).sort();
-                const startDate = new Date(dates[0] + 'T00:00:00Z');
-                const endDate = new Date(dates[dates.length - 1] + 'T00:00:00Z');
+                // Parse dates from the response
+                const startDateStr = activityResponse.start_date;
+                const endDateStr = activityResponse.end_date;
+                const startDate = new Date(startDateStr + 'T00:00:00Z');
+                const endDate = new Date(endDateStr + 'T00:00:00Z');
 
-                // Create simplified month labels
+                // Create month labels
                 let monthsHTML = '<div class="flex text-xs text-gray-500 mb-1 pl-8">';
-                for (let i = 0; i < 6; i++) { // Fixed number of months
-                    const monthIndex = (startDate.getMonth() + i) % 12;
+
+                // Calculate how many months to display
+                const monthDiff = (endDate.getFullYear() - startDate.getFullYear()) * 12 +
+                                 (endDate.getMonth() - startDate.getMonth());
+                const monthsToShow = Math.min(6, monthDiff + 1);
+
+                for (let i = 0; i < monthsToShow; i++) {
+                    const monthDate = new Date(startDate);
+                    monthDate.setMonth(startDate.getMonth() + i);
+                    const monthIndex = monthDate.getMonth();
                     monthsHTML += `<div class="flex-1 text-left">${months[monthIndex]}</div>`;
                 }
                 monthsHTML += '</div>';
 
-                // Create simplified grid
+                // Create grid structure
                 let gridHTML = `
                 <div class="flex h-[calc(100%-1rem)]">
                     <div class="flex flex-col w-8 text-xs text-gray-500 justify-between py-0.5 pr-2">
@@ -638,24 +637,38 @@
                     <div class="flex flex-1 gap-1 overflow-hidden">
                 `;
 
-                // Generate a fixed number of weeks (26 weeks = ~6 months)
-                const weeksToShow = 26;
+                // Calculate number of weeks to display
+                const dayDiff = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+                const weeksToShow = Math.ceil(dayDiff / 7);
 
+                // Generate weeks
+                const currentDate = new Date(startDate);
                 for (let week = 0; week < weeksToShow; week++) {
                     gridHTML += '<div class="flex flex-col gap-1 w-4">';
 
                     // Generate 5 days per week (Mon-Fri)
                     for (let day = 0; day < 5; day++) {
-                        // Randomly assign activity levels for visual effect
-                        const activityLevel = Math.floor(Math.random() * 5);
+                        const dateStr = currentDate.toISOString().split('T')[0];
+                        const activityLevel = activityData[dateStr] || 0;
 
+                        // Set color based on activity level
                         let bgColor = 'bg-neutral-700'; // Default: No activity
                         if (activityLevel === 1) bgColor = 'bg-emerald-900';
                         if (activityLevel === 2) bgColor = 'bg-emerald-700';
                         if (activityLevel === 3) bgColor = 'bg-emerald-500';
                         if (activityLevel >= 4) bgColor = 'bg-emerald-300';
 
-                        gridHTML += `<div class="h-4 w-4 rounded-sm ${bgColor}"></div>`;
+                        // Add tooltip with date and activity count
+                        const dateDisplay = new Date(dateStr).toLocaleDateString();
+                        const activityTitle = activityLevel === 0 ? 'No activity' :
+                                            activityLevel === 1 ? 'Low activity' :
+                                            activityLevel === 2 ? 'Medium activity' :
+                                            activityLevel === 3 ? 'High activity' : 'Very high activity';
+
+                        gridHTML += `<div class="h-4 w-4 rounded-sm ${bgColor}" title="${dateDisplay}: ${activityTitle}"></div>`;
+
+                        // Move to next day
+                        currentDate.setDate(currentDate.getDate() + 1);
                     }
 
                     gridHTML += '</div>';
