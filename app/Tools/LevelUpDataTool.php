@@ -7,35 +7,44 @@ namespace App\Tools;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use LevelUp\Experience\Facades\Leaderboard;
+use LevelUp\Experience\Models\Activity;
 use Prism\Prism\Facades\Tool;
 use Prism\Prism\Schema\EnumSchema;
-use Prism\Prism\Schema\IntegerSchema;
+use Prism\Prism\Schema\NumberSchema;
 use Prism\Prism\Tool as BaseTool;
 
 class LevelUpDataTool extends BaseTool
 {
     public function __construct()
     {
+        Log::info('LevelUpDataTool constructor called.');
         // Register the tool with Prism
-        // Tool::register($this);
+        // Tool::register($this); // Re-commented this line
 
         $this->as('level_up_data')
             ->for(
-                "Retrieves user-specific gamification data including level, experience points, and leaderboard information. " .
-                "Use this tool to answer questions about the user's current level, experience points, and leaderboard rankings."
+                "Retrieves user-specific gamification data including level, experience points, achievements, streaks, and leaderboard information. " .
+                "Use this tool to answer questions about the user's current level, experience, achievements, streaks, and leaderboard rankings."
             )
             ->withParameter(
                 new EnumSchema(
                     name: 'query_type',
-                    description: 'The type of query to perform.',
+                    description: 'The type of query to perform: get level, get experience, get achievements, get streaks, or get leaderboard.',
                     options: [
                         'get_user_level',
                         'get_user_experience',
+                        'get_user_achievements',
+                        'get_user_streaks',
                         'get_leaderboard'
                     ]
                 )
             )
-           
+            ->withParameter(
+                new NumberSchema(
+                    name: 'limit',
+                    description: 'The maximum number of leaderboard entries to return (default: 10). Only used with query_type get_leaderboard.'
+                )
+            )
             ->using($this);
     }
 
@@ -57,6 +66,8 @@ class LevelUpDataTool extends BaseTool
             $result = match ($query_type) {
                 'get_user_level' => $this->getUserLevel($user),
                 'get_user_experience' => $this->getUserExperience($user),
+                'get_user_achievements' => $this->getUserAchievements($user),
+                'get_user_streaks' => $this->getUserStreaks($user),
                 'get_leaderboard' => $this->getLeaderboard($limit ?? 10),
                 default => ['error' => 'Invalid query_type for LevelUpDataTool: ' . $query_type],
             };
@@ -144,6 +155,126 @@ class LevelUpDataTool extends BaseTool
         }
 
         return $result;
+    }
+
+    /**
+     * Get the user's achievements
+     *
+     * @param \App\Models\User $user The user
+     * @return array Achievement information
+     */
+    private function getUserAchievements($user): array
+    {
+        if (!method_exists($user, 'achievements')) {
+            return ['error' => 'The user model does not have achievement functionality. Make sure the HasAchievements trait is added to your User model.'];
+        }
+
+        try {
+            // Get achievements including progress
+            $achievements = $user->achievements()->withPivot('progress', 'unlocked_at')->get();
+            $allAchievements = \LevelUp\Experience\Models\Achievement::all(); // Get all possible achievements for context
+
+            if ($achievements->isEmpty()) {
+                return [
+                    'user_achievements' => [
+                        'user' => $user->name,
+                        'message' => 'No achievements unlocked yet.',
+                        'total_possible_achievements' => $allAchievements->count(),
+                    ]
+                ];
+            }
+
+            $achievementsData = $achievements->map(function ($achievement) {
+                return [
+                    'name' => $achievement->name,
+                    'description' => $achievement->description,
+                    'is_secret' => $achievement->is_secret,
+                    'unlocked_at' => $achievement->pivot->unlocked_at ? $achievement->pivot->unlocked_at->format('Y-m-d H:i') : null,
+                    'progress' => $achievement->pivot->progress,
+                ];
+            })->toArray();
+
+            return [
+                'user_achievements' => [
+                    'user' => $user->name,
+                    'unlocked_count' => $achievements->where('pivot.progress', 100)->count(),
+                    'in_progress_count' => $achievements->where('pivot.progress', '<', 100)->count(),
+                    'total_possible_achievements' => $allAchievements->count(),
+                    'achievements' => $achievementsData,
+                ]
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error fetching achievements', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            return ['error' => 'Could not retrieve achievement data. ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Get the user's current streaks
+     *
+     * @param \App\Models\User $user The user
+     * @return array Streak information
+     */
+    private function getUserStreaks($user): array
+    {
+        if (!method_exists($user, 'streaks')) {
+            return ['error' => 'The user model does not have streak functionality. Make sure the HasStreaks trait is added to your User model.'];
+        }
+        if (!class_exists(Activity::class)) {
+            return ['error' => 'Activity model not found for streaks.'];
+        }
+
+        try {
+            $activities = Activity::all();
+            if ($activities->isEmpty()) {
+                return ['message' => 'No activities configured for tracking streaks.'];
+            }
+
+            $streaksData = [];
+            $userStreaks = $user->streaks()->with('activity')->get()->keyBy('activity_id');
+
+            foreach ($activities as $activity) {
+                $streak = $userStreaks->get($activity->id);
+                $currentCount = $streak->count ?? 0;
+                $lastActivityDate = $streak->streaked_at ?? null;
+                $isFrozen = $streak && $streak->frozen_until && $streak->frozen_until->isFuture();
+                $frozenUntil = $isFrozen ? $streak->frozen_until->format('Y-m-d H:i') : null;
+
+                $hasStreakToday = false;
+                if ($lastActivityDate) {
+                    $lastDate = \Carbon\Carbon::parse($lastActivityDate);
+                    $now = now();
+                    if ($isFrozen && $now->lessThanOrEqualTo($streak->frozen_until)) {
+                        $hasStreakToday = true;
+                    } elseif ($lastDate->isToday()) {
+                        $hasStreakToday = true;
+                    } elseif ($lastDate->isYesterday()) {
+                        // Streak might continue today, but we only know the last date
+                        // Let's report false unless explicitly asked "Did I do X today?"
+                        // $hasStreakToday = false;
+                    }
+                }
+
+                $streaksData[] = [
+                    'activity_name' => $activity->name,
+                    'current_streak' => $currentCount,
+                    'last_active_date' => $lastActivityDate ? \Carbon\Carbon::parse($lastActivityDate)->format('Y-m-d H:i') : 'Never',
+                    'is_frozen' => $isFrozen,
+                    'frozen_until' => $frozenUntil,
+                    'active_today' => $hasStreakToday,
+                ];
+            }
+
+            return [
+                'user_streaks' => [
+                    'user' => $user->name,
+                    'streaks' => $streaksData,
+                ]
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error fetching streaks', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+            return ['error' => 'Could not retrieve streak data. ' . $e->getMessage()];
+        }
     }
 
     /**
