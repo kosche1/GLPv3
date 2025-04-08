@@ -52,6 +52,19 @@ Route::middleware(
     Route::get('schedule', [ScheduleController::class, 'index'])->name('schedule');
     Route::view('grades','grades')->name('grades');
     Route::view('messages','messages')->name('messages');
+
+    // Attendance routes
+    Route::get('attendance', [\App\Http\Controllers\AttendanceController::class, 'myAttendance'])->name('attendance.my-attendance');
+    Route::get('attendance/students', [\App\Http\Controllers\AttendanceController::class, 'allStudents'])
+        ->name('attendance.all-students')
+        ->middleware('can:view-student-attendance');
+    Route::get('attendance/students/{id}', [\App\Http\Controllers\AttendanceController::class, 'studentDetail'])
+        ->name('attendance.student-detail')
+        ->middleware('can:view-student-attendance');
+
+    // Test routes for attendance
+    Route::get('test-attendance', [\App\Http\Controllers\TestAttendanceController::class, 'index'])->name('test.attendance.index');
+    Route::get('test-attendance/run', [\App\Http\Controllers\TestAttendanceController::class, 'testAttendance'])->name('test.attendance');
     // Forum routes
     Route::get('forums', [ForumController::class, 'index'])->name('forums');
     Route::get('forums/create', [ForumController::class, 'createTopic'])->name('forum.create-topic');
