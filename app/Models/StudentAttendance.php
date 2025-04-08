@@ -15,6 +15,9 @@ class StudentAttendance extends Model
         'date',
         'status',
         'notes',
+        'first_login_time',
+        'last_login_time',
+        'login_count',
     ];
 
     protected $casts = [
@@ -82,9 +85,20 @@ class StudentAttendance extends Model
             Log::info('Today is ' . $today);
 
             // Check if attendance already recorded for today
-            $existingAttendance = self::where('user_id', $userId)
-                ->where('date', $today)
-                ->first();
+            // Use a transaction to prevent race conditions
+            $existingAttendance = \Illuminate\Support\Facades\DB::transaction(function() use ($userId, $today) {
+                return self::where('user_id', $userId)
+                    ->where('date', $today)
+                    ->lockForUpdate()
+                    ->first();
+            });
+
+            // Double-check outside the transaction in case another process created a record
+            if (!$existingAttendance) {
+                $existingAttendance = self::where('user_id', $userId)
+                    ->where('date', $today)
+                    ->first();
+            }
 
             Log::info('Existing attendance check result', [
                 'exists' => $existingAttendance ? 'yes' : 'no',
@@ -95,11 +109,15 @@ class StudentAttendance extends Model
             if (!$existingAttendance) {
                 Log::info('Creating new attendance record for user ' . $userId);
 
+                $currentTime = now()->format('H:i:s');
                 $newAttendance = self::create([
                     'user_id' => $userId,
                     'date' => $today,
                     'status' => 'present',
-                    'notes' => 'Logged in at ' . now()->format('H:i:s')
+                    'notes' => 'Logged in at ' . $currentTime,
+                    'first_login_time' => $currentTime,
+                    'last_login_time' => $currentTime,
+                    'login_count' => 1
                 ]);
 
                 Log::info('New attendance record created', [
@@ -116,15 +134,33 @@ class StudentAttendance extends Model
                     'date' => $existingAttendance->date
                 ]);
 
-                // Update the notes to indicate multiple logins if needed
-                if (!str_contains($existingAttendance->notes, 'Additional login')) {
-                    $existingAttendance->notes .= '. Additional login at ' . now()->format('H:i:s');
-                    $existingAttendance->save();
+                // Update the attendance record for additional logins
+                $currentTime = now()->format('H:i:s');
+                $existingAttendance->last_login_time = $currentTime;
+                $existingAttendance->login_count += 1;
 
-                    Log::info('Updated attendance record notes');
+                // Update the notes to indicate multiple logins
+                if (!str_contains($existingAttendance->notes, 'Additional login')) {
+                    $existingAttendance->notes .= '. Additional login at ' . $currentTime;
                 } else {
-                    Log::info('No need to update attendance record notes');
+                    // Just update the count in the notes
+                    $existingAttendance->notes = preg_replace(
+                        '/Total logins today: (\d+)/',
+                        'Total logins today: ' . $existingAttendance->login_count,
+                        $existingAttendance->notes
+                    );
+
+                    // If the pattern wasn't found, append the count
+                    if (!str_contains($existingAttendance->notes, 'Total logins today:')) {
+                        $existingAttendance->notes .= '. Total logins today: ' . $existingAttendance->login_count;
+                    }
                 }
+
+                $existingAttendance->save();
+                Log::info('Updated attendance record', [
+                    'login_count' => $existingAttendance->login_count,
+                    'last_login_time' => $existingAttendance->last_login_time
+                ]);
             }
 
             return $existingAttendance;
@@ -180,6 +216,49 @@ class StudentAttendance extends Model
         }
 
         return $query->distinct('date')->count('date');
+    }
+
+    /**
+     * Clean up duplicate attendance records for a user
+     *
+     * @param int $userId
+     * @return int Number of records removed
+     */
+    public static function cleanupDuplicateRecords($userId = null)
+    {
+        try {
+            $query = \Illuminate\Support\Facades\DB::table('student_attendance as a')
+                ->join(\Illuminate\Support\Facades\DB::raw('(SELECT user_id, date, MIN(id) as min_id FROM student_attendance GROUP BY user_id, date) as b'),
+                    function($join) {
+                        $join->on('a.user_id', '=', 'b.user_id')
+                            ->on('a.date', '=', 'b.date')
+                            ->whereColumn('a.id', '!=', 'b.min_id');
+                    });
+
+            if ($userId) {
+                $query->where('a.user_id', $userId);
+            }
+
+            $duplicateIds = $query->pluck('a.id');
+
+            if ($duplicateIds->isEmpty()) {
+                return 0;
+            }
+
+            $count = self::whereIn('id', $duplicateIds)->delete();
+
+            Log::info('Cleaned up duplicate attendance records', [
+                'user_id' => $userId ?? 'all',
+                'count' => $count,
+                'ids' => $duplicateIds->toArray()
+            ]);
+
+            return $count;
+        } catch (\Exception $e) {
+            Log::error('Error cleaning up duplicate attendance records: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+            return 0;
+        }
     }
 
     /**

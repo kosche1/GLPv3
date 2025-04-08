@@ -65,6 +65,16 @@ Route::middleware(
     // Test routes for attendance
     Route::get('test-attendance', [\App\Http\Controllers\TestAttendanceController::class, 'index'])->name('test.attendance.index');
     Route::get('test-attendance/run', [\App\Http\Controllers\TestAttendanceController::class, 'testAttendance'])->name('test.attendance');
+
+    // Debug route for attendance middleware
+    Route::get('debug-attendance', function() {
+        return response()->json([
+            'message' => 'Attendance middleware test',
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'authenticated' => \Illuminate\Support\Facades\Auth::check(),
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+    })->name('debug.attendance');
     // Forum routes
     Route::get('forums', [ForumController::class, 'index'])->name('forums');
     Route::get('forums/create', [ForumController::class, 'createTopic'])->name('forum.create-topic');

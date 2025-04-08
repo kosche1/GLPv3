@@ -36,7 +36,8 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\TrackAttendance::class,
+            // Disabled in favor of using Login event listener
+            // \App\Http\Middleware\TrackAttendance::class,
         ],
 
         'api' => [
@@ -67,4 +68,4 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'check.task.completion' => \App\Http\Middleware\CheckTaskCompletion::class,
     ];
-} 
+}

@@ -23,7 +23,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
     public string $password = '';
 
     public bool $remember = false;
-    
+
     public ?string $rewardMessage = null;
 
     /**
@@ -45,16 +45,16 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
 
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
-        
+
         // Process daily login reward
         $this->processDailyLoginReward();
-        
+
         // Check for achievements
         $this->checkForAchievements();
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
-    
+
     /**
      * Process the daily login reward for the user
      */
@@ -62,20 +62,20 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
     {
         $user = Auth::user();
         $today = Carbon::today();
-        
+
         // Get the user's latest daily reward claim
         $latestReward = UserDailyReward::where('user_id', $user->id)
             ->orderBy('claimed_at', 'desc')
             ->first();
-            
+
         $currentStreak = 1; // Default to 1 for first login
-        
+
         if ($latestReward) {
             // Check if the user already claimed a reward today
             if ($latestReward->claimed_at->isToday()) {
                 return; // Already claimed today
             }
-            
+
             // Check if this is a consecutive day (yesterday)
             if ($latestReward->claimed_at->isYesterday()) {
                 $currentStreak = $latestReward->current_streak + 1;
@@ -84,15 +84,15 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
                 $currentStreak = 1;
             }
         }
-        
+
         // Find the appropriate reward tier for the current streak day
         $rewardTier = DailyRewardTier::where('day_number', $currentStreak)->first();
-        
+
         // If no specific tier exists for this day, get the default tier for regular days
         if (!$rewardTier) {
             // For days 8-13, 15-20, 22-29, 31+ use a default reward based on the streak count
             $defaultPoints = 10 + min(($currentStreak * 5), 100); // Scale up to max 100 points
-            
+
             // Create a temporary tier object
             $rewardTier = new DailyRewardTier([
                 'name' => "Day {$currentStreak} Reward",
@@ -102,7 +102,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
                 'reward_data' => null,
             ]);
         }
-        
+
         // Record the claimed reward
         UserDailyReward::create([
             'user_id' => $user->id,
@@ -111,23 +111,23 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
             'streak_date' => $today,
             'current_streak' => $currentStreak,
         ]);
-        
+
         // Award the points
         $user->addPoints(
-            $rewardTier->points_reward, 
+            $rewardTier->points_reward,
             reason: "Daily login reward - Day {$currentStreak}"
         );
-        
+
         $rewardMessage = "You received {$rewardTier->points_reward} points for your Day {$currentStreak} login streak!";
-        
+
         // Process additional rewards if any
         if ($rewardTier->reward_type && $rewardTier->reward_data) {
             $additionalRewards = [];
-            
+
             // Handle badge rewards
             if ($rewardTier->reward_type === 'badge' && isset($rewardTier->reward_data['badge_id'])) {
                 $badge = Badge::find($rewardTier->reward_data['badge_id']);
-                
+
                 if ($badge) {
                     // Attach the badge to the user if they don't already have it
                     if (!$user->badges()->where('badge_id', $badge->id)->exists()) {
@@ -138,11 +138,11 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
                     }
                 }
             }
-            
+
             // Handle streak freeze rewards
             if (isset($rewardTier->reward_data['streak_freeze']) && method_exists($user, 'freezeStreak')) {
                 $freezeDays = $rewardTier->reward_data['streak_freeze'];
-                
+
                 // Use Level-Up package's streak functionality if available
                 try {
                     $activities = \LevelUp\Experience\Models\Activity::all();
@@ -155,19 +155,19 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
                     // Streak freeze functionality not available
                 }
             }
-            
+
             // Add additional rewards to message
             if (!empty($additionalRewards)) {
                 $rewardMessage .= " Plus: " . implode(', ', $additionalRewards);
             }
         }
-        
+
         $this->rewardMessage = $rewardMessage;
-        
+
         // Store reward message in session to display after redirect
         session()->flash('daily_reward_message', $rewardMessage);
     }
-    
+
     /**
      * Check for any achievements the user may have earned
      */
@@ -176,10 +176,10 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
         try {
             $user = Auth::user();
             $achievementService = new AchievementService();
-            
+
             // Check for all types of achievements
             $achievementService->checkAllAchievements($user);
-            
+
             // Get newly awarded achievements to display in notification
             $recentAchievements = session('recent_achievements', []);
             if (!empty($recentAchievements)) {
@@ -239,7 +239,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
-    
+
     <!-- Daily Reward Message -->
     @if($rewardMessage)
         <div class="p-3 bg-emerald-900/30 border border-emerald-500/30 rounded-lg text-center text-emerald-300">

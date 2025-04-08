@@ -16,6 +16,65 @@
             </div>
         </div>
 
+        <!-- Today's Login Card -->
+        <div class="bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 p-6 overflow-hidden shadow-lg mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-white">Today's Attendance</h3>
+                <div class="h-10 w-10 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+
+            @php
+                // Debug information
+                $today = now()->toDateString();
+                $todayRecord = null;
+
+                // Loop through attendance records to find today's record
+                foreach ($attendanceHistory as $record) {
+                    if ($record->date->format('Y-m-d') === $today) {
+                        $todayRecord = $record;
+                        break;
+                    }
+                }
+            @endphp
+
+            @if($todayRecord)
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700/50">
+                        <h4 class="text-sm font-medium text-neutral-400 mb-2">First Login</h4>
+                        <p class="text-xl font-bold text-white">{{ $todayRecord->first_login_time ?? 'N/A' }}</p>
+                    </div>
+
+                    <div class="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700/50">
+                        <h4 class="text-sm font-medium text-neutral-400 mb-2">Last Login</h4>
+                        <p class="text-xl font-bold text-white">{{ $todayRecord->last_login_time ?? 'N/A' }}</p>
+                    </div>
+
+                    <div class="bg-neutral-800/50 rounded-lg p-4 border border-neutral-700/50">
+                        <h4 class="text-sm font-medium text-neutral-400 mb-2">Login Count</h4>
+                        <p class="text-xl font-bold text-white">
+                            <span class="px-2.5 py-1 rounded-full text-sm font-medium {{ $todayRecord->login_count > 1 ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' }}">
+                                {{ $todayRecord->login_count ?? '0' }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            @else
+                <div class="bg-neutral-800/50 rounded-lg p-6 border border-neutral-700/50 text-center">
+                    <p class="text-neutral-400">No attendance recorded for today ({{ $today }}).</p>
+
+                    @if(count($attendanceHistory) > 0)
+                        <p class="text-xs text-neutral-500 mt-2">Latest record: {{ $attendanceHistory->first()->date->format('Y-m-d') }}</p>
+                    @else
+                        <p class="text-xs text-neutral-500 mt-2">No attendance records found.</p>
+                    @endif
+                </div>
+            @endif
+        </div>
+
         <!-- Attendance Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <!-- Total Login Days -->
@@ -145,6 +204,8 @@
                         <tr class="border-b border-neutral-700">
                             <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-400">Date</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-400">Status</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-400">Login Times</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-400">Count</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-neutral-400">Notes</th>
                         </tr>
                     </thead>
@@ -160,11 +221,30 @@
                                         {{ ucfirst($record->status) }}
                                     </span>
                                 </td>
+                                <td class="py-4 px-4 text-neutral-300">
+                                    @if($record->first_login_time)
+                                        <span class="text-emerald-400">First:</span> {{ $record->first_login_time }}
+                                        @if($record->last_login_time && $record->first_login_time != $record->last_login_time)
+                                            <br><span class="text-amber-400">Last:</span> {{ $record->last_login_time }}
+                                        @endif
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td class="py-4 px-4 text-center">
+                                    @if($record->login_count > 1)
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                            {{ $record->login_count }}
+                                        </span>
+                                    @else
+                                        <span class="text-neutral-400">1</span>
+                                    @endif
+                                </td>
                                 <td class="py-4 px-4 text-neutral-300">{{ $record->notes }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="py-6 px-4 text-center text-neutral-400">
+                                <td colspan="5" class="py-6 px-4 text-center text-neutral-400">
                                     <div class="flex flex-col items-center justify-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
