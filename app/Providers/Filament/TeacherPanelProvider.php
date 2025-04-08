@@ -41,6 +41,7 @@ class TeacherPanelProvider extends PanelProvider
                 \App\Filament\Teacher\Pages\AssessmentTools::class,
                 \App\Filament\Teacher\Pages\Feedback::class,
                 \App\Filament\Teacher\Pages\StudentAnalytics::class,
+                \App\Filament\Teacher\Pages\StudentAttendancePage::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Teacher/Widgets'), for: 'App\\Filament\\Teacher\\Widgets')
             ->widgets([

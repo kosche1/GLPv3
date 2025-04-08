@@ -4,7 +4,7 @@ namespace App\Providers\Livewire;
 
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use App\Livewire\Filament\Teacher\Widgets\StudentStats;
+
 use App\Livewire\Filament\Teacher\Widgets\RecentActivities;
 use App\Livewire\Filament\Teacher\Widgets\UpcomingTasks;
 use App\Livewire\Filament\Teacher\Widgets\TopStudents;
@@ -29,7 +29,6 @@ class TeacherWidgetsServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Register widget components
-        Livewire::component('filament.teacher.widgets.student-stats', StudentStats::class);
         Livewire::component('filament.teacher.widgets.recent-activities', RecentActivities::class);
         Livewire::component('filament.teacher.widgets.upcoming-tasks', UpcomingTasks::class);
         Livewire::component('filament.teacher.widgets.top-students', TopStudents::class);
