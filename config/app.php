@@ -169,6 +169,7 @@ return [
         App\Providers\FolioServiceProvider::class,
         App\Providers\ToolServiceProvider::class,
         App\Providers\Livewire\TeacherWidgetsServiceProvider::class,
+        App\Providers\FilamentActivityLogServiceProvider::class,
     ],
 
 ];

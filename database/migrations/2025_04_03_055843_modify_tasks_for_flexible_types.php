@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('tasks', function (Blueprint $table) {
             //
-            $table->text('instructions'); 
+            $table->text('instructions');
             $table->string('submission_type');
             $table->string('evaluation_type');
             $table->json('evaluation_details')->nullable();
@@ -28,7 +28,7 @@ return new class extends Migration
     {
         Schema::table('tasks', function (Blueprint $table) {
             // Add back the original columns
-            $table->string('type'); 
+            $table->string('type');
             $table->text('completion_criteria')->nullable();
             $table->text('answer_key')->nullable();
             $table->text('expected_output')->nullable();

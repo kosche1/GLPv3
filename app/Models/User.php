@@ -13,6 +13,9 @@ use LevelUp\Experience\Concerns\HasAchievements;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
 
 class User extends Authenticatable
 {
@@ -20,6 +23,33 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasRoles;
     use GiveExperience;
     use HasAchievements;
+    use LogsActivity;
+
+    /**
+     * Get the options for logging activity.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'name',
+                'email',
+                'bio',
+                'skills',
+                'avatar',
+            ])
+            ->useLogName('User')
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
+
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        // Set the log_name to the user's name if the causer is a user
+        if ($activity->causer && $activity->causer instanceof User) {
+            $activity->log_name = $activity->causer->name;
+        }
+    }
 
     /**
      * The attributes that are mass assignable.

@@ -28,8 +28,7 @@
             <flux:navlist.group heading="Student Management" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
                 <flux:navlist.item icon="user" :href="route('profile')" :current="request()->routeIs('profile')" wire:navigate class="py-1">{{ __('Profile') }}</flux:navlist.item>
                 <flux:navlist.item icon="calendar" :href="route('schedule')" :current="request()->routeIs('schedule')" wire:navigate class="py-1">{{ __('Schedule') }}</flux:navlist.item>
-                <flux:navlist.item icon="chart-bar" :href="route('grades')" :current="request()->routeIs('grades')" wire:navigate class="py-1">{{ __('Grades') }}</flux:navlist.item>
-                <flux:navlist.item icon="clock" :href="route('attendance.my-attendance')" :current="request()->routeIs('attendance.my-attendance')" wire:navigate class="py-1">{{ __('Attendance') }}</flux:navlist.item>
+                <flux:navlist.item icon="chart-bar" :href="route('grades')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Grades') }}</flux:navlist.item>
             </flux:navlist.group>
 
             <!-- Communication -->
