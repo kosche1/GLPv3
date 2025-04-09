@@ -49,7 +49,7 @@ class NotificationController extends Controller
         $user = Auth::user();
         $notifications = $user->notifications()
             ->latest()
-            ->limit(10)
+            ->limit(20) // Increased limit to ensure we have enough after filtering
             ->get()
             ->map(function ($notification) {
                 return [
@@ -62,7 +62,22 @@ class NotificationController extends Controller
                 ];
             });
 
-        return response()->json($notifications);
+        // Filter out duplicate notifications based on message and type
+        $uniqueNotifications = collect();
+        $seenMessages = [];
+
+        foreach ($notifications as $notification) {
+            $key = $notification['message'] . '|' . $notification['type'];
+            if (!in_array($key, $seenMessages)) {
+                $seenMessages[] = $key;
+                $uniqueNotifications->push($notification);
+            }
+        }
+
+        // Limit to 10 notifications after filtering
+        $uniqueNotifications = $uniqueNotifications->take(10);
+
+        return response()->json($uniqueNotifications);
     }
 
     /**

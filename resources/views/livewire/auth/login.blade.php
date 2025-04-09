@@ -13,6 +13,7 @@ use App\Models\UserDailyReward;
 use App\Models\DailyRewardTier;
 use App\Models\Badge;
 use App\Services\AchievementService;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 
 new #[Layout('components.layouts.auth.card')] class extends Component {
@@ -175,7 +176,8 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
     {
         try {
             $user = Auth::user();
-            $achievementService = new AchievementService();
+            $notificationService = app(NotificationService::class);
+            $achievementService = new AchievementService($notificationService);
 
             // Check for all types of achievements
             $achievementService->checkAllAchievements($user);
