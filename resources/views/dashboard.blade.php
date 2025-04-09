@@ -9,12 +9,177 @@
                 <div class="h-8 w-1 bg-gradient-to-b from-emerald-400 to-emerald-600 rounded-full"></div>
                 <h1 class="text-2xl font-bold text-white tracking-tight">GLP - Gamified Dashboard</h1>
             </div>
-            <div class="flex items-center gap-3 bg-neutral-800/50 px-4 py-1.5 rounded-full border border-neutral-700/50 shadow-lg backdrop-blur-sm">
-                <span class="text-sm text-gray-300 font-medium">{{ date('l, F j, Y') }}</span>
-                <div class="h-6 w-6 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 bg-neutral-800/50 px-4 py-1.5 rounded-full border border-neutral-700/50 shadow-lg backdrop-blur-sm">
+                    <span class="text-sm text-gray-300 font-medium">{{ date('l, F j, Y') }}</span>
+                    <div class="h-6 w-6 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Real Notification System -->
+                <div x-data="{
+                    notifications: [],
+                    showNotifications: false,
+                    loading: true,
+                    init() {
+                        this.fetchNotifications();
+
+                        // Poll for new notifications every 30 seconds
+                        setInterval(() => {
+                            this.fetchNotifications();
+                        }, 30000);
+                    },
+                    fetchNotifications() {
+                        this.loading = true;
+                        fetch('{{ route("notifications.get") }}')
+                            .then(response => response.json())
+                            .then(data => {
+                                this.notifications = data;
+                                this.loading = false;
+                            })
+                            .catch(error => {
+                                console.error('Error fetching notifications:', error);
+                                this.loading = false;
+                            });
+                    },
+                    markAsRead(id) {
+                        fetch(`{{ url('api/notifications') }}/${id}/read`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                this.notifications = this.notifications.map(n =>
+                                    n.id === id ? {...n, read: true} : n
+                                );
+                            }
+                        })
+                        .catch(error => console.error('Error marking notification as read:', error));
+                    },
+                    markAllAsRead() {
+                        fetch('{{ route("notifications.read-all") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                this.notifications = this.notifications.map(n => ({...n, read: true}));
+                            }
+                        })
+                        .catch(error => console.error('Error marking all notifications as read:', error));
+                    },
+                    getUnreadCount() {
+                        return this.notifications.filter(n => !n.read).length;
+                    }
+                }" class="relative">
+                    <button @click="showNotifications = !showNotifications" class="relative p-2 rounded-full bg-neutral-800/50 border border-neutral-700/50 hover:bg-neutral-700/50 transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <span x-show="getUnreadCount() > 0" x-text="getUnreadCount()" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"></span>
+                    </button>
+
+                    <!-- Notification Panel -->
+                    <div x-show="showNotifications" @click.away="showNotifications = false" class="absolute right-0 mt-2 w-[40rem] max-w-[90vw] bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl z-50 overflow-hidden" style="transform: translateX(0);">
+                        <div class="p-4 border-b border-neutral-700 flex justify-between items-center">
+                            <h3 class="text-white font-medium text-lg">Notifications</h3>
+                            <button @click="markAllAsRead()" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">Mark all as read</button>
+                        </div>
+                        <div class="max-h-96 overflow-y-auto">
+                            <template x-if="loading">
+                                <div class="p-4 space-y-4">
+                                    <div class="flex items-start gap-4 animate-pulse">
+                                        <div class="h-10 w-10 rounded-full bg-neutral-700/50"></div>
+                                        <div class="flex-1 space-y-2">
+                                            <div class="h-5 bg-neutral-700/50 rounded w-3/4"></div>
+                                            <div class="flex justify-between">
+                                                <div class="h-3 bg-neutral-700/50 rounded w-1/4"></div>
+                                                <div class="h-3 bg-emerald-700/50 rounded w-1/6"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-4 animate-pulse">
+                                        <div class="h-10 w-10 rounded-full bg-neutral-700/50"></div>
+                                        <div class="flex-1 space-y-2">
+                                            <div class="h-5 bg-neutral-700/50 rounded w-2/3"></div>
+                                            <div class="flex justify-between">
+                                                <div class="h-3 bg-neutral-700/50 rounded w-1/4"></div>
+                                                <div class="h-3 bg-emerald-700/50 rounded w-1/6"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template x-if="!loading && notifications.length === 0">
+                                <div class="p-6 text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-neutral-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                    </svg>
+                                    <p class="text-gray-400 text-sm font-medium">No notifications yet</p>
+                                    <p class="text-gray-500 text-xs mt-1">New notifications will appear here</p>
+                                </div>
+                            </template>
+                            <template x-for="notification in notifications" :key="notification.id">
+                                <div @click="markAsRead(notification.id)" :class="{'bg-emerald-900/30': !notification.read}" class="p-4 border-b border-neutral-700 hover:bg-neutral-700 cursor-pointer transition-colors duration-200">
+                                    <div class="flex items-start gap-4">
+                                        <div>
+                                            <template x-if="notification.type === 'achievement'">
+                                                <div class="h-8 w-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                            <template x-if="notification.type === 'challenge'">
+                                                <div class="h-8 w-8 rounded-full bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                            <template x-if="notification.type === 'grade'">
+                                                <div class="h-8 w-8 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                            <template x-if="notification.type === 'system'">
+                                                <div class="h-8 w-8 rounded-full bg-gray-500/20 border border-gray-500/30 flex items-center justify-center text-gray-400">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-white truncate max-w-full" x-text="notification.message"></p>
+                                            <div class="flex justify-between mt-2">
+                                                <p class="text-xs text-gray-400" x-text="notification.time"></p>
+                                                <span x-show="notification.link" class="text-xs text-emerald-400 ml-2">View details</span>
+                                            </div>
+                                        </div>
+                                        <div x-show="!notification.read" class="h-2 w-2 rounded-full bg-emerald-500"></div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        <div class="p-4 border-t border-neutral-700 text-center">
+                            <a href="{{ route('notifications') }}" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">View all notifications</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -68,12 +233,16 @@
             $activeChallenges = $user->getActiveChallenges()->take(3);
         @endphp
 
-        <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Main Content Grid - Improved Mobile Responsiveness -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 sm:gap-6">
             <!-- Left Column (Profile + Stats) -->
             <div class="lg:col-span-8 space-y-6">
-                <!-- Profile Card with Stats -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                <!-- Profile Card with Stats - Progressive Loading -->
+                <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 100)"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 transform scale-95"
+                    x-transition:enter-end="opacity-100 transform scale-100"
+                    class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/10 to-emerald-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
                     <div class="relative p-6 z-10">
@@ -103,47 +272,53 @@
                                 </div>
                             </div>
 
-                            <!-- Stats Cards -->
-                            <div class="grid grid-cols-3 gap-4 md:ml-auto">
-                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col items-center justify-center relative group hover:border-yellow-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden">
+                            <!-- Stats Cards - Horizontal Layout -->
+                            <div class="flex flex-row flex-wrap md:flex-nowrap gap-3 md:gap-4 md:ml-auto w-full md:w-auto mt-4 md:mt-0 justify-center md:justify-end">
+                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex items-center gap-3 relative group hover:border-yellow-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden w-32">
                                     <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                     <div class="absolute -inset-1 bg-yellow-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                    <div class="text-yellow-400 mb-1 relative z-10">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <div class="text-yellow-400 relative z-10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                         </svg>
                                     </div>
-                                    <span class="text-xs text-gray-400 relative z-10">Score</span>
-                                    <span class="text-white font-bold relative z-10 text-lg">{{ $score }}</span>
-                                    <span class="text-xs {{ $scoreChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10">
-                                        {{ $scoreChange >= 0 ? '+' : '' }}{{ number_format($scoreChange, 2) }}
-                                    </span>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-400 relative z-10">Score</span>
+                                        <span class="text-white font-bold relative z-10 text-lg">{{ $score }}</span>
+                                        <span class="text-xs {{ $scoreChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10">
+                                            {{ $scoreChange >= 0 ? '+' : '' }}{{ number_format($scoreChange, 2) }}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col items-center justify-center relative group hover:border-blue-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden">
+                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex items-center gap-3 relative group hover:border-blue-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden w-32">
                                     <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                     <div class="absolute -inset-1 bg-blue-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                    <div class="text-blue-400 mb-1 relative z-10">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <div class="text-blue-400 relative z-10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
                                         </svg>
                                     </div>
-                                    <span class="text-xs text-gray-400 relative z-10">Attendance</span>
-                                    <span class="text-white font-bold relative z-10 text-lg">{{ $attendancePercentage }}%</span>
-                                    <span class="text-xs {{ $attendanceChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10">
-                                        {{ $attendanceChange >= 0 ? '+' : '' }}{{ $attendanceChange }}%
-                                    </span>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-400 relative z-10">Attendance</span>
+                                        <span class="text-white font-bold relative z-10 text-lg">{{ $attendancePercentage }}%</span>
+                                        <span class="text-xs {{ $attendanceChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10">
+                                            {{ $attendanceChange >= 0 ? '+' : '' }}{{ $attendanceChange }}%
+                                        </span>
+                                    </div>
                                 </div>
-                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col items-center justify-center relative group hover:border-purple-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden">
+                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex items-center gap-3 relative group hover:border-purple-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden w-32">
                                     <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                     <div class="absolute -inset-1 bg-purple-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                    <div class="text-purple-400 mb-1 relative z-10">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <div class="text-purple-400 relative z-10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                                             <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804v-10A7.968 7.968 0 0014.5 4z" />
                                         </svg>
                                     </div>
-                                    <span class="text-xs text-gray-400 relative z-10">Credits</span>
-                                    <span class="text-white font-bold relative z-10 text-lg">{{ $completionPercentage }}%</span>
-                                    <span class="text-xs text-gray-400 relative z-10">{{ $creditsCompleted }}/{{ $creditsRequired }}</span>
+                                    <div class="flex flex-col">
+                                        <span class="text-xs text-gray-400 relative z-10">Credits</span>
+                                        <span class="text-white font-bold relative z-10 text-lg">{{ $completionPercentage }}%</span>
+                                        <span class="text-xs text-gray-400 relative z-10">{{ $creditsCompleted }}/{{ $creditsRequired }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -173,8 +348,20 @@
                     </div>
                 </div>
 
-                <!-- Activity Graph -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300" style="min-height: 350px; height: 400px;">
+                <!-- Activity Graph with Skeleton Loading -->
+                <div x-data="{ loading: true }" x-init="setTimeout(() => loading = false, 800)" class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300" style="min-height: 350px; height: 400px;">
+                    <!-- Skeleton Loading State -->
+                    <div x-show="loading" class="absolute inset-0 z-20 flex flex-col p-6 space-y-4">
+                        <div class="flex items-center gap-2">
+                            <div class="h-5 w-5 rounded-full bg-neutral-700/70 animate-pulse"></div>
+                            <div class="h-6 w-40 rounded-md bg-neutral-700/70 animate-pulse"></div>
+                        </div>
+                        <div class="flex-1 grid grid-cols-7 gap-2">
+                            <template x-for="i in 35">
+                                <div class="h-full w-full rounded-md bg-neutral-700/50 animate-pulse"></div>
+                            </template>
+                        </div>
+                    </div>
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
                     <div class="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(16,185,129,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(16,185,129,0.01)_1px,transparent_1px)] bg-[size:20px_20px] opacity-10"></div>
@@ -279,8 +466,30 @@
                     </div>
                 </div>
 
-                <!-- Active Challenges -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                <!-- Active Challenges with Skeleton Loading -->
+                <div x-data="{ loading: true }" x-init="setTimeout(() => loading = false, 1000)" class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                    <!-- Skeleton Loading State -->
+                    <div x-show="loading" class="absolute inset-0 z-20 flex flex-col p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="h-5 w-5 rounded-full bg-neutral-700/70 animate-pulse"></div>
+                                <div class="h-6 w-40 rounded-md bg-neutral-700/70 animate-pulse"></div>
+                            </div>
+                            <div class="h-6 w-20 rounded-md bg-neutral-700/70 animate-pulse"></div>
+                        </div>
+                        <div class="space-y-4">
+                            <template x-for="i in 3">
+                                <div class="p-4 rounded-xl bg-neutral-700/50 animate-pulse space-y-3">
+                                    <div class="flex justify-between">
+                                        <div class="h-5 w-32 rounded-md bg-neutral-700/70 animate-pulse"></div>
+                                        <div class="h-5 w-16 rounded-md bg-neutral-700/70 animate-pulse"></div>
+                                    </div>
+                                    <div class="h-2 w-full rounded-full bg-neutral-700/70 animate-pulse"></div>
+                                    <div class="h-4 w-3/4 rounded-md bg-neutral-700/70 animate-pulse"></div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-orange-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
                     <div class="p-6 relative z-10">
@@ -422,6 +631,68 @@
                         </div>
                     </a>
                 </div> -->
+
+                <!-- Keyboard Shortcuts Help -->
+                <div x-data="{ showShortcuts: false }" class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300 mt-6">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-70"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-white bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Keyboard Shortcuts</span>
+                            </h3>
+                            <button @click="showShortcuts = !showShortcuts" class="text-xs text-purple-400 hover:text-purple-300 transition-colors duration-300">
+                                <span x-text="showShortcuts ? 'Hide' : 'Show'"></span>
+                            </button>
+                        </div>
+                        <div x-show="showShortcuts" x-transition class="space-y-2">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Learning</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + L</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Profile</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + P</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Grades</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + G</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Schedule</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + S</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Forums</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + F</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Messages</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + M</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Badges -->
                 <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300 mt-6">
@@ -685,25 +956,74 @@
         });
     </script>
 
+    <!-- Keyboard Shortcuts -->
+    <script>
+        // Keyboard shortcuts for quick navigation
+        document.addEventListener('keydown', function(e) {
+            // Only trigger shortcuts if no input is focused
+            if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                // Alt+L to go to Learning page
+                if (e.altKey && e.key === 'l') {
+                    window.location.href = '{{ route("learning") }}';
+                }
+                // Alt+P to go to Profile page
+                if (e.altKey && e.key === 'p') {
+                    window.location.href = '{{ route("profile") }}';
+                }
+                // Alt+G to go to Grades page
+                if (e.altKey && e.key === 'g') {
+                    window.location.href = '{{ route("grades") }}';
+                }
+                // Alt+S to go to Schedule page
+                if (e.altKey && e.key === 's') {
+                    window.location.href = '{{ route("schedule") }}';
+                }
+                // Alt+F to go to Forums page
+                if (e.altKey && e.key === 'f') {
+                    window.location.href = '{{ route("forums") }}';
+                }
+                // Alt+M to go to Messages page
+                if (e.altKey && e.key === 'm') {
+                    window.location.href = '{{ route("messages") }}';
+                }
+            }
+        });
+    </script>
+
     <style>
-        /* Optimized animations with reduced performance impact */
+        /* Further optimized animations with reduced performance impact */
         @keyframes shimmer {
             0% { background-position: 200% 0; }
             100% { background-position: 0 0; }
         }
         .animate-shimmer {
-            animation: shimmer 3s infinite linear;
-            will-change: background-position;
+            animation: shimmer 4s infinite linear;
+            will-change: transform;
         }
 
-        /* Optimized pulse animation with fewer keyframes */
+        /* Optimized pulse animation with fewer keyframes and longer duration */
         @keyframes pulse-slow {
             50% { opacity: 1; }
         }
         .animate-pulse-slow {
             opacity: 0.7;
-            animation: pulse-slow 4s infinite ease-in-out;
-            will-change: opacity;
+            animation: pulse-slow 6s infinite ease-in-out;
+        }
+
+        /* Selective hardware acceleration */
+        .hw-accelerate {
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        /* Reduce animation on mobile */
+        @media (max-width: 768px) {
+            .animate-pulse-slow {
+                animation-duration: 8s;
+            }
+            .animate-shimmer {
+                animation-duration: 6s;
+            }
         }
     </style>
 </x-layouts.app>

@@ -401,4 +401,12 @@ class User extends Authenticatable
 
         return $relation->withTimestamps();
     }
+
+    /**
+     * Get the notifications for the user.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

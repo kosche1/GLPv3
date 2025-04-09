@@ -7,9 +7,17 @@ use App\Observers\StudentAnswerObserver;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use App\Events\UserCompletedChallenge;
+use App\Events\UserEnrolledInChallenge;
 use App\Listeners\RecordUserAttendance;
+use App\Listeners\SendAchievementNotification;
+use App\Listeners\SendChallengeCompletionNotification;
+use App\Listeners\SendLevelUpNotification;
+use App\Listeners\SendNewChallengeNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use LevelUp\Experience\Events\AchievementAwarded;
+use LevelUp\Experience\Events\UserLevelledUp;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -24,6 +32,18 @@ class EventServiceProvider extends ServiceProvider
         ],
         Login::class => [
             RecordUserAttendance::class,
+        ],
+        UserLevelledUp::class => [
+            SendLevelUpNotification::class,
+        ],
+        AchievementAwarded::class => [
+            SendAchievementNotification::class,
+        ],
+        UserEnrolledInChallenge::class => [
+            SendNewChallengeNotification::class,
+        ],
+        UserCompletedChallenge::class => [
+            SendChallengeCompletionNotification::class,
         ],
     ];
 

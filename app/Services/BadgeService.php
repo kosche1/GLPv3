@@ -4,11 +4,28 @@ namespace App\Services;
 
 use App\Models\Badge;
 use App\Models\User;
-
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Log;
 
 class BadgeService
 {
+    /**
+     * The notification service instance.
+     *
+     * @var NotificationService
+     */
+    private NotificationService $notificationService;
+
+    /**
+     * Create a new badge service instance.
+     *
+     * @param NotificationService $notificationService
+     */
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
      * Check and award level-based badges to a user
      *
@@ -67,6 +84,13 @@ class BadgeService
                 ]);
 
                 $awardedBadges[] = $badge->id;
+
+                // Create a notification for the badge
+                $this->notificationService->badgeNotification(
+                    $user,
+                    $badge->name,
+                    route('profile') // Link to profile page where badges are displayed
+                );
 
                 Log::info("Awarded level badge '{$badge->name}' to user {$user->name} (ID: {$user->id})");
             }
