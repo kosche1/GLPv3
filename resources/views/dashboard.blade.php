@@ -91,28 +91,28 @@
                     </button>
 
                     <!-- Notification Panel -->
-                    <div x-show="showNotifications" @click.away="showNotifications = false" class="absolute right-0 mt-2 w-[40rem] max-w-[90vw] bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl z-50 overflow-hidden" style="transform: translateX(0);">
-                        <div class="p-4 border-b border-neutral-700 flex justify-between items-center">
-                            <h3 class="text-white font-medium text-lg">Notifications</h3>
+                    <div x-show="showNotifications" @click.away="showNotifications = false" class="absolute right-0 mt-2 w-[25rem] bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl z-50 overflow-hidden" style="transform: translateX(0);">
+                        <div class="p-3 border-b border-neutral-700 flex justify-between items-center">
+                            <h3 class="text-white font-medium">Notifications</h3>
                             <button @click="markAllAsRead()" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">Mark all as read</button>
                         </div>
-                        <div class="max-h-96 overflow-y-auto">
+                        <div class="max-h-[16rem] overflow-y-auto">
                             <template x-if="loading">
-                                <div class="p-4 space-y-4">
-                                    <div class="flex items-start gap-4 animate-pulse">
-                                        <div class="h-10 w-10 rounded-full bg-neutral-700/50"></div>
+                                <div class="p-3 space-y-3">
+                                    <div class="flex items-start gap-3 animate-pulse">
+                                        <div class="h-8 w-8 rounded-full bg-neutral-700/50"></div>
                                         <div class="flex-1 space-y-2">
-                                            <div class="h-5 bg-neutral-700/50 rounded w-3/4"></div>
+                                            <div class="h-4 bg-neutral-700/50 rounded w-3/4"></div>
                                             <div class="flex justify-between">
                                                 <div class="h-3 bg-neutral-700/50 rounded w-1/4"></div>
                                                 <div class="h-3 bg-emerald-700/50 rounded w-1/6"></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="flex items-start gap-4 animate-pulse">
-                                        <div class="h-10 w-10 rounded-full bg-neutral-700/50"></div>
+                                    <div class="flex items-start gap-3 animate-pulse">
+                                        <div class="h-8 w-8 rounded-full bg-neutral-700/50"></div>
                                         <div class="flex-1 space-y-2">
-                                            <div class="h-5 bg-neutral-700/50 rounded w-2/3"></div>
+                                            <div class="h-4 bg-neutral-700/50 rounded w-2/3"></div>
                                             <div class="flex justify-between">
                                                 <div class="h-3 bg-neutral-700/50 rounded w-1/4"></div>
                                                 <div class="h-3 bg-emerald-700/50 rounded w-1/6"></div>
@@ -122,8 +122,8 @@
                                 </div>
                             </template>
                             <template x-if="!loading && notifications.length === 0">
-                                <div class="p-6 text-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-neutral-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div class="p-4 text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-neutral-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                     </svg>
                                     <p class="text-gray-400 text-sm font-medium">No notifications yet</p>
@@ -131,25 +131,25 @@
                                 </div>
                             </template>
                             <template x-for="notification in notifications" :key="notification.id">
-                                <div @click="markAsRead(notification.id)" :class="{'bg-emerald-900/30': !notification.read}" class="p-4 border-b border-neutral-700 hover:bg-neutral-700 cursor-pointer transition-colors duration-200">
-                                    <div class="flex items-start gap-4">
+                                <div @click="markAsRead(notification.id)" :class="{'bg-emerald-900/30': !notification.read}" class="p-3 border-b border-neutral-700 hover:bg-neutral-700 cursor-pointer transition-colors duration-200">
+                                    <div class="flex items-start gap-3">
                                         <div>
                                             <template x-if="notification.type === 'achievement'">
-                                                <div class="h-8 w-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                                                <div class="h-7 w-7 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                                     </svg>
                                                 </div>
                                             </template>
                                             <template x-if="notification.type === 'challenge'">
-                                                <div class="h-8 w-8 rounded-full bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400">
+                                                <div class="h-7 w-7 rounded-full bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
                                                     </svg>
                                                 </div>
                                             </template>
                                             <template x-if="notification.type === 'grade'">
-                                                <div class="h-8 w-8 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
+                                                <div class="h-7 w-7 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
                                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -157,7 +157,7 @@
                                                 </div>
                                             </template>
                                             <template x-if="notification.type === 'system'">
-                                                <div class="h-8 w-8 rounded-full bg-gray-500/20 border border-gray-500/30 flex items-center justify-center text-gray-400">
+                                                <div class="h-7 w-7 rounded-full bg-gray-500/20 border border-gray-500/30 flex items-center justify-center text-gray-400">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
                                                     </svg>
@@ -165,8 +165,8 @@
                                             </template>
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-medium text-white truncate max-w-full" x-text="notification.message"></p>
-                                            <div class="flex justify-between mt-2">
+                                            <p class="text-xs font-medium text-white truncate max-w-full" x-text="notification.message"></p>
+                                            <div class="flex justify-between mt-1">
                                                 <p class="text-xs text-gray-400" x-text="notification.time"></p>
                                                 <span x-show="notification.link" class="text-xs text-emerald-400 ml-2">View details</span>
                                             </div>
@@ -176,8 +176,8 @@
                                 </div>
                             </template>
                         </div>
-                        <div class="p-4 border-t border-neutral-700 text-center">
-                            <a href="{{ route('notifications') }}" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">View all notifications</a>
+                        <div class="p-2 border-t border-neutral-700 text-center">
+                            <a href="{{ route('notifications') }}" class="text-xs text-emerald-400 hover:text-emerald-300 transition-colors">View all notifications</a>
                         </div>
                     </div>
                 </div>
@@ -348,20 +348,8 @@
                     </div>
                 </div>
 
-                <!-- Activity Graph with Skeleton Loading -->
-                <div x-data="{ loading: true }" x-init="setTimeout(() => loading = false, 800)" class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300" style="min-height: 350px; height: 400px;">
-                    <!-- Skeleton Loading State -->
-                    <div x-show="loading" class="absolute inset-0 z-20 flex flex-col p-6 space-y-4">
-                        <div class="flex items-center gap-2">
-                            <div class="h-5 w-5 rounded-full bg-neutral-700/70 animate-pulse"></div>
-                            <div class="h-6 w-40 rounded-md bg-neutral-700/70 animate-pulse"></div>
-                        </div>
-                        <div class="flex-1 grid grid-cols-7 gap-2">
-                            <template x-for="i in 35">
-                                <div class="h-full w-full rounded-md bg-neutral-700/50 animate-pulse"></div>
-                            </template>
-                        </div>
-                    </div>
+                <!-- Activity Graph (Server-Side Rendered) -->
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300" style="min-height: 550px; height: auto;">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
                     <div class="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(16,185,129,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(16,185,129,0.01)_1px,transparent_1px)] bg-[size:20px_20px] opacity-10"></div>
@@ -376,6 +364,48 @@
                                 </div>
                                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Your Activity</span>
                             </h3>
+                            <div class="flex items-center gap-2">
+                                <!-- Current Streak Display -->
+                                <div class="flex items-center gap-2 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner mr-2">
+                                    <div class="text-xs text-emerald-400">Current Streak:</div>
+                                    <div class="text-sm font-bold text-white">{{ $currentLoginStreak }} days</div>
+                                </div>
+
+                                <!-- Activity Trend Indicator -->
+                                {!! $trendIndicatorHtml !!}
+                            </div>
+                        </div>
+
+                        <!-- Activity Filters and Time Range -->
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                            <!-- Activity Type Filter -->
+                            <form action="{{ route('dashboard') }}" method="GET" class="flex items-center gap-2">
+                                <input type="hidden" name="time_range" value="{{ $selectedTimeRange }}">
+                                <div class="flex items-center gap-2 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner">
+                                    <div class="text-xs text-gray-400">Filter:</div>
+                                    <select name="activity_type" onchange="this.form.submit()" class="bg-transparent text-xs text-white border-0 focus:ring-0 cursor-pointer">
+                                        <option value="all" {{ $selectedActivityType == 'all' ? 'selected' : '' }}>All Activity</option>
+                                        <option value="logins" {{ $selectedActivityType == 'logins' ? 'selected' : '' }}>Logins</option>
+                                        <option value="submissions" {{ $selectedActivityType == 'submissions' ? 'selected' : '' }}>Submissions</option>
+                                        <option value="tasks" {{ $selectedActivityType == 'tasks' ? 'selected' : '' }}>Tasks</option>
+                                    </select>
+                                </div>
+                            </form>
+
+                            <!-- Time Range Selector -->
+                            <form action="{{ route('dashboard') }}" method="GET" class="flex items-center gap-2">
+                                <input type="hidden" name="activity_type" value="{{ $selectedActivityType }}">
+                                <div class="flex items-center gap-2 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner">
+                                    <div class="text-xs text-gray-400">Time Range:</div>
+                                    <select name="time_range" onchange="this.form.submit()" class="bg-transparent text-xs text-white border-0 focus:ring-0 cursor-pointer">
+                                        @foreach($timeRanges as $value => $label)
+                                            <option value="{{ $value }}" {{ $selectedTimeRange == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </form>
+
+                            <!-- Activity Level Legend -->
                             <div class="flex items-center gap-2 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner">
                                 <div class="text-xs text-gray-400">Less</div>
                                 <div class="flex items-center gap-1">
@@ -388,83 +418,22 @@
                                 <div class="text-xs text-gray-400">More</div>
                             </div>
                         </div>
-                        <div class="overflow-x-auto h-[calc(100%-3rem)] bg-neutral-800/30 rounded-xl border border-neutral-700/30 p-3">
+
+                        <div class="overflow-x-auto h-[300px] bg-neutral-800/30 rounded-xl border border-neutral-700/30 p-3">
                             <div class="contribution-calendar min-w-[700px] h-full">
-                                <div id="contributionGraph" class="mt-2 w-full h-[calc(100%-0.5rem)]"></div>
+                                <!-- Server-side rendered activity graph -->
+                                {!! $activityGraphHtml !!}
                             </div>
+                        </div>
+
+                        <!-- Weekly Activity Summary with integrated Activity Goals -->
+                        <div class="mt-6">
+                            {!! $weeklySummaryHtml !!}
                         </div>
                     </div>
                 </div>
 
-                <!-- Achievements -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
-                    <div class="p-6 relative z-10">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <div class="relative">
-                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-70"></div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                                    </svg>
-                                </div>
-                                <span class="text-white bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Achievements</span>
-                            </h3>
-                            <a href="#" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 hover:bg-neutral-800 hover:border-purple-500/30 transition-all duration-300">
-                                View All
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        </div>
-                        @if(isset($userAchievements) && $userAchievements->isNotEmpty())
-                            <div class="grid grid-cols-3 gap-3">
-                                @foreach($userAchievements as $achievement)
-                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-2 flex flex-col items-center justify-between hover:bg-neutral-700/30 hover:border-purple-500/30 transition-all transform hover:scale-105 group relative overflow-hidden w-20 h-28 mx-auto" title="{{ $achievement->description }}">
-                                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                        <div class="absolute -inset-1 bg-purple-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                        <div class="relative z-10">
-                                            @if($achievement->image)
-                                                <div class="relative mb-0.5 mx-auto">
-                                                    <div class="absolute -inset-1 bg-purple-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                    <img src="{{ asset($achievement->image) }}" alt="{{ $achievement->name }}" class="h-7 w-7 object-contain relative mx-auto">
-                                                </div>
-                                            @else
-                                                <div class="relative mb-0.5 mx-auto">
-                                                    <div class="absolute -inset-1 bg-purple-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                    <div class="h-7 w-7 rounded-full bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30 flex items-center justify-center relative overflow-hidden group-hover:border-purple-500/50 transition-colors duration-300">
-                                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.2),transparent_50%)] opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative z-10" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                            <div class="mt-2 w-full pb-1">
-                                                <p class="text-[10px] text-gray-200 font-medium text-center leading-tight group-hover:text-purple-300 transition-colors duration-300 mx-auto px-1">{{ $achievement->name }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
 
-                            <!-- <div class="mt-3 text-right">
-                                <span class="text-xs text-gray-400">{{ $userAchievements->count() }} achievements earned</span>
-                            </div> -->
-                        @else
-                            <div class="flex flex-col items-center justify-center p-6 bg-neutral-800/30 rounded-xl border border-neutral-700/50">
-                                <div class="h-16 w-16 rounded-full bg-purple-500/10 flex items-center justify-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                                    </svg>
-                                </div>
-                                <p class="text-gray-300 text-center mb-1">No achievements earned yet</p>
-                                <p class="text-sm text-gray-500 text-center">Keep learning to earn achievements!</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
 
                 <!-- Active Challenges with Skeleton Loading -->
                 <div x-data="{ loading: true }" x-init="setTimeout(() => loading = false, 1000)" class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
@@ -754,6 +723,76 @@
                     </div>
                 </div>
 
+                <!-- Achievements -->
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300 mt-6">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-70"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                    </svg>
+                                </div>
+                                <span class="text-white bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Achievements</span>
+                            </h3>
+                            <a href="#" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 hover:bg-neutral-800 hover:border-purple-500/30 transition-all duration-300">
+                                View All
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                        @if(isset($userAchievements) && $userAchievements->isNotEmpty())
+                            <div class="grid grid-cols-3 gap-3">
+                                @foreach($userAchievements as $achievement)
+                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-2 flex flex-col items-center justify-between hover:bg-neutral-700/30 hover:border-purple-500/30 transition-all transform hover:scale-105 group relative overflow-hidden w-20 h-28 mx-auto" title="{{ $achievement->description }}">
+                                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        <div class="absolute -inset-1 bg-purple-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
+                                        <div class="relative z-10">
+                                            @if($achievement->image)
+                                                <div class="relative mb-0.5 mx-auto">
+                                                    <div class="absolute -inset-1 bg-purple-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                    <img src="{{ asset($achievement->image) }}" alt="{{ $achievement->name }}" class="h-7 w-7 object-contain relative mx-auto">
+                                                </div>
+                                            @else
+                                                <div class="relative mb-0.5 mx-auto">
+                                                    <div class="absolute -inset-1 bg-purple-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                    <div class="h-7 w-7 rounded-full bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30 flex items-center justify-center relative overflow-hidden group-hover:border-purple-500/50 transition-colors duration-300">
+                                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.2),transparent_50%)] opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative z-10" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            <div class="mt-2 w-full pb-1">
+                                                <p class="text-[10px] text-gray-200 font-medium text-center leading-tight group-hover:text-purple-300 transition-colors duration-300 mx-auto px-1">{{ $achievement->name }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <!-- <div class="mt-3 text-right">
+                                <span class="text-xs text-gray-400">{{ $userAchievements->count() }} achievements earned</span>
+                            </div> -->
+                        @else
+                            <div class="flex flex-col items-center justify-center p-6 bg-neutral-800/30 rounded-xl border border-neutral-700/50">
+                                <div class="h-16 w-16 rounded-full bg-purple-500/10 flex items-center justify-center mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                    </svg>
+                                </div>
+                                <p class="text-gray-300 text-center mb-1">No achievements earned yet</p>
+                                <p class="text-sm text-gray-500 text-center">Keep learning to earn achievements!</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
                 <!-- Leaderboard -->
                 <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(234,179,8,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -830,131 +869,7 @@
         </div>
     </div>
 
-    <script>
-        // Dynamic contribution graph with real activity data
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configuration
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const days = ['Mon', 'Wed', 'Fri']; // Only showing weekdays
-
-            // Fetch real activity data from the API
-            async function fetchActivityData() {
-                try {
-                    const response = await fetch('/api/user-activity');
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch activity data');
-                    }
-                    return await response.json();
-                } catch (error) {
-                    console.error('Error fetching activity data:', error);
-                    return { activity_data: {} };
-                }
-            }
-
-            // Create the contribution graph with real data
-            async function createContributionGraph() {
-                const graphContainer = document.getElementById('contributionGraph');
-                if (!graphContainer) return;
-
-                // Show loading state
-                graphContainer.innerHTML = '<div class="flex items-center justify-center h-full"><div class="animate-pulse text-gray-400">Loading activity data...</div></div>';
-
-                // Fetch real activity data
-                const activityResponse = await fetchActivityData();
-                const activityData = activityResponse.activity_data || {};
-
-                if (Object.keys(activityData).length === 0) {
-                    graphContainer.innerHTML = '<p class="text-gray-400 text-sm">No activity data to display.</p>';
-                    return;
-                }
-
-                // Clear existing content
-                graphContainer.innerHTML = '';
-
-                // Parse dates from the response
-                const startDateStr = activityResponse.start_date;
-                const endDateStr = activityResponse.end_date;
-                const startDate = new Date(startDateStr + 'T00:00:00Z');
-                const endDate = new Date(endDateStr + 'T00:00:00Z');
-
-                // Create month labels
-                let monthsHTML = '<div class="flex text-xs text-gray-500 mb-1 pl-8">';
-
-                // Calculate how many months to display
-                const monthDiff = (endDate.getFullYear() - startDate.getFullYear()) * 12 +
-                                 (endDate.getMonth() - startDate.getMonth());
-                const monthsToShow = Math.min(6, monthDiff + 1);
-
-                for (let i = 0; i < monthsToShow; i++) {
-                    const monthDate = new Date(startDate);
-                    monthDate.setMonth(startDate.getMonth() + i);
-                    const monthIndex = monthDate.getMonth();
-                    monthsHTML += `<div class="flex-1 text-left">${months[monthIndex]}</div>`;
-                }
-                monthsHTML += '</div>';
-
-                // Create grid structure
-                let gridHTML = `
-                <div class="flex h-[calc(100%-1rem)]">
-                    <div class="flex flex-col w-8 text-xs text-gray-500 justify-between py-0.5 pr-2">
-                        <div class="h-4"></div>
-                        <div class="h-4">${days[0]}</div>
-                        <div class="h-4"></div>
-                        <div class="h-4">${days[1]}</div>
-                        <div class="h-4"></div>
-                        <div class="h-4">${days[2]}</div>
-                        <div class="h-4"></div>
-                    </div>
-                    <div class="flex flex-1 gap-1 overflow-hidden">
-                `;
-
-                // Calculate number of weeks to display
-                const dayDiff = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
-                const weeksToShow = Math.ceil(dayDiff / 7);
-
-                // Generate weeks
-                const currentDate = new Date(startDate);
-                for (let week = 0; week < weeksToShow; week++) {
-                    gridHTML += '<div class="flex flex-col gap-1 w-4">';
-
-                    // Generate 5 days per week (Mon-Fri)
-                    for (let day = 0; day < 5; day++) {
-                        const dateStr = currentDate.toISOString().split('T')[0];
-                        const activityLevel = activityData[dateStr] || 0;
-
-                        // Set color based on activity level
-                        let bgColor = 'bg-neutral-700'; // Default: No activity
-                        if (activityLevel === 1) bgColor = 'bg-emerald-900';
-                        if (activityLevel === 2) bgColor = 'bg-emerald-700';
-                        if (activityLevel === 3) bgColor = 'bg-emerald-500';
-                        if (activityLevel >= 4) bgColor = 'bg-emerald-300';
-
-                        // Add tooltip with date and activity count
-                        const dateDisplay = new Date(dateStr).toLocaleDateString();
-                        const activityTitle = activityLevel === 0 ? 'No activity' :
-                                            activityLevel === 1 ? 'Low activity' :
-                                            activityLevel === 2 ? 'Medium activity' :
-                                            activityLevel === 3 ? 'High activity' : 'Very high activity';
-
-                        gridHTML += `<div class="h-4 w-4 rounded-sm ${bgColor}" title="${dateDisplay}: ${activityTitle}"></div>`;
-
-                        // Move to next day
-                        currentDate.setDate(currentDate.getDate() + 1);
-                    }
-
-                    gridHTML += '</div>';
-                }
-
-                gridHTML += '</div></div>';
-
-                // Set the HTML all at once to minimize DOM operations
-                graphContainer.innerHTML = monthsHTML + gridHTML;
-            }
-
-            // Use requestAnimationFrame to ensure the graph renders after the page layout is complete
-            requestAnimationFrame(createContributionGraph);
-        });
-    </script>
+    <!-- Activity graph is now server-side rendered -->
 
     <!-- Keyboard Shortcuts -->
     <script>

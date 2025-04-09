@@ -8,6 +8,7 @@ use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\ActivityGoalController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,11 @@ Route::middleware(
     Route::get('attendance/students/{id}', [\App\Http\Controllers\AttendanceController::class, 'studentDetail'])
         ->name('attendance.student-detail')
         ->middleware('can:view-student-attendance');
+
+    // Activity Goals Routes
+    Route::resource('goals', ActivityGoalController::class);
+    Route::post('/goals/{goal}/complete', [ActivityGoalController::class, 'complete'])->name('goals.complete');
+    Route::get('/api/active-goals', [ActivityGoalController::class, 'getActiveGoals'])->name('api.active-goals');
 
     // Test routes for attendance
     Route::get('test-attendance', [\App\Http\Controllers\TestAttendanceController::class, 'index'])->name('test.attendance.index');
