@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use LevelUp\Experience\Models\Achievement;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use App\Services\NotificationService;
 
 class AchievementService
 {
@@ -18,6 +19,23 @@ class AchievementService
      * @var bool
      */
     private bool $trackInSession = true;
+
+    /**
+     * The notification service instance.
+     *
+     * @var NotificationService
+     */
+    private NotificationService $notificationService;
+
+    /**
+     * Create a new achievement service instance.
+     *
+     * @param NotificationService $notificationService
+     */
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
 
     /**
      * Disable tracking achievements in session (for bulk operations)
@@ -269,6 +287,13 @@ class AchievementService
                 $recentAchievements[] = $achievement->name;
                 Session::put('recent_achievements', $recentAchievements);
             }
+
+            // Create a notification for the achievement
+            $this->notificationService->achievementNotification(
+                $user,
+                $achievement->name,
+                route('profile') // Link to profile page where achievements are displayed
+            );
 
             Log::info("Achievement '{$achievementName}' awarded to user {$user->name}");
         } catch (\Exception $e) {

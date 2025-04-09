@@ -43,7 +43,11 @@ Route::middleware(
     Route::get('/challenges/{challenge}/tasks/{task}', [ChallengeController::class, 'showTask'])
         ->name('challenge.task')
         ->middleware(['auth', \App\Http\Middleware\CheckTaskCompletion::class]);
-    Route::view('notifications', 'notifications')->name('notifications');
+    // Notification routes
+    Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');
+    Route::get('api/notifications', [\App\Http\Controllers\NotificationController::class, 'getNotifications'])->name('notifications.get');
+    Route::post('api/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('api/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::get('courses', [CourseController::class, 'index'])->name('courses');
     Route::get('learning-materials', [\App\Http\Controllers\LearningMaterialController::class, 'index'])->name('learning-materials');
     Route::get('assignments', [\App\Http\Controllers\AssignmentController::class, 'index'])->name('assignments');
@@ -52,32 +56,29 @@ Route::middleware(
     Route::get('schedule', [ScheduleController::class, 'index'])->name('schedule');
     Route::view('grades','grades')->name('grades');
     Route::view('messages','messages')->name('messages');
-// <<<<<<< v3
+    // Attendance routes
+    Route::get('attendance', [\App\Http\Controllers\AttendanceController::class, 'myAttendance'])->name('attendance.my-attendance');
+    Route::get('attendance/students', [\App\Http\Controllers\AttendanceController::class, 'allStudents'])
+        ->name('attendance.all-students')
+        ->middleware('can:view-student-attendance');
+    Route::get('attendance/students/{id}', [\App\Http\Controllers\AttendanceController::class, 'studentDetail'])
+        ->name('attendance.student-detail')
+        ->middleware('can:view-student-attendance');
 
-//     // Attendance routes
-//     Route::get('attendance', [\App\Http\Controllers\AttendanceController::class, 'myAttendance'])->name('attendance.my-attendance');
-//     Route::get('attendance/students', [\App\Http\Controllers\AttendanceController::class, 'allStudents'])
-//         ->name('attendance.all-students')
-//         ->middleware('can:view-student-attendance');
-//     Route::get('attendance/students/{id}', [\App\Http\Controllers\AttendanceController::class, 'studentDetail'])
-//         ->name('attendance.student-detail')
-//         ->middleware('can:view-student-attendance');
+    // Test routes for attendance
+    Route::get('test-attendance', [\App\Http\Controllers\TestAttendanceController::class, 'index'])->name('test.attendance.index');
+    Route::get('test-attendance/run', [\App\Http\Controllers\TestAttendanceController::class, 'testAttendance'])->name('test.attendance');
 
-//     // Test routes for attendance
-//     Route::get('test-attendance', [\App\Http\Controllers\TestAttendanceController::class, 'index'])->name('test.attendance.index');
-//     Route::get('test-attendance/run', [\App\Http\Controllers\TestAttendanceController::class, 'testAttendance'])->name('test.attendance');
+    // Debug route for attendance middleware
+    Route::get('debug-attendance', function() {
+        return response()->json([
+            'message' => 'Attendance middleware test',
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'authenticated' => \Illuminate\Support\Facades\Auth::check(),
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+    })->name('debug.attendance');
 
-//     // Debug route for attendance middleware
-//     Route::get('debug-attendance', function() {
-//         return response()->json([
-//             'message' => 'Attendance middleware test',
-//             'user_id' => \Illuminate\Support\Facades\Auth::id(),
-//             'authenticated' => \Illuminate\Support\Facades\Auth::check(),
-//             'timestamp' => now()->toDateTimeString(),
-//         ]);
-//     })->name('debug.attendance');
-// =======
-// >>>>>>> main
     // Forum routes
     Route::get('forums', [ForumController::class, 'index'])->name('forums');
     Route::get('forums/create', [ForumController::class, 'createTopic'])->name('forum.create-topic');

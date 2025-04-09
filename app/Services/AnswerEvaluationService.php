@@ -4,10 +4,28 @@ namespace App\Services;
 
 use App\Models\StudentAnswer;
 use App\Models\Task;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Log;
 
 class AnswerEvaluationService
 {
+    /**
+     * The notification service instance.
+     *
+     * @var NotificationService
+     */
+    private NotificationService $notificationService;
+
+    /**
+     * Create a new answer evaluation service instance.
+     *
+     * @param NotificationService $notificationService
+     */
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
      * Evaluate a student's answer based on the associated task's evaluation criteria.
      *
@@ -80,7 +98,7 @@ class AnswerEvaluationService
                         } else {
                             $isCorrect = strcasecmp($submittedText, $expectedAnswer) === 0;
                         }
-                        
+
                         if ($isCorrect) {
                             $score = $task->points_reward;
                             $feedback = 'Correct answer.';
@@ -181,5 +199,30 @@ class AnswerEvaluationService
             'evaluated_at' => now(),
             // 'evaluated_by' => null, // Or set to a system user ID for automated evaluations
         ]);
+
+        // Create a notification for the user about their graded submission
+        $task = $studentAnswer->task;
+        $user = $studentAnswer->user;
+
+        if ($task && $user) {
+            $grade = $isCorrect ? 'Correct' : 'Incorrect';
+
+            // Create a grade notification
+            $this->notificationService->gradeNotification(
+                $user,
+                $task->name,
+                $grade,
+                route('challenge.task', ['challenge' => $task->challenge_id, 'task' => $task->id])
+            );
+
+            // If there's feedback, create a feedback notification
+            if ($feedback && $feedback !== 'Correct answer.' && $feedback !== 'Answer format is correct.') {
+                $this->notificationService->feedbackNotification(
+                    $user,
+                    $task->name,
+                    route('challenge.task', ['challenge' => $task->challenge_id, 'task' => $task->id])
+                );
+            }
+        }
     }
-} 
+}
