@@ -45,6 +45,9 @@ class DatabaseSeeder extends Seeder
             // Forum categories
             ForumCategorySeeder::class,
 
+            // Help center content
+            HelpCenterSeeder::class,
+
             // Streak activities
             StreakActivitySeeder::class,
 

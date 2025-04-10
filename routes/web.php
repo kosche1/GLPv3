@@ -94,7 +94,13 @@ Route::middleware(
     Route::get('forums/{category}/{topic}', [ForumController::class, 'topic'])->name('forum.topic');
     Route::post('forums/comment/{topic}', [ForumController::class, 'storeComment'])->name('forum.store-comment')->where('topic', '[0-9]+');
     Route::post('forums/like', [ForumController::class, 'like'])->name('forum.like');
-    Route::view('help-center', 'help-center')->name('help-center');
+
+    // Help Center routes
+    Route::get('help-center', [\App\Http\Controllers\HelpCenterController::class, 'index'])->name('help-center');
+    Route::get('help-center/search', [\App\Http\Controllers\HelpCenterController::class, 'search'])->name('help-center.search');
+    Route::get('help-center/faqs', [\App\Http\Controllers\HelpCenterController::class, 'faqs'])->name('help-center.faqs');
+    Route::get('help-center/{category}', [\App\Http\Controllers\HelpCenterController::class, 'category'])->name('help-center.category');
+    Route::get('help-center/{category}/{article}', [\App\Http\Controllers\HelpCenterController::class, 'article'])->name('help-center.article');
     Route::view('technical-support', 'technical-support')->name('technical-support');
 
     Route::redirect('settings', 'settings/profile');
