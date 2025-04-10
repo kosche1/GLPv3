@@ -16,31 +16,31 @@ class PermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create permissions for users
-        Permission::create(['name' => 'view users']);
-        Permission::create(['name' => 'create users']);
-        Permission::create(['name' => 'edit users']);
-        Permission::create(['name' => 'delete users']);
+        Permission::firstOrCreate(['name' => 'view users']);
+        Permission::firstOrCreate(['name' => 'create users']);
+        Permission::firstOrCreate(['name' => 'edit users']);
+        Permission::firstOrCreate(['name' => 'delete users']);
 
         // Create permissions for badges
-        Permission::create(['name' => 'view badges']);
-        Permission::create(['name' => 'create badges']);
-        Permission::create(['name' => 'edit badges']);
-        Permission::create(['name' => 'delete badges']);
+        Permission::firstOrCreate(['name' => 'view badges']);
+        Permission::firstOrCreate(['name' => 'create badges']);
+        Permission::firstOrCreate(['name' => 'edit badges']);
+        Permission::firstOrCreate(['name' => 'delete badges']);
 
         // Create permissions for tasks
-        Permission::create(['name' => 'view tasks']);
-        Permission::create(['name' => 'create tasks']);
-        Permission::create(['name' => 'edit tasks']);
-        Permission::create(['name' => 'delete tasks']);
+        Permission::firstOrCreate(['name' => 'view tasks']);
+        Permission::firstOrCreate(['name' => 'create tasks']);
+        Permission::firstOrCreate(['name' => 'edit tasks']);
+        Permission::firstOrCreate(['name' => 'delete tasks']);
 
         // Create permissions for rewards
-        Permission::create(['name' => 'view rewards']);
-        Permission::create(['name' => 'create rewards']);
-        Permission::create(['name' => 'edit rewards']);
-        Permission::create(['name' => 'delete rewards']);
+        Permission::firstOrCreate(['name' => 'view rewards']);
+        Permission::firstOrCreate(['name' => 'create rewards']);
+        Permission::firstOrCreate(['name' => 'edit rewards']);
+        Permission::firstOrCreate(['name' => 'delete rewards']);
 
         // Create permissions for leaderboards
-        Permission::create(['name' => 'view leaderboards']);
-        Permission::create(['name' => 'manage leaderboards']);
+        Permission::firstOrCreate(['name' => 'view leaderboards']);
+        Permission::firstOrCreate(['name' => 'manage leaderboards']);
     }
 }

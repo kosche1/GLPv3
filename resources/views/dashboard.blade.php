@@ -274,50 +274,73 @@
 
                             <!-- Stats Cards - Horizontal Layout -->
                             <div class="flex flex-row flex-wrap md:flex-nowrap gap-3 md:gap-4 md:ml-auto w-full md:w-auto mt-4 md:mt-0 justify-center md:justify-end">
-                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex items-center gap-3 relative group hover:border-yellow-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden w-32">
+                                <!-- Score Card -->
+                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col relative group hover:border-yellow-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden w-[90px] flex-shrink-0">
                                     <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                     <div class="absolute -inset-1 bg-yellow-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                    <div class="text-yellow-400 relative z-10">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex flex-col">
+
+                                    <!-- Header with icon -->
+                                    <div class="flex items-center justify-between mb-1">
                                         <span class="text-xs text-gray-400 relative z-10">Score</span>
-                                        <span class="text-white font-bold relative z-10 text-lg">{{ $score }}</span>
-                                        <span class="text-xs {{ $scoreChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10">
+                                        <div class="text-yellow-400 relative z-10 flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- Value -->
+                                    <div class="text-center">
+                                        <span class="text-white font-bold relative z-10 text-xl block">{{ $score }}</span>
+                                        <span class="text-xs {{ $scoreChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10 block">
                                             {{ $scoreChange >= 0 ? '+' : '' }}{{ number_format($scoreChange, 2) }}
                                         </span>
                                     </div>
                                 </div>
-                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex items-center gap-3 relative group hover:border-blue-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden w-32">
+
+                                <!-- Attendance Card -->
+                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col relative group hover:border-blue-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden w-[90px] flex-shrink-0">
                                     <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                     <div class="absolute -inset-1 bg-blue-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                    <div class="text-blue-400 relative z-10">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex flex-col">
+
+                                    <!-- Header with icon -->
+                                    <div class="flex items-center justify-between mb-1">
                                         <span class="text-xs text-gray-400 relative z-10">Attendance</span>
-                                        <span class="text-white font-bold relative z-10 text-lg">{{ $attendancePercentage }}%</span>
-                                        <span class="text-xs {{ $attendanceChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10">
+                                        <div class="text-blue-400 relative z-10 flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- Value -->
+                                    <div class="text-center">
+                                        <span class="text-white font-bold relative z-10 text-xl block">{{ $attendancePercentage }}%</span>
+                                        <span class="text-xs {{ $attendanceChange >= 0 ? 'text-green-400' : 'text-red-400' }} relative z-10 block">
                                             {{ $attendanceChange >= 0 ? '+' : '' }}{{ $attendanceChange }}%
                                         </span>
                                     </div>
                                 </div>
-                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex items-center gap-3 relative group hover:border-purple-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden w-32">
+
+                                <!-- Credits Card -->
+                                <div class="rounded-xl bg-neutral-800/80 border border-neutral-700 p-3 flex flex-col relative group hover:border-purple-500/30 hover:bg-neutral-800/90 transition-all duration-300 overflow-hidden w-[90px] flex-shrink-0">
                                     <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                                     <div class="absolute -inset-1 bg-purple-400/10 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                    <div class="text-purple-400 relative z-10">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804v-10A7.968 7.968 0 0014.5 4z" />
-                                        </svg>
-                                    </div>
-                                    <div class="flex flex-col">
+
+                                    <!-- Header with icon -->
+                                    <div class="flex items-center justify-between mb-1">
                                         <span class="text-xs text-gray-400 relative z-10">Credits</span>
-                                        <span class="text-white font-bold relative z-10 text-lg">{{ $completionPercentage }}%</span>
-                                        <span class="text-xs text-gray-400 relative z-10">{{ $creditsCompleted }}/{{ $creditsRequired }}</span>
+                                        <div class="text-purple-400 relative z-10 flex-shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804v-10A7.968 7.968 0 0014.5 4z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- Value -->
+                                    <div class="text-center">
+                                        <span class="text-white font-bold relative z-10 text-xl block">{{ $completionPercentage }}%</span>
+                                        <span class="text-xs text-gray-400 relative z-10 block">{{ $creditsCompleted }}/{{ $creditsRequired }}</span>
                                     </div>
                                 </div>
                             </div>
