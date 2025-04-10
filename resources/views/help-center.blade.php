@@ -13,62 +13,67 @@
             <!-- Enhanced Search Section with Suggested Searches -->
             <div class="mb-12">
                 <div class="max-w-2xl mx-auto">
-                    <form action="{{ route('help-center.search') }}" method="GET" class="relative">
-                        <input type="text" name="query" placeholder="Search for help..." class="w-full px-4 py-3 rounded-lg border border-neutral-700 bg-neutral-800/80 text-white placeholder-neutral-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 hover:border-neutral-600 transition-all duration-300 ease-in-out pl-12">
+                    <div class="relative">
+                        <input type="text" placeholder="Search for help..." class="w-full px-4 py-3 rounded-lg border border-neutral-700 bg-neutral-800/80 text-white placeholder-neutral-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 hover:border-neutral-600 transition-all duration-300 ease-in-out pl-12">
                         <div class="absolute left-3 top-3">
                             <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
-                        <button type="submit" class="absolute right-3 top-2 px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-md text-sm border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors">
+                        <button class="absolute right-3 top-2 px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-md text-sm border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors">
                             Search
                         </button>
-                    </form>
-
+                    </div>
+                    
                     <!-- Suggested Searches -->
                     <div class="mt-3 flex flex-wrap gap-2 justify-center">
                         <span class="text-xs text-neutral-400">Popular searches:</span>
-                        <a href="{{ route('help-center.search', ['query' => 'password reset']) }}" class="text-xs px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-colors">password reset</a>
-                        <a href="{{ route('help-center.search', ['query' => 'course access']) }}" class="text-xs px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-colors">course access</a>
-                        <a href="{{ route('help-center.search', ['query' => 'assignments']) }}" class="text-xs px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-colors">assignments</a>
-                        <a href="{{ route('help-center.search', ['query' => 'account']) }}" class="text-xs px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-colors">account</a>
+                        <a href="#" class="text-xs px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-colors">password reset</a>
+                        <a href="#" class="text-xs px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-colors">course access</a>
+                        <a href="#" class="text-xs px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-colors">payment issues</a>
+                        <a href="#" class="text-xs px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 hover:bg-neutral-700 transition-colors">mobile app</a>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Links with Improved Design -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                @foreach($categories->take(3) as $category)
                 <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                     <div class="flex items-center mb-4">
-                        <div class="p-3 rounded-lg bg-{{ $category->color ?? 'emerald' }}-500/10 border border-{{ $category->color ?? 'emerald' }}-500/20">
-                            <svg class="w-6 h-6 text-{{ $category->color ?? 'emerald' }}-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                @if($category->icon == 'book-open')
+                        <div class="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                                @elseif($category->icon == 'user-circle')
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                @elseif($category->icon == 'academic-cap')
-                                <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                                <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-                                @else
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                @endif
                             </svg>
                         </div>
-                        <h2 class="ml-3 text-xl font-semibold text-white">{{ $category->name }}</h2>
+                        <h2 class="ml-3 text-xl font-semibold text-white">Getting Started</h2>
                     </div>
-                    <p class="text-zinc-400 mb-4">{{ $category->description }}</p>
-                    <a href="{{ route('help-center.category', $category) }}" class="text-{{ $category->color ?? 'emerald' }}-400 hover:text-{{ $category->color ?? 'emerald' }}-300 transition-colors text-sm flex items-center">
-                        <span>View articles</span>
+                    <p class="text-zinc-400 mb-4">Learn the basics and get up to speed with our platform features</p>
+                    <a href="#" class="text-emerald-400 hover:text-emerald-300 transition-colors text-sm flex items-center">
+                        <span>View guides</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
                     </a>
                 </div>
-                @endforeach
 
-                @if($categories->count() < 3)
+                <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                    <div class="flex items-center mb-4">
+                        <div class="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="ml-3 text-xl font-semibold text-white">FAQs</h2>
+                    </div>
+                    <p class="text-zinc-400 mb-4">Find answers to commonly asked questions about our services</p>
+                    <a href="#" class="text-blue-400 hover:text-blue-300 transition-colors text-sm flex items-center">
+                        <span>Browse FAQs</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                </div>
+
                 <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                     <div class="flex items-center mb-4">
                         <div class="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
@@ -79,14 +84,13 @@
                         <h2 class="ml-3 text-xl font-semibold text-white">Technical Support</h2>
                     </div>
                     <p class="text-zinc-400 mb-4">Get technical assistance and troubleshooting help</p>
-                    <a href="{{ route('technical-support') }}" class="text-purple-400 hover:text-purple-300 transition-colors text-sm flex items-center">
+                    <a href="#" class="text-purple-400 hover:text-purple-300 transition-colors text-sm flex items-center">
                         <span>Get support</span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
                     </a>
                 </div>
-                @endif
             </div>
 
             <!-- Knowledge Base Section -->
@@ -97,43 +101,124 @@
                     </svg>
                     Knowledge Base
                 </h2>
-
+                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    @foreach($categories as $category)
                     <div class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300">
-                        <h3 class="text-lg font-semibold text-white mb-3">{{ $category->name }}</h3>
+                        <h3 class="text-lg font-semibold text-white mb-3">Getting Started</h3>
                         <ul class="space-y-2">
-                            @foreach($category->articles()->where('is_published', true)->orderBy('created_at', 'desc')->take(4)->get() as $article)
                             <li>
-                                <a href="{{ route('help-center.article', ['category' => $category, 'article' => $article]) }}" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                     </svg>
-                                    {{ $article->title }}
+                                    Platform overview
                                 </a>
                             </li>
-                            @endforeach
-
-                            @if($category->articles()->where('is_published', true)->count() == 0)
                             <li>
-                                <span class="text-zinc-500 flex items-center text-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                     </svg>
-                                    No articles available yet
-                                </span>
+                                    Creating your account
+                                </a>
                             </li>
-                            @endif
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Navigating the dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Setting up your profile
+                                </a>
+                            </li>
                         </ul>
-                        <a href="{{ route('help-center.category', $category) }}" class="mt-4 inline-block text-xs text-emerald-400 hover:text-emerald-300">View all articles →</a>
+                        <a href="#" class="mt-4 inline-block text-xs text-emerald-400 hover:text-emerald-300">View all articles →</a>
                     </div>
-                    @endforeach
-
-                    @if($categories->count() == 0)
-                    <div class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 col-span-3 text-center py-10">
-                        <p class="text-zinc-400">No knowledge base categories available yet. Check back soon!</p>
+                    
+                    <div class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300">
+                        <h3 class="text-lg font-semibold text-white mb-3">Account Management</h3>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    How to reset your password
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Updating your profile information
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Managing notification settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Two-factor authentication
+                                </a>
+                            </li>
+                        </ul>
+                        <a href="#" class="mt-4 inline-block text-xs text-emerald-400 hover:text-emerald-300">View all articles →</a>
                     </div>
-                    @endif
+                    
+                    <div class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300">
+                        <h3 class="text-lg font-semibold text-white mb-3">Course Access</h3>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Accessing course materials
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Submitting assignments
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Viewing grades and feedback
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-zinc-300 hover:text-emerald-400 transition-colors flex items-center text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Downloading course certificates
+                                </a>
+                            </li>
+                        </ul>
+                        <a href="#" class="mt-4 inline-block text-xs text-emerald-400 hover:text-emerald-300">View all articles →</a>
+                    </div>
                 </div>
             </div>
 
@@ -145,37 +230,67 @@
                     </svg>
                     Frequently Asked Questions
                 </h2>
-
+                
                 <div class="space-y-4">
-                    @forelse($faqs as $index => $faq)
-                    <!-- FAQ Item {{ $index + 1 }} -->
+                    <!-- FAQ Item 1 -->
                     <div class="border border-neutral-700 rounded-lg overflow-hidden">
-                        <button class="w-full flex justify-between items-center p-4 bg-neutral-800 hover:bg-neutral-700 transition-colors text-left" onclick="toggleFaq('faq{{ $index + 1 }}')">
-                            <span class="font-medium text-white">{{ $faq->question }}</span>
-                            <svg id="faq{{ $index + 1 }}-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button class="w-full flex justify-between items-center p-4 bg-neutral-800 hover:bg-neutral-700 transition-colors text-left" onclick="toggleFaq('faq1')">
+                            <span class="font-medium text-white">How do I reset my password?</span>
+                            <svg id="faq1-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
-                        <div id="faq{{ $index + 1 }}" class="hidden p-4 bg-neutral-800/50 border-t border-neutral-700">
+                        <div id="faq1" class="hidden p-4 bg-neutral-800/50 border-t border-neutral-700">
                             <p class="text-zinc-300 text-sm">
-                                {{ $faq->answer }}
+                                To reset your password, click on the "Forgot Password" link on the login page. Enter your email address, and we'll send you a password reset link. Follow the instructions in the email to create a new password.
                             </p>
                         </div>
                     </div>
-                    @empty
-                    <!-- No FAQs Available -->
-                    <div class="border border-neutral-700 rounded-lg overflow-hidden p-6 text-center">
-                        <p class="text-zinc-400">No FAQs available yet. Check back soon!</p>
+                    
+                    <!-- FAQ Item 2 -->
+                    <div class="border border-neutral-700 rounded-lg overflow-hidden">
+                        <button class="w-full flex justify-between items-center p-4 bg-neutral-800 hover:bg-neutral-700 transition-colors text-left" onclick="toggleFaq('faq2')">
+                            <span class="font-medium text-white">How do I access my course materials?</span>
+                            <svg id="faq2-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="faq2" class="hidden p-4 bg-neutral-800/50 border-t border-neutral-700">
+                            <p class="text-zinc-300 text-sm">
+                                After logging in, navigate to the "My Courses" section in your dashboard. Click on the course you want to access, and you'll be taken to the course homepage where you can find all materials, lectures, assignments, and resources for that course.
+                            </p>
+                        </div>
                     </div>
-                    @endforelse
-
-                    @if(count($faqs) > 0)
-                    <div class="text-center mt-6">
-                        <a href="{{ route('help-center.faqs') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors">
-                            View All FAQs
-                        </a>
+                    
+                    <!-- FAQ Item 3 -->
+                    <div class="border border-neutral-700 rounded-lg overflow-hidden">
+                        <button class="w-full flex justify-between items-center p-4 bg-neutral-800 hover:bg-neutral-700 transition-colors text-left" onclick="toggleFaq('faq3')">
+                            <span class="font-medium text-white">How do I submit assignments?</span>
+                            <svg id="faq3-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="faq3" class="hidden p-4 bg-neutral-800/50 border-t border-neutral-700">
+                            <p class="text-zinc-300 text-sm">
+                                To submit an assignment, go to the specific course page, find the assignment section, and click on the assignment you want to submit. You'll see a "Submit Assignment" button where you can upload your files or type your answers, depending on the assignment type.
+                            </p>
+                        </div>
                     </div>
-                    @endif
+                    
+                    <!-- FAQ Item 4 -->
+                    <div class="border border-neutral-700 rounded-lg overflow-hidden">
+                        <button class="w-full flex justify-between items-center p-4 bg-neutral-800 hover:bg-neutral-700 transition-colors text-left" onclick="toggleFaq('faq4')">
+                            <span class="font-medium text-white">How do I get a certificate for completed courses?</span>
+                            <svg id="faq4-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div id="faq4" class="hidden p-4 bg-neutral-800/50 border-t border-neutral-700">
+                            <p class="text-zinc-300 text-sm">
+                                Once you've completed all the required components of a course (lectures, assignments, quizzes, etc.), a certificate will automatically be generated. You can access and download your certificates from the "Achievements" or "Certificates" section in your profile.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -187,7 +302,7 @@
                     </svg>
                     Community Support
                 </h2>
-
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:border-emerald-500/30">
                         <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
@@ -201,7 +316,7 @@
                             Browse Forums
                         </a>
                     </div>
-
+                    
                     <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:border-emerald-500/30">
                         <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -225,7 +340,7 @@
                         <h2 class="text-2xl font-bold text-white mb-4">Still Need Help?</h2>
                         <p class="text-zinc-400 max-w-2xl mx-auto">Our support team is available 24/7 to assist you with any questions or issues you may have.</p>
                     </div>
-
+                    
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <a href="#" class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300 flex flex-col items-center text-center group">
                             <div class="p-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 group-hover:bg-emerald-500/20 transition-colors">
@@ -237,7 +352,7 @@
                             <p class="text-zinc-400 text-sm mb-3">Send us an email and we'll respond within 24 hours</p>
                             <span class="text-emerald-400 text-sm">support@example.com</span>
                         </a>
-
+                        
                         <a href="#" class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300 flex flex-col items-center text-center group">
                             <div class="p-3 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4 group-hover:bg-blue-500/20 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -248,7 +363,7 @@
                             <p class="text-zinc-400 text-sm mb-3">Chat with our support team in real-time</p>
                             <span class="text-blue-400 text-sm">Available 24/7</span>
                         </a>
-
+                        
                         <a href="#" class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300 flex flex-col items-center text-center group">
                             <div class="p-3 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4 group-hover:bg-purple-500/20 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -260,7 +375,7 @@
                             <span class="text-purple-400 text-sm">+1 (555) 123-4567</span>
                         </a>
                     </div>
-
+                    
                     <!-- Floating Chat Button -->
                     <div class="fixed bottom-6 right-6 z-50">
                         <button class="w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 group">
@@ -274,13 +389,13 @@
             </div>
         </div>
     </div>
-
+    
     <!-- JavaScript for FAQ Accordion -->
     <script>
         function toggleFaq(id) {
             const content = document.getElementById(id);
             const icon = document.getElementById(id + '-icon');
-
+            
             if (content.classList.contains('hidden')) {
                 content.classList.remove('hidden');
                 icon.classList.add('rotate-180');
