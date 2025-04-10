@@ -11,6 +11,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\FileUpload;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ChallengeResource extends Resource
 {
@@ -36,25 +38,49 @@ class ChallengeResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Section::make('Challenge Details')->schema([
-                Forms\Components\TextInput::make('name')
+            Forms\Components\Section::make("Basic Information")->schema([
+                Forms\Components\TextInput::make("name")
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                    ->maxLength(255)
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('slug', str($state)->slug())),
+                Forms\Components\Textarea::make("description")
                     ->required()
-                    ->maxLength(65535),
-                Forms\Components\Select::make('difficulty_level')
+                    ->columnSpanFull(),
+                Forms\Components\Select::make("category_id")
+                    ->relationship("category", "name")
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                        ->required()
+                        ->maxLength(255)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => $set('slug', str($state)->slug())),
+                    Forms\Components\TextInput::make('description')
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('slug')
+                        ->required()
+                        ->maxLength(255)
+                        ->unique('categories', 'slug', ignoreRecord: true),
+                    ]),
+                Forms\Components\Grid::make()
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\DateTimePicker::make(
+                            "start_date"
+                        )->required(),
+                        Forms\Components\DateTimePicker::make("end_date")
+                            ->after("start_date")
+                            ->helperText("Leave empty for ongoing challenges"),
+                    ]),
+                Forms\Components\Select::make("difficulty_level")
                     ->options([
-                        'beginner' => 'Beginner',
-                        'intermediate' => 'Intermediate',
-                        'advanced' => 'Advanced',
-                        'expert' => 'Expert',
+                        "beginner" => "Beginner",
+                        "intermediate" => "Intermediate",
+                        "advanced" => "Advanced",
+                        "expert" => "Expert",
                     ])
                     ->required(),
-                Forms\Components\DateTimePicker::make('start_date')
-                    ->required(),
-                Forms\Components\DateTimePicker::make('end_date'),
-                Forms\Components\TextInput::make('points_reward')
+                Forms\Components\TextInput::make("points_reward")
                     ->numeric()
                     ->required(),
                 FileUpload::make('image')
@@ -63,24 +89,202 @@ class ChallengeResource extends Resource
                     ->image()
                     ->imageEditor()
                     ->columnSpanFull(),
-                Forms\Components\Toggle::make('is_active')
+                Forms\Components\Toggle::make("is_active")
                     ->default(true),
-                Forms\Components\TextInput::make('max_participants')
+                Forms\Components\TextInput::make("max_participants")
                     ->numeric()
                     ->minValue(1),
-                Forms\Components\TextInput::make('required_level')
+                Forms\Components\TextInput::make("required_level")
                     ->numeric()
                     ->minValue(1)
                     ->default(1),
-                Forms\Components\TextInput::make('programming_language')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('tech_category')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('time_limit')
-                    ->numeric()
-                    ->suffix('minutes')
-                    ->helperText('Leave empty for no time limit'),
-            ])->columns(2),
+            ]),
+
+            Forms\Components\Section::make("Challenge Configuration")->schema([
+                Forms\Components\Select::make("challenge_type")
+                ->label("Challenge Type")
+                ->required()
+                ->options([
+                    "debugging" => "Debugging Exercise",
+                    "algorithm" => "Algorithm Challenge",
+                    "database" => "Database Challenge",
+                    "ui_design" => "UI/UX Challenge",
+                    "problem_solving" => "Problem Solving Challenge",
+                    "essay" => "Essay Challenge",
+                    "language" => "Language Challenge",
+                    "research" => "Research Challenge",
+                    "creative" => "Creative Challenge",
+                    "data_visualization" => "Data Visualization Challenge",
+                ])
+                ->default("coding_challenge")
+                ->reactive()
+                ->afterStateUpdated(function (callable $set) {
+                    $set("challenge_content", []);
+                }),
+
+            Forms\Components\Select::make("programming_language")
+                ->label("Programming Language")
+                ->options([
+                    "python" => "Python",
+                    "java" => "Java",
+                    "csharp" => "C#",
+                    "php" => "PHP",
+                    "sql" => "SQL",
+                    "none" => "Not Language Specific",
+                ])
+                ->default("none")
+                ->visible(function (Forms\Get $get) {
+                    return in_array($get("challenge_type"), [
+                        "coding_challenge", "debugging", "algorithm", "project", "code_review"
+                    ]);
+                }),
+
+            Forms\Components\TextInput::make("time_limit")
+                ->label("Time Limit (minutes)")
+                ->numeric()
+                ->minValue(1)
+                ->placeholder("Leave empty for no time limit")
+                ->helperText(
+                    "How long users have to complete this challenge"
+                ),
+        ]),
+
+        // Dynamic content section for each challenge type
+        Forms\Components\Section::make("Challenge Content")
+            ->schema(function (Forms\Get $get) {
+                $challengeType = $get("challenge_type");
+                return match ($challengeType) {
+                    "debugging" => [
+                        Forms\Components\Textarea::make("challenge_content.scenario")
+                            ->label("Debugging Scenario")
+                            ->required()
+                            ->hint('Provide a scenario where the user is expected to debug the given code.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.buggy_code")
+                            ->label("Code with Bugs")
+                            ->required()
+                            ->hint('Provide the code that contains bugs.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.expected_behavior")
+                            ->label("Expected Behavior")
+                            ->required()
+                            ->hint('What should the code look like after debugging?'),
+                        Forms\Components\Textarea::make("challenge_content.current_behavior")
+                            ->label("Current Behavior")
+                            ->required()
+                            ->hint('What is the current behavior of the code?'),
+                    ],
+
+                    "algorithm" => [
+                        Forms\Components\Textarea::make("challenge_content.problem_statement")
+                            ->label("Algorithm Problem")
+                            ->required()
+                            ->hint('Describe the problem and provide a clear statement.')
+                            ->columnSpanFull(),
+                        Forms\Components\Select::make("challenge_content.algorithm_type")
+                            ->label("Algorithm Type")
+                            ->hint('Select the type of algorithm.')
+                            ->options([
+                                "sorting" => "Sorting",
+                                "searching" => "Searching",
+                                "graph" => "Graph Algorithms",
+                                "dynamic" => "Dynamic Programming",
+                                "greedy" => "Greedy Algorithms",
+                                "recursion" => "Recursion",
+                                "other" => "Other",
+                            ])
+                            ->required(),
+                        Forms\Components\Textarea::make("challenge_content.example")
+                            ->label("Example")
+                            ->required()
+                            ->hint('Provide an example of the algorithm in action.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.solution_approach")
+                            ->label("Solution Approach")
+                            ->hint('Describe the approach to solving the algorithm.')
+                            ->columnSpanFull(),
+                    ],
+
+                    "database" => [
+                        Forms\Components\Textarea::make("challenge_content.scenario")
+                            ->label("Database Scenario")
+                            ->required()
+                            ->hint('Describe the scenario for the database challenge.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.schema")
+                            ->label("Database Schema")
+                            ->required()
+                            ->hint('Provide the database schema.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.tasks")
+                            ->label("SQL Tasks")
+                            ->required()
+                            ->hint('List the tasks for the database challenge.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.sample_data")
+                            ->label("Sample Data")
+                            ->required()
+                            ->hint('Provide sample data for the database challenge.')
+                            ->columnSpanFull(),
+                    ],
+
+                    "ui_design" => [
+                        Forms\Components\Textarea::make("challenge_content.design_brief")
+                            ->label("Design Brief")
+                            ->required()
+                            ->hint('"Provide a brief description of the UI/UX challenge."')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.requirements")
+                            ->label("UI/UX Requirements")
+                            ->required()
+                            ->hint('Provide the requirements for the UI/UX challenge.')
+                            ->columnSpanFull(),
+                        Forms\Components\FileUpload::make("challenge_content.assets")
+                            ->label("Design Assets")
+                            ->multiple()
+                            ->hint('Upload any design assets for the UI/UX challenge.')
+                            ->directory("ui_challenges"),
+                        Forms\Components\Textarea::make("challenge_content.evaluation_criteria")
+                            ->label("Evaluation Criteria")
+                            ->required()
+                            ->hint('Describe the evaluation criteria for the UI/UX challenge.')
+                            ->columnSpanFull(),
+                    ],
+
+                    // Add cases for other common challenge types based on seeder structure
+                    "problem_solving",
+                    "essay",
+                    "language",
+                    "research",
+                    "creative",
+                    "data_visualization" => [
+                        Forms\Components\Textarea::make("challenge_content.problem_statement")
+                            ->label("Problem Statement / Task Overview")
+                            ->required()
+                            ->hint('Describe the main goal or problem the user needs to address.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.sections")
+                            ->label("Detailed Instructions / Sections / Requirements")
+                            ->required()
+                            ->hint('Provide detailed steps, parts, specific requirements, or different sections of the challenge.')
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make("challenge_content.evaluation_criteria")
+                            ->label("Evaluation Criteria")
+                            ->required()
+                            ->hint('How will the submission be evaluated?')
+                            ->columnSpanFull(),
+                    ],
+
+                    default => [
+                        Forms\Components\Placeholder::make("standard_note")
+                            ->content(
+                                'Please select a challenge type to configure specific content.'
+                            )
+                            ->columnSpanFull(),
+                    ],
+                };
+            })
+            ->columnSpanFull(),
         ]);
     }
 
@@ -88,60 +292,145 @@ class ChallengeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make("name")->searchable(),
+                Tables\Columns\TextColumn::make("category.name")
+                    ->label("Category")
+                    ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('programming_language')
-                    ->label('Language'),
-                Tables\Columns\TextColumn::make('difficulty_level')
+                Tables\Columns\TextColumn::make("challenge_type")
+                    ->label("Type")
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'beginner' => 'success',
-                        'intermediate' => 'warning',
-                        'advanced' => 'danger',
-                        'expert' => 'gray',
-                        default => 'gray',
+                        "coding_challenge" => "primary",
+                        "debugging" => "success",
+                        "algorithm" => "warning",
+                        "quiz" => "danger",
+                        "flashcard" => "info",
+                        "project" => "secondary",
+                        "code_review" => "gray",
+                        "database" => "purple",
+                        "security" => "red",
+                        "ui_design" => "blue",
+                        default => "gray",
                     }),
-                Tables\Columns\TextColumn::make('time_limit')
-                    ->label('Time Limit')
+                Tables\Columns\TextColumn::make("programming_language")
+                    ->label("Language"),
+                Tables\Columns\TextColumn::make("difficulty_level")
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        "beginner" => "success",
+                        "intermediate" => "warning",
+                        "advanced" => "danger",
+                        "expert" => "gray",
+                        default => "gray",
+                    }),
+                Tables\Columns\TextColumn::make("time_limit")
+                    ->label("Time Limit")
                     ->formatStateUsing(
                         fn($state) => $state ? "{$state} min" : "No limit"
                     ),
-                Tables\Columns\TextColumn::make('points_reward')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('start_date')
+                Tables\Columns\TextColumn::make("points_reward")->sortable(),
+                Tables\Columns\TextColumn::make("start_date")
                     ->dateTime()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('users_count')
-                    ->label('Participants')
-                    ->counts('users')
+                Tables\Columns\TextColumn::make("users_count")
+                    ->label("Participants")
+                    ->counts("users")
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_active')
+                Tables\Columns\IconColumn::make("is_active")
                     ->boolean()
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('difficulty_level')
-                    ->options([
-                        'beginner' => 'Beginner',
-                        'intermediate' => 'Intermediate',
-                        'advanced' => 'Advanced',
-                        'expert' => 'Expert',
-                    ]),
-                Tables\Filters\Filter::make('is_active')
-                    ->query(fn (Builder $query): Builder => $query->where('is_active', true))
-                    ->label('Active only')
-                    ->toggle()
-                    ->default(),
+                Tables\Filters\SelectFilter::make("challenge_type")->options([
+                    "coding_challenge" => "Coding Challenge",
+                    "debugging" => "Debugging Exercise",
+                    "algorithm" => "Algorithm Challenge",
+                    "quiz" => "Technical Quiz",
+                    "flashcard" => "Technical Flashcards",
+                    "project" => "Mini Project",
+                    "code_review" => "Code Review Challenge",
+                    "database" => "Database Challenge",
+                    "security" => "Security Challenge",
+                    "ui_design" => "UI/UX Challenge",
+                ]),
+                Tables\Filters\SelectFilter::make("programming_language")->options([
+                    "python" => "Python",
+                    "javascript" => "JavaScript",
+                    "java" => "Java",
+                    "csharp" => "C#",
+                    "cpp" => "C++",
+                    "php" => "PHP",
+                    "sql" => "SQL",
+                    "multiple" => "Multiple Languages",
+                    "none" => "Not Language Specific",
+                ]),
+                Tables\Filters\SelectFilter::make("difficulty_level")->options([
+                    "beginner" => "Beginner",
+                    "intermediate" => "Intermediate",
+                    "advanced" => "Advanced",
+                    "expert" => "Expert",
+                ]),
+                Tables\Filters\TernaryFilter::make("is_active")->label(
+                    "Active Status"
+                ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make("manage_participants")
+                ->label("Participants")
+                ->icon("heroicon-s-users")
+                ->url(
+                    fn(Challenge $record): string => static::getUrl(
+                        "participants",
+                        ["record" => $record]
+                    )
+                ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make("activate")
+                        ->label("Activate Selected")
+                        ->icon("heroicon-o-check-badge")
+                        ->action(
+                            fn(Collection $records) => $records->each->update([
+                                "is_active" => true,
+                            ])
+                        ),
+                    Tables\Actions\BulkAction::make("deactivate")
+                        ->label("Deactivate Selected")
+                        ->icon("heroicon-s-x-circle")
+                        ->action(
+                            fn(Collection $records) => $records->each->update([
+                                "is_active" => false,
+                            ])
+                        ),
+                    Tables\Actions\BulkAction::make("extend_deadline")
+                        ->label("Extend Deadline (7 days)")
+                        ->icon("heroicon-s-calendar")
+                        ->action(function (Collection $records) {
+                            foreach ($records as $record) {
+                                if ($record->end_date) {
+                                    $record->update([
+                                        'end_date' => $record->end_date->addDays(7)
+                                    ]);
+                                } else {
+                                    $record->update([
+                                        'end_date' => DB::raw('NOW() + INTERVAL 7 DAY')
+                                    ]);
+                                }
+                            }
+                        }),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+    return parent::getEloquentQuery()
+        ->withCount('users');
     }
 
     public static function getRelations(): array
@@ -157,6 +446,9 @@ class ChallengeResource extends Resource
             'index' => Pages\ListChallenges::route('/'),
             'create' => Pages\CreateChallenge::route('/create'),
             'edit' => Pages\EditChallenge::route('/{record}/edit'),
+            'participants' => Pages\ManageChallengeParticipants::route(
+                '/{record}/participants'
+            ),
         ];
     }
 

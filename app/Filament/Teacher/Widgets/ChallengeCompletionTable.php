@@ -13,6 +13,11 @@ class ChallengeCompletionTable extends BaseWidget
     protected int|string|array $columnSpan = 'full';
     protected static ?string $heading = 'Challenge Completion Rates';
 
+    protected function getTableSearchDebounce(): ?int
+    {
+        return 500;
+    }
+
     public function table(Table $table): Table
     {
         return $table
@@ -40,12 +45,16 @@ class ChallengeCompletionTable extends BaseWidget
                         if ($record->total_participants === 0) {
                             return '0%';
                         }
-                        
+
                         $percentage = ($record->completed_count / $record->total_participants) * 100;
                         return number_format($percentage, 1) . '%';
                     })
                     ->alignCenter(),
             ])
-            ->paginated(false);
+            ->paginated(false)
+            ->searchable()
+            ->searchPlaceholder('Search challenges...')
+            ->persistSearchInSession()
+            ->deferLoading();
     }
 }

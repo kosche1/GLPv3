@@ -36,6 +36,8 @@ Route::middleware(
     ])
 )->group(function () {
 
+    // Admin routes - removed custom user management in favor of Filament admin panel
+
     Route::get('dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
         ->name('dashboard');
 

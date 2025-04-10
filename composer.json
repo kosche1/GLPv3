@@ -23,6 +23,7 @@
         "spatie/laravel-activitylog": "^4.10",
         "tomatophp/filament-users": "^2.0",
         "westacks/filament-monaco-editor": "^1.1",
+        "wire-elements/modal": "^2.0",
         "workos/workos-php-laravel": "^4.1"
     },
     "require-dev": {

@@ -62,7 +62,7 @@ class ListStudents extends Component implements Tables\Contracts\HasTable
                 Action::make('view_progress')
                     ->label('View Progress')
                     ->icon('heroicon-o-academic-cap')
-                    ->url(fn (User $record) => route('filament.admin.resources.users.view', $record))
+                    ->url(fn (User $record) => '/admin/user-management/' . $record->id . '/edit')
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([

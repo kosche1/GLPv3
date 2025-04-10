@@ -12,7 +12,7 @@
             <span class="text-neutral-500">/</span>
             <span class="text-white truncate">{{ $topic->title }}</span>
         </div>
-            
+
         <div class="mt-6 space-y-4">
             <!-- Forum Post -->
             <div class="bg-linear-to-br from-neutral-800 to-neutral-900 border border-neutral-700 overflow-hidden shadow-xs rounded-xl transition-all duration-300 ease-in-out">
@@ -30,19 +30,19 @@
                             </span>
                         </div>
                     </div>
-                    
+
                     <!-- Post Content -->
                     <h2 class="text-xl font-semibold text-white mb-2">{{ $topic->title }}</h2>
                     <div class="text-neutral-300 mb-4 prose prose-invert max-w-none">
-                        {!! nl2br(e($topic->content)) !!}
+                        {!! $topic->content !!}
                     </div>
-                    
+
                     <!-- Post Actions -->
                     <div class="flex items-center space-x-4 text-sm text-neutral-400">
                         <div class="flex items-center space-x-2">
-                            <button class="like-button hover:text-emerald-400 transition-colors duration-300" 
-                                    data-likeable-id="{{ $topic->id }}" 
-                                    data-likeable-type="topic" 
+                            <button class="like-button hover:text-emerald-400 transition-colors duration-300"
+                                    data-likeable-id="{{ $topic->id }}"
+                                    data-likeable-type="topic"
                                     data-is-like="true">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
@@ -50,8 +50,8 @@
                             </button>
                             <span class="likes-count">{{ $topic->likes_count }}</span>
                             <button class="like-button hover:text-emerald-400 transition-colors duration-300"
-                                    data-likeable-id="{{ $topic->id }}" 
-                                    data-likeable-type="topic" 
+                                    data-likeable-id="{{ $topic->id }}"
+                                    data-likeable-type="topic"
                                     data-is-like="false">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Comments Section -->
                 <div class="border-t border-neutral-700">
                     <div class="p-6 space-y-6">
@@ -90,7 +90,7 @@
                                 </form>
                             </div>
                         </div>
-                        
+
                         <!-- Comment Thread -->
                         <div class="space-y-4">
                             @forelse($topic->comments as $comment)
@@ -109,18 +109,18 @@
                                             <div class="mt-2 flex items-center space-x-4 text-sm text-neutral-400">
                                                 <div class="flex items-center space-x-2">
                                                     <button class="like-button hover:text-emerald-400 transition-colors duration-300"
-                                                            data-likeable-id="{{ $comment->id }}" 
-                                                            data-likeable-type="comment" 
+                                                            data-likeable-id="{{ $comment->id }}"
+                                                            data-likeable-type="comment"
                                                             data-is-like="true">↑</button>
                                                     <span class="likes-count">{{ $comment->likes_count }}</span>
                                                     <button class="like-button hover:text-emerald-400 transition-colors duration-300"
-                                                            data-likeable-id="{{ $comment->id }}" 
-                                                            data-likeable-type="comment" 
+                                                            data-likeable-id="{{ $comment->id }}"
+                                                            data-likeable-type="comment"
                                                             data-is-like="false">↓</button>
                                                 </div>
                                                 <button class="reply-button hover:text-emerald-400 transition-colors duration-300" data-comment-id="{{ $comment->id }}">Reply</button>
                                             </div>
-                                            
+
                                             <!-- Reply Form (hidden by default) -->
                                             <div id="reply-form-{{ $comment->id }}" class="mt-4 hidden">
                                                 <form action="{{ route('forum.store-comment', $topic->id) }}" method="POST">
@@ -134,7 +134,7 @@
                                                 </form>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Nested Comments -->
                                         @if($comment->replies->count() > 0)
                                             @foreach($comment->replies as $reply)
@@ -153,13 +153,13 @@
                                                                 <div class="mt-2 flex items-center space-x-4 text-sm text-neutral-400">
                                                                     <div class="flex items-center space-x-2">
                                                                         <button class="like-button hover:text-emerald-400 transition-colors duration-300"
-                                                                                data-likeable-id="{{ $reply->id }}" 
-                                                                                data-likeable-type="comment" 
+                                                                                data-likeable-id="{{ $reply->id }}"
+                                                                                data-likeable-type="comment"
                                                                                 data-is-like="true">↑</button>
                                                                         <span class="likes-count">{{ $reply->likes_count }}</span>
                                                                         <button class="like-button hover:text-emerald-400 transition-colors duration-300"
-                                                                                data-likeable-id="{{ $reply->id }}" 
-                                                                                data-likeable-type="comment" 
+                                                                                data-likeable-id="{{ $reply->id }}"
+                                                                                data-likeable-type="comment"
                                                                                 data-is-like="false">↓</button>
                                                                     </div>
                                                                 </div>
@@ -182,7 +182,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Reply functionality
@@ -192,21 +192,21 @@
                     document.getElementById(`reply-form-${commentId}`).classList.remove('hidden');
                 });
             });
-            
+
             document.querySelectorAll('.cancel-reply').forEach(button => {
                 button.addEventListener('click', function() {
                     const commentId = this.getAttribute('data-comment-id');
                     document.getElementById(`reply-form-${commentId}`).classList.add('hidden');
                 });
             });
-            
+
             // Like functionality
             document.querySelectorAll('.like-button').forEach(button => {
                 button.addEventListener('click', function() {
                     const likeableId = this.getAttribute('data-likeable-id');
                     const likeableType = this.getAttribute('data-likeable-type');
                     const isLike = this.getAttribute('data-is-like') === 'true';
-                    
+
                     fetch('{{ route('forum.like') }}', {
                         method: 'POST',
                         headers: {
@@ -224,7 +224,7 @@
                         // Update the likes count
                         const likesCountElement = this.closest('.flex').querySelector('.likes-count');
                         likesCountElement.textContent = data.likes_count;
-                        
+
                         // Highlight the button if liked/disliked
                         if (data.action === 'liked') {
                             this.classList.add('text-emerald-400');

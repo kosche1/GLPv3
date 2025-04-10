@@ -27,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id("admin")
-            ->authGuard("admin")
+            ->authGuard("web")
             ->path("admin")
             ->login()
             ->colors([
@@ -56,7 +56,7 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 FilamentAssistantPlugin::make(),
-                \TomatoPHP\FilamentUsers\FilamentUsersPlugin::make(),
+                // Removed TomatoPHP FilamentUsers plugin to use our custom UserResource
             ])
 
             ->middleware([
