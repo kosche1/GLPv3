@@ -28,7 +28,7 @@
                 </a>
             </div>
         </div>
-        
+
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
             <div class="relative w-full md:w-1/2">
                 <form action="{{ route('forum.search') }}" method="GET">
@@ -37,12 +37,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
-                    <input type="text" name="query" placeholder="Search topics..." 
+                    <input type="text" name="query" placeholder="Search topics..."
                         class="w-full rounded-lg border border-neutral-700 bg-neutral-800 pl-10 pr-4 py-2 text-sm text-white placeholder-neutral-400 focus:border-emerald-500/30 focus:outline-hidden transition-all duration-300 hover:border-neutral-600">
                 </form>
             </div>
         </div>
-        
+
         <div class="mt-6 space-y-4">
             @if($topics->isEmpty())
                 <div class="bg-neutral-800 border border-neutral-700 rounded-lg p-8 text-center">
@@ -65,13 +65,13 @@
                                     <p class="text-xs text-neutral-400">{{ $topic->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
-                            
+
                             <!-- Topic Content -->
                             <a href="{{ route('forum.topic', [$category->slug, $topic->slug]) }}" class="block">
                                 <h2 class="text-xl font-semibold text-white mb-2 hover:text-emerald-400 transition-colors">{{ $topic->title }}</h2>
-                                <p class="text-neutral-300 mb-4 line-clamp-2">{{ Str::limit(strip_tags($topic->content), 150) }}</p>
+                                <div class="text-neutral-300 mb-4 line-clamp-2">{{ Str::limit(strip_tags($topic->content), 150) }}</div>
                             </a>
-                            
+
                             <!-- Topic Actions -->
                             <div class="flex items-center space-x-4 text-sm text-neutral-400">
                                 <div class="flex items-center space-x-2">
@@ -95,7 +95,7 @@
                         </div>
                     </div>
                 @endforeach
-                
+
                 <div class="mt-6">
                     {{ $topics->links() }}
                 </div>

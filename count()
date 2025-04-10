@@ -1,22 +1,22 @@
 
-   Psy\Exception\ParseErrorException 
+   InvalidArgumentException 
 
-  PHP Parse error: Syntax error, unexpected ';' on line 1
+  Unexpected end of input
 
-  at vendor\psy\psysh\src\Exception\ParseErrorException.php:44
-     40▕      * @param \PhpParser\Error $e
-     41▕      */
-     42▕     public static function fromParseError(\PhpParser\Error $e): self
-     43▕     {
-  ➜  44▕         return new self($e->getRawMessage(), $e->getAttributes());
-     45▕     }
-     46▕ }
-     47▕
+  at vendor\psy\psysh\src\Shell.php:891
+    887▕ 
+    888▕         if (!$this->hasValidCode()) {
+    889▕             $this->popCodeStack();
+    890▕ 
+  ➜ 891▕             throw new \InvalidArgumentException('Unexpected end of input');
+    892▕         }
+    893▕     }
+    894▕ 
+    895▕     /**
 
-  1   vendor\psy\psysh\src\CodeCleaner.php:306
-      Psy\Exception\ParseErrorException::fromParseError(Object(PhpParser\Error))
+  1   vendor\psy\psysh\src\Shell.php:1390
+      Psy\Shell::setCode("App\Models\User::role('student')-")
 
-  2   vendor\psy\psysh\src\CodeCleaner.php:240
-      Psy\CodeCleaner::parse("<?php DB::table('student_attendance')-;
-")
+  2   vendor\laravel\tinker\src\Console\TinkerCommand.php:76
+      Psy\Shell::execute("App\Models\User::role('student')-")
 

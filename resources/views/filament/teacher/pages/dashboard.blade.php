@@ -8,7 +8,12 @@
         </div>
     </x-filament::section>
 
-    {{ $this->header() }}
-    {{ $this->content() }}
-    {{ $this->footer() }}
+    <div class="mt-6">
+        @livewire('\App\Filament\Teacher\Widgets\TeacherDashboardWidget')
+    </div>
+
+    <div class="mt-6">
+        @livewire('\App\Filament\Teacher\Widgets\TopStudentsTable')
+    </div>
+
 </x-filament-panels::page>

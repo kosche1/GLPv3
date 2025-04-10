@@ -3,13 +3,17 @@
 namespace App\Filament\Teacher\Pages;
 
 use Filament\Pages\Page;
-use Illuminate\Support\Str;
 
+// This class is no longer used as the Communication section has been removed
+// Forum functionality is now directly accessible from the Teaching navigation group
 class Feedback extends Page
 {
+    // Hide this page from navigation
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
-    protected static ?string $navigationLabel = 'Communication';
-    protected static ?int $navigationSort = 4;
+    protected static ?string $navigationLabel = 'Communication (Deprecated)';
+    protected static ?int $navigationSort = 99;
     protected static ?string $navigationGroup = 'Teaching';
 
     protected static string $view = 'filament.teacher.pages.feedback';

@@ -93,7 +93,7 @@
                                 <span class="text-xs text-neutral-400">{{ $topic->created_at->diffForHumans() }}</span>
                             </div>
                             <h3 class="text-white text-sm font-medium mb-1">{{ $topic->title }}</h3>
-                            <p class="text-neutral-400 text-xs mb-1.5 line-clamp-2">{{ Str::limit(strip_tags($topic->content), 80) }}</p>
+                            <div class="text-neutral-400 text-xs mb-1.5 line-clamp-2">{{ Str::limit(strip_tags($topic->content), 80) }}</div>
                             <div class="flex justify-between items-center text-xs text-neutral-400">
                                 <span class="truncate max-w-[60%]">By {{ $topic->user->name }}</span>
                                 <span>{{ $topic->comments_count }} comments</span>

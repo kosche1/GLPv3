@@ -14,6 +14,11 @@ class StudentProgressTable extends BaseWidget
     protected int|string|array $columnSpan = 'full';
     protected static ?string $heading = 'Student Progress';
 
+    protected function getTableSearchDebounce(): ?int
+    {
+        return 500;
+    }
+
     public function table(Table $table): Table
     {
         return $table
@@ -44,6 +49,10 @@ class StudentProgressTable extends BaseWidget
                     ->date()
                     ->sortable(),
             ])
-            ->paginated(true);
+            ->paginated(true)
+            ->searchable()
+            ->searchPlaceholder('Search students...')
+            ->persistSearchInSession()
+            ->deferLoading();
     }
 }

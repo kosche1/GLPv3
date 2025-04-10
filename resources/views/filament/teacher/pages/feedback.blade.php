@@ -78,7 +78,7 @@
                                             <x-heroicon-o-chat-bubble-left class="h-4 w-4 text-primary-600 dark:text-primary-400" />
                                         </div>
                                         <div class="flex-1">
-                                            <a href="{{ route('filament.admin.resources.forum-topics.edit', $topic) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">{{ $topic->title }}</a>
+                                            <a href="{{ route('filament.teacher.resources.forum-topics.edit', $topic) }}" class="text-sm font-medium text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">{{ $topic->title }}</a>
                                             <div class="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                 <span>{{ $topic->user->name }}</span>
                                                 <span class="mx-1">•</span>
@@ -99,11 +99,17 @@
                         </div>
                     @endif
 
-                    <div class="mt-2">
-                        <a href="{{ route('filament.admin.resources.forum-categories.index') }}" class="filament-button filament-button-size-md inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset min-h-[2.25rem] px-4 text-sm text-white shadow focus:ring-white border-transparent bg-primary-600 hover:bg-primary-500 focus:bg-primary-700 focus:ring-offset-primary-700">
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <a href="{{ route('filament.teacher.resources.forum-topics.index') }}" class="filament-button filament-button-size-md inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset min-h-[2.25rem] px-4 text-sm text-white shadow focus:ring-white border-transparent bg-primary-600 hover:bg-primary-500 focus:bg-primary-700 focus:ring-offset-primary-700">
                             <span class="flex items-center gap-1">
-                                <x-heroicon-s-chat-bubble-left-right class="w-5 h-5" />
-                                <span>Manage Forums</span>
+                                <x-heroicon-s-document-text class="w-5 h-5" />
+                                <span>Forum Topics</span>
+                            </span>
+                        </a>
+                        <a href="{{ route('filament.teacher.resources.forum-comments.index') }}" class="filament-button filament-button-size-md inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset min-h-[2.25rem] px-4 text-sm text-white shadow focus:ring-white border-transparent bg-warning-600 hover:bg-warning-500 focus:bg-warning-700 focus:ring-offset-warning-700">
+                            <span class="flex items-center gap-1">
+                                <x-heroicon-s-chat-bubble-bottom-center-text class="w-5 h-5" />
+                                <span>Forum Comments</span>
                             </span>
                         </a>
                     </div>
