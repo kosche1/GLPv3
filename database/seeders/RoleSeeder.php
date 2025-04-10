@@ -14,10 +14,10 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         // Create roles and assign permissions
-        $adminRole = Role::create(['name' => 'admin']);
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $adminRole->givePermissionTo(Permission::all());
 
-        $facultyRole = Role::create(['name' => 'faculty']);
+        $facultyRole = Role::firstOrCreate(['name' => 'faculty']);
         $facultyRole->givePermissionTo([
             'view users', 'view badges', 'view tasks', 'view rewards', 'view leaderboards',
             'create tasks', 'edit tasks', 'delete tasks',
@@ -25,7 +25,7 @@ class RoleSeeder extends Seeder
             'manage leaderboards',
         ]);
 
-        $studentRole = Role::create(['name' => 'student']);
+        $studentRole = Role::firstOrCreate(['name' => 'student']);
         $studentRole->givePermissionTo([
             'view badges', 'view tasks', 'view rewards', 'view leaderboards',
         ]);

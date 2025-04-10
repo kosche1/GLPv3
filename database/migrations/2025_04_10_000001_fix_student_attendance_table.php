@@ -64,24 +64,29 @@ return new class extends Migration
             }
         }
 
-        // Add test data for user ID 29 if it doesn't exist
-        $exists = DB::table('student_attendance')
-            ->where('user_id', 29)
-            ->where('date', now()->toDateString())
-            ->exists();
+        // Add test data for a valid user if it doesn't exist
+        // First, find a valid user ID from the users table
+        $validUser = DB::table('users')->first();
 
-        if (!$exists) {
-            DB::table('student_attendance')->insert([
-                'user_id' => 29,
-                'date' => now()->toDateString(),
-                'status' => 'present',
-                'notes' => 'Added by migration',
-                'first_login_time' => now()->format('H:i:s'),
-                'last_login_time' => now()->format('H:i:s'),
-                'login_count' => 1,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+        if ($validUser) {
+            $exists = DB::table('student_attendance')
+                ->where('user_id', $validUser->id)
+                ->where('date', now()->toDateString())
+                ->exists();
+
+            if (!$exists) {
+                DB::table('student_attendance')->insert([
+                    'user_id' => $validUser->id,
+                    'date' => now()->toDateString(),
+                    'status' => 'present',
+                    'notes' => 'Added by migration',
+                    'first_login_time' => now()->format('H:i:s'),
+                    'last_login_time' => now()->format('H:i:s'),
+                    'login_count' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
         }
     }
 
