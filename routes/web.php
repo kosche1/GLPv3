@@ -22,10 +22,7 @@ Route::get('/challenge/{challenge}', function (Challenge $challenge) {
 
 use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
-Route::get('/', function () {
-    $challenges = \App\Models\Challenge::orderBy('id')->take(3)->get();
-    return view('welcome', ['challenges' => $challenges]);
-})->name('home');
+Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('home');
 
 
 
