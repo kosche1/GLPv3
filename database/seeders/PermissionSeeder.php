@@ -42,5 +42,10 @@ class PermissionSeeder extends Seeder
         // Create permissions for leaderboards
         Permission::firstOrCreate(['name' => 'view leaderboards']);
         Permission::firstOrCreate(['name' => 'manage leaderboards']);
+
+        //database backup download and delete
+        Permission::firstOrCreate(['name' => 'download-backups']);
+        Permission::firstOrCreate(['name' => 'delete-backups']);
+        Permission::firstOrCreate(['name' => 'restore-backups']);
     }
 }
