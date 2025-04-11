@@ -19,6 +19,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -56,6 +57,12 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 FilamentAssistantPlugin::make(),
+                FilamentSpatieLaravelBackupPlugin::make()
+                    ->usingPage(\App\Filament\Pages\Backups::class)
+                    ->usingPolingInterval('10s')
+                    ->statusListRecordsTable(true)
+                    ->timeout(300)
+                    ->authorize(fn () => true), // Allow all authenticated users to access backups
                 // Removed TomatoPHP FilamentUsers plugin to use our custom UserResource
             ])
 

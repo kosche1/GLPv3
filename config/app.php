@@ -170,6 +170,7 @@ return [
         App\Providers\ToolServiceProvider::class,
         App\Providers\Livewire\TeacherWidgetsServiceProvider::class,
         App\Providers\FilamentActivityLogServiceProvider::class,
+        App\Providers\BackupServiceProvider::class,
     ],
 
 ];
