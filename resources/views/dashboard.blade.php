@@ -409,6 +409,14 @@
 
                                 <!-- Activity Trend Indicator -->
                                 {!! $trendIndicatorHtml !!}
+
+                                <!-- Refresh Activity Button -->
+                                <a href="{{ route('refresh-activity') }}" class="flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner hover:bg-neutral-700/80 transition-colors duration-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span class="text-xs text-emerald-400">Refresh</span>
+                                </a>
                             </div>
                         </div>
 
@@ -454,6 +462,16 @@
                                 <div class="text-xs text-gray-400">More</div>
                             </div>
                         </div>
+
+                        <!-- Status Message -->
+                        @if(session('status'))
+                            <div class="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                {{ session('status') }}
+                            </div>
+                        @endif
 
                         <div class="overflow-x-auto h-[300px] bg-neutral-800/30 rounded-xl border border-neutral-700/30 p-3">
                             <div class="contribution-calendar min-w-[700px] h-full">
