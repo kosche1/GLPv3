@@ -207,10 +207,46 @@
             $attendancePercentage = \App\Models\StudentAttendance::getAttendancePercentage($user->id);
             $attendanceChange = \App\Models\StudentAttendance::getAttendanceChange($user->id);
 
-            $credits = \App\Models\StudentCredit::getCreditsInfo($user->id);
-            $creditsCompleted = $credits ? $credits->credits_completed : 0;
-            $creditsRequired = $credits ? ($credits->credits_required ?: 120) : 120;
-            $completionPercentage = $credits ? $credits->completion_percentage : 0;
+            // Get challenges as proxy for courses
+            $challenges = \App\Models\Challenge::where('is_active', true)
+                ->orderBy('required_level', 'asc')
+                ->take(5)
+                ->get();
+
+            $completedCredits = 0;
+            $creditsRequired = 120;
+
+            foreach ($challenges as $challenge) {
+                // Get tasks related to this challenge
+                $tasks = \App\Models\Task::where('challenge_id', $challenge->id)->get();
+
+                // Calculate completion status
+                $totalTasks = $tasks->count();
+                $completedTasks = \App\Models\StudentAnswer::where('user_id', $user->id)
+                    ->whereIn('task_id', $tasks->pluck('id'))
+                    ->where('is_correct', true)
+                    ->count();
+
+                $status = 'Not Started';
+                if ($completedTasks > 0) {
+                    $status = ($completedTasks >= $totalTasks) ? 'Completed' : 'In Progress';
+                }
+
+                // Count completed credits
+                if ($status === 'Completed') {
+                    // Determine credits based on challenge ID
+                    if ($challenge->id % 3 === 0) {
+                        $completedCredits += 4; // Advanced courses (divisible by 3)
+                    } elseif ($challenge->id % 2 === 0) {
+                        $completedCredits += 3; // Intermediate courses (divisible by 2 but not 3)
+                    } else {
+                        $completedCredits += 2; // Basic courses (not divisible by 2 or 3)
+                    }
+                }
+            }
+
+            $creditsCompleted = $completedCredits;
+            $completionPercentage = round(($completedCredits / $creditsRequired) * 100, 2);
 
             // --- Leaderboard Data ---
             $leaderboardData = collect([
