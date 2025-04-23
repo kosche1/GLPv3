@@ -44,6 +44,7 @@ class AdminPanelProvider extends PanelProvider
             )
             ->pages([Pages\Dashboard::class,
             \AssistantEngine\Filament\Chat\Pages\AssistantChat::class,
+            \App\Filament\Pages\Reports::class,
             ])
             ->discoverWidgets(
                 in: app_path("Filament/Widgets"),
