@@ -12,6 +12,7 @@ use App\Http\Controllers\ActivityGoalController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
 
 
 
@@ -23,6 +24,9 @@ Route::get('/challenge/{challenge}', function (Challenge $challenge) {
 use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('home');
+
+// Terms & Conditions page - accessible without authentication
+Route::view('terms', 'terms')->name('terms');
 
 
 
@@ -128,6 +132,21 @@ Route::get('/ai/stream', [\App\Http\Controllers\AiStreamController::class, 'stre
 Route::get('/api/user-activity', [\App\Http\Controllers\ActivityController::class, 'getUserActivityData'])
     ->name('api.user-activity')
     ->middleware('auth');
+
+// Refresh activity graph cache
+Route::get('/refresh-activity', function() {
+    $userId = Auth::id();
+    if (!$userId) return redirect()->route('login');
+
+    // Clear all activity-related caches
+    Cache::forget("user_activity_{$userId}_6_all");
+    Cache::forget("user_activity_{$userId}_3_all");
+    Cache::forget("user_activity_{$userId}_9_all");
+    Cache::forget("user_activity_{$userId}_12_all");
+    Cache::forget("dashboard_data_{$userId}");
+
+    return redirect()->route('dashboard')->with('status', 'Activity graph refreshed!');
+})->name('refresh-activity')->middleware('auth');
 
 // Level-up Data Demo
 Route::get('/level-up-data-demo', function () {

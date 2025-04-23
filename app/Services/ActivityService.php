@@ -22,9 +22,13 @@ class ActivityService
      */
     public function getUserActivityData($userId, $months = 6, $activityType = null)
     {
-        // Try to get from cache first (cache for 30 minutes)
+        // Try to get from cache first (cache for 5 minutes to ensure recent activities show up)
         $cacheKey = "user_activity_{$userId}_{$months}_{$activityType}";
-        return Cache::remember($cacheKey, 30 * 60, function () use ($userId, $months, $activityType) {
+
+        // Clear the cache to ensure we get fresh data
+        Cache::forget($cacheKey);
+
+        return Cache::remember($cacheKey, 5 * 60, function () use ($userId, $months, $activityType) {
             // Calculate the start date (X months ago from today)
             $startDate = Carbon::now()->subMonths($months)->startOfDay();
             $endDate = Carbon::now();

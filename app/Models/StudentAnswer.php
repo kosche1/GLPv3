@@ -37,7 +37,8 @@ class StudentAnswer extends Model
                 'evaluated_by',
             ])
             ->useLogName('Student Answer')
-            ->logOnlyDirty()
+            ->logAll() // Log all changes, not just dirty ones
+            ->logOnlyDirty(false) // Don't limit to dirty attributes
             ->dontSubmitEmptyLogs();
     }
 
@@ -98,12 +99,34 @@ class StudentAnswer extends Model
             if (!isset($studentAnswer->is_correct)) {
                 $studentAnswer->is_correct = null;
             }
+
+            // Log this activity for the activity graph
+            activity()
+                ->causedBy(auth()->user())
+                ->performedOn($studentAnswer)
+                ->withProperties([
+                    'task_id' => $studentAnswer->task_id,
+                    'is_correct' => $studentAnswer->is_correct,
+                    'status' => $studentAnswer->status,
+                ])
+                ->log('submitted_answer');
         });
 
         static::updating(function ($studentAnswer) {
             // If the status is being changed to 'evaluated', set the evaluated_at timestamp
             if ($studentAnswer->isDirty('status') && $studentAnswer->status === 'evaluated' && !$studentAnswer->evaluated_at) {
                 $studentAnswer->evaluated_at = now();
+
+                // Log evaluation activity
+                activity()
+                    ->causedBy(auth()->user())
+                    ->performedOn($studentAnswer)
+                    ->withProperties([
+                        'task_id' => $studentAnswer->task_id,
+                        'is_correct' => $studentAnswer->is_correct,
+                        'status' => 'evaluated',
+                    ])
+                    ->log('answer_evaluated');
             }
         });
     }

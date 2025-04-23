@@ -72,8 +72,11 @@ class DashboardController extends Controller
             return $achievements;
         });
 
-        // Cache dashboard data for better performance (30 second cache)
-        $dashboardData = Cache::remember('dashboard_data_'.$user->id, 30, function () use ($user) {
+        // Clear dashboard cache to ensure fresh data
+        Cache::forget('dashboard_data_'.$user->id);
+
+        // Cache dashboard data for better performance (5 second cache)
+        $dashboardData = Cache::remember('dashboard_data_'.$user->id, 5, function () use ($user) {
             return [
                 'currentLevel' => $user->getLevel(),
                 'currentPoints' => $user->getPoints(),

@@ -49,6 +49,10 @@ class AnswerEvaluationService
                 case 'automated':
                     $this->evaluateAutomated($studentAnswer, $task);
                     break;
+                case 'exact_match':
+                    // Handle exact match evaluation type
+                    $this->evaluateExactMatch($studentAnswer, $task);
+                    break;
                 case 'manual':
                     // Manual evaluation requires intervention. Set status maybe?
                     $studentAnswer->update(['status' => 'pending_manual_evaluation']);
@@ -87,10 +91,11 @@ class AnswerEvaluationService
         try {
             switch ($matchType) {
                 case 'exact':
-                    $expectedAnswer = $details['expected_answer'] ?? null;
+                    // Check for both 'expected' and 'expected_answer' keys for compatibility
+                    $expectedAnswer = $details['expected'] ?? $details['expected_answer'] ?? null;
                     $caseSensitive = $details['case_sensitive'] ?? false;
                     if ($expectedAnswer === null) {
-                        Log::warning("Automated evaluation (exact) failed: expected_answer missing in evaluation_details for Task ID: {$task->id}");
+                        Log::warning("Automated evaluation (exact) failed: expected answer missing in evaluation_details for Task ID: {$task->id}");
                         $feedback = 'Task configuration error: Expected answer not set.';
                     } else {
                         if ($caseSensitive) {
@@ -182,6 +187,52 @@ class AnswerEvaluationService
         $feedback = 'File evaluation is not yet implemented.';
 
         $this->updateAnswer($studentAnswer, $isCorrect, $score, $feedback);
+    }
+
+    /**
+     * Evaluate a student answer using exact match criteria.
+     */
+    protected function evaluateExactMatch(StudentAnswer $studentAnswer, Task $task): void
+    {
+        $details = $task->evaluation_details ?? [];
+        $submittedText = $studentAnswer->submitted_text ?? '';
+
+        // Check for both 'expected' and 'expected_answer' keys for compatibility
+        $expectedAnswer = $details['expected'] ?? $details['expected_answer'] ?? null;
+        $caseSensitive = $details['case_sensitive'] ?? false;
+
+        $isCorrect = false;
+        $score = 0;
+        $feedback = 'Evaluation could not be performed based on task configuration.';
+
+        try {
+            if ($expectedAnswer === null) {
+                Log::warning("Exact match evaluation failed: expected answer missing in evaluation_details for Task ID: {$task->id}");
+                $feedback = 'Task configuration error: Expected answer not set.';
+            } else {
+                if ($caseSensitive) {
+                    $isCorrect = $submittedText === $expectedAnswer;
+                } else {
+                    $isCorrect = strcasecmp($submittedText, $expectedAnswer) === 0;
+                }
+
+                if ($isCorrect) {
+                    $score = $task->points_reward;
+                    $feedback = 'Correct answer.';
+                } else {
+                    $feedback = 'Submitted answer does not match the expected answer.';
+                }
+            }
+        } catch (\Exception $e) {
+            // Catch potential errors during evaluation
+            Log::error("Exception during exact match evaluation for StudentAnswer ID: {$studentAnswer->id}. Error: " . $e->getMessage());
+            $isCorrect = false;
+            $score = 0;
+            $feedback = 'An unexpected error occurred during evaluation.';
+        }
+
+        $this->updateAnswer($studentAnswer, $isCorrect, $score, $feedback);
+        Log::info("Exact match evaluation completed for StudentAnswer ID: {$studentAnswer->id}. Correct: " . ($isCorrect ? 'Yes' : 'No'));
     }
 
 
