@@ -27,13 +27,13 @@
         <x-loading-screen />
 
         <!-- Animated Background -->
-        <div class="fixed inset-0 hero-pattern opacity-30 z-0"></div>
-        <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <!-- <div class="fixed inset-0 hero-pattern opacity-30 z-0"></div>
+        <div class="fixed inset-0 overflow-hidden pointer-events-none z-0"> -->
             <!-- Glowing orbs -->
-            <div class="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-emerald-500/10 filter blur-3xl animate-pulse-slow"></div>
+            <!-- <div class="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-emerald-500/10 filter blur-3xl animate-pulse-slow"></div>
             <div class="absolute bottom-1/3 right-1/3 w-96 h-96 rounded-full bg-blue-500/10 filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
             <div class="absolute top-2/3 left-1/2 w-72 h-72 rounded-full bg-purple-500/10 filter blur-3xl animate-pulse-slow animation-delay-4000"></div>
-        </div>
+        </div> -->
 
         <!-- Navigation -->
         <nav class="fixed top-0 left-0 right-0 z-50 bg-zinc-900/80 backdrop-blur-lg border-b border-neutral-800">
@@ -61,14 +61,14 @@
                                 Dashboard
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="px-5 py-1.5 text-sm rounded-lg border-2 border-emerald-500 bg-transparent text-emerald-500 font-semibold text-center transition-all duration-300 hover:bg-emerald-500 hover:text-white shadow-lg flex items-center justify-center gap-2">
+                            <a href="{{ route('login') }}" class="px-5 py-1.5 text-sm rounded-lg border-2 border-emerald-500 bg-emerald-500 text-white font-semibold text-center transition-all duration-300 hover:bg-emerald-600 shadow-lg flex items-center justify-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                                 </svg>
                                 Login
                             </a>
 
-                            <a href="{{ route('register') }}" class="px-5 py-1.5 text-sm rounded-lg border-2 border-emerald-500 bg-transparent text-emerald-500 font-semibold text-center transition-all duration-300 hover:bg-emerald-500 hover:text-white shadow-md flex items-center justify-center gap-2">
+                            <a href="{{ route('register') }}" class="px-5 py-1.5 text-sm rounded-lg border-2 border-emerald-500 bg-emerald-500 text-white font-semibold text-center transition-all duration-300 hover:bg-emerald-600 shadow-md flex items-center justify-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                                 </svg>
