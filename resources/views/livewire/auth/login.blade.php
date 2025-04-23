@@ -295,4 +295,8 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
         Don't have an account?
         <flux:link href="{{ route('register') }}" wire:navigate class="text-emerald-400 hover:text-emerald-300 transition-colors duration-300">Sign up</flux:link>
     </div>
+
+    <div class="text-center text-xs text-zinc-500 mt-4">
+        <flux:link href="{{ route('terms') }}" class="text-zinc-400 hover:text-emerald-300 transition-colors duration-300">Terms & Conditions</flux:link>
+    </div>
 </div>
