@@ -33,7 +33,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
         // Auth::login($user);
         
         session()->flash('status', 'Account created successfully. Please login with your credentials.');
-        $this->redirect(route('login', absolute: false), navigate: true);
+        $this->redirect(route('login', absolute: false));
     }
 }; ?>
 
@@ -102,6 +102,6 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
 
     <div class="space-x-1 text-center text-sm text-zinc-600 dark:text-zinc-400">
         Already have an account?
-        <flux:link href="{{ route('login') }}" wire:navigate>Log in</flux:link>
+        <flux:link href="{{ route('login') }}">Log in</flux:link>
     </div>
 </div>
