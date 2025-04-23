@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Password;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('components.layouts.auth.card')] class extends Component {
     public string $email = '';
 
     /**
@@ -23,6 +23,18 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-6">
+    <!-- Logo Animation -->
+    <div class="text-center mb-4">
+        <div class="flex justify-center">
+            <div class="relative">
+                <div class="absolute -inset-0.5 bg-linear-to-r from-emerald-500 to-blue-500 rounded-full blur-sm opacity-75 animate-pulse-slow"></div>
+                <div class="relative w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center border-2 border-emerald-500/50">
+                    <x-app-logo-icon class="h-10 w-10 text-emerald-400" />
+                </div>
+            </div>
+        </div>
+    </div>
+
     <x-auth-header title="Forgot password" description="Enter your email to receive a password reset link" />
 
     <!-- Session Status -->
@@ -40,11 +52,17 @@ new #[Layout('components.layouts.auth')] class extends Component {
             placeholder="email@example.com"
         />
 
-        <flux:button variant="primary" type="submit" class="w-full">{{ __('Email password reset link') }}</flux:button>
+        <div class="flex items-center justify-end">
+            <flux:button variant="primary" type="submit" class="w-full bg-linear-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 transition-all duration-300">{{ __('Email password reset link') }}</flux:button>
+        </div>
     </form>
 
     <div class="space-x-1 text-center text-sm text-zinc-400">
         Or, return to
-        <flux:link href="{{ route('login') }}">log in</flux:link>
+        <flux:link href="{{ route('login') }}" class="text-emerald-400 hover:text-emerald-300 transition-colors duration-300">log in</flux:link>
+    </div>
+
+    <div class="text-center text-xs text-zinc-500 mt-4">
+        <flux:link href="{{ route('terms') }}" class="text-zinc-400 hover:text-emerald-300 transition-colors duration-300">Terms & Conditions</flux:link>
     </div>
 </div>
