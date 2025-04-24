@@ -706,12 +706,6 @@
                                         <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + F</span>
                                     </div>
                                 </div>
-                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm text-neutral-300">Messages</span>
-                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + M</span>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -792,12 +786,6 @@
                                 </div>
                                 <span class="text-white bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Achievements</span>
                             </h3>
-                            <a href="#" class="text-sm text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 hover:bg-neutral-800 hover:border-purple-500/30 transition-all duration-300">
-                                View All
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
                         </div>
                         @if(isset($userAchievements) && $userAchievements->isNotEmpty())
                             <div class="grid grid-cols-3 gap-3">
@@ -950,10 +938,6 @@
                 // Alt+F to go to Forums page
                 if (e.altKey && e.key === 'f') {
                     window.location.href = '{{ route("forums") }}';
-                }
-                // Alt+M to go to Messages page
-                if (e.altKey && e.key === 'm') {
-                    window.location.href = '{{ route("messages") }}';
                 }
             }
         });
