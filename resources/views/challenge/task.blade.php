@@ -457,7 +457,7 @@
                     <p id="message-text" class="text-center font-medium"></p>
                 </div>
 
-                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="mt-4 grid grid-cols-1 gap-4">
                     <button id="submit-solution" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center flex items-center justify-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -648,21 +648,6 @@
                             }
                         });
                     </script>
-                    @if($nextTask)
-                        <a href="{{ route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) }}" class="w-full py-3 px-4 rounded-xl bg-blue-500 hover:bg-blue-600 transition-colors duration-300 text-white font-semibold text-center flex items-center justify-center gap-2">
-                            <span>Next Task</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                            </svg>
-                        </a>
-                    @else
-                        <div class="w-full py-3 px-4 rounded-xl bg-neutral-700 text-neutral-400 font-semibold text-center cursor-not-allowed flex items-center justify-center gap-2">
-                            <span>Last Task</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
@@ -842,12 +827,22 @@
                     clearOutput();
                     displayOutput('Submitting solution...', false);
 
+                    // Log detailed submission data
+                    console.log('SUBMISSION DEBUG - Preparing to submit coding solution');
+                    console.log('SUBMISSION DEBUG - Task ID:', {{ $currentTask->id }});
+                    console.log('SUBMISSION DEBUG - User ID:', {{ auth()->user()->id }});
+                    console.log('SUBMISSION DEBUG - Code:', code.substring(0, 100) + (code.length > 100 ? '...' : ''));
+                    console.log('SUBMISSION DEBUG - Output:', currentOutput);
+                    console.log('SUBMISSION DEBUG - CSRF Token:', document.querySelector('meta[name="csrf-token"]')?.content ? 'Present' : 'Missing');
+
                     // Use the direct submission endpoint
                     fetch('/api/direct-text-solution', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'Accept': 'application/json',
+                        'X-Debug-Info': 'Coding-Task-Submission'
                     },
                     body: JSON.stringify({
                         task_id: {{ $currentTask->id }},
@@ -860,17 +855,34 @@
                     })
                 })
                 .then(response => {
+                    console.log('SUBMISSION DEBUG - Response received:', response.status);
+                    console.log('SUBMISSION DEBUG - Response headers:',
+                        Array.from(response.headers.entries()).reduce((obj, [key, val]) => {
+                            obj[key] = val;
+                            return obj;
+                        }, {})
+                    );
+
                     const contentType = response.headers.get('content-type');
+                    console.log('SUBMISSION DEBUG - Content-Type:', contentType);
+
                     if (contentType && contentType.includes('application/json')) {
                         return response.json().then(data => {
+                            console.log('SUBMISSION DEBUG - Response JSON data:', data);
+
                             if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}, message: ${data.message || 'Unknown error'}`);
+                                const errorMsg = `HTTP error! status: ${response.status}, message: ${data.message || 'Unknown error'}`;
+                                console.error('SUBMISSION DEBUG - Error:', errorMsg);
+                                throw new Error(errorMsg);
                             }
                             return data;
+                        }).catch(error => {
+                            console.error('SUBMISSION DEBUG - JSON parsing error:', error);
+                            throw new Error(`Failed to parse JSON response: ${error.message}`);
                         });
                     } else {
                         return response.text().then(text => {
-                            console.error('Received non-JSON response:', text.substring(0, 100) + '...');
+                            console.error('SUBMISSION DEBUG - Received non-JSON response:', text.substring(0, 100) + '...');
                             throw new Error(`Received non-JSON response. You might need to log in or there's a server error.`);
                         });
                     }
@@ -906,9 +918,29 @@
                 })
                 .catch(error => {
                     clearOutput();
-                    console.error('Submission error:', error);
-                    displayOutput(`Error submitting solution. Please try again.`, true);
-                    // No alert, just log the error
+                    console.error('SUBMISSION DEBUG - Submission error:', error);
+                    console.error('SUBMISSION DEBUG - Error details:', error.stack || 'No stack trace available');
+                    console.error('SUBMISSION DEBUG - Error name:', error.name);
+                    console.error('SUBMISSION DEBUG - Error message:', error.message);
+
+                    // Try to get more detailed error information
+                    if (error.response) {
+                        console.error('SUBMISSION DEBUG - Response status:', error.response.status);
+                        console.error('SUBMISSION DEBUG - Response data:', error.response.data);
+                    }
+
+                    displayOutput(`Error submitting solution: ${error.message}. Please try again.`, true);
+
+                    // Show error message in the submission message container
+                    const messageContainer = document.getElementById('submission-message');
+                    const messageText = document.getElementById('message-text');
+
+                    if (messageContainer && messageText) {
+                        messageContainer.classList.remove('hidden');
+                        messageContainer.classList.add('bg-red-500/10', 'border-red-500/20');
+                        messageText.classList.add('text-red-400');
+                        messageText.textContent = `Error submitting solution: ${error.message}. Please try again.`;
+                    }
                 });
                 } else {
                     // Handle non-coding challenges (text input)

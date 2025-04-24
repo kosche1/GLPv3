@@ -7,7 +7,8 @@
         <div id="next-task-url" class="hidden" data-url="{{ $nextTask ?
             ($challenge->subject_type === 'core' ? route('core.challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) :
             ($challenge->subject_type === 'applied' ? route('applied.challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) :
-            route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask]))) : '' }}"></div>
+            ($challenge->subject_type === 'specialized' ? route('specialized.challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) :
+            route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask])))) : '' }}"></div>
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="p-2 bg-emerald-500/10 rounded-lg">
@@ -288,7 +289,8 @@
                         <a href="{{
                             $challenge->subject_type === 'core' ? route('core.challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) :
                             ($challenge->subject_type === 'applied' ? route('applied.challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) :
-                            route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask]))
+                            ($challenge->subject_type === 'specialized' ? route('specialized.challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) :
+                            route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask])))
                         }}" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center flex items-center justify-center gap-2">
                             <span>Next Task</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

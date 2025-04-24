@@ -15,13 +15,17 @@ class TextSolutionController extends Controller
     public function submit(Request $request)
     {
         try {
-            // Log the incoming request data for debugging
-            Log::info('Text solution submission request data:', [
-                'request_data' => $request->all()
+            // Log the incoming request data for debugging with more details
+            Log::alert('TEXT SOLUTION SUBMISSION - REQUEST DATA:', [
+                'request_data' => $request->all(),
+                'request_method' => $request->method(),
+                'request_path' => $request->path(),
+                'request_url' => $request->url(),
+                'request_ip' => $request->ip()
             ]);
 
             // Log the entire request for debugging
-            Log::info('Full request data:', [
+            Log::alert('TEXT SOLUTION SUBMISSION - FULL REQUEST DATA:', [
                 'all' => $request->all(),
                 'json' => $request->json()->all(),
                 'headers' => $request->header()
@@ -201,24 +205,52 @@ class TextSolutionController extends Controller
                     ]);
                 }
 
-            // Create student answer record with the submitted text in the submitted_text column
-            $studentAnswer = StudentAnswer::create([
-                'user_id' => $userId,
-                'task_id' => $taskId,
-                'submitted_text' => $submittedText, // Store in submitted_text column
-                'status' => 'submitted',
-                'is_correct' => $isCorrect
-            ]);
-
-            // Log the created record for verification
-            Log::info('Student answer created with the following data:', [
-                'id' => $studentAnswer->id,
+            // Log before creating the student answer
+            Log::alert('TEXT SOLUTION SUBMISSION - ATTEMPTING TO CREATE STUDENT ANSWER:', [
                 'user_id' => $userId,
                 'task_id' => $taskId,
                 'submitted_text' => $submittedText,
                 'status' => 'submitted',
                 'is_correct' => $isCorrect
             ]);
+
+            try {
+                // Create student answer record with the submitted text in the submitted_text column
+                $studentAnswer = StudentAnswer::create([
+                    'user_id' => $userId,
+                    'task_id' => $taskId,
+                    'submitted_text' => $submittedText, // Store in submitted_text column
+                    'status' => 'submitted',
+                    'is_correct' => $isCorrect
+                ]);
+
+                // Log the created record for verification
+                Log::alert('TEXT SOLUTION SUBMISSION - STUDENT ANSWER CREATED SUCCESSFULLY:', [
+                    'id' => $studentAnswer->id,
+                    'user_id' => $userId,
+                    'task_id' => $taskId,
+                    'submitted_text' => $submittedText,
+                    'status' => 'submitted',
+                    'is_correct' => $isCorrect,
+                    'created_at' => $studentAnswer->created_at
+                ]);
+
+                // Double-check that the record exists in the database
+                $verifyRecord = StudentAnswer::find($studentAnswer->id);
+                Log::alert('TEXT SOLUTION SUBMISSION - DATABASE VERIFICATION:', [
+                    'record_exists' => $verifyRecord ? 'YES' : 'NO',
+                    'id' => $studentAnswer->id,
+                    'verified_data' => $verifyRecord ? $verifyRecord->toArray() : 'Record not found'
+                ]);
+            } catch (\Exception $dbException) {
+                // Log detailed database error
+                Log::alert('TEXT SOLUTION SUBMISSION - DATABASE ERROR:', [
+                    'error_message' => $dbException->getMessage(),
+                    'error_code' => $dbException->getCode(),
+                    'error_trace' => $dbException->getTraceAsString()
+                ]);
+                throw $dbException; // Re-throw to be caught by the outer try-catch
+            }
 
             // If the answer is correct and the task has evaluation_type 'exact_match', award experience points
             if ($isCorrect && $task->evaluation_type === 'exact_match') {
@@ -264,14 +296,38 @@ class TextSolutionController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error submitting answer: ' . $e->getMessage(), [
-                'exception' => $e,
-                'trace' => $e->getTraceAsString(),
+            // Log detailed error information
+            Log::alert('TEXT SOLUTION SUBMISSION - CRITICAL ERROR:', [
+                'error_message' => $e->getMessage(),
+                'error_code' => $e->getCode(),
+                'error_class' => get_class($e),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'error_trace' => $e->getTraceAsString(),
                 'request_data' => $request->all()
             ]);
+
+            // Check if this is a database exception
+            if ($e instanceof \Illuminate\Database\QueryException) {
+                Log::alert('TEXT SOLUTION SUBMISSION - DATABASE QUERY ERROR:', [
+                    'sql' => method_exists($e, 'getSql') ? $e->getSql() : 'SQL not available',
+                    'bindings' => method_exists($e, 'getBindings') ? $e->getBindings() : 'Bindings not available',
+                    'error_info' => $e->errorInfo ?? 'Error info not available',
+                    'connection' => config('database.default'),
+                    'database_path' => config('database.connections.sqlite.database')
+                ]);
+            }
+
+            // Return a more detailed error response
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to submit answer: ' . $e->getMessage()
+                'message' => 'Failed to submit answer: ' . $e->getMessage(),
+                'error_type' => get_class($e),
+                'error_code' => $e->getCode(),
+                'debug_info' => app()->environment('production') ? null : [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ], 500);
         }
     }

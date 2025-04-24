@@ -48,6 +48,16 @@ class DatabaseSeeder extends Seeder
             // Specialized Subjects
             SpecializedSubjectsSeeder::class,
 
+            // Specialized Track Subjects
+            StemSubjectsSeeder::class,
+            AbmSubjectsSeeder::class,
+            HumssSubjectsSeeder::class,
+            HeSubjectsSeeder::class,
+            IctSubjectsSeeder::class,
+
+            // ICT Computer Programming
+            IctComputerProgrammingSeeder::class,
+
             // Forum categories
             ForumCategorySeeder::class,
 

@@ -96,7 +96,7 @@
                             <h3 class="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">Specialized Subjects</h3>
                         </div>
 
-                        <p class="text-sm text-neutral-400 mb-4">Advanced subjects that focus on specific areas of expertise. These include Artificial Intelligence, Data Science, Cybersecurity, and Advanced Mathematics.</p>
+                        <p class="text-sm text-neutral-400 mb-4">Advanced subjects that focus on specific areas of expertise. They are designed to provide in-depth knowledge and skills for a particular field of study or occupation.</p>
 
                         <div class="mt-auto pt-4 border-t border-neutral-700">
                             <a href="{{ route('subjects.specialized') }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">

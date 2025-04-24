@@ -34,25 +34,31 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="text-xs font-medium text-emerald-400">Artificial Intelligence</span>
+                        <span class="text-xs font-medium text-emerald-400">ABM</span>
                     </div>
                     <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="text-xs font-medium text-emerald-400">Data Science</span>
+                        <span class="text-xs font-medium text-emerald-400">HE</span>
                     </div>
                     <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="text-xs font-medium text-emerald-400">Cybersecurity</span>
+                        <span class="text-xs font-medium text-emerald-400">HUMMS</span>
                     </div>
                     <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="text-xs font-medium text-emerald-400">Advanced Mathematics</span>
+                        <span class="text-xs font-medium text-emerald-400">STEM</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-xs font-medium text-emerald-400">ICT</span>
                     </div>
                 </div>
             </div>
