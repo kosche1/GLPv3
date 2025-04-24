@@ -42,6 +42,12 @@ class DatabaseSeeder extends Seeder
             // Core Subjects
             CoreSubjectsSeeder::class,
 
+            // Applied Subjects
+            AppliedSubjectsSeeder::class,
+
+            // Specialized Subjects
+            SpecializedSubjectsSeeder::class,
+
             // Forum categories
             ForumCategorySeeder::class,
 

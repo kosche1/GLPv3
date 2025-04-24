@@ -34,25 +34,25 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="text-xs font-medium text-emerald-400">Computer Science</span>
+                        <span class="text-xs font-medium text-emerald-400">English for Academic and Professional Purposes</span>
                     </div>
                     <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="text-xs font-medium text-emerald-400">Engineering</span>
+                        <span class="text-xs font-medium text-emerald-400">Filipino sa Piling Larangan</span>
                     </div>
                     <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="text-xs font-medium text-emerald-400">Business Studies</span>
+                        <span class="text-xs font-medium text-emerald-400">Empowerment Technologies</span>
                     </div>
                     <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="text-xs font-medium text-emerald-400">Health Sciences</span>
+                        <span class="text-xs font-medium text-emerald-400">Entrepreneurship</span>
                     </div>
                 </div>
             </div>
@@ -85,10 +85,10 @@
                             </div>
                         @endif
 
-                        <!-- Language Badge -->
+                        <!-- Subject Type Badge -->
                         <div class="absolute top-3 right-3">
                             <span class="bg-neutral-800/90 text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full border border-emerald-500/20">
-                                {{ $challenge->programming_language }}
+                                Applied Subject
                             </span>
                         </div>
 
@@ -155,12 +155,6 @@
                     </svg>
                     <h3 class="text-xl font-medium text-white mb-2">No courses found</h3>
                     <p class="text-neutral-400 text-center mb-6">We're currently developing new applied subject courses. Check back soon!</p>
-                    <a href="{{ route('learning') }}" class="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        <span>Back to Learning Portal</span>
-                    </a>
                 </div>
             @endif
         </div>

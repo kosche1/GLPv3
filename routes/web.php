@@ -54,10 +54,22 @@ Route::middleware(
         ->name('core.challenge.task')
         ->middleware(['auth']);
 
+    // New route for applied subjects without the CheckTaskCompletion middleware
+    Route::get('/applied-subjects/{challenge}/tasks/{task}', [ChallengeController::class, 'showAppliedSubjectTask'])
+        ->name('applied.challenge.task')
+        ->middleware(['auth']);
+
+    // New route for specialized subjects without the CheckTaskCompletion middleware
+    Route::get('/specialized-subjects/{challenge}/tasks/{task}', [ChallengeController::class, 'showAppliedSubjectTask'])
+        ->name('specialized.challenge.task')
+        ->middleware(['auth']);
+
     // Debug route for task type
     Route::get('/debug-task-type/{challenge}/{task}', function (\App\Models\Challenge $challenge, \App\Models\Task $task) {
         $categoryName = $challenge->category->name ?? '';
-        $codingCategories = ['Computer Science', 'Web Development', 'Mobile Development'];
+        // Updated coding categories to match the actual subjects
+        $codingCategories = [];
+        // For applied subjects, we don't want to use the coding task view
         $isCodingTask = in_array($categoryName, $codingCategories) || !empty($challenge->programming_language);
 
         // Determine which view to use
@@ -70,6 +82,9 @@ Route::middleware(
         } else if ($challenge->subject_type === 'core') {
             $viewUsed = 'challenge.core-subject-task';
             $controllerMethod = 'showCoreSubjectTask';
+        } else if ($challenge->subject_type === 'applied' || $challenge->subject_type === 'specialized') {
+            $viewUsed = 'challenge.core-subject-task';
+            $controllerMethod = 'showAppliedSubjectTask';
         }
 
         return response()->json([
@@ -81,7 +96,9 @@ Route::middleware(
             'subject_type' => $challenge->subject_type,
             'view_used' => $viewUsed,
             'controller_method' => $controllerMethod,
-            'route_used' => $challenge->subject_type === 'core' ? 'core.challenge.task' : 'challenge.task'
+            'route_used' => $challenge->subject_type === 'core' ? 'core.challenge.task' :
+                           ($challenge->subject_type === 'applied' ? 'applied.challenge.task' :
+                           ($challenge->subject_type === 'specialized' ? 'specialized.challenge.task' : 'challenge.task'))
         ]);
     })->middleware('auth');
 

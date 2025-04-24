@@ -71,7 +71,7 @@
                             <h3 class="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">Applied Subjects</h3>
                         </div>
 
-                        <p class="text-sm text-neutral-400 mb-4">Practical subjects that apply theoretical knowledge to real-world scenarios. These include Computer Science, Engineering, Business Studies, and Health Sciences.</p>
+                        <p class="text-sm text-neutral-400 mb-4">Practical subjects that apply theoretical knowledge to real-world scenarios that are contextualized and applied to the specific career track.</p>
 
                         <div class="mt-auto pt-4 border-t border-neutral-700">
                             <a href="{{ route('subjects.applied') }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">

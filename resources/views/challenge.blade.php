@@ -339,7 +339,12 @@
                                                         </svg>
                                                     </span>
                                                 @else
-                                                    <a href="{{ $challenge->subject_type === 'core' ? route('core.challenge.task', ['challenge' => $challenge, 'task' => $task]) : route('challenge.task', ['challenge' => $challenge, 'task' => $task]) }}"
+                                                    <a href="{{
+                                                        $challenge->subject_type === 'core' ? route('core.challenge.task', ['challenge' => $challenge, 'task' => $task]) :
+                                                        ($challenge->subject_type === 'applied' ? route('applied.challenge.task', ['challenge' => $challenge, 'task' => $task]) :
+                                                        ($challenge->subject_type === 'specialized' ? route('specialized.challenge.task', ['challenge' => $challenge, 'task' => $task]) :
+                                                        route('challenge.task', ['challenge' => $challenge, 'task' => $task])))
+                                                    }}"
                                                        class="px-6 py-1.5 text-sm font-medium rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white transition-colors duration-300 flex items-center gap-1.5">
                                                         {{ $task->completed ? 'Review' : 'Start' }}
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

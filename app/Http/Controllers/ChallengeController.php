@@ -43,7 +43,8 @@ class ChallengeController extends Controller
 
         // Determine if this is a coding task based on challenge category or programming language
         $categoryName = $challenge->category->name ?? '';
-        $codingCategories = ['Computer Science', 'Web Development', 'Mobile Development'];
+        // Updated coding categories - empty for applied subjects
+        $codingCategories = [];
         $isCodingTask = in_array($categoryName, $codingCategories) || !empty($challenge->programming_language);
 
         // Log the task type determination for debugging
@@ -95,6 +96,37 @@ class ChallengeController extends Controller
         ]);
 
         // Always use the core subject template
+        return view('challenge.core-subject-task', compact('challenge', 'currentTask', 'previousTask', 'nextTask'));
+    }
+
+    /**
+     * Show an applied subject task without checking for previous submissions
+     */
+    public function showAppliedSubjectTask(Challenge $challenge, Task $task)
+    {
+        if ($task->challenge_id !== $challenge->id) {
+            return back()
+                ->with('error', 'Task not found in this challenge');
+        }
+
+        $tasks = $challenge->tasks()->orderBy('order')->get();
+        $currentTaskIndex = $tasks->search(function($item) use ($task) {
+            return $item->id === $task->id;
+        });
+
+        $previousTask = $currentTaskIndex > 0 ? $tasks[$currentTaskIndex - 1] : null;
+        $nextTask = $currentTaskIndex < $tasks->count() - 1 ? $tasks[$currentTaskIndex + 1] : null;
+
+        $currentTask = $task;
+
+        // Log the task access for debugging
+        \Illuminate\Support\Facades\Log::info('Applied subject task access', [
+            'task_id' => $task->id,
+            'challenge_id' => $challenge->id,
+            'subject_type' => $challenge->subject_type
+        ]);
+
+        // Use the core subject template for applied subjects as well
         return view('challenge.core-subject-task', compact('challenge', 'currentTask', 'previousTask', 'nextTask'));
     }
 }
