@@ -10,11 +10,11 @@
                 <h1 class="text-2xl font-bold text-white">{{ $challenge->name }}</h1>
             </div>
             <div class="flex gap-4">
-                <a href="{{ route('learning') }}" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/20 group">
+                <a href="{{ $challenge->subject_type === 'core' ? route('subjects.core') : ($challenge->subject_type === 'applied' ? route('subjects.applied') : ($challenge->subject_type === 'specialized' ? route('subjects.specialized') : route('learning'))) }}" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/20 group">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 group-hover:text-emerald-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    <span class="text-base font-medium text-emerald-400 group-hover:text-emerald-300 transition-colors">Back to Learning</span>
+                    <span class="text-base font-medium text-emerald-400 group-hover:text-emerald-300 transition-colors">Back to {{ ucfirst($challenge->subject_type ?? 'Learning') }} Subjects</span>
                 </a>
             </div>
         </div>
@@ -339,7 +339,7 @@
                                                         </svg>
                                                     </span>
                                                 @else
-                                                    <a href="{{ route('challenge.task', ['challenge' => $challenge, 'task' => $task]) }}"
+                                                    <a href="{{ $challenge->subject_type === 'core' ? route('core.challenge.task', ['challenge' => $challenge, 'task' => $task]) : route('challenge.task', ['challenge' => $challenge, 'task' => $task]) }}"
                                                        class="px-6 py-1.5 text-sm font-medium rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white transition-colors duration-300 flex items-center gap-1.5">
                                                         {{ $task->completed ? 'Review' : 'Start' }}
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -477,4 +477,94 @@
             </div>
         </div>
     </div>
+
+    <!-- Completion Modal -->
+    <div id="completion-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="relative bg-neutral-800 rounded-xl shadow-lg p-8 max-w-md w-full mx-4 border border-emerald-500/30 transform transition-all">
+            <div class="absolute top-4 right-4">
+                <button id="close-modal" class="text-neutral-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/20 mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">All Tasks Submitted!</h3>
+                <p class="text-neutral-300 mb-2">Congratulations! You've submitted answers for all tasks in this challenge.</p>
+                <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
+                    <p class="text-blue-400 flex items-start gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Your answers will be reviewed by your teacher. You'll receive feedback and points once the review is complete.</span>
+                    </p>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <a href="{{ $challenge->subject_type === 'core' ? route('subjects.core') : ($challenge->subject_type === 'applied' ? route('subjects.applied') : ($challenge->subject_type === 'specialized' ? route('subjects.specialized') : route('learning'))) }}" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        <span>Back to {{ ucfirst($challenge->subject_type ?? 'Learning') }} Subjects</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if all tasks are completed
+            const totalTasks = {{ $challenge->tasks->count() }};
+            let completedTasks = 0;
+
+            @foreach($challenge->tasks as $task)
+                @php
+                    // Check if the task has a submission
+                    $hasSubmission = \App\Models\StudentAnswer::where('user_id', Auth::id())
+                        ->where('task_id', $task->id)
+                        ->exists();
+
+                    if ($task->completed || $hasSubmission) {
+                        echo "completedTasks++;";
+                    }
+                @endphp
+            @endforeach
+
+            // Show modal if all tasks are completed
+            if (totalTasks > 0 && completedTasks === totalTasks) {
+                const modal = document.getElementById('completion-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                }
+            }
+
+            // Close modal when clicking the close button
+            const closeButton = document.getElementById('close-modal');
+            if (closeButton) {
+                closeButton.addEventListener('click', function() {
+                    const modal = document.getElementById('completion-modal');
+                    if (modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Close modal when clicking outside
+            const modalOverlay = document.querySelector('#completion-modal .absolute.inset-0');
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', function() {
+                    const modal = document.getElementById('completion-modal');
+                    if (modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
 </x-layouts.app>

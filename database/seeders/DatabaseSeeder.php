@@ -42,6 +42,9 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             LeaderboardCategorySeeder::class,
 
+            // Core Subjects
+            CoreSubjectsSeeder::class,
+
             // Forum categories
             ForumCategorySeeder::class,
 

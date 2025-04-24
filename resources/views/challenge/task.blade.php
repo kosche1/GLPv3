@@ -224,16 +224,33 @@
                     </div>
 
                     <div class="space-y-4">
+                        @php
+                            $categoryName = $challenge->category->name ?? '';
+                            $codingCategories = ['Computer Science', 'Web Development', 'Mobile Development'];
+                            $isCodingTask = in_array($categoryName, $codingCategories) || !empty($challenge->programming_language);
+                        @endphp
+
                         <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
                             <h4 class="font-medium text-white mb-2 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
+                                @if($isCodingTask)
                                 Scenario
+                                @else
+                                Task
+                                @endif
                             </h4>
-                            <p class="text-neutral-300">{{ $challenge->challenge_content['scenario'] ?? 'No scenario available' }}</p>
+                            <p class="text-neutral-300">
+                                @if($isCodingTask)
+                                {{ $challenge->challenge_content['scenario'] ?? 'No scenario available' }}
+                                @else
+                                {{ $currentTask->description }}
+                                @endif
+                            </p>
                         </div>
 
+                        @if($isCodingTask)
                         <div class="p-4 rounded-lg bg-neutral-800/50 border border-neutral-700">
                             <h4 class="font-medium text-white mb-2 flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -270,6 +287,7 @@
                             </h4>
                             <p class="text-neutral-300">{{ $currentTask->description }}</p>
                         </div>
+                        @endif
                     </div>
                     {{-- @dd(auth()->user()->id) --}}
                     <div class="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
@@ -281,6 +299,13 @@
                         </h3>
                         <div class="prose prose-invert max-w-none">
                             <div class="space-y-4">
+                                @php
+                                    $categoryName = $challenge->category->name ?? '';
+                                    $codingCategories = ['Computer Science', 'Web Development', 'Mobile Development'];
+                                    $isCodingTask = in_array($categoryName, $codingCategories) || !empty($challenge->programming_language);
+                                @endphp
+
+                                @if($isCodingTask)
                                 <h4 class="text-emerald-400 font-medium mb-2">Debug Process</h4>
                                 <ul class="list-none space-y-2 text-neutral-300">
                                     <li class="flex items-center gap-2">
@@ -308,6 +333,35 @@
                                         <span>Verify the solution works</span>
                                     </li>
                                 </ul>
+                                @else
+                                <h4 class="text-emerald-400 font-medium mb-2">Completion Steps</h4>
+                                <ul class="list-none space-y-2 text-neutral-300">
+                                    <li class="flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                        <span>Read the task description carefully</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                        <span>Analyze the requirements</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                        <span>Formulate your answer</span>
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                        <span>Review your answer before submitting</span>
+                                    </li>
+                                </ul>
+                                @endif
                             </div>
                         </div>
                     </div>

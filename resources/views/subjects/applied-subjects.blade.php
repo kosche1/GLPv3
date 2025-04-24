@@ -21,54 +21,38 @@
         </div>
 
         <!-- Description Section -->
-        <div class="p-6 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
-            <h2 class="text-xl font-semibold text-white mb-3">About Applied Subjects</h2>
-            <p class="text-neutral-300 mb-4">
-                Applied subjects bridge the gap between theoretical knowledge and real-world applications. These disciplines focus on practical implementation of concepts to solve tangible problems.
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                <div class="flex items-start gap-3">
-                    <div class="p-2 bg-emerald-500/10 rounded-lg mt-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-medium text-white">Computer Science</h3>
-                        <p class="text-neutral-400">Learn programming, algorithms, data structures, and software development principles.</p>
-                    </div>
+        <div class="p-4 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
+            <div class="flex flex-col md:flex-row md:items-center gap-4">
+                <div class="flex-shrink-0">
+                    <h2 class="text-lg font-semibold text-white">About Applied Subjects</h2>
+                    <p class="text-sm text-neutral-300">
+                        Practical disciplines bridging theory and real-world applications.
+                    </p>
                 </div>
-                <div class="flex items-start gap-3">
-                    <div class="p-2 bg-emerald-500/10 rounded-lg mt-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <div class="flex flex-wrap gap-3 md:ml-auto">
+                    <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
+                        <span class="text-xs font-medium text-emerald-400">Computer Science</span>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-medium text-white">Engineering</h3>
-                        <p class="text-neutral-400">Apply scientific principles to design and build solutions to complex problems.</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <div class="p-2 bg-emerald-500/10 rounded-lg mt-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
+                        <span class="text-xs font-medium text-emerald-400">Engineering</span>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-medium text-white">Business Studies</h3>
-                        <p class="text-neutral-400">Understand economics, management, marketing, and entrepreneurship principles.</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-3">
-                    <div class="p-2 bg-emerald-500/10 rounded-lg mt-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
+                        <span class="text-xs font-medium text-emerald-400">Business Studies</span>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-medium text-white">Health Sciences</h3>
-                        <p class="text-neutral-400">Study human health, medicine, nutrition, and healthcare systems.</p>
+                    <div class="flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-xs font-medium text-emerald-400">Health Sciences</span>
                     </div>
                 </div>
             </div>
@@ -111,7 +95,7 @@
                         <!-- Completed Badge -->
                         @if(isset($completedChallenges) && in_array($challenge->id, $completedChallenges ?? []))
                         <div class="absolute top-3 left-3">
-                            <span class="bg-emerald-500/90 text-white text-xs font-medium px-2.5 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1">
+                            <span class="bg-emerald-500 text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                 </svg>

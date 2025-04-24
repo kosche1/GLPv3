@@ -44,9 +44,46 @@ Route::middleware(
 
     Route::get('learning', [\App\Http\Controllers\LearningController::class, 'index'])->name('learning');
     Route::get('challenge/{challenge}', [\App\Http\Controllers\LearningController::class, 'show'])->name('challenge');
+    // Original route with middleware that prevents viewing if already submitted
     Route::get('/challenges/{challenge}/tasks/{task}', [ChallengeController::class, 'showTask'])
         ->name('challenge.task')
         ->middleware(['auth', \App\Http\Middleware\CheckTaskCompletion::class]);
+
+    // New route for core subjects without the CheckTaskCompletion middleware
+    Route::get('/core-subjects/{challenge}/tasks/{task}', [ChallengeController::class, 'showCoreSubjectTask'])
+        ->name('core.challenge.task')
+        ->middleware(['auth']);
+
+    // Debug route for task type
+    Route::get('/debug-task-type/{challenge}/{task}', function (\App\Models\Challenge $challenge, \App\Models\Task $task) {
+        $categoryName = $challenge->category->name ?? '';
+        $codingCategories = ['Computer Science', 'Web Development', 'Mobile Development'];
+        $isCodingTask = in_array($categoryName, $codingCategories) || !empty($challenge->programming_language);
+
+        // Determine which view to use
+        $viewUsed = 'challenge.non-coding-task';
+        $controllerMethod = 'showTask';
+
+        if ($isCodingTask) {
+            $viewUsed = 'challenge.task';
+            $controllerMethod = 'showTask';
+        } else if ($challenge->subject_type === 'core') {
+            $viewUsed = 'challenge.core-subject-task';
+            $controllerMethod = 'showCoreSubjectTask';
+        }
+
+        return response()->json([
+            'task_id' => $task->id,
+            'challenge_id' => $challenge->id,
+            'category_name' => $categoryName,
+            'programming_language' => $challenge->programming_language ?? 'none',
+            'is_coding_task' => $isCodingTask,
+            'subject_type' => $challenge->subject_type,
+            'view_used' => $viewUsed,
+            'controller_method' => $controllerMethod,
+            'route_used' => $challenge->subject_type === 'core' ? 'core.challenge.task' : 'challenge.task'
+        ]);
+    })->middleware('auth');
 
     // Subject routes
     Route::get('subjects/core', [\App\Http\Controllers\SubjectsController::class, 'coreSubjects'])->name('subjects.core');
@@ -129,6 +166,10 @@ Route::get('/debug-task-status/{task}', function (\App\Models\Task $task) {
             ->get()
     ]);
 })->middleware('auth');
+
+// Debug route to test core-subject-task template
+Route::get('/debug-core-task/{challenge}/{task}', [ChallengeController::class, 'showCoreSubjectTask'])
+    ->middleware('auth');
 
 // AI Chat routes
 Route::get('/ai/stream', [\App\Http\Controllers\AiStreamController::class, 'stream'])->name('ai.stream');

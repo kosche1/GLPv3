@@ -20,9 +20,30 @@ class SubjectsController extends Controller
             ->orderBy('required_level', 'asc')
             ->get();
 
+        // Get completed challenges for the current user
+        $completedChallenges = [];
+        if (Auth::check()) {
+            $userId = Auth::id();
+
+            foreach ($challenges as $challenge) {
+                $totalTasks = $challenge->tasks->count();
+                if ($totalTasks > 0) {
+                    $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
+                        ->whereIn('task_id', $challenge->tasks->pluck('id'))
+                        ->count();
+
+                    // If all tasks are completed, mark the challenge as completed
+                    if ($completedTasks >= $totalTasks) {
+                        $completedChallenges[] = $challenge->id;
+                    }
+                }
+            }
+        }
+
         return view('subjects.core-subjects', [
             'challenges' => $challenges,
-            'subjectType' => 'Core'
+            'subjectType' => 'Core',
+            'completedChallenges' => $completedChallenges
         ]);
     }
 
@@ -37,9 +58,30 @@ class SubjectsController extends Controller
             ->orderBy('required_level', 'asc')
             ->get();
 
+        // Get completed challenges for the current user
+        $completedChallenges = [];
+        if (Auth::check()) {
+            $userId = Auth::id();
+
+            foreach ($challenges as $challenge) {
+                $totalTasks = $challenge->tasks->count();
+                if ($totalTasks > 0) {
+                    $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
+                        ->whereIn('task_id', $challenge->tasks->pluck('id'))
+                        ->count();
+
+                    // If all tasks are completed, mark the challenge as completed
+                    if ($completedTasks >= $totalTasks) {
+                        $completedChallenges[] = $challenge->id;
+                    }
+                }
+            }
+        }
+
         return view('subjects.applied-subjects', [
             'challenges' => $challenges,
-            'subjectType' => 'Applied'
+            'subjectType' => 'Applied',
+            'completedChallenges' => $completedChallenges
         ]);
     }
 
@@ -54,9 +96,30 @@ class SubjectsController extends Controller
             ->orderBy('required_level', 'asc')
             ->get();
 
+        // Get completed challenges for the current user
+        $completedChallenges = [];
+        if (Auth::check()) {
+            $userId = Auth::id();
+
+            foreach ($challenges as $challenge) {
+                $totalTasks = $challenge->tasks->count();
+                if ($totalTasks > 0) {
+                    $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
+                        ->whereIn('task_id', $challenge->tasks->pluck('id'))
+                        ->count();
+
+                    // If all tasks are completed, mark the challenge as completed
+                    if ($completedTasks >= $totalTasks) {
+                        $completedChallenges[] = $challenge->id;
+                    }
+                }
+            }
+        }
+
         return view('subjects.specialized-subjects', [
             'challenges' => $challenges,
-            'subjectType' => 'Specialized'
+            'subjectType' => 'Specialized',
+            'completedChallenges' => $completedChallenges
         ]);
     }
 }
