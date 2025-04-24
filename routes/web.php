@@ -47,6 +47,11 @@ Route::middleware(
     Route::get('/challenges/{challenge}/tasks/{task}', [ChallengeController::class, 'showTask'])
         ->name('challenge.task')
         ->middleware(['auth', \App\Http\Middleware\CheckTaskCompletion::class]);
+
+    // Subject routes
+    Route::get('subjects/core', [\App\Http\Controllers\SubjectsController::class, 'coreSubjects'])->name('subjects.core');
+    Route::get('subjects/applied', [\App\Http\Controllers\SubjectsController::class, 'appliedSubjects'])->name('subjects.applied');
+    Route::get('subjects/specialized', [\App\Http\Controllers\SubjectsController::class, 'specializedSubjects'])->name('subjects.specialized');
     // Notification routes
     Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');
     Route::get('api/notifications', [\App\Http\Controllers\NotificationController::class, 'getNotifications'])->name('notifications.get');

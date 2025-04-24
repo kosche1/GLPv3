@@ -39,6 +39,7 @@ class Challenge extends Model
                 'time_limit',
                 'programming_language',
                 'tech_category',
+                'subject_type',
                 'image',
             ])
             ->useLogName('Challenge')
@@ -78,6 +79,7 @@ class Challenge extends Model
         "challenge_content",
         "programming_language", // New field for programming language focus
         "tech_category",       // New field for categorizing tech topics
+        "subject_type",        // Field for categorizing subjects (core, applied, specialized)
         "image",              // Field for storing challenge image path
     ];
 
