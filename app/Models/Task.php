@@ -67,7 +67,8 @@ class Task extends Model
         "is_active",
         "due_date",
         "challenge_id",
-        "order"
+        "order",
+        "challenge_content"
     ];
 
     /**
@@ -80,6 +81,7 @@ class Task extends Model
         "evaluation_details" => "array",
         "expected_output" => "array",
         "due_date" => "date",
+        "challenge_content" => "array",
     ];
 
     /**

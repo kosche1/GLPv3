@@ -44,9 +44,78 @@ Route::middleware(
 
     Route::get('learning', [\App\Http\Controllers\LearningController::class, 'index'])->name('learning');
     Route::get('challenge/{challenge}', [\App\Http\Controllers\LearningController::class, 'show'])->name('challenge');
+    // Original route with middleware that prevents viewing if already submitted
     Route::get('/challenges/{challenge}/tasks/{task}', [ChallengeController::class, 'showTask'])
         ->name('challenge.task')
         ->middleware(['auth', \App\Http\Middleware\CheckTaskCompletion::class]);
+
+    // New route for core subjects without the CheckTaskCompletion middleware
+    Route::get('/core-subjects/{challenge}/tasks/{task}', [ChallengeController::class, 'showCoreSubjectTask'])
+        ->name('core.challenge.task')
+        ->middleware(['auth']);
+
+    // New route for applied subjects without the CheckTaskCompletion middleware
+    Route::get('/applied-subjects/{challenge}/tasks/{task}', [ChallengeController::class, 'showAppliedSubjectTask'])
+        ->name('applied.challenge.task')
+        ->middleware(['auth']);
+
+    // New route for specialized subjects without the CheckTaskCompletion middleware
+    Route::get('/specialized-subjects/{challenge}/tasks/{task}', [ChallengeController::class, 'showSpecializedSubjectTask'])
+        ->name('specialized.challenge.task')
+        ->middleware(['auth']);
+
+    // Debug route for task type
+    Route::get('/debug-task-type/{challenge}/{task}', function (\App\Models\Challenge $challenge, \App\Models\Task $task) {
+        $categoryName = $challenge->category->name ?? '';
+        // Updated coding categories to match the actual subjects
+        $codingCategories = [];
+        // For applied subjects, we don't want to use the coding task view
+        $isCodingTask = in_array($categoryName, $codingCategories) || !empty($challenge->programming_language);
+
+        // Determine which view to use
+        $viewUsed = 'challenge.non-coding-task';
+        $controllerMethod = 'showTask';
+
+        if ($isCodingTask) {
+            $viewUsed = 'challenge.task';
+            $controllerMethod = 'showTask';
+        } else if ($challenge->subject_type === 'core') {
+            $viewUsed = 'challenge.core-subject-task';
+            $controllerMethod = 'showCoreSubjectTask';
+        } else if ($challenge->subject_type === 'applied') {
+            $viewUsed = 'challenge.core-subject-task';
+            $controllerMethod = 'showAppliedSubjectTask';
+        } else if ($challenge->subject_type === 'specialized') {
+            $viewUsed = 'challenge.core-subject-task';
+            $controllerMethod = 'showSpecializedSubjectTask';
+        }
+
+        return response()->json([
+            'task_id' => $task->id,
+            'challenge_id' => $challenge->id,
+            'category_name' => $categoryName,
+            'programming_language' => $challenge->programming_language ?? 'none',
+            'is_coding_task' => $isCodingTask,
+            'subject_type' => $challenge->subject_type,
+            'view_used' => $viewUsed,
+            'controller_method' => $controllerMethod,
+            'route_used' => $challenge->subject_type === 'core' ? 'core.challenge.task' :
+                           ($challenge->subject_type === 'applied' ? 'applied.challenge.task' :
+                           ($challenge->subject_type === 'specialized' ? 'specialized.challenge.task' : 'challenge.task'))
+        ]);
+    })->middleware('auth');
+
+    // Subject routes
+    Route::get('subjects/core', [\App\Http\Controllers\SubjectsController::class, 'coreSubjects'])->name('subjects.core');
+    Route::get('subjects/applied', [\App\Http\Controllers\SubjectsController::class, 'appliedSubjects'])->name('subjects.applied');
+    Route::get('subjects/specialized', [\App\Http\Controllers\SubjectsController::class, 'specializedSubjects'])->name('subjects.specialized');
+
+    // Specialized Track routes
+    Route::get('subjects/specialized/abm', [\App\Http\Controllers\SubjectsController::class, 'abmTrack'])->name('subjects.specialized.abm');
+    Route::get('subjects/specialized/he', [\App\Http\Controllers\SubjectsController::class, 'heTrack'])->name('subjects.specialized.he');
+    Route::get('subjects/specialized/humms', [\App\Http\Controllers\SubjectsController::class, 'hummsTrack'])->name('subjects.specialized.humms');
+    Route::get('subjects/specialized/stem', [\App\Http\Controllers\SubjectsController::class, 'stemTrack'])->name('subjects.specialized.stem');
+    Route::get('subjects/specialized/ict', [\App\Http\Controllers\SubjectsController::class, 'ictTrack'])->name('subjects.specialized.ict');
     // Notification routes
     Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');
     Route::get('api/notifications', [\App\Http\Controllers\NotificationController::class, 'getNotifications'])->name('notifications.get');
@@ -125,6 +194,43 @@ Route::get('/debug-task-status/{task}', function (\App\Models\Task $task) {
     ]);
 })->middleware('auth');
 
+// Database connection test routes
+Route::get('/test-db-connection', function () {
+    return view('test-db-connection');
+})->middleware('auth')->name('test.db-connection');
+
+// Database fix route
+Route::get('/fix-student-answers-table', [\App\Http\Controllers\DatabaseFixController::class, 'fixStudentAnswersTable'])
+    ->middleware('auth')->name('fix.student-answers-table');
+
+Route::post('/test-create-student-answer', function (Illuminate\Http\Request $request) {
+    try {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'task_id' => 'required|exists:tasks,id',
+            'submitted_text' => 'required|string'
+        ]);
+
+        $studentAnswer = \App\Models\StudentAnswer::create([
+            'user_id' => $validated['user_id'],
+            'task_id' => $validated['task_id'],
+            'submitted_text' => $validated['submitted_text'],
+            'status' => 'submitted',
+            'is_correct' => false
+        ]);
+
+        return redirect()->route('test.db-connection')
+            ->with('success', "Test answer created successfully! ID: {$studentAnswer->id}");
+    } catch (\Exception $e) {
+        return redirect()->route('test.db-connection')
+            ->with('error', "Error creating test answer: {$e->getMessage()}");
+    }
+})->middleware('auth')->name('test.create-student-answer');
+
+// Debug route to test core-subject-task template
+Route::get('/debug-core-task/{challenge}/{task}', [ChallengeController::class, 'showCoreSubjectTask'])
+    ->middleware('auth');
+
 // AI Chat routes
 Route::get('/ai/stream', [\App\Http\Controllers\AiStreamController::class, 'stream'])->name('ai.stream');
 
@@ -152,5 +258,9 @@ Route::get('/refresh-activity', function() {
 Route::get('/level-up-data-demo', function () {
     return view('level-up-data-demo');
 })->name('level-up-data-demo');
+
+// Fix ICT Programming Tasks
+Route::get('/fix-ict-tasks', [\App\Http\Controllers\FixIctTasksController::class, 'fixTasks'])
+    ->name('fix.ict-tasks');
 
 require __DIR__.'/auth.php';

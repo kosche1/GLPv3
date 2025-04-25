@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -30,9 +29,7 @@ class DatabaseSeeder extends Seeder
             BadgeSeeder::class,
             AchievementSeeder::class,
 
-            // Challenges must be seeded before tasks since tasks depend on challenges
-            ChallengeTypeSeeder::class,
-            TaskSeeder::class,
+            // Challenges are now handled by CoreSubjectsSeeder
 
             DailyRewardTierSeeder::class,
             RewardSeeder::class,
@@ -41,6 +38,25 @@ class DatabaseSeeder extends Seeder
             // Categories and Leaderboard categories
             CategorySeeder::class,
             LeaderboardCategorySeeder::class,
+
+            // Core Subjects
+            CoreSubjectsSeeder::class,
+
+            // Applied Subjects
+            AppliedSubjectsSeeder::class,
+
+            // Specialized Subjects
+            SpecializedSubjectsSeeder::class,
+
+            // Specialized Track Subjects
+            StemSubjectsSeeder::class,
+            AbmSubjectsSeeder::class,
+            HumssSubjectsSeeder::class,
+            HeSubjectsSeeder::class,
+            IctSubjectsSeeder::class,
+
+            // ICT Computer Programming
+            IctComputerProgrammingSeeder::class,
 
             // Forum categories
             ForumCategorySeeder::class,
