@@ -285,7 +285,7 @@
                                 </svg>
                                 Expected Behavior
                             </h4>
-                            <p class="text-neutral-300">{{ $currentTask->instructions ?? $currentTask->description }}</p>
+                            <p class="text-neutral-300">{!! $currentTask->instructions ?? $currentTask->description !!}</p>
                         </div>
                         @endif
                     </div>
