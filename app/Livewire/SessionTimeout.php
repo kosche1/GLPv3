@@ -11,8 +11,8 @@ class SessionTimeout extends Component
     public $showLockModal = false;
     public $password = '';
     public $errorMessage = '';
-    public $inactivityTimeout = 10; // 300 seconds (5 minutes)
-    public $warningTimeout = 5; // 30 seconds warning before lock
+    public $inactivityTimeout = 1790;
+    public $warningTimeout = 10;
 
     public function mount()
     {

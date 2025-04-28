@@ -469,6 +469,8 @@
             @livewire('session-timeout')
         @endauth
 
+        @stack('styles')
         @fluxScripts
+        @stack('scripts')
     </body>
 </html>
