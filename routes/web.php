@@ -167,6 +167,12 @@ Route::middleware(
     Route::get('forums/{category}/{topic}', [ForumController::class, 'topic'])->name('forum.topic');
     Route::post('forums/comment/{topic}', [ForumController::class, 'storeComment'])->name('forum.store-comment')->where('topic', '[0-9]+');
     Route::post('forums/like', [ForumController::class, 'like'])->name('forum.like');
+
+    // Typing Test routes
+    Route::get('typing-test', [\App\Http\Controllers\TypingTestController::class, 'index'])->name('typing-test');
+    Route::get('typing-test/words', [\App\Http\Controllers\TypingTestController::class, 'getWords'])->name('typing-test.words');
+    Route::post('typing-test/save-result', [\App\Http\Controllers\TypingTestController::class, 'saveResult'])->name('typing-test.save-result');
+    Route::get('typing-test/history', [\App\Http\Controllers\TypingTestController::class, 'getHistory'])->name('typing-test.history');
     Route::view('help-center', 'help-center')->name('help-center');
     Route::view('technical-support', 'technical-support')->name('technical-support');
 
