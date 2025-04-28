@@ -263,4 +263,9 @@ Route::get('/level-up-data-demo', function () {
 Route::get('/fix-ict-tasks', [\App\Http\Controllers\FixIctTasksController::class, 'fixTasks'])
     ->name('fix.ict-tasks');
 
+// Password verification for auto-lock feature
+Route::post('/verify-password', [\App\Http\Controllers\PasswordVerificationController::class, 'verify'])
+    ->middleware('auth')
+    ->name('verify-password');
+
 require __DIR__.'/auth.php';

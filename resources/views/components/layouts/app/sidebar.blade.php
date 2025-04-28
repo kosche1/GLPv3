@@ -465,6 +465,10 @@
 
         {{ $slot }}
 
+        @auth
+            @livewire('session-timeout')
+        @endauth
+
         @fluxScripts
     </body>
 </html>

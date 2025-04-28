@@ -17,6 +17,8 @@ class Logout
         Session::invalidate();
         Session::regenerateToken();
 
+        // Clear session lock state is handled by JavaScript in the login page
+
         return redirect('/');
     }
 }

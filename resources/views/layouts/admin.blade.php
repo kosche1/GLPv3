@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    @auth
+    <meta name="user-role" content="{{ Auth::check() && method_exists(Auth::user(), 'hasRole') ? (Auth::user()->hasRole('faculty') ? 'faculty' : (Auth::user()->hasRole('admin') ? 'admin' : 'student')) : 'student' }}">
+    @endauth
 
     <title>{{ config('app.name', 'Laravel') }} - Admin</title>
 
@@ -13,7 +16,7 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     <!-- Livewire Styles -->
     @livewireStyles
 </head>
@@ -33,7 +36,7 @@
             @yield('content')
         </main>
     </div>
-    
+
     <!-- Livewire Scripts -->
     @livewireScripts
 </body>
