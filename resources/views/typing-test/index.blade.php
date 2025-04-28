@@ -3,40 +3,63 @@
         <div class="max-w-7xl w-full mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h2 class="text-2xl font-bold mb-6 text-center">Typing Speed Test</h2>
-                    <p class="text-center mb-6 text-gray-600 dark:text-gray-400">Improve your typing speed and accuracy with this typing test. Type the words as they appear and see your results.</p>
+                    <h2 class="text-3xl font-bold mb-4 text-center text-gray-800 dark:text-white">Typing Speed Test</h2>
+                    <p class="text-center mb-8 text-gray-700 dark:text-gray-300 text-lg max-w-3xl mx-auto">Improve your typing speed and accuracy with this typing test. Type the words as they appear and see your results.</p>
 
                     <div class="mb-8">
-                        <div class="flex justify-center mb-6">
-                            <div class="inline-flex rounded-md shadow-sm" role="group">
-                                <button id="mode-words" class="test-mode-btn px-5 py-2 text-sm font-medium bg-blue-600 text-white rounded-l-lg border border-blue-600 hover:bg-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
+                        <div class="flex justify-center mb-8">
+                            <div class="inline-flex rounded-md shadow-md" role="group">
+                                <button id="mode-words" class="test-mode-btn px-6 py-3 text-base font-medium bg-blue-600 text-white rounded-l-lg border border-blue-600 hover:bg-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
                                     Word Count
                                 </button>
-                                <button id="mode-time" class="test-mode-btn px-5 py-2 text-sm font-medium bg-gray-500 text-white rounded-r-lg border border-gray-500 hover:bg-gray-600 focus:z-10 focus:ring-2 focus:ring-gray-500 transition-colors duration-200">
+                                <button id="mode-time" class="test-mode-btn px-6 py-3 text-base font-medium bg-gray-600 text-white rounded-r-lg border border-gray-600 hover:bg-gray-700 focus:z-10 focus:ring-2 focus:ring-gray-500 transition-colors duration-200">
                                     Timed Test
                                 </button>
                             </div>
                         </div>
 
-                        <div id="word-count-options" class="mb-6">
-                            <h3 class="text-lg font-semibold mb-3 text-center">Select Word Count</h3>
-                            <div class="flex flex-wrap justify-center gap-2 mb-4">
-                                <button id="wordCount-25" class="word-count-btn px-4 py-2 rounded-md bg-blue-500 text-white font-medium shadow-sm hover:bg-blue-600 transition-colors duration-200" data-count="25">25 words</button>
-                                <button id="wordCount-50" class="word-count-btn px-4 py-2 rounded-md bg-gray-500 text-white font-medium shadow-sm hover:bg-gray-600 transition-colors duration-200" data-count="50">50 words</button>
-                                <button id="wordCount-100" class="word-count-btn px-4 py-2 rounded-md bg-gray-500 text-white font-medium shadow-sm hover:bg-gray-600 transition-colors duration-200" data-count="100">100 words</button>
+                        <div id="word-count-options" class="mb-8">
+                            <h3 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">Select Word Count</h3>
+                            <div class="flex flex-wrap justify-center gap-3 mb-4">
+                                <button id="wordCount-25" class="word-count-btn px-5 py-2.5 rounded-md bg-blue-600 text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base" data-count="25">25 words</button>
+                                <button id="wordCount-50" class="word-count-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-count="50">50 words</button>
+                                <button id="wordCount-100" class="word-count-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-count="100">100 words</button>
                             </div>
                         </div>
 
-                        <div id="time-options" class="mb-6 hidden">
-                            <h3 class="text-lg font-semibold mb-3 text-center">Select Time Limit</h3>
-                            <div class="flex flex-wrap justify-center gap-2 mb-4">
-                                <button id="timeLimit-15" class="time-limit-btn px-4 py-2 rounded-md bg-gray-500 text-white font-medium shadow-sm hover:bg-gray-600 transition-colors duration-200" data-seconds="15">15 seconds</button>
-                                <button id="timeLimit-30" class="time-limit-btn px-4 py-2 rounded-md bg-gray-500 text-white font-medium shadow-sm hover:bg-gray-600 transition-colors duration-200" data-seconds="30">30 seconds</button>
-                                <button id="timeLimit-60" class="time-limit-btn px-4 py-2 rounded-md bg-blue-500 text-white font-medium shadow-sm hover:bg-blue-600 transition-colors duration-200" data-seconds="60">1 minute</button>
-                                <button id="timeLimit-120" class="time-limit-btn px-4 py-2 rounded-md bg-gray-500 text-white font-medium shadow-sm hover:bg-gray-600 transition-colors duration-200" data-seconds="120">2 minutes</button>
-                                <button id="timeLimit-180" class="time-limit-btn px-4 py-2 rounded-md bg-gray-500 text-white font-medium shadow-sm hover:bg-gray-600 transition-colors duration-200" data-seconds="180">3 minutes</button>
-                                <button id="timeLimit-240" class="time-limit-btn px-4 py-2 rounded-md bg-gray-500 text-white font-medium shadow-sm hover:bg-gray-600 transition-colors duration-200" data-seconds="240">4 minutes</button>
-                                <button id="timeLimit-300" class="time-limit-btn px-4 py-2 rounded-md bg-gray-500 text-white font-medium shadow-sm hover:bg-gray-600 transition-colors duration-200" data-seconds="300">5 minutes</button>
+                        <div id="time-options" class="mb-8 hidden">
+                            <h3 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">Select Time Limit</h3>
+                            <div class="flex flex-wrap justify-center gap-3 mb-4">
+                                <button id="timeLimit-15" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="15">15 seconds</button>
+                                <button id="timeLimit-30" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="30">30 seconds</button>
+                                <button id="timeLimit-60" class="time-limit-btn px-5 py-2.5 rounded-md bg-blue-600 text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base" data-seconds="60">1 minute</button>
+                                <button id="timeLimit-120" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="120">2 minutes</button>
+                                <button id="timeLimit-180" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="180">3 minutes</button>
+                                <button id="timeLimit-240" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="240">4 minutes</button>
+                                <button id="timeLimit-300" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="300">5 minutes</button>
+                            </div>
+                        </div>
+
+                        <div id="result-container" class="hidden p-6 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 mb-8">
+                            <h3 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">Your Results</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                                    <div id="wpm" class="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">0</div>
+                                    <p class="text-gray-700 dark:text-gray-300 font-medium">Words Per Minute</p>
+                                </div>
+                                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                                    <div id="cpm" class="text-4xl font-bold text-green-600 dark:text-green-400 mb-2">0</div>
+                                    <p class="text-gray-700 dark:text-gray-300 font-medium">Characters Per Minute</p>
+                                </div>
+                                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                                    <div id="accuracy" class="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">0%</div>
+                                    <p class="text-gray-700 dark:text-gray-300 font-medium">Accuracy</p>
+                                </div>
+                            </div>
+                            <div class="mt-8 text-center">
+                                <button id="save-result-button" class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium shadow-md transition-colors duration-200">
+                                    Save Result
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -45,6 +68,20 @@
                         <div id="timer-container" class="hidden mb-4 text-center">
                             <div class="inline-block px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
                                 <span class="text-xl font-bold text-gray-800 dark:text-gray-200">Time: <span id="timer-display" class="text-blue-600 dark:text-blue-400">60</span></span>
+                            </div>
+                        </div>
+                        <div id="live-stats-container" class="mb-4 text-center flex justify-center space-x-4">
+                            <div class="inline-block px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">WPM</span>
+                                <span id="live-wpm" class="ml-2 text-lg font-bold text-blue-600 dark:text-blue-400">0</span>
+                            </div>
+                            <div class="inline-block px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">CPM</span>
+                                <span id="live-cpm" class="ml-2 text-lg font-bold text-green-600 dark:text-green-400">0</span>
+                            </div>
+                            <div class="inline-block px-4 py-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">ACC</span>
+                                <span id="live-accuracy" class="ml-2 text-lg font-bold text-purple-600 dark:text-purple-400">100%</span>
                             </div>
                         </div>
                         <div id="word-container" class="text-lg mb-6 leading-relaxed min-h-[150px] p-6 bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-600 shadow-inner"></div>
@@ -58,41 +95,18 @@
                         </div>
                     </div>
 
-                    <div id="result-container" class="hidden p-6 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 mb-6">
-                        <h3 class="text-xl font-bold mb-4 text-center">Your Results</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-                                <div id="wpm" class="text-4xl font-bold text-blue-500 mb-2">0</div>
-                                <p class="text-gray-600 dark:text-gray-400 font-medium">Words Per Minute</p>
-                            </div>
-                            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-                                <div id="cpm" class="text-4xl font-bold text-green-500 mb-2">0</div>
-                                <p class="text-gray-600 dark:text-gray-400 font-medium">Characters Per Minute</p>
-                            </div>
-                            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-                                <div id="accuracy" class="text-4xl font-bold text-purple-500 mb-2">0%</div>
-                                <p class="text-gray-600 dark:text-gray-400 font-medium">Accuracy</p>
-                            </div>
-                        </div>
-                        <div class="mt-8 text-center">
-                            <button id="save-result-button" class="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium shadow-sm transition-colors duration-200">
-                                Save Result
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="history-container" class="mt-8 p-6 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
-                        <h3 class="text-xl font-bold mb-4 text-center">Your History</h3>
+                    <div id="history-container" class="mt-10 p-8 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
+                        <h3 class="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">Your History</h3>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden">
-                                <thead class="bg-gray-50 dark:bg-gray-700">
+                            <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden shadow-md">
+                                <thead class="bg-gray-100 dark:bg-gray-700">
                                     <tr>
-                                        <th class="py-3 px-4 border-b border-gray-300 dark:border-gray-700 text-left font-semibold">Date</th>
-                                        <th class="py-3 px-4 border-b border-gray-300 dark:border-gray-700 text-left font-semibold">WPM</th>
-                                        <th class="py-3 px-4 border-b border-gray-300 dark:border-gray-700 text-left font-semibold">CPM</th>
-                                        <th class="py-3 px-4 border-b border-gray-300 dark:border-gray-700 text-left font-semibold">Accuracy</th>
-                                        <th class="py-3 px-4 border-b border-gray-300 dark:border-gray-700 text-left font-semibold">Words</th>
-                                        <th class="py-3 px-4 border-b border-gray-300 dark:border-gray-700 text-left font-semibold">Mode</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Date</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">WPM</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">CPM</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Accuracy</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Words</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Mode</th>
                                     </tr>
                                 </thead>
                                 <tbody id="history-table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -111,6 +125,7 @@
             let words;
             let correctCharactersTyped = 0;
             let charactersTyped = 0;
+            let incorrectWords = 0;
             let enteredWords = 0;
             let activeWordIndex = 0;
             let activeWord;
@@ -124,6 +139,7 @@
             let timeLimit = 60; // in seconds
             let timerInterval;
             let remainingTime;
+            let statsUpdateInterval;
 
             const wordContainer = document.getElementById("word-container");
             const inputField = document.getElementById('input-field');
@@ -189,6 +205,12 @@
                     timerInterval = null;
                 }
 
+                // Clear any existing stats update interval
+                if (statsUpdateInterval) {
+                    clearInterval(statsUpdateInterval);
+                    statsUpdateInterval = null;
+                }
+
                 resetVariables();
                 resetStyles();
 
@@ -212,6 +234,15 @@
                 } else {
                     timerContainer.classList.add('hidden');
                 }
+
+                // Start stats update interval when user starts typing
+                const startStatsUpdateOnFirstInput = function() {
+                    // Update stats every 500ms
+                    statsUpdateInterval = setInterval(updateLiveStats, 500);
+                    inputField.removeEventListener('input', startStatsUpdateOnFirstInput);
+                };
+
+                inputField.addEventListener('input', startStatsUpdateOnFirstInput);
             }
 
             function setTestMode(mode) {
@@ -220,12 +251,12 @@
                 // Update UI
                 testModeButtons.forEach(button => {
                     button.classList.remove('bg-blue-600', 'border-blue-600');
-                    button.classList.add('bg-gray-500', 'border-gray-500');
+                    button.classList.add('bg-gray-600', 'border-gray-600');
                 });
 
                 const activeButton = document.getElementById(`mode-${mode}`);
                 if (activeButton) {
-                    activeButton.classList.remove('bg-gray-500', 'border-gray-500');
+                    activeButton.classList.remove('bg-gray-600', 'border-gray-600');
                     activeButton.classList.add('bg-blue-600', 'border-blue-600');
                 }
 
@@ -264,13 +295,19 @@
                 clearInterval(timerInterval);
                 timerInterval = null;
 
+                // Clear stats update interval
+                if (statsUpdateInterval) {
+                    clearInterval(statsUpdateInterval);
+                    statsUpdateInterval = null;
+                }
+
                 endTime = Date.now();
                 const totalTime = timeLimit; // Use the full time limit for calculations
                 const minutes = totalTime / 60;
 
                 CPM = Math.round(correctCharactersTyped / minutes);
                 WPM = Math.round((correctCharactersTyped / 5) / minutes);
-                Accuracy = Math.round((correctCharactersTyped / charactersTyped) * 100);
+                Accuracy = enteredWords > 0 ? Math.round(((enteredWords - incorrectWords) / enteredWords) * 100) : 100;
 
                 inputField.disabled = true;
                 inputField.removeEventListener('input', handleInput);
@@ -290,34 +327,34 @@
 
             function updateWordCountStyle(wordCount) {
                 wordCountButtons.forEach(button => {
-                    button.classList.remove('bg-blue-500');
-                    button.classList.add('bg-gray-500');
+                    button.classList.remove('bg-blue-600');
+                    button.classList.add('bg-gray-600');
                 });
 
                 const selectedButton = document.getElementById(`wordCount-${wordCount}`);
                 if (selectedButton) {
-                    selectedButton.classList.remove('bg-gray-500');
-                    selectedButton.classList.add('bg-blue-500');
+                    selectedButton.classList.remove('bg-gray-600');
+                    selectedButton.classList.add('bg-blue-600');
                 }
             }
 
             function updateTimeLimitStyle(seconds) {
                 timeLimitButtons.forEach(button => {
-                    button.classList.remove('bg-blue-500');
-                    button.classList.add('bg-gray-500');
+                    button.classList.remove('bg-blue-600');
+                    button.classList.add('bg-gray-600');
                 });
 
                 const selectedButton = document.getElementById(`timeLimit-${seconds}`);
                 if (selectedButton) {
-                    selectedButton.classList.remove('bg-gray-500');
-                    selectedButton.classList.add('bg-blue-500');
+                    selectedButton.classList.remove('bg-gray-600');
+                    selectedButton.classList.add('bg-blue-600');
                 }
             }
 
             // Store all words for timed test
             let allWords = [];
             let visibleWordCount = 0;
-            let wordsPerRow = 7; // Approximate number of words per row - adjusted for better fit
+            let wordsPerRow = 6; // Reduced number of words per row for better visibility and spacing
 
             function getRandomWords(numberOfWords) {
                 fetch('{{ route("typing-test.words") }}?count=' + numberOfWords)
@@ -347,141 +384,71 @@
             function displayWords() {
                 wordContainer.innerHTML = "";
 
-                if (testMode === 'time') {
-                    // For timed mode, organize words into rows
-                    // Display exactly 3 rows
-                    visibleWordCount = 0;
+                // For both modes, display all words in a continuous flow
+                // This allows for smooth scrolling like monkeytype.com
+                visibleWordCount = allWords.length;
 
-                    // Create 3 rows
-                    for (let row = 0; row < 3; row++) {
-                        const rowDiv = document.createElement('div');
-                        rowDiv.className = 'word-row';
+                // Create a wrapper div for all words
+                const wordsWrapper = document.createElement('div');
+                wordsWrapper.className = 'words-wrapper';
 
-                        // Add words to this row
-                        for (let i = 0; i < wordsPerRow; i++) {
-                            const wordIndex = row * wordsPerRow + i;
+                // Add all words to the wrapper
+                for (let i = 0; i < allWords.length; i++) {
+                    const wordSpan = document.createElement('span');
+                    wordSpan.className = 'word';
+                    wordSpan.dataset.index = i; // Store the index for easier reference
+                    wordSpan.dataset.text = allWords[i]; // Store the original text
 
-                            // Break if we run out of words
-                            if (wordIndex >= allWords.length) break;
-
-                            const wordSpan = document.createElement('span');
-                            wordSpan.className = 'word';
-                            wordSpan.textContent = allWords[wordIndex];
-
-                            rowDiv.appendChild(wordSpan);
-                            visibleWordCount++;
-
-                            // Add a space after each word except the last one in a row
-                            if (i < wordsPerRow - 1 && wordIndex < allWords.length - 1) {
-                                const space = document.createTextNode(' ');
-                                rowDiv.appendChild(space);
-                            }
-                        }
-
-                        // Only add the row if it has words
-                        if (rowDiv.childNodes.length > 0) {
-                            wordContainer.appendChild(rowDiv);
-                        } else {
-                            break; // No more words to add
-                        }
-                    }
-                } else {
-                    // For word count mode, display all words in a single flow
-                    let spanWords = '';
-                    visibleWordCount = allWords.length;
-
-                    for(let i = 0; i < allWords.length; ++i) {
-                        spanWords += `<span class="word">${allWords[i]}</span> `;
+                    // Split the word into individual character spans
+                    const wordText = allWords[i];
+                    for (let j = 0; j < wordText.length; j++) {
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'char';
+                        charSpan.textContent = wordText[j];
+                        charSpan.dataset.index = j; // Store the character index
+                        wordSpan.appendChild(charSpan);
                     }
 
-                    wordContainer.innerHTML = spanWords;
+                    wordsWrapper.appendChild(wordSpan);
+
+                    // Add a space after each word except the last one
+                    if (i < allWords.length - 1) {
+                        const space = document.createTextNode(' ');
+                        wordsWrapper.appendChild(space);
+                    }
                 }
 
+                wordContainer.appendChild(wordsWrapper);
                 words = wordContainer.getElementsByClassName("word");
                 activeWord = words[activeWordIndex];
 
                 if (activeWord) {
                     activeWord.classList.add('active');
+                    // Ensure the active word is visible initially
+                    scrollActiveWordIntoView();
                 }
             }
 
-            // Function to load more words when user reaches the end of visible words
-            function loadMoreWords() {
-                if (testMode !== 'time') {
-                    return; // Only load more words in timed mode
-                }
+            // Function to scroll the active word into view
+            function scrollActiveWordIntoView() {
+                if (!activeWord) return;
 
-                // Calculate which row the active word is in (0-based index)
-                // We need to account for the actual DOM structure, not just the index
-                // Get all word-row elements
-                const rows = wordContainer.querySelectorAll('.word-row');
-                if (rows.length === 0) return;
+                // Calculate the position of the active word relative to the container
+                const containerRect = wordContainer.getBoundingClientRect();
+                const activeWordRect = activeWord.getBoundingClientRect();
 
-                // Find which row contains the active word
-                let activeWordRow = -1;
-                let wordIndexInRow = -1;
+                // Calculate the scroll position to center the active word vertically
+                const scrollTop = activeWordRect.top - containerRect.top - (containerRect.height / 2) + (activeWordRect.height / 2);
 
-                for (let i = 0; i < rows.length; i++) {
-                    const wordsInRow = rows[i].querySelectorAll('.word');
-                    for (let j = 0; j < wordsInRow.length; j++) {
-                        if (wordsInRow[j].classList.contains('active')) {
-                            activeWordRow = i;
-                            wordIndexInRow = j;
-                            break;
-                        }
-                    }
-                    if (activeWordRow !== -1) break;
-                }
-
-                // If we're on the last word of the 2nd row, scroll to maintain 3 visible rows
-                const isLastWordOfSecondRow = (activeWordRow === 1 && wordIndexInRow === rows[1].querySelectorAll('.word').length - 1);
-
-                if (!isLastWordOfSecondRow) {
-                    return; // Only scroll when at the end of the 2nd row
-                }
-
-                // Scrolling to next row
-
-                // Remove the first row
-                if (wordContainer.firstChild) {
-                    wordContainer.removeChild(wordContainer.firstChild);
-                }
-
-                // Add a new row at the end
-                const newRow = document.createElement('div');
-                newRow.className = 'word-row';
-                let wordCount = 0;
-
-                // Calculate the start index for the new row
-                const startIndex = visibleWordCount;
-                const endIndex = Math.min(startIndex + wordsPerRow, allWords.length);
-
-                for (let i = startIndex; i < endIndex; i++) {
-                    if (!allWords[i]) continue; // Skip if no more words
-
-                    const wordSpan = document.createElement('span');
-                    wordSpan.className = 'word';
-                    wordSpan.textContent = allWords[i];
-
-                    newRow.appendChild(wordSpan);
-                    wordCount++;
-
-                    // Add a space after each word except the last one
-                    if (wordCount < wordsPerRow && i < endIndex - 1) {
-                        const space = document.createTextNode(' ');
-                        newRow.appendChild(space);
-                    }
-                }
-
-                // Only add the row if it has words
-                if (wordCount > 0) {
-                    wordContainer.appendChild(newRow);
-                    visibleWordCount = endIndex;
-
-                    // Update the words collection
-                    words = wordContainer.getElementsByClassName("word");
-                }
+                // Smooth scroll to the active word
+                wordContainer.scrollTo({
+                    top: scrollTop + wordContainer.scrollTop,
+                    behavior: 'smooth'
+                });
             }
+
+            // We no longer need the loadMoreWords function as we're using a scrolling approach
+            // All words are loaded at once and we scroll to the active word
 
             function getTextInput() {
                 if (inputField) {
@@ -503,11 +470,69 @@
                     updateTextfieldColor();
                 }
 
+                // Update live stats
+                updateLiveStats();
+
                 checkIfTestEnded();
             }
 
+            // Function to update live WPM, CPM, and Accuracy stats
+            function updateLiveStats() {
+                if (!startTime) return;
+
+                const currentTime = Date.now();
+                const elapsedTimeInSeconds = (currentTime - startTime) / 1000;
+                const elapsedTimeInMinutes = elapsedTimeInSeconds / 60;
+
+                // Only update if we have some elapsed time to avoid division by zero
+                if (elapsedTimeInMinutes > 0) {
+                    // Calculate live stats
+                    const liveWPM = Math.round((correctCharactersTyped / 5) / elapsedTimeInMinutes);
+                    const liveCPM = Math.round(correctCharactersTyped / elapsedTimeInMinutes);
+                    const liveAccuracy = enteredWords > 0 ? Math.round(((enteredWords - incorrectWords) / enteredWords) * 100) : 100;
+
+                    // Update the display
+                    document.getElementById('live-wpm').textContent = liveWPM;
+                    document.getElementById('live-cpm').textContent = liveCPM;
+                    document.getElementById('live-accuracy').textContent = liveAccuracy + '%';
+                }
+            }
+
             function updateTextfieldColor() {
-                if (activeWord && inputField.value !== (activeWord.textContent).substring(0, inputField.value.length)) {
+                if (!activeWord) return;
+
+                const wordText = activeWord.dataset.text;
+                const inputText = inputField.value;
+                const chars = activeWord.querySelectorAll('.char');
+
+                // Reset all characters
+                chars.forEach(char => {
+                    char.classList.remove('correct', 'incorrect', 'current');
+                });
+
+                // Process each character
+                for (let i = 0; i < Math.max(inputText.length, wordText.length); i++) {
+                    // If we've gone beyond the word length, break
+                    if (i >= wordText.length) break;
+
+                    // If we've gone beyond the input length, this character hasn't been typed yet
+                    if (i >= inputText.length) {
+                        if (i === inputText.length) {
+                            chars[i].classList.add('current'); // Mark the next character as current
+                        }
+                        continue;
+                    }
+
+                    // Compare the characters
+                    if (inputText[i] === wordText[i]) {
+                        chars[i].classList.add('correct');
+                    } else {
+                        chars[i].classList.add('incorrect');
+                    }
+                }
+
+                // Update input field background color
+                if (inputText !== wordText.substring(0, inputText.length)) {
                     inputField.classList.add('bg-red-100');
                     inputField.classList.remove('bg-green-100');
                 } else {
@@ -527,10 +552,17 @@
             function handleEnteredWord() {
                 if (isInputCorrect()) {
                     activeWord.classList.add('text-green-500');
-                    correctCharactersTyped += activeWord.textContent.length;
+                    correctCharactersTyped += activeWord.dataset.text.length;
                 } else {
                     activeWord.classList.add('text-red-500');
+                    incorrectWords++;
                 }
+
+                // Reset character highlighting
+                const chars = activeWord.querySelectorAll('.char');
+                chars.forEach(char => {
+                    char.classList.remove('correct', 'incorrect', 'current');
+                });
 
                 activeWord.classList.remove('active');
                 nextWord();
@@ -542,17 +574,12 @@
 
                 activeWordIndex++;
 
-                // loadMoreWords will check if we need to load more words
-                // It will only load more when we're at the end of the 3rd row
-                loadMoreWords();
-
                 if (activeWordIndex < words.length) {
                     activeWord = words[activeWordIndex];
                     activeWord.classList.add('active');
 
-                    // We'll let the loadMoreWords function handle scrolling
-                    // No need for additional scrolling here as we're controlling
-                    // exactly when rows are added and removed
+                    // Scroll the active word into view
+                    scrollActiveWordIntoView();
                 }
 
                 enteredWords++;
@@ -561,13 +588,19 @@
             function checkIfTestEnded() {
                 // For word count mode, check if we've reached the word count
                 if (testMode === 'words' && enteredWords >= WordCount) {
+                    // Clear stats update interval
+                    if (statsUpdateInterval) {
+                        clearInterval(statsUpdateInterval);
+                        statsUpdateInterval = null;
+                    }
+
                     endTime = Date.now();
                     const totalTime = (endTime - startTime) / 1000;
                     const minutes = totalTime / 60;
 
                     CPM = Math.round(correctCharactersTyped / minutes);
                     WPM = Math.round((correctCharactersTyped / 5) / minutes);
-                    Accuracy = Math.round((correctCharactersTyped / charactersTyped) * 100);
+                    Accuracy = enteredWords > 0 ? Math.round(((enteredWords - incorrectWords) / enteredWords) * 100) : 100;
 
                     inputField.disabled = true;
                     inputField.removeEventListener('input', handleInput);
@@ -580,7 +613,7 @@
             }
 
             function isInputCorrect() {
-                return inputField.value.slice(0, -1) === activeWord.textContent;
+                return inputField.value.slice(0, -1) === activeWord.dataset.text;
             }
 
             function isNextWordTriggered() {
@@ -593,6 +626,9 @@
                 document.getElementById("accuracy").textContent = `${Accuracy}%`;
 
                 resultContainer.classList.remove('hidden');
+
+                // Scroll to the results container
+                resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
             function saveResult() {
@@ -631,13 +667,14 @@
                 const dateString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
 
                 const newRow = document.createElement('tr');
+                newRow.className = 'hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150';
                 newRow.innerHTML = `
-                    <td class="py-3 px-4">${dateString}</td>
-                    <td class="py-3 px-4 font-medium text-blue-500">${WPM}</td>
-                    <td class="py-3 px-4 font-medium text-green-500">${CPM}</td>
-                    <td class="py-3 px-4 font-medium text-purple-500">${Accuracy}%</td>
-                    <td class="py-3 px-4">${enteredWords}</td>
-                    <td class="py-3 px-4">${testMode === 'time' ? `${formatTime(timeLimit)}` : 'Words'}</td>
+                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${dateString}</td>
+                    <td class="py-4 px-6 font-medium text-blue-600 dark:text-blue-400">${WPM}</td>
+                    <td class="py-4 px-6 font-medium text-green-600 dark:text-green-400">${CPM}</td>
+                    <td class="py-4 px-6 font-medium text-purple-600 dark:text-purple-400">${Accuracy}%</td>
+                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${enteredWords}</td>
+                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${testMode === 'time' ? `${formatTime(timeLimit)}` : 'Words'}</td>
                 `;
 
                 historyTableBody.prepend(newRow);
@@ -666,7 +703,7 @@
                             // If no history, show a message
                             const emptyRow = document.createElement('tr');
                             emptyRow.innerHTML = `
-                                <td colspan="6" class="py-4 px-4 text-center text-gray-500 italic">No typing test history yet. Complete a test to see your results here.</td>
+                                <td colspan="6" class="py-6 px-6 text-center text-gray-500 dark:text-gray-400 italic text-lg">No typing test history yet. Complete a test to see your results here.</td>
                             `;
                             historyTableBody.appendChild(emptyRow);
                         } else {
@@ -676,13 +713,14 @@
                                 const dateString = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
 
                                 const row = document.createElement('tr');
+                                row.className = 'hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150';
                                 row.innerHTML = `
-                                    <td class="py-3 px-4">${dateString}</td>
-                                    <td class="py-3 px-4 font-medium text-blue-500">${item.wpm}</td>
-                                    <td class="py-3 px-4 font-medium text-green-500">${item.cpm}</td>
-                                    <td class="py-3 px-4 font-medium text-purple-500">${item.accuracy}%</td>
-                                    <td class="py-3 px-4">${item.word_count}</td>
-                                    <td class="py-3 px-4">${item.test_mode === 'time' ? (item.time_limit ? formatTime(item.time_limit) : '1:00') : 'Words'}</td>
+                                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${dateString}</td>
+                                    <td class="py-4 px-6 font-medium text-blue-600 dark:text-blue-400">${item.wpm}</td>
+                                    <td class="py-4 px-6 font-medium text-green-600 dark:text-green-400">${item.cpm}</td>
+                                    <td class="py-4 px-6 font-medium text-purple-600 dark:text-purple-400">${item.accuracy}%</td>
+                                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${item.word_count}</td>
+                                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${item.test_mode === 'time' ? (item.time_limit ? formatTime(item.time_limit) : '1:00') : 'Words'}</td>
                                 `;
                                 historyTableBody.appendChild(row);
                             });
@@ -696,6 +734,7 @@
             function resetVariables() {
                 correctCharactersTyped = 0;
                 charactersTyped = 0;
+                incorrectWords = 0;
                 enteredWords = 0;
                 activeWordIndex = 0;
                 activeWord = undefined;
@@ -719,6 +758,11 @@
                 // Reset timer display color
                 timerDisplay.classList.remove('text-red-600', 'dark:text-red-400');
                 timerDisplay.classList.add('text-blue-600', 'dark:text-blue-400');
+
+                // Reset live stats display
+                document.getElementById('live-wpm').textContent = '0';
+                document.getElementById('live-cpm').textContent = '0';
+                document.getElementById('live-accuracy').textContent = '100%';
             }
         });
     </script>
@@ -726,64 +770,151 @@
     @push('styles')
     <style>
         .word {
-            margin-right: 10px;
+            margin-right: 8px;
+            margin-bottom: 8px;
             display: inline-block;
-            padding: 3px 6px;
-            border-radius: 4px;
+            padding: 2px 4px;
+            border-radius: 3px;
             transition: all 0.2s ease;
             font-size: 1.35rem;
             font-weight: 500;
-            color: #1F2937; /* Dark gray for better contrast */
+            color: #4B5563; /* Medium gray for better contrast */
             letter-spacing: 0.02em;
         }
 
         .dark .word {
-            color: #E5E7EB; /* Light gray for dark mode */
+            color: #9CA3AF; /* Medium gray for dark mode */
         }
 
         .active {
-            color: #4338CA; /* Darker indigo for better contrast */
-            background-color: rgba(79, 70, 229, 0.15);
-            border-bottom: 3px solid #4338CA;
+            color: #4F46E5; /* Indigo for better contrast */
+            background-color: rgba(79, 70, 229, 0.1);
+            border-bottom: 2px solid #4F46E5;
             font-weight: 600;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Add a subtle cursor effect */
+        .active::after {
+            content: '';
+            position: absolute;
+            right: -2px;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: #4F46E5;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
         .text-green-500 {
-            color: #047857; /* Darker green for better contrast */
-            background-color: rgba(16, 185, 129, 0.15);
+            color: #059669; /* Green for correct words */
+            background-color: transparent;
         }
 
         .text-red-500 {
-            color: #B91C1C; /* Darker red for better contrast */
-            background-color: rgba(239, 68, 68, 0.15);
+            color: #DC2626; /* Red for incorrect words */
+            background-color: rgba(239, 68, 68, 0.1);
+            text-decoration: underline;
+            text-decoration-color: #DC2626;
+            text-decoration-thickness: 2px;
+        }
+
+        /* Character styling */
+        .char {
+            display: inline-block;
+            position: relative;
+            transition: all 0.1s ease;
+            border-left: 2px solid transparent;
+            border-right: 2px solid transparent;
+            margin: 0 -2px; /* Compensate for the borders */
+        }
+
+        .char.correct {
+            color: #059669; /* Green for correct characters */
+        }
+
+        .char.incorrect {
+            color: #DC2626; /* Red for incorrect characters */
+            background-color: rgba(239, 68, 68, 0.2);
+            border-radius: 2px;
+        }
+
+        .char.current {
+            border-left: 2px solid #4F46E5;
+            animation: blink-char 1s infinite;
+        }
+
+        @keyframes blink-char {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Adjust active word styling to work better with character highlighting */
+        .active {
+            color: #4B5563; /* Reset to default color */
+            background-color: rgba(79, 70, 229, 0.05);
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+        }
+
+        /* Remove the cursor effect from active word since we have it on characters now */
+        .active::after {
+            display: none;
         }
 
         #word-container {
-            line-height: 2.1;
+            line-height: 2.5;
             font-size: 1.35rem;
-            padding: 1.25rem;
+            padding: 1.5rem;
             background-color: #F9FAFB; /* Light gray background */
             border-radius: 8px;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            overflow-y: auto; /* Enable vertical scrolling */
+            overflow-x: hidden; /* Hide horizontal scrollbar */
             position: relative;
+            height: 12rem; /* Fixed height for scrolling container */
+            scrollbar-width: thin; /* For Firefox */
+            scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* For Firefox */
+        }
+
+        /* Webkit scrollbar styling */
+        #word-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #word-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #word-container::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
         }
 
         .dark #word-container {
             background-color: #1F2937; /* Darker background for dark mode */
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent; /* For Firefox */
         }
 
-        /* For timed test mode - limit to 3 lines */
-        .timed-mode #word-container {
-            height: 8.5rem; /* Approximately 3 lines of text */
-            overflow: hidden;
+        .dark #word-container::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
-        .word-row {
-            white-space: nowrap;
-            overflow: hidden;
-            margin-bottom: 0.4rem;
+        .words-wrapper {
+            padding: 1rem 0.5rem;
+            line-height: 2.8;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            max-width: 100%;
+            justify-content: center; /* Center words horizontally */
+            gap: 0 4px; /* Add some gap between words */
         }
     </style>
     @endpush
