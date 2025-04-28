@@ -19,7 +19,7 @@ class WelcomeController extends Controller
     {
         // Get featured challenges
         $challenges = Challenge::orderBy('id')->take(3)->get();
-        
+
         // Get statistics for counter section
         $stats = [
             'users' => User::count(),
@@ -27,7 +27,7 @@ class WelcomeController extends Controller
             'completedTasks' => UserTask::where('completed', true)->count(),
             'achievements' => DB::table('achievement_user')->count(),
         ];
-        
+
         // Get learning paths/steps
         $learningPaths = [
             [
@@ -46,47 +46,95 @@ class WelcomeController extends Controller
                 'description' => 'Complete challenges, earn points, unlock achievements, and track your progress.'
             ]
         ];
-        
-        // Get technologies taught
-        $technologies = [
-            [
-                'name' => 'JavaScript',
-                'icon' => 'javascript',
-                'color' => 'yellow',
-                'count' => Challenge::where('programming_language', 'javascript')->count()
-            ],
-            [
-                'name' => 'Python',
-                'icon' => 'python',
+
+        // Get 2 subjects from each specialized track
+        $technologies = [];
+
+        // STEM subjects
+        $stemSubjects = Challenge::where('subject_type', 'specialized')
+            ->where('tech_category', 'stem')
+            ->where('is_active', true)
+            ->take(2)
+            ->get();
+
+        foreach ($stemSubjects as $subject) {
+            $technologies[] = [
+                'name' => $subject->name,
+                'icon' => 'stem',
                 'color' => 'blue',
-                'count' => Challenge::where('programming_language', 'python')->count()
-            ],
-            [
-                'name' => 'Java',
-                'icon' => 'java',
-                'color' => 'orange',
-                'count' => Challenge::where('programming_language', 'java')->count()
-            ],
-            [
-                'name' => 'C#',
-                'icon' => 'csharp',
+                'count' => $subject->tasks()->count(),
+                'strand' => 'STEM'
+            ];
+        }
+
+        // ABM subjects
+        $abmSubjects = Challenge::where('subject_type', 'specialized')
+            ->where('tech_category', 'abm')
+            ->where('is_active', true)
+            ->take(2)
+            ->get();
+
+        foreach ($abmSubjects as $subject) {
+            $technologies[] = [
+                'name' => $subject->name,
+                'icon' => 'abm',
+                'color' => 'amber',
+                'count' => $subject->tasks()->count(),
+                'strand' => 'ABM'
+            ];
+        }
+
+        // HUMSS subjects
+        $humssSubjects = Challenge::where('subject_type', 'specialized')
+            ->where('tech_category', 'humms')
+            ->where('is_active', true)
+            ->take(2)
+            ->get();
+
+        foreach ($humssSubjects as $subject) {
+            $technologies[] = [
+                'name' => $subject->name,
+                'icon' => 'humms',
                 'color' => 'purple',
-                'count' => Challenge::where('programming_language', 'csharp')->count()
-            ],
-            [
-                'name' => 'PHP',
-                'icon' => 'php',
-                'color' => 'indigo',
-                'count' => Challenge::where('programming_language', 'php')->count()
-            ],
-            [
-                'name' => 'SQL',
-                'icon' => 'database',
+                'count' => $subject->tasks()->count(),
+                'strand' => 'HUMSS'
+            ];
+        }
+
+        // HE subjects
+        $heSubjects = Challenge::where('subject_type', 'specialized')
+            ->where('tech_category', 'he')
+            ->where('is_active', true)
+            ->take(2)
+            ->get();
+
+        foreach ($heSubjects as $subject) {
+            $technologies[] = [
+                'name' => $subject->name,
+                'icon' => 'he',
+                'color' => 'pink',
+                'count' => $subject->tasks()->count(),
+                'strand' => 'HE'
+            ];
+        }
+
+        // ICT subjects
+        $ictSubjects = Challenge::where('subject_type', 'specialized')
+            ->where('tech_category', 'ict')
+            ->where('is_active', true)
+            ->take(2)
+            ->get();
+
+        foreach ($ictSubjects as $subject) {
+            $technologies[] = [
+                'name' => $subject->name,
+                'icon' => 'ict',
                 'color' => 'emerald',
-                'count' => Challenge::where('programming_language', 'sql')->count()
-            ]
-        ];
-        
+                'count' => $subject->tasks()->count(),
+                'strand' => 'ICT'
+            ];
+        }
+
         return view('welcome', compact('challenges', 'stats', 'learningPaths', 'technologies'));
     }
 }
