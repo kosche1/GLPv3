@@ -142,32 +142,50 @@
                         <p class="text-neutral-300 mb-4">Improve your typing speed and accuracy with our interactive typing test. Track your progress and see your words per minute (WPM), characters per minute (CPM), and accuracy.</p>
 
                         <div class="mb-4">
-                            <h3 class="text-lg font-medium text-white mb-2">Benefits:</h3>
-                            <ul class="space-y-2 text-neutral-300">
+                            <h3 class="text-lg font-medium text-white mb-3">Benefits:</h3>
+                            <ul class="space-y-3 text-neutral-300">
                                 <li class="flex items-start gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
-                                    <span>Increase your typing speed for better productivity</span>
+                                    <span>Increase your typing speed for better productivity and faster code writing</span>
                                 </li>
                                 <li class="flex items-start gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
-                                    <span>Improve accuracy to reduce errors in your work</span>
+                                    <span>Improve accuracy to reduce syntax errors and debugging time in programming</span>
                                 </li>
                                 <li class="flex items-start gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
-                                    <span>Track your progress over time with detailed statistics</span>
+                                    <span>Track your progress over time with detailed WPM, CPM, and accuracy statistics</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>Develop muscle memory for common programming terms and syntax patterns</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>Reduce mental fatigue by automating the mechanical aspects of typing</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span>Compete with yourself to achieve new personal records and milestones</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
 
                     <div class="flex-1 flex flex-col justify-center items-center">
-                        <img src="{{ asset('images/typing-test-preview.png') }}" alt="Typing Test Preview" class="w-full max-w-md rounded-lg shadow-lg mb-6" onerror="this.src='https://placehold.co/600x400/3b3b3b/6ee7b7?text=Typing+Test&font=montserrat'">
+                        <img src="{{ asset('images/games/Typing_Test.png') }}" alt="Typing Test Preview" class="w-full max-w-md rounded-lg shadow-lg mb-6" onerror="this.src='https://placehold.co/600x400/3b3b3b/6ee7b7?text=Typing+Test&font=montserrat'">
 
                         <a href="{{ route('typing-test') }}" class="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
                             Start Typing Test
