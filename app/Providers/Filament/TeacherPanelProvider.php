@@ -25,6 +25,8 @@ class TeacherPanelProvider extends PanelProvider
         return $panel
             ->id('teacher')
             ->path('teacher')
+            ->authGuard('web')
+            ->login()
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -66,6 +68,22 @@ class TeacherPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->tenantMiddleware([
+                // Ensure only faculty members can access the teacher panel
+                function () {
+                    return function ($request, $next) {
+                        $user = $request->user();
+
+                        if (!$user || !$user->hasRole('faculty')) {
+                            // Redirect non-faculty users to the dashboard
+                            return redirect()->route('dashboard')
+                                ->with('error', 'You do not have permission to access the teacher panel.');
+                        }
+
+                        return $next($request);
+                    };
+                },
             ]);
     }
 }
