@@ -18,5 +18,8 @@
         {{ $slot }}
 
         @livewire('AiWidget')
+        @auth
+            @livewire('session-timeout')
+        @endauth
     </flux:main>
 </x-layouts.app.sidebar>

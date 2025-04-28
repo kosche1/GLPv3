@@ -14,6 +14,7 @@ use App\Listeners\SendAchievementNotification;
 use App\Listeners\SendChallengeCompletionNotification;
 use App\Listeners\SendLevelUpNotification;
 use App\Listeners\SendNewChallengeNotification;
+use App\Listeners\AssignStudentRole;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use LevelUp\Experience\Events\AchievementAwarded;
@@ -29,6 +30,7 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+            AssignStudentRole::class,
         ],
         Login::class => [
             RecordUserAttendance::class,

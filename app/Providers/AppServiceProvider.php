@@ -7,6 +7,7 @@ use Prism\Prism\Prism;
 use App\Models\StudentAnswer;
 use Prism\Prism\Enums\Provider;
 use App\Livewire\GradesComponent;
+use App\Livewire\SessionTimeout;
 use Prism\Prism\Facades\PrismServer;
 use Prism\Prism\Text\PendingRequest;
 use Illuminate\Support\ServiceProvider;
@@ -31,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Register Livewire components
         Livewire::component('grades-component', GradesComponent::class);
+        Livewire::component('session-timeout', SessionTimeout::class);
 
         // Configure Prism providers
         $this->configurePrisms();
@@ -46,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
                 ->withMaxTokens(1000)
         );
 
-      
+
     }
 }
 

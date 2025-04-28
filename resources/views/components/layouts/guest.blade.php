@@ -25,6 +25,10 @@
             {{ $slot }}
         </main>
 
+        @auth
+            @livewire('session-timeout')
+        @endauth
+
         @fluxScripts
     </body>
 </html>

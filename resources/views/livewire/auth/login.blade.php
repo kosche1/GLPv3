@@ -296,6 +296,23 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
         <flux:link href="{{ route('register') }}" class="text-emerald-400 hover:text-emerald-300 transition-colors duration-300">Sign up</flux:link>
     </div>
 
+    <script>
+        // Clear session lock state on login page
+        document.addEventListener('DOMContentLoaded', function() {
+            localStorage.removeItem('sessionLocked');
+            console.log('Session lock state cleared on login page');
+
+            // Set up login form to mark a fresh login
+            const loginForm = document.querySelector('form[wire\\:submit="login"]');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function() {
+                    sessionStorage.setItem('justLoggedIn', 'true');
+                    console.log('Login form submitted, marked as fresh login');
+                });
+            }
+        });
+    </script>
+
     <div class="text-center text-xs text-zinc-500 mt-4">
         <flux:link href="{{ route('terms') }}" class="text-zinc-400 hover:text-emerald-300 transition-colors duration-300">Terms & Conditions</flux:link>
     </div>

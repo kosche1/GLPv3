@@ -1,5 +1,9 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="csrf-token" content="{{ csrf_token() }}">
+@auth
+<meta name="user-role" content="{{ Auth::check() && method_exists(Auth::user(), 'hasRole') ? (Auth::user()->hasRole('faculty') ? 'faculty' : (Auth::user()->hasRole('admin') ? 'admin' : 'student')) : 'student' }}">
+@endauth
 
 <title>{{ $title ?? 'GameLearnPro' }}</title>
 
@@ -18,6 +22,9 @@
 
 <!-- Custom Scrollbar Styles -->
 <style>
+    /* Alpine.js x-cloak directive to hide elements until Alpine initializes */
+    [x-cloak] { display: none !important; }
+
     /* Custom scrollbar styles */
     .scrollbar-thin::-webkit-scrollbar {
         width: 6px;
