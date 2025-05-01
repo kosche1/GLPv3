@@ -24,6 +24,12 @@ class StemSubjectsSeeder extends Seeder
             ]
         );
 
+        // Get the Specialized subject type
+        $specializedSubjectType = \App\Models\SubjectType::where('code', 'specialized')->first();
+
+        // Get the STEM strand
+        $stemStrand = \App\Models\Strand::where('code', 'stem')->first();
+
         // Define STEM subjects
         $stemSubjects = [
             [
@@ -118,6 +124,8 @@ class StemSubjectsSeeder extends Seeder
                 'programming_language' => 'none',
                 'tech_category' => $subjectData['tech_category'],
                 'subject_type' => 'specialized',
+                'subject_type_id' => $specializedSubjectType->id,
+                'strand_id' => $stemStrand->id,
                 'category_id' => $educationCategory->id,
             ]);
 

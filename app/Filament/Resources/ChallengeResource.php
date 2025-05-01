@@ -57,13 +57,16 @@ class ChallengeResource extends Resource
                             ->relationship("subjectType", "name")
                             ->preload()
                             ->searchable()
-                            ->required(),
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(fn (callable $set) => $set('strand_id', null)),
                         Forms\Components\Select::make("strand_id")
                             ->label("Strand")
                             ->relationship("strand", "name")
                             ->preload()
                             ->searchable()
-                            ->required()
+                            ->required(fn (callable $get) => $get('subject_type_id') && \App\Models\SubjectType::find($get('subject_type_id'))?->code === 'specialized')
+                            ->visible(fn (callable $get) => $get('subject_type_id') && \App\Models\SubjectType::find($get('subject_type_id'))?->code === 'specialized')
                             ->helperText("Select the strand (HUMMS, ICT, etc.)"),
                     ]),
                 Forms\Components\Grid::make()

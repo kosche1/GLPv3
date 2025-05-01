@@ -24,6 +24,12 @@ class IctSubjectsSeeder extends Seeder
             ]
         );
 
+        // Get the Specialized subject type
+        $specializedSubjectType = \App\Models\SubjectType::where('code', 'specialized')->first();
+
+        // Get the ICT strand
+        $ictStrand = \App\Models\Strand::where('code', 'ict')->first();
+
         // Define ICT subjects - empty array as we're removing all subjects
         // The programming subjects are handled by IctComputerProgrammingSeeder.php
         $ictSubjects = [];
@@ -43,6 +49,8 @@ class IctSubjectsSeeder extends Seeder
                 'programming_language' => 'none',
                 'tech_category' => $subjectData['tech_category'],
                 'subject_type' => 'specialized',
+                'subject_type_id' => $specializedSubjectType->id,
+                'strand_id' => $ictStrand->id,
                 'category_id' => $educationCategory->id,
             ]);
 
