@@ -47,6 +47,9 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
+        // Set a session flag to indicate a fresh login
+        session()->put('justLoggedIn', true);
+
         // Process daily login reward
         $this->processDailyLoginReward();
 
@@ -306,6 +309,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
             const loginForm = document.querySelector('form[wire\\:submit="login"]');
             if (loginForm) {
                 loginForm.addEventListener('submit', function() {
+                    // This is a backup in case the server-side session flag doesn't work
                     sessionStorage.setItem('justLoggedIn', 'true');
                     console.log('Login form submitted, marked as fresh login');
                 });
