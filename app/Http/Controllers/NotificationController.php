@@ -13,7 +13,8 @@ class NotificationController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Auth::user()->notifications();
+        $user = Auth::user();
+        $query = \App\Models\Notification::where('user_id', $user->id);
 
         // Filter by type if provided
         if ($request->has('type') && $request->type !== 'all') {
@@ -32,7 +33,7 @@ class NotificationController extends Controller
         $notifications = $query->latest()->paginate(10)->withQueryString();
 
         // Get unique notification types for the filter dropdown
-        $types = Auth::user()->notifications()
+        $types = \App\Models\Notification::where('user_id', $user->id)
             ->select('type')
             ->distinct()
             ->pluck('type')
@@ -47,26 +48,30 @@ class NotificationController extends Controller
     public function getNotifications()
     {
         $user = Auth::user();
-        $notifications = $user->notifications()
+
+        // Get all notifications from the database
+        $notifications = \App\Models\Notification::where('user_id', $user->id)
             ->latest()
             ->limit(20) // Increased limit to ensure we have enough after filtering
-            ->get()
-            ->map(function ($notification) {
-                return [
-                    'id' => $notification->id,
-                    'message' => $notification->message,
-                    'time' => $notification->formatted_time,
-                    'read' => $notification->read,
-                    'type' => $notification->type,
-                    'link' => $notification->link,
-                ];
-            });
+            ->get();
+
+        // Map the notifications to the format expected by the frontend
+        $mappedNotifications = $notifications->map(function ($notification) {
+            return [
+                'id' => $notification->id,
+                'message' => $notification->message,
+                'time' => $notification->getFormattedTimeAttribute(),
+                'read' => (bool)$notification->read,
+                'type' => $notification->type,
+                'link' => $notification->link,
+            ];
+        });
 
         // Filter out duplicate notifications based on message and type
         $uniqueNotifications = collect();
         $seenMessages = [];
 
-        foreach ($notifications as $notification) {
+        foreach ($mappedNotifications as $notification) {
             $key = $notification['message'] . '|' . $notification['type'];
             if (!in_array($key, $seenMessages)) {
                 $seenMessages[] = $key;
@@ -85,7 +90,8 @@ class NotificationController extends Controller
      */
     public function markAsRead(Request $request, $id)
     {
-        $notification = Auth::user()->notifications()->findOrFail($id);
+        $user = Auth::user();
+        $notification = \App\Models\Notification::where('user_id', $user->id)->findOrFail($id);
         $notification->markAsRead();
 
         // If the request wants JSON, return JSON response
@@ -102,7 +108,8 @@ class NotificationController extends Controller
      */
     public function markAllAsRead(Request $request)
     {
-        Auth::user()->notifications()->update(['read' => true]);
+        $user = Auth::user();
+        \App\Models\Notification::where('user_id', $user->id)->update(['read' => true]);
 
         // If the request wants JSON, return JSON response
         if ($request->expectsJson()) {

@@ -170,6 +170,38 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
 
         // Store reward message in session to display after redirect
         session()->flash('daily_reward_message', $rewardMessage);
+
+        // Create a notification for the daily reward
+        try {
+            $notificationService = app(NotificationService::class);
+
+            // Check if a notification for today's reward already exists
+            $notificationExists = \App\Models\Notification::where('user_id', $user->id)
+                ->where('type', 'reward')
+                ->whereDate('created_at', Carbon::today())
+                ->exists();
+
+            if (!$notificationExists) {
+                $notification = $notificationService->dailyRewardNotification(
+                    $user,
+                    $rewardTier->points_reward,
+                    $currentStreak,
+                    route('dashboard')
+                );
+
+                \Illuminate\Support\Facades\Log::info('Daily reward notification created on login', [
+                    'notification_id' => $notification->id,
+                    'user_id' => $user->id,
+                    'message' => $notification->message,
+                    'type' => $notification->type
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error creating daily reward notification on login', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 
     /**

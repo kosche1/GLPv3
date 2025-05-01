@@ -155,4 +155,23 @@ class NotificationService
             $link
         );
     }
+
+    /**
+     * Create a daily reward notification.
+     *
+     * @param User $user
+     * @param int $points
+     * @param int $streak
+     * @param string|null $link
+     * @return Notification
+     */
+    public function dailyRewardNotification(User $user, int $points, int $streak, ?string $link = null): Notification
+    {
+        return $this->createNotification(
+            $user,
+            "You received {$points} points for your Day {$streak} login streak!",
+            'reward',
+            $link
+        );
+    }
 }

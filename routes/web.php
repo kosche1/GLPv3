@@ -127,6 +127,8 @@ Route::middleware(
     Route::get('api/notifications', [\App\Http\Controllers\NotificationController::class, 'getNotifications'])->name('notifications.get');
     Route::post('api/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('api/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+
+
     Route::get('courses', [CourseController::class, 'index'])->name('courses');
     Route::get('learning-materials', [\App\Http\Controllers\LearningMaterialController::class, 'index'])->name('learning-materials');
     Route::get('assignments', [\App\Http\Controllers\AssignmentController::class, 'index'])->name('assignments');

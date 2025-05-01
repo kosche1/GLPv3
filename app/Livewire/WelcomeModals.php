@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
 use App\Models\UserDailyReward;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 
 class WelcomeModals extends Component
@@ -16,12 +17,22 @@ class WelcomeModals extends Component
     public $rewardPoints = 10;
     public $currentStreak = 0;
 
+    protected NotificationService $notificationService;
+
+    public function boot(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function mount()
     {
         // Check if this is a fresh login
         if (session()->has('justLoggedIn')) {
             $this->showWelcomeModal = true;
             session()->forget('justLoggedIn');
+
+            // Create a notification for the daily reward on login
+            $this->createDailyRewardNotification();
         }
 
         // Calculate the current streak for the user
@@ -39,6 +50,64 @@ class WelcomeModals extends Component
 
             Log::info('Calculated streak on mount', [
                 'currentStreak' => $this->currentStreak
+            ]);
+        }
+    }
+
+    /**
+     * Create a notification for the daily reward without claiming it
+     */
+    protected function createDailyRewardNotification()
+    {
+        if (!Auth::check()) {
+            Log::info('User not authenticated in createDailyRewardNotification');
+            return;
+        }
+
+        $user = Auth::user();
+
+        // Check if user has already claimed a reward today
+        $hasClaimedToday = UserDailyReward::where('user_id', $user->id)
+            ->whereDate('claimed_at', Carbon::today())
+            ->exists();
+
+        if ($hasClaimedToday) {
+            // User has already claimed a reward today
+            Log::info('User has already claimed a reward today, not creating notification');
+            return;
+        }
+
+        // Check if a notification for today's reward already exists
+        $notificationExists = \App\Models\Notification::where('user_id', $user->id)
+            ->where('type', 'reward')
+            ->whereDate('created_at', Carbon::today())
+            ->exists();
+
+        if ($notificationExists) {
+            // Notification already exists
+            Log::info('Daily reward notification already exists for today');
+            return;
+        }
+
+        // Create a notification for the daily reward
+        try {
+            $notification = $this->notificationService->dailyRewardNotification(
+                $user,
+                $this->rewardPoints,
+                $this->currentStreak,
+                route('dashboard')
+            );
+
+            Log::info('Daily reward notification created automatically on login', [
+                'notification_id' => $notification->id,
+                'user_id' => $user->id,
+                'message' => $notification->message,
+                'type' => $notification->type
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error creating automatic daily reward notification', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
         }
     }
@@ -283,7 +352,29 @@ class WelcomeModals extends Component
             // Show success message
             session()->flash('status', "You received {$this->rewardPoints} points for your Day {$this->currentStreak} login streak!");
 
-            Log::info('Daily reward claimed successfully');
+            // Create a notification for the daily reward
+            try {
+                $notification = $this->notificationService->dailyRewardNotification(
+                    $user,
+                    $this->rewardPoints,
+                    $this->currentStreak,
+                    route('dashboard')
+                );
+
+                Log::info('Daily reward notification created successfully', [
+                    'notification_id' => $notification->id,
+                    'user_id' => $user->id,
+                    'message' => $notification->message,
+                    'type' => $notification->type
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Error creating daily reward notification', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+
+            Log::info('Daily reward claimed successfully and notification created');
         } catch (\Exception $e) {
             Log::error('Error claiming daily reward', [
                 'error' => $e->getMessage(),
