@@ -39,6 +39,9 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             LeaderboardCategorySeeder::class,
 
+            // Strands and Subject Types
+            StrandAndSubjectTypeSeeder::class,
+
             // Core Subjects
             CoreSubjectsSeeder::class,
 
