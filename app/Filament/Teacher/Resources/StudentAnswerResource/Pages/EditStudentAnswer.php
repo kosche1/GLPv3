@@ -50,7 +50,11 @@ class EditStudentAnswer extends EditRecord
                     ]
                 ]);
 
-                // Show a notification
+                // Make sure notification_shown is set to false to trigger the modal
+                $record->notification_shown = false;
+                $record->saveQuietly(); // Save without triggering observers again
+
+                // Show a notification to the admin
                 Notification::make()
                     ->success()
                     ->title('Points awarded')

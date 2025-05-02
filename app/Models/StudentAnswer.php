@@ -63,14 +63,16 @@ class StudentAnswer extends Model
         'submitted_data',
         'feedback',
         'evaluated_at',
-        'evaluated_by'
+        'evaluated_by',
+        'notification_shown'
     ];
 
     protected $casts = [
         'is_correct' => 'boolean',
         'submitted_data' => 'array',
         'evaluated_at' => 'datetime',
-        'completed_at' => 'datetime'
+        'completed_at' => 'datetime',
+        'notification_shown' => 'boolean'
     ];
 
     public function user()

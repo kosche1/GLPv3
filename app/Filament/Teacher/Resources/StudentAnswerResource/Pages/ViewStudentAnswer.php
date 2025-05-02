@@ -5,6 +5,7 @@ namespace App\Filament\Teacher\Resources\StudentAnswerResource\Pages;
 use App\Filament\Teacher\Resources\StudentAnswerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\Auth;
 
 class ViewStudentAnswer extends ViewRecord
 {
@@ -35,7 +36,8 @@ class ViewStudentAnswer extends ViewRecord
                         'feedback' => $data['feedback'],
                         'status' => 'evaluated',
                         'evaluated_at' => now(),
-                        'evaluated_by' => auth()->id() ?? 1,
+                        'evaluated_by' => Auth::id() ?? 1,
+                        'notification_shown' => false, // Set to false to trigger the notification modal
                     ]);
 
                     // Award points if correct
