@@ -69,7 +69,7 @@ class Notification extends Model
         if ($created->diffInMinutes($now) < 60) {
             return (int)$created->diffInMinutes($now) . ' min ago';
         } elseif ($created->diffInHours($now) < 24) {
-            return $created->diffInHours($now) . ' hours ago';
+            return (int)$created->diffInHours($now) . ' hours ago';
         } else {
             return $created->format('M d, Y');
         }
