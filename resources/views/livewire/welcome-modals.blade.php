@@ -1,21 +1,25 @@
-<div x-data="{
-    showWelcomeModal: @entangle('showWelcomeModal'),
-    showRewardModal: @entangle('showRewardModal'),
-    rewardPoints: {{ $rewardPoints }},
-    currentStreak: {{ $currentStreak }},
 
-    closeWelcomeAndShowReward() {
-        this.showWelcomeModal = false;
-        setTimeout(() => {
-            this.showRewardModal = true;
-        }, 300);
-    },
 
-    skipAllModals() {
-        this.showWelcomeModal = false;
-        this.showRewardModal = false;
-    }
-}">
+<div
+    wire:poll.visible.750ms
+    x-data="{
+        showWelcomeModal: @entangle('showWelcomeModal'),
+        showRewardModal: @entangle('showRewardModal'),
+
+        closeWelcomeAndShowReward() {
+            this.showWelcomeModal = false;
+            setTimeout(() => {
+                this.showRewardModal = true;
+                $wire.updateRewardPointsForStreak();
+            }, 300);
+        },
+
+        skipAllModals() {
+            this.showWelcomeModal = false;
+            this.showRewardModal = false;
+        }
+    }"
+>
     <!-- Welcome Modal -->
     <div x-show="showWelcomeModal"
          x-cloak
@@ -61,11 +65,11 @@
                     We're excited to have you back! Get ready to continue your learning journey with interactive challenges and rewards.
                 </p>
 
-                <button @click="closeWelcomeAndShowReward()" class="w-full px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors mb-3">
+                <button @click="closeWelcomeAndShowReward()" class="w-full px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 hover:font-bold mb-3">
                     Let's Get Started
                 </button>
 
-                <button @click="skipAllModals()" class="w-full px-4 py-2 bg-transparent hover:bg-neutral-700 text-neutral-400 hover:text-white rounded-lg border border-neutral-600 transition-colors mb-2">
+                <button @click="skipAllModals()" class="w-full px-4 py-2 bg-transparent hover:bg-neutral-700 text-neutral-400 hover:text-white rounded-lg border border-neutral-600 transition-all duration-300 hover:shadow-lg hover:scale-105 hover:font-bold mb-2">
                     Skip
                 </button>
             </div>
@@ -75,6 +79,12 @@
     <!-- Daily Reward Modal -->
     <div x-show="showRewardModal"
          x-cloak
+         x-init="$watch('showRewardModal', value => {
+            if(value) {
+                $wire.forceUpdateRewardPoints();
+                $wire.$refresh();
+            }
+         })"
          class="fixed inset-0 z-50 flex items-center justify-center"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
@@ -113,15 +123,46 @@
                 </div>
 
                 <h3 class="text-xl font-semibold text-white mb-2">Daily Reward!</h3>
-                <p class="text-neutral-300 mb-2">
-                    You've earned <span class="text-amber-400 font-bold">{{ $rewardPoints }} points</span> for logging in today!
-                </p>
-                <p class="text-neutral-300 mb-6">
-                    Current login streak: <span class="text-emerald-400 font-bold">Day {{ $currentStreak }}</span>
-                </p>
+                <div>
+                    <p class="text-neutral-300 mb-2">
+                        @php
+                            use Illuminate\Support\Facades\Auth;
+                            use App\Models\UserDailyReward;
+                            use App\Models\DailyRewardTier;
 
-                <button wire:click="claimDailyReward" class="w-full px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors">
-                    Claim Reward
+                            // Get the reward tier directly in the template
+                            $user = Auth::user();
+                            $latestReward = UserDailyReward::where('user_id', $user->id)
+                                ->orderBy('claimed_at', 'desc')
+                                ->first();
+
+                            // Calculate streak - use the latest streak value directly
+                            $currentStreakDay = $latestReward ? $latestReward->current_streak : 1;
+
+                            // If this is a new day (not today), increment the streak
+                            if ($latestReward && !$latestReward->claimed_at->isToday()) {
+                                $currentStreakDay = $latestReward->current_streak + 1;
+                            }
+
+                            // Get reward tier
+                            $rewardTier = DailyRewardTier::where('day_number', $currentStreakDay)->first();
+
+                            // Set points to show
+                            $pointsToShow = $rewardTier ? $rewardTier->points_reward : 10;
+                        @endphp
+                        You've earned <span class="text-amber-400 font-bold">{{ $pointsToShow }} points</span> for logging in today!
+                    </p>
+                    <p class="text-neutral-300 mb-6">
+                        Current login streak: <span class="text-emerald-400 font-bold">Day {{ $currentStreakDay }}</span>
+                    </p>
+
+
+                </div>
+
+                <button
+                    wire:click="claimDailyReward"
+                    class="w-full px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 hover:font-bold">
+                    Claim Reward ({{ $pointsToShow }} points)
                 </button>
             </div>
         </div>
