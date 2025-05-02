@@ -4,9 +4,9 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
 use App\Models\UserDailyReward;
+use App\Models\DailyRewardTier;
 use App\Services\NotificationService;
 use Carbon\Carbon;
 
@@ -14,8 +14,17 @@ class WelcomeModals extends Component
 {
     public $showWelcomeModal = false;
     public $showRewardModal = false;
-    public $rewardPoints = 10;
+    public $rewardPoints = 10; // Default value, will be updated based on streak
     public $currentStreak = 0;
+
+    // Listen for property updates
+    protected $listeners = ['refreshRewardPoints' => 'updateRewardPointsForStreak'];
+
+    // Define properties that can be updated from the frontend
+    protected $rules = [
+        'currentStreak' => 'required|integer|min:1',
+        'rewardPoints' => 'required|integer|min:1',
+    ];
 
     protected NotificationService $notificationService;
 
@@ -44,14 +53,74 @@ class WelcomeModals extends Component
                 ->orderBy('claimed_at', 'desc')
                 ->first();
 
-            $this->currentStreak = $latestReward && $latestReward->claimed_at->isYesterday()
-                ? $latestReward->current_streak + 1
-                : 1;
+            // Calculate streak - use the latest streak value directly
+            $this->currentStreak = $latestReward ? $latestReward->current_streak : 1;
+
+            // If this is a new day (not today), increment the streak
+            if ($latestReward && !$latestReward->claimed_at->isToday()) {
+                $this->currentStreak = $latestReward->current_streak + 1;
+            }
+
+            // Get the reward tier for the current streak
+            $this->updateRewardPointsForStreak();
 
             Log::info('Calculated streak on mount', [
-                'currentStreak' => $this->currentStreak
+                'currentStreak' => $this->currentStreak,
+                'rewardPoints' => $this->rewardPoints
             ]);
         }
+    }
+
+    /**
+     * Update the reward points based on the current streak
+     */
+    public function updateRewardPointsForStreak()
+    {
+        // Calculate the current streak for the user if not already set
+        if (Auth::check() && $this->currentStreak === 0) {
+            $user = Auth::user();
+
+            // Get the user's latest daily reward claim to calculate streak
+            $latestReward = UserDailyReward::where('user_id', $user->id)
+                ->orderBy('claimed_at', 'desc')
+                ->first();
+
+            // Calculate streak - use the latest streak value directly
+            $this->currentStreak = $latestReward ? $latestReward->current_streak : 1;
+
+            // If this is a new day (not today), increment the streak
+            if ($latestReward && !$latestReward->claimed_at->isToday()) {
+                $this->currentStreak = $latestReward->current_streak + 1;
+            }
+        }
+
+        // Find the appropriate reward tier for the current streak day
+        $rewardTier = DailyRewardTier::where('day_number', $this->currentStreak)->first();
+
+        // If no specific tier exists for this day, use the default value
+        if ($rewardTier) {
+            $oldPoints = $this->rewardPoints;
+            $this->rewardPoints = $rewardTier->points_reward;
+
+            Log::info('Updated reward points from tier', [
+                'day_number' => $rewardTier->day_number,
+                'old_points' => $oldPoints,
+                'new_points' => $this->rewardPoints
+            ]);
+        } else {
+            // For days without specific tiers, calculate a default value
+            $oldPoints = $this->rewardPoints;
+            $this->rewardPoints = 10 + min(($this->currentStreak * 5), 100); // Scale up to max 100 points
+
+            Log::info('Using calculated reward points', [
+                'currentStreak' => $this->currentStreak,
+                'old_points' => $oldPoints,
+                'new_points' => $this->rewardPoints
+            ]);
+        }
+
+        // Force a refresh of the component
+        $this->dispatch('refreshComponent');
     }
 
     /**
@@ -89,6 +158,9 @@ class WelcomeModals extends Component
             return;
         }
 
+        // Make sure reward points are updated based on streak
+        $this->updateRewardPointsForStreak();
+
         // Create a notification for the daily reward
         try {
             $notification = $this->notificationService->dailyRewardNotification(
@@ -102,7 +174,9 @@ class WelcomeModals extends Component
                 'notification_id' => $notification->id,
                 'user_id' => $user->id,
                 'message' => $notification->message,
-                'type' => $notification->type
+                'type' => $notification->type,
+                'points' => $this->rewardPoints,
+                'streak' => $this->currentStreak
             ]);
         } catch (\Exception $e) {
             Log::error('Error creating automatic daily reward notification', [
@@ -137,15 +211,23 @@ class WelcomeModals extends Component
             ->orderBy('claimed_at', 'desc')
             ->first();
 
-        $this->currentStreak = $latestReward && $latestReward->claimed_at->isYesterday()
-            ? $latestReward->current_streak + 1
-            : 1;
+        // Calculate streak - use the latest streak value directly
+        $this->currentStreak = $latestReward ? $latestReward->current_streak : 1;
+
+        // If this is a new day (not today), increment the streak
+        if ($latestReward && !$latestReward->claimed_at->isToday()) {
+            $this->currentStreak = $latestReward->current_streak + 1;
+        }
+
+        // Update reward points based on streak
+        $this->updateRewardPointsForStreak();
 
         // Only show reward modal if welcome modal is not showing
         if (!$this->showWelcomeModal) {
             $this->showRewardModal = true;
             Log::info('Showing reward modal', [
-                'currentStreak' => $this->currentStreak
+                'currentStreak' => $this->currentStreak,
+                'rewardPoints' => $this->rewardPoints
             ]);
         }
     }
@@ -194,12 +276,21 @@ class WelcomeModals extends Component
             Log::info('No previous rewards found for user');
         }
 
-        // Calculate streak
-        $this->currentStreak = $latestReward && $latestReward->claimed_at->isYesterday()
-            ? $latestReward->current_streak + 1
-            : 1;
+        // Calculate streak - use the latest streak value directly
+        $this->currentStreak = $latestReward ? $latestReward->current_streak : 1;
 
-        Log::info('Showing reward modal', ['current_streak' => $this->currentStreak]);
+        // If this is a new day (not today), increment the streak
+        if ($latestReward && !$latestReward->claimed_at->isToday()) {
+            $this->currentStreak = $latestReward->current_streak + 1;
+        }
+
+        // Update reward points based on streak
+        $this->updateRewardPointsForStreak();
+
+        Log::info('Showing reward modal', [
+            'current_streak' => $this->currentStreak,
+            'reward_points' => $this->rewardPoints
+        ]);
 
         // Show the reward modal
         $this->showRewardModal = true;
@@ -224,8 +315,35 @@ class WelcomeModals extends Component
         // Close welcome modal first
         $this->showWelcomeModal = false;
 
-        // Set a default streak
-        $this->currentStreak = 1;
+        // Calculate the current streak for the user
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            // Get the user's latest daily reward claim to calculate streak
+            $latestReward = UserDailyReward::where('user_id', $user->id)
+                ->orderBy('claimed_at', 'desc')
+                ->first();
+
+            // Calculate streak - use the latest streak value directly
+            $this->currentStreak = $latestReward ? $latestReward->current_streak : 1;
+
+            // If this is a new day (not today), increment the streak
+            if ($latestReward && !$latestReward->claimed_at->isToday()) {
+                $this->currentStreak = $latestReward->current_streak + 1;
+            }
+
+            // Update reward points based on streak
+            $this->forceUpdateRewardPoints();
+
+            Log::info('Updated reward points for modal', [
+                'currentStreak' => $this->currentStreak,
+                'rewardPoints' => $this->rewardPoints
+            ]);
+        } else {
+            // Set a default streak if not authenticated
+            $this->currentStreak = 1;
+            $this->rewardPoints = 10;
+        }
 
         // Show the reward modal
         $this->showRewardModal = true;
@@ -261,12 +379,20 @@ class WelcomeModals extends Component
             ->orderBy('claimed_at', 'desc')
             ->first();
 
-        $this->currentStreak = $latestReward && $latestReward->claimed_at->isYesterday()
-            ? $latestReward->current_streak + 1
-            : 1;
+        // Calculate streak - use the latest streak value directly
+        $this->currentStreak = $latestReward ? $latestReward->current_streak : 1;
+
+        // If this is a new day (not today), increment the streak
+        if ($latestReward && !$latestReward->claimed_at->isToday()) {
+            $this->currentStreak = $latestReward->current_streak + 1;
+        }
+
+        // Update reward points based on streak
+        $this->forceUpdateRewardPoints();
 
         Log::info('Showing reward modal with streak', [
-            'currentStreak' => $this->currentStreak
+            'currentStreak' => $this->currentStreak,
+            'rewardPoints' => $this->rewardPoints
         ]);
 
         // Then show the reward modal
@@ -296,6 +422,35 @@ class WelcomeModals extends Component
             return;
         }
 
+        // Calculate the current streak and reward points
+        // Get the user's latest daily reward claim to calculate streak
+        $latestReward = UserDailyReward::where('user_id', $user->id)
+            ->orderBy('claimed_at', 'desc')
+            ->first();
+
+        // Calculate streak - use the latest streak value directly
+        $this->currentStreak = $latestReward ? $latestReward->current_streak : 1;
+
+        // If this is a new day (not today), increment the streak
+        if ($latestReward && !$latestReward->claimed_at->isToday()) {
+            $this->currentStreak = $latestReward->current_streak + 1;
+        }
+
+        // Get the reward tier for the current streak
+        $rewardTier = DailyRewardTier::where('day_number', $this->currentStreak)->first();
+
+        if ($rewardTier) {
+            $this->rewardPoints = $rewardTier->points_reward;
+        } else {
+            // Default to 10 points if no tier is found
+            $this->rewardPoints = 10;
+        }
+
+        Log::info('Current values before claiming', [
+            'currentStreak' => $this->currentStreak,
+            'rewardPoints' => $this->rewardPoints
+        ]);
+
         Log::info('Claiming daily reward', [
             'user_id' => $user->id,
             'current_streak' => $this->currentStreak,
@@ -303,43 +458,38 @@ class WelcomeModals extends Component
         ]);
 
         try {
+            // Find the appropriate reward tier for the current streak day
+            $rewardTier = DailyRewardTier::where('day_number', $this->currentStreak)->first();
+            $rewardTierId = $rewardTier ? $rewardTier->id : 1; // Use default tier if none found
+
             // Record the claimed reward
             $reward = UserDailyReward::create([
                 'user_id' => $user->id,
-                'daily_reward_tier_id' => 1, // Default tier
+                'daily_reward_tier_id' => $rewardTierId,
                 'claimed_at' => now(),
                 'streak_date' => $today,
                 'current_streak' => $this->currentStreak,
             ]);
 
-            Log::info('Reward record created', ['reward_id' => $reward->id]);
+            Log::info('Reward record created', [
+                'reward_id' => $reward->id,
+                'tier_id' => $rewardTierId,
+                'points' => $this->rewardPoints
+            ]);
 
             // Award the points
             try {
                 Log::info('Attempting to award points');
 
-                // Try using the LevelUp package method
-                if (method_exists($user, 'addPoints')) {
-                    Log::info('Using addPoints method');
-                    // @phpstan-ignore-next-line
-                    $user->addPoints(
-                        amount: $this->rewardPoints,
-                        reason: "Daily login reward - Day {$this->currentStreak}"
-                    );
-                }
-                // Try using the increment method
-                else if (method_exists($user, 'increment') && Schema::hasColumn('users', 'points')) {
-                    Log::info('Using increment method');
-                    // @phpstan-ignore-next-line
-                    $user->increment('points', $this->rewardPoints);
-                }
-                // Last resort - update directly
-                else {
-                    Log::info('Using direct update method');
-                    $currentPoints = $user->points ?? 0;
-                    // @phpstan-ignore-next-line
-                    $user->update(['points' => $currentPoints + $this->rewardPoints]);
-                }
+                // Award points using the LevelUp package
+                Log::info('Using addPoints method from LevelUp package');
+
+                // @phpstan-ignore-next-line
+                // The User model uses the GiveExperience trait which provides the addPoints method
+                $user->addPoints(
+                    amount: $this->rewardPoints,
+                    reason: "Daily login reward - Day {$this->currentStreak}"
+                );
             } catch (\Exception $e) {
                 Log::error('Error awarding points', [
                     'error' => $e->getMessage()
@@ -382,6 +532,56 @@ class WelcomeModals extends Component
             ]);
 
             session()->flash('status', "There was an error claiming your reward. Please try again.");
+        }
+    }
+
+    /**
+     * Hook that runs when a property is updated
+     */
+    public function updated($name, $value)
+    {
+        // When the reward modal is shown, update the reward points
+        if ($name === 'showRewardModal' && $value === true) {
+            Log::info('Reward modal shown, updating reward points');
+            $this->forceUpdateRewardPoints();
+        }
+    }
+
+    /**
+     * Force update the reward points - can be called from the frontend
+     */
+    public function forceUpdateRewardPoints()
+    {
+        Log::info('Force updating reward points');
+
+        // Calculate the current streak
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            // Get the user's latest daily reward claim to calculate streak
+            $latestReward = UserDailyReward::where('user_id', $user->id)
+                ->orderBy('claimed_at', 'desc')
+                ->first();
+
+            // Calculate streak - use the latest streak value directly
+            $this->currentStreak = $latestReward ? $latestReward->current_streak : 1;
+
+            // If this is a new day (not today), increment the streak
+            if ($latestReward && !$latestReward->claimed_at->isToday()) {
+                $this->currentStreak = $latestReward->current_streak + 1;
+            }
+
+            // Get the reward tier for the current streak
+            $rewardTier = DailyRewardTier::where('day_number', $this->currentStreak)->first();
+
+            if ($rewardTier) {
+                $this->rewardPoints = $rewardTier->points_reward;
+
+                Log::info('Force updated reward points from tier', [
+                    'day_number' => $rewardTier->day_number,
+                    'points_reward' => $rewardTier->points_reward
+                ]);
+            }
         }
     }
 
