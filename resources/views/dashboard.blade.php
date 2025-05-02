@@ -381,14 +381,78 @@
                                     </div>
                                     <span class="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Level {{ $currentLevel }} Progress</span>
                                 </div>
-                                <span class="text-xs text-gray-300 font-mono bg-neutral-800/80 px-2 py-0.5 rounded-full">{{ number_format($currentPoints) }} / {{ number_format($pointsForNextLevel) }} XP</span>
+                                <span
+                                    x-data="{
+                                        currentPoints: 0,
+                                        targetPoints: {{ $currentPoints }},
+                                        pointsForNextLevel: {{ $pointsForNextLevel }},
+                                        formatNumber(num) {
+                                            return new Intl.NumberFormat().format(Math.round(num));
+                                        },
+                                        init() {
+                                            const duration = 1500;
+                                            const startTime = performance.now();
+                                            const animate = (currentTime) => {
+                                                const elapsedTime = currentTime - startTime;
+                                                const progress = Math.min(elapsedTime / duration, 1);
+                                                // Use cubic-bezier easing similar to the progress bar
+                                                const t = progress;
+                                                const easedProgress = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+                                                this.currentPoints = easedProgress * this.targetPoints;
+
+                                                if (progress < 1) {
+                                                    requestAnimationFrame(animate);
+                                                }
+                                            };
+                                            requestAnimationFrame(animate);
+                                        }
+                                    }"
+                                    class="text-xs text-gray-300 font-mono bg-neutral-800/80 px-2 py-0.5 rounded-full relative overflow-hidden group"
+                                >
+                                    <span class="relative z-10">
+                                        <span x-text="formatNumber(currentPoints)"></span> / {{ number_format($pointsForNextLevel) }} XP
+                                    </span>
+                                    <span class="absolute inset-0 bg-emerald-500/10 transform scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-700 ease-out"></span>
+                                </span>
                             </div>
                             <div class="w-full h-3 bg-neutral-800/80 rounded-full overflow-hidden border border-neutral-700/50">
-                                <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full" style="width: {{ $progressPercentage }}%"></div>
+                                <div
+                                    x-data="{
+                                        width: 0,
+                                        targetWidth: {{ $progressPercentage }},
+                                        init() {
+                                            const duration = 1500;
+                                            const startTime = performance.now();
+                                            const animate = (currentTime) => {
+                                                const elapsedTime = currentTime - startTime;
+                                                const progress = Math.min(elapsedTime / duration, 1);
+                                                // Use cubic-bezier easing for smooth animation
+                                                const t = progress;
+                                                const easedProgress = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+                                                this.width = easedProgress * this.targetWidth;
+
+                                                if (progress < 1) {
+                                                    requestAnimationFrame(animate);
+                                                } else {
+                                                    // Ensure we end exactly at the target width
+                                                    this.width = this.targetWidth;
+                                                }
+                                            };
+                                            requestAnimationFrame(animate);
+                                        }
+                                    }"
+                                    class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full hw-accelerate relative overflow-hidden"
+                                    :style="`width: ${width}%;`"
+                                    style="width: 0%;"
+                                >
+                                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer" style="background-size: 200% 100%;"></div>
+                                </div>
                             </div>
                             <div class="flex justify-between mt-1">
-                                <span class="text-xs text-gray-500">Level {{ $currentLevel }}</span>
-                                <span class="text-xs text-gray-400">{{ number_format($xpToNextLevel) }} XP to Level {{ $currentLevel + 1 }}</span>
+                                <span class="text-xs text-gray-500 group-hover:text-emerald-500 transition-colors duration-300">Level {{ $currentLevel }}</span>
+                                <span class="text-xs text-gray-400 group-hover:text-teal-400 transition-colors duration-300">{{ number_format($xpToNextLevel) }} XP to Level {{ $currentLevel + 1 }}</span>
                             </div>
                         </div>
                     </div>
@@ -551,12 +615,65 @@
                                         <div class="relative z-10">
                                             <div class="flex justify-between items-center mb-2">
                                                 <span class="font-medium text-white">{{ $challenge->name }}</span>
-                                                <span class="text-xs font-semibold px-2 py-1 rounded-full {{ ($challenge->pivot->progress ?? 0) >= 100 ? 'bg-green-500/20 text-green-400 group-hover:bg-green-500/30' : 'bg-orange-500/20 text-orange-400 group-hover:bg-orange-500/30' }} transition-colors duration-300">
-                                                    {{ $challenge->pivot->progress ?? 0 }}% Complete
+                                                <span
+                                                    x-data="{
+                                                        progress: 0,
+                                                        targetProgress: {{ $challenge->pivot->progress ?? 0 }},
+                                                        init() {
+                                                            const duration = 1500;
+                                                            const startTime = performance.now();
+                                                            const animate = (currentTime) => {
+                                                                const elapsedTime = currentTime - startTime;
+                                                                const progress = Math.min(elapsedTime / duration, 1);
+                                                                const easedProgress = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+                                                                this.progress = Math.round(easedProgress * this.targetProgress);
+
+                                                                if (progress < 1) {
+                                                                    requestAnimationFrame(animate);
+                                                                }
+                                                            };
+                                                            requestAnimationFrame(animate);
+                                                        }
+                                                    }"
+                                                    class="text-xs font-semibold px-2 py-1 rounded-full {{ ($challenge->pivot->progress ?? 0) >= 100 ? 'bg-green-500/20 text-green-400 group-hover:bg-green-500/30' : 'bg-orange-500/20 text-orange-400 group-hover:bg-orange-500/30' }} transition-colors duration-300"
+                                                >
+                                                    <span x-text="progress"></span>% Complete
                                                 </span>
                                             </div>
                                             <div class="w-full bg-neutral-800/80 rounded-full h-2 overflow-hidden border border-neutral-700/50">
-                                                <div class="bg-gradient-to-r from-orange-500 to-yellow-500 h-2 rounded-full" style="width: {{ $challenge->pivot->progress ?? 0 }}%"></div>
+                                                <div
+                                                    x-data="{
+                                                        width: 0,
+                                                        targetWidth: {{ $challenge->pivot->progress ?? 0 }},
+                                                        init() {
+                                                            const duration = 1500;
+                                                            const startTime = performance.now();
+                                                            const animate = (currentTime) => {
+                                                                const elapsedTime = currentTime - startTime;
+                                                                const progress = Math.min(elapsedTime / duration, 1);
+                                                                // Use cubic-bezier easing for smooth animation
+                                                                const t = progress;
+                                                                const easedProgress = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+                                                                this.width = easedProgress * this.targetWidth;
+
+                                                                if (progress < 1) {
+                                                                    requestAnimationFrame(animate);
+                                                                } else {
+                                                                    // Ensure we end exactly at the target width
+                                                                    this.width = this.targetWidth;
+                                                                }
+                                                            };
+                                                            requestAnimationFrame(animate);
+                                                        }
+                                                    }"
+                                                    class="bg-gradient-to-r from-orange-500 to-yellow-500 h-2 rounded-full hw-accelerate relative overflow-hidden"
+                                                    :style="`width: ${width}%;`"
+                                                    style="width: 0%;"
+                                                >
+                                                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer" style="background-size: 200% 100%;"></div>
+                                                </div>
                                             </div>
                                             @if($challenge->description)
                                                 <p class="text-xs text-gray-400 mt-2">{{ Str::limit($challenge->description, 100) }}</p>
@@ -907,7 +1024,38 @@
                                             <div class="flex items-center mt-1">
                                                 <div class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">Level {{ $currentLevel }}</div>
                                                 <div class="ml-2 w-full bg-neutral-800/80 rounded-full h-1.5 overflow-hidden border border-neutral-700/50">
-                                                    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full" style="width: {{ $progressPercentage }}%"></div>
+                                                    <div
+                                                        x-data="{
+                                                            width: 0,
+                                                            targetWidth: {{ $progressPercentage }},
+                                                            init() {
+                                                                const duration = 1500;
+                                                                const startTime = performance.now();
+                                                                const animate = (currentTime) => {
+                                                                    const elapsedTime = currentTime - startTime;
+                                                                    const progress = Math.min(elapsedTime / duration, 1);
+                                                                    // Use cubic-bezier easing for smooth animation
+                                                                    const t = progress;
+                                                                    const easedProgress = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+                                                                    this.width = easedProgress * this.targetWidth;
+
+                                                                    if (progress < 1) {
+                                                                        requestAnimationFrame(animate);
+                                                                    } else {
+                                                                        // Ensure we end exactly at the target width
+                                                                        this.width = this.targetWidth;
+                                                                    }
+                                                                };
+                                                                requestAnimationFrame(animate);
+                                                            }
+                                                        }"
+                                                        class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full hw-accelerate relative overflow-hidden"
+                                                        :style="`width: ${width}%;`"
+                                                        style="width: 0%;"
+                                                    >
+                                                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer" style="background-size: 200% 100%;"></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -971,6 +1119,49 @@
         .animate-pulse-slow {
             opacity: 0.7;
             animation: pulse-slow 6s infinite ease-in-out;
+        }
+
+        /* Progress bar fill animation */
+        @keyframes progress-fill {
+            0% { width: 0%; }
+            20% { width: 0%; } /* Hold at 0% briefly */
+            90% { width: calc(var(--progress-percentage) * 1.05); } /* Slightly overshoot */
+            100% { width: var(--progress-percentage); } /* Settle at exact percentage */
+        }
+        .animate-progress-fill {
+            animation: progress-fill 2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+            background-size: 200% 100%;
+            background-position: 0 0;
+        }
+
+        /* Progress bar shine effect */
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .animate-shimmer {
+            animation: shimmer 3s infinite linear;
+            animation-delay: 1.5s;
+        }
+
+        /* Number counter animation */
+        @keyframes count-up {
+            0% {
+                content: "0";
+                opacity: 0.7;
+            }
+            20% {
+                content: "0";
+                opacity: 1;
+            }
+            100% {
+                content: attr(data-count);
+                opacity: 1;
+            }
+        }
+        .animate-count::after {
+            content: attr(data-count);
+            animation: count-up 2s forwards cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
         /* Selective hardware acceleration */
