@@ -403,10 +403,19 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the custom notifications for the user.
+     */
+    public function customNotifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
      * Get the notifications for the user.
+     * This method is used by the notification system.
      */
     public function notifications()
     {
-        return $this->hasMany(Notification::class);
+        return $this->customNotifications();
     }
 }

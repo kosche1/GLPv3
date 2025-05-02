@@ -69,7 +69,9 @@
                         </h3>
                         <div class="prose prose-invert max-w-none">
                             <div class="space-y-4">
-                                <p class="text-neutral-300">{{ $currentTask->instructions }}</p>
+                                @if($currentTask->instructions)
+                                    <div class="text-neutral-300">{!! $currentTask->instructions !!}</div>
+                                @endif
                                 <h4 class="text-emerald-400 font-medium mb-2">Completion Steps</h4>
                                 <ul class="list-none space-y-2 text-neutral-300">
                                     <li class="flex items-center gap-2">

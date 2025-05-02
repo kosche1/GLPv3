@@ -7,6 +7,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\StudentAnswer;
 use App\Models\Category;
+use App\Models\SubjectType;
 
 class LearningController extends Controller
 {
@@ -17,6 +18,11 @@ class LearningController extends Controller
             ->get();
 
         $techCategories = Category::all()->pluck('name', 'id');
+
+        // Fetch active subject types ordered by their order field
+        $subjectTypes = SubjectType::where('is_active', true)
+            ->orderBy('order')
+            ->get();
 
         // Calculate overall progress
         $totalTasks = $challenges->sum(function ($challenge) {
@@ -84,7 +90,8 @@ class LearningController extends Controller
             'completedLevels' => $completedLevels,
             'techCategories' => $techCategories,
             'completedChallenges' => $completedChallenges,
-            'challengeFeedback' => $challengeFeedback
+            'challengeFeedback' => $challengeFeedback,
+            'subjectTypes' => $subjectTypes
         ]);
     }
 

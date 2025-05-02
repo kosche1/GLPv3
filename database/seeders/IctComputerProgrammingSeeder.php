@@ -24,6 +24,12 @@ class IctComputerProgrammingSeeder extends Seeder
             ]
         );
 
+        // Get the Specialized subject type
+        $specializedSubjectType = \App\Models\SubjectType::where('code', 'specialized')->first();
+
+        // Get the ICT strand
+        $ictStrand = \App\Models\Strand::where('code', 'ict')->first();
+
         // Create a challenge for Python programming
         $pythonChallenge = Challenge::create([
             'name' => 'Python Programming',
@@ -38,6 +44,8 @@ class IctComputerProgrammingSeeder extends Seeder
             'programming_language' => 'python',
             'tech_category' => 'ict',
             'subject_type' => 'specialized',
+            'subject_type_id' => $specializedSubjectType->id,
+            'strand_id' => $ictStrand->id,
             'category_id' => $category->id,
             'challenge_content' => [
                 'scenario' => 'Practice Python programming with these beginner-friendly exercises',
@@ -64,6 +72,8 @@ class IctComputerProgrammingSeeder extends Seeder
             'programming_language' => 'javascript',
             'tech_category' => 'ict',
             'subject_type' => 'specialized',
+            'subject_type_id' => $specializedSubjectType->id,
+            'strand_id' => $ictStrand->id,
             'category_id' => $category->id,
             'challenge_content' => [
                 'scenario' => 'Practice JavaScript programming with these beginner-friendly exercises',
@@ -90,6 +100,8 @@ class IctComputerProgrammingSeeder extends Seeder
             'programming_language' => 'java',
             'tech_category' => 'ict',
             'subject_type' => 'specialized',
+            'subject_type_id' => $specializedSubjectType->id,
+            'strand_id' => $ictStrand->id,
             'category_id' => $category->id,
             'challenge_content' => [
                 'scenario' => 'Practice Java programming with these beginner-friendly exercises',

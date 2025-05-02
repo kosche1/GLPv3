@@ -79,7 +79,9 @@ class Challenge extends Model
         "challenge_content",
         "programming_language", // New field for programming language focus
         "tech_category",       // New field for categorizing tech topics
-        "subject_type",        // Field for categorizing subjects (core, applied, specialized)
+        "subject_type",        // Legacy field for categorizing subjects (core, applied, specialized)
+        "strand_id",           // Foreign key for strand (HUMMS, ICT, etc.)
+        "subject_type_id",     // Foreign key for subject type (Core, Applied, Specialized)
         "image",              // Field for storing challenge image path
     ];
 
@@ -204,5 +206,21 @@ class Challenge extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get the strand that owns the challenge.
+     */
+    public function strand()
+    {
+        return $this->belongsTo(Strand::class);
+    }
+
+    /**
+     * Get the subject type that owns the challenge.
+     */
+    public function subjectType()
+    {
+        return $this->belongsTo(SubjectType::class);
     }
 }

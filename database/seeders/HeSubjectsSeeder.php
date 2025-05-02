@@ -24,6 +24,12 @@ class HeSubjectsSeeder extends Seeder
             ]
         );
 
+        // Get the Specialized subject type
+        $specializedSubjectType = \App\Models\SubjectType::where('code', 'specialized')->first();
+
+        // Get the HE strand
+        $heStrand = \App\Models\Strand::where('code', 'he')->first();
+
         // Define HE subjects
         $heSubjects = [
             [
@@ -118,6 +124,8 @@ class HeSubjectsSeeder extends Seeder
                 'programming_language' => 'none',
                 'tech_category' => $subjectData['tech_category'],
                 'subject_type' => 'specialized',
+                'subject_type_id' => $specializedSubjectType->id,
+                'strand_id' => $heStrand->id,
                 'category_id' => $educationCategory->id,
             ]);
 

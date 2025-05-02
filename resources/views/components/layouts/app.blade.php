@@ -20,6 +20,7 @@
         @livewire('AiWidget')
         @auth
             @livewire('session-timeout')
+            @livewire('welcome-modals')
         @endauth
     </flux:main>
 </x-layouts.app.sidebar>

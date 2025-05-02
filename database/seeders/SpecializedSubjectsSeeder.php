@@ -24,6 +24,9 @@ class SpecializedSubjectsSeeder extends Seeder
             ]
         );
 
+        // Get the Specialized subject type
+        $specializedSubjectType = \App\Models\SubjectType::where('code', 'specialized')->first();
+
         // Define specialized subjects
         $specializedSubjects = [
             [
@@ -163,6 +166,7 @@ class SpecializedSubjectsSeeder extends Seeder
                 'programming_language' => 'none',
                 'tech_category' => 'none',
                 'subject_type' => 'specialized',
+                'subject_type_id' => $specializedSubjectType->id,
                 'category_id' => $educationCategory->id,
             ]);
 

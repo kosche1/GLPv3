@@ -116,11 +116,19 @@ Route::middleware(
     Route::get('subjects/specialized/humms', [\App\Http\Controllers\SubjectsController::class, 'hummsTrack'])->name('subjects.specialized.humms');
     Route::get('subjects/specialized/stem', [\App\Http\Controllers\SubjectsController::class, 'stemTrack'])->name('subjects.specialized.stem');
     Route::get('subjects/specialized/ict', [\App\Http\Controllers\SubjectsController::class, 'ictTrack'])->name('subjects.specialized.ict');
+
+    // Dynamic route for any strand - must be after specific strand routes
+    Route::get('subjects/specialized/{code}', [\App\Http\Controllers\SubjectsController::class, 'showStrand'])->name('subjects.specialized.strand');
+
+    // Dynamic route for any subject type - must be after specific routes
+    Route::get('subjects/{code}', [\App\Http\Controllers\SubjectsController::class, 'showSubjectType'])->name('subjects.type');
     // Notification routes
     Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');
     Route::get('api/notifications', [\App\Http\Controllers\NotificationController::class, 'getNotifications'])->name('notifications.get');
     Route::post('api/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('api/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+
+
     Route::get('courses', [CourseController::class, 'index'])->name('courses');
     Route::get('learning-materials', [\App\Http\Controllers\LearningMaterialController::class, 'index'])->name('learning-materials');
     Route::get('assignments', [\App\Http\Controllers\AssignmentController::class, 'index'])->name('assignments');

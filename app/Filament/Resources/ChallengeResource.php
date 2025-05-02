@@ -52,6 +52,26 @@ class ChallengeResource extends Resource
                 Forms\Components\Grid::make()
                     ->columns(2)
                     ->schema([
+                        Forms\Components\Select::make("subject_type_id")
+                            ->label("Subject Type")
+                            ->relationship("subjectType", "name")
+                            ->preload()
+                            ->searchable()
+                            ->required()
+                            ->reactive()
+                            ->afterStateUpdated(fn (callable $set) => $set('strand_id', null)),
+                        Forms\Components\Select::make("strand_id")
+                            ->label("Strand")
+                            ->relationship("strand", "name")
+                            ->preload()
+                            ->searchable()
+                            ->required(fn (callable $get) => $get('subject_type_id') && \App\Models\SubjectType::find($get('subject_type_id'))?->code === 'specialized')
+                            ->visible(fn (callable $get) => $get('subject_type_id') && \App\Models\SubjectType::find($get('subject_type_id'))?->code === 'specialized')
+                            ->helperText("Select the strand (HUMMS, ICT, etc.)"),
+                    ]),
+                Forms\Components\Grid::make()
+                    ->columns(2)
+                    ->schema([
                         Forms\Components\DateTimePicker::make(
                             "start_date"
                         )->required(),
@@ -291,6 +311,14 @@ public static function table(Table $table): Table
                 ->label("Category")
                 ->sortable()
                 ->searchable(),
+            Tables\Columns\TextColumn::make("subjectType.name")
+                ->label("Subject Type")
+                ->sortable()
+                ->searchable(),
+            Tables\Columns\TextColumn::make("strand.name")
+                ->label("Strand")
+                ->sortable()
+                ->searchable(),
             Tables\Columns\BadgeColumn::make("challenge_type")
                 ->label("Type")
                 ->colors([
@@ -331,6 +359,12 @@ public static function table(Table $table): Table
                 ->sortable(),
         ])
         ->filters([
+            Tables\Filters\SelectFilter::make("subject_type_id")
+                ->label("Subject Type")
+                ->relationship("subjectType", "name"),
+            Tables\Filters\SelectFilter::make("strand_id")
+                ->label("Strand")
+                ->relationship("strand", "name"),
             Tables\Filters\SelectFilter::make("challenge_type")->options([
                 "coding_challenge" => "Coding Challenge",
                 "debugging" => "Debugging Exercise",
