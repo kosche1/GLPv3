@@ -101,6 +101,7 @@ class ListStudentAnswers extends Component implements Tables\Contracts\HasTable
                             'status' => 'evaluated',
                             'evaluated_at' => now(),
                             'evaluated_by' => Auth::id() ?? 1,
+                            'notification_shown' => false, // Set to false to trigger the notification modal
                         ]);
 
                         // Award points if correct
