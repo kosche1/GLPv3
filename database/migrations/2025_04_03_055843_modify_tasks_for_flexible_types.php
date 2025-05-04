@@ -13,11 +13,40 @@ return new class extends Migration
     {
         Schema::table('tasks', function (Blueprint $table) {
             //
-            $table->text('instructions');
-            $table->string('submission_type');
-            $table->string('evaluation_type');
-            $table->json('evaluation_details')->nullable();
-            $table->dropColumn(['type', 'completion_criteria', 'answer_key', 'expected_output', 'expected_solution']);
+            if (!Schema::hasColumn('tasks', 'instructions')) {
+                $table->text('instructions');
+            }
+            if (!Schema::hasColumn('tasks', 'submission_type')) {
+                $table->string('submission_type');
+            }
+            if (!Schema::hasColumn('tasks', 'evaluation_type')) {
+                $table->string('evaluation_type');
+            }
+            if (!Schema::hasColumn('tasks', 'evaluation_details')) {
+                $table->json('evaluation_details')->nullable();
+            }
+
+            // Only drop columns if they exist
+            $columnsToDrop = [];
+            if (Schema::hasColumn('tasks', 'type')) {
+                $columnsToDrop[] = 'type';
+            }
+            if (Schema::hasColumn('tasks', 'completion_criteria')) {
+                $columnsToDrop[] = 'completion_criteria';
+            }
+            if (Schema::hasColumn('tasks', 'answer_key')) {
+                $columnsToDrop[] = 'answer_key';
+            }
+            if (Schema::hasColumn('tasks', 'expected_output')) {
+                $columnsToDrop[] = 'expected_output';
+            }
+            if (Schema::hasColumn('tasks', 'expected_solution')) {
+                $columnsToDrop[] = 'expected_solution';
+            }
+
+            if (!empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 

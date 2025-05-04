@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::table('challenges', function (Blueprint $table) {
             // Add foreign key for strand
-            $table->foreignId('strand_id')->nullable()->after('tech_category')->constrained()->nullOnDelete();
+            if (!Schema::hasColumn('challenges', 'strand_id')) {
+                $table->foreignId('strand_id')->nullable()->after('tech_category')->constrained()->nullOnDelete();
+            }
 
             // Add foreign key for subject type
-            $table->foreignId('subject_type_id')->nullable()->after('strand_id')->constrained()->nullOnDelete();
+            if (!Schema::hasColumn('challenges', 'subject_type_id')) {
+                $table->foreignId('subject_type_id')->nullable()->after('strand_id')->constrained()->nullOnDelete();
+            }
         });
     }
 

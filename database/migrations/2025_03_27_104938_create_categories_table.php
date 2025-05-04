@@ -17,7 +17,9 @@ return new class extends Migration
         });
 
         Schema::table('challenges', function (Blueprint $table) {
-            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            if (!Schema::hasColumn('challenges', 'category_id')) {
+                $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            }
         });
     }
 

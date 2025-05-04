@@ -9,9 +9,15 @@ return new class extends Migration
     public function up()
     {
         Schema::table('student_answers', function (Blueprint $table) {
-            $table->text('solution')->nullable();
-            $table->text('output')->nullable();
-            $table->string('status')->default('pending');
+            if (!Schema::hasColumn('student_answers', 'solution')) {
+                $table->text('solution')->nullable();
+            }
+            if (!Schema::hasColumn('student_answers', 'output')) {
+                $table->text('output')->nullable();
+            }
+            if (!Schema::hasColumn('student_answers', 'status')) {
+                $table->string('status')->default('pending');
+            }
         });
     }
 
