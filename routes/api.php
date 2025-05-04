@@ -191,3 +191,11 @@ Route::get('/debug-task/{task}', function (\App\Models\Task $task) {
     ]);
 });
 
+// Investment Challenge Routes - All made public for development
+Route::get('/investment-challenges', [\App\Http\Controllers\API\InvestmentChallengeController::class, 'index']);
+Route::get('/user-investment-challenges', [\App\Http\Controllers\API\InvestmentChallengeController::class, 'userChallenges']);
+Route::post('/investment-challenges/start', [\App\Http\Controllers\API\InvestmentChallengeController::class, 'startChallenge']);
+Route::put('/user-investment-challenges/{id}/progress', [\App\Http\Controllers\API\InvestmentChallengeController::class, 'updateProgress']);
+Route::post('/user-investment-challenges/{id}/submit', [\App\Http\Controllers\API\InvestmentChallengeController::class, 'submitChallenge']);
+Route::delete('/user-investment-challenges/{id}', [\App\Http\Controllers\API\InvestmentChallengeController::class, 'deleteChallenge']);
+
