@@ -56,7 +56,13 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
         // Check for achievements
         $this->checkForAchievements();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        // Check for redirect parameter
+        $redirect = request()->query('redirect');
+        if ($redirect) {
+            $this->redirect($redirect);
+        } else {
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        }
     }
 
     /**

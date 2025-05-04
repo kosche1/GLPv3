@@ -10,6 +10,7 @@
         "axios": "^1.8.4",
         "concurrently": "^9.1.2",
         "fs-extra": "^11.3.0",
+        "highcharts": "^12.2.0",
         "laravel-vite-plugin": "^1.2.0",
         "monaco-editor": "^0.52.2",
         "postcss": "^8.5.3",
@@ -255,6 +256,8 @@
     "has-tostringtag": ["has-tostringtag@1.0.2", "", { "dependencies": { "has-symbols": "^1.0.3" } }, "sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw=="],
 
     "hasown": ["hasown@2.0.2", "", { "dependencies": { "function-bind": "^1.1.2" } }, "sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ=="],
+
+    "highcharts": ["highcharts@12.2.0", "", {}, "sha512-UUN+osTP3aeGc4KmoMuWAjzpKif8GYHFozzYI4O8h1ILGof25M/ZGBpXLvgqf1z0LVh7N9eG7i0HnzMfjcR4nA=="],
 
     "is-fullwidth-code-point": ["is-fullwidth-code-point@3.0.0", "", {}, "sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg=="],
 

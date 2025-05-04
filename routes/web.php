@@ -112,6 +112,21 @@ Route::middleware(
 
     // Specialized Track routes
     Route::get('subjects/specialized/abm', [\App\Http\Controllers\SubjectsController::class, 'abmTrack'])->name('subjects.specialized.abm');
+    Route::get('subjects/specialized/abm/investsmart', [\App\Http\Controllers\InvestSmartController::class, 'index'])->name('subjects.specialized.abm.investsmart');
+
+    // InvestSmart API Routes
+    Route::prefix('api/investsmart')->middleware('auth')->group(function () {
+        Route::get('/portfolio', [\App\Http\Controllers\InvestSmartController::class, 'getPortfolio']);
+        Route::get('/market', [\App\Http\Controllers\InvestSmartController::class, 'getMarketData']);
+        Route::post('/buy', [\App\Http\Controllers\InvestSmartController::class, 'buyStock']);
+        Route::post('/sell', [\App\Http\Controllers\InvestSmartController::class, 'sellStock']);
+        Route::get('/transactions', [\App\Http\Controllers\InvestSmartController::class, 'getTransactions']);
+        Route::post('/update-prices', [\App\Http\Controllers\InvestSmartController::class, 'updatePrices']);
+    });
+
+    Route::get('subjects/specialized/abm/investsmart-test', function() {
+        return view('investsmart-test');
+    })->name('subjects.specialized.abm.investsmart-test');
     Route::get('subjects/specialized/he', [\App\Http\Controllers\SubjectsController::class, 'heTrack'])->name('subjects.specialized.he');
     Route::get('subjects/specialized/humms', [\App\Http\Controllers\SubjectsController::class, 'hummsTrack'])->name('subjects.specialized.humms');
     Route::get('subjects/specialized/stem', [\App\Http\Controllers\SubjectsController::class, 'stemTrack'])->name('subjects.specialized.stem');
@@ -273,6 +288,15 @@ Route::get('/level-up-data-demo', function () {
     return view('level-up-data-demo');
 })->name('level-up-data-demo');
 
+// Debug route for investment challenges
+Route::get('/debug-investment-challenges', function() {
+    $challenges = \App\Models\InvestmentChallenge::all();
+    return response()->json([
+        'count' => $challenges->count(),
+        'challenges' => $challenges
+    ]);
+});
+
 // Fix ICT Programming Tasks
 Route::get('/fix-ict-tasks', [\App\Http\Controllers\FixIctTasksController::class, 'fixTasks'])
     ->name('fix.ict-tasks');
@@ -281,5 +305,14 @@ Route::get('/fix-ict-tasks', [\App\Http\Controllers\FixIctTasksController::class
 Route::post('/verify-password', [\App\Http\Controllers\PasswordVerificationController::class, 'verify'])
     ->middleware('auth')
     ->name('verify-password');
+
+// Debug route for investment challenges
+Route::get('/debug-investment-challenges', function() {
+    $challenges = \App\Models\InvestmentChallenge::all();
+    return response()->json([
+        'count' => $challenges->count(),
+        'challenges' => $challenges
+    ]);
+});
 
 require __DIR__.'/auth.php';
