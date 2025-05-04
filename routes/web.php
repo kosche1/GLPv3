@@ -124,9 +124,7 @@ Route::middleware(
         Route::post('/update-prices', [\App\Http\Controllers\InvestSmartController::class, 'updatePrices']);
     });
 
-    Route::get('subjects/specialized/abm/investsmart-test', function() {
-        return view('investsmart-test');
-    })->name('subjects.specialized.abm.investsmart-test');
+
     Route::get('subjects/specialized/he', [\App\Http\Controllers\SubjectsController::class, 'heTrack'])->name('subjects.specialized.he');
     Route::get('subjects/specialized/humms', [\App\Http\Controllers\SubjectsController::class, 'hummsTrack'])->name('subjects.specialized.humms');
     Route::get('subjects/specialized/stem', [\App\Http\Controllers\SubjectsController::class, 'stemTrack'])->name('subjects.specialized.stem');

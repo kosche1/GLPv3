@@ -46,7 +46,7 @@ import ChallengesView from './views/ChallengesView.vue';
 
 // Data properties
 const activeView = ref('portfolio');
-const username = ref('Student');
+const username = ref(document.querySelector('meta[name="user-name"]')?.getAttribute('content') || 'Student');
 const balance = ref(100000); // Starting with ₱100,000
 const portfolio = ref([]);
 const transactions = ref([]);

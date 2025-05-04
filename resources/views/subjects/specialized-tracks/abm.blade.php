@@ -47,12 +47,7 @@
                             </svg>
                             InvestSmart Game
                         </a>
-                        <a href="{{ route('subjects.specialized.abm.investsmart-test') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-md shadow-sm transition-colors duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                            Test Version
-                        </a>
+
                     @elseif($trackName == 'HE')
                     @elseif($trackName == 'HUMMS')
                     @elseif($trackName == 'STEM')
