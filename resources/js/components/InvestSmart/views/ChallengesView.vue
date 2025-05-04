@@ -339,27 +339,8 @@ export default {
     };
   },
   created() {
-    // Check if there's a pending challenge to start after login
-    const pendingChallengeId = localStorage.getItem('pendingChallengeId');
-
-    if (pendingChallengeId) {
-      // Clear the pending challenge
-      localStorage.removeItem('pendingChallengeId');
-
-      // Fetch challenges and then start the pending challenge
-      this.fetchChallenges().then(() => {
-        // Find the challenge in available challenges
-        const challenge = this.availableChallenges.find(c => c.id.toString() === pendingChallengeId);
-        if (challenge) {
-          console.log('Resuming pending challenge:', challenge.title);
-          // Start the challenge
-          this.startChallenge(challenge);
-        }
-      });
-    } else {
-      // Just fetch challenges normally
-      this.fetchChallenges();
-    }
+    // Fetch challenges when component is created
+    this.fetchChallenges();
   },
   computed: {
     filteredChallenges() {

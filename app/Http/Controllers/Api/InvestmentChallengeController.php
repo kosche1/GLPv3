@@ -35,28 +35,21 @@ class InvestmentChallengeController extends Controller
      */
     public function userChallenges()
     {
-        // Always use the student user for development
-        $user = \App\Models\User::where('email', 'student@example.com')->first();
+        // Get the authenticated user
+        $user = Auth::user();
 
-        if (!$user) {
-            // Create a student user if it doesn't exist
-            $user = \App\Models\User::create([
-                'name' => 'Student User',
-                'email' => 'student@example.com',
-                'password' => bcrypt('password'),
-                'role' => 'student'
-            ]);
-
-            \Illuminate\Support\Facades\Log::info('Created student user for challenges', [
-                'user_id' => $user->id,
-                'email' => $user->email
-            ]);
-        }
-
-        \Illuminate\Support\Facades\Log::info('Using student user for userChallenges:', [
-            'user_id' => $user->id,
-            'email' => $user->email
+        // Log authentication status
+        \Illuminate\Support\Facades\Log::info('User authentication status in userChallenges:', [
+            'is_authenticated' => !!$user,
+            'user_id' => $user ? $user->id : null,
+            'session_id' => session()->getId(),
+            'auth_check' => Auth::check(),
         ]);
+
+        // If no user is authenticated, return empty array
+        if (!$user) {
+            return response()->json([]);
+        }
 
         $userChallenges = UserInvestmentChallenge::with('challenge')
             ->where('user_id', $user->id)
@@ -96,28 +89,15 @@ class InvestmentChallengeController extends Controller
 
         $challenge = InvestmentChallenge::findOrFail($request->challenge_id);
 
-        // Always use the student user for development
-        $user = \App\Models\User::where('email', 'student@example.com')->first();
+        // Get the authenticated user
+        $user = Auth::user();
 
-        if (!$user) {
-            // Create a student user if it doesn't exist
-            $user = \App\Models\User::create([
-                'name' => 'Student User',
-                'email' => 'student@example.com',
-                'password' => bcrypt('password'),
-                'role' => 'student'
-            ]);
-
-            \Illuminate\Support\Facades\Log::info('Created student user for challenges', [
-                'user_id' => $user->id,
-                'email' => $user->email
-            ]);
-        }
-
-        \Illuminate\Support\Facades\Log::info('Using student user for challenge:', [
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'challenge_id' => $challenge->id
+        // Log authentication status
+        \Illuminate\Support\Facades\Log::info('User authentication status in startChallenge:', [
+            'is_authenticated' => !!$user,
+            'user_id' => $user ? $user->id : null,
+            'session_id' => session()->getId(),
+            'auth_check' => Auth::check(),
         ]);
 
         // Old code for temporary challenges - no longer used
@@ -188,29 +168,23 @@ class InvestmentChallengeController extends Controller
             'progress' => 'required|integer|min:0|max:100'
         ]);
 
-        // Always use the student user for development
-        $user = \App\Models\User::where('email', 'student@example.com')->first();
+        // Get the authenticated user
+        $user = Auth::user();
 
-        if (!$user) {
-            // Create a student user if it doesn't exist
-            $user = \App\Models\User::create([
-                'name' => 'Student User',
-                'email' => 'student@example.com',
-                'password' => bcrypt('password'),
-                'role' => 'student'
-            ]);
-
-            \Illuminate\Support\Facades\Log::info('Created student user for challenges', [
-                'user_id' => $user->id,
-                'email' => $user->email
-            ]);
-        }
-
-        \Illuminate\Support\Facades\Log::info('Using student user for updateProgress:', [
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'challenge_id' => $id
+        // Log authentication status
+        \Illuminate\Support\Facades\Log::info('User authentication status in updateProgress:', [
+            'is_authenticated' => !!$user,
+            'user_id' => $user ? $user->id : null,
+            'session_id' => session()->getId(),
+            'auth_check' => Auth::check(),
         ]);
+
+        // If no user is authenticated, return error
+        if (!$user) {
+            return response()->json([
+                'message' => 'You must be logged in to update challenge progress'
+            ], 401);
+        }
 
         $userChallenge = UserInvestmentChallenge::where('id', $id)
             ->where('user_id', $user->id)
@@ -240,29 +214,23 @@ class InvestmentChallengeController extends Controller
             'learnings' => 'required|string'
         ]);
 
-        // Always use the student user for development
-        $user = \App\Models\User::where('email', 'student@example.com')->first();
+        // Get the authenticated user
+        $user = Auth::user();
 
-        if (!$user) {
-            // Create a student user if it doesn't exist
-            $user = \App\Models\User::create([
-                'name' => 'Student User',
-                'email' => 'student@example.com',
-                'password' => bcrypt('password'),
-                'role' => 'student'
-            ]);
-
-            \Illuminate\Support\Facades\Log::info('Created student user for challenges', [
-                'user_id' => $user->id,
-                'email' => $user->email
-            ]);
-        }
-
-        \Illuminate\Support\Facades\Log::info('Using student user for submitChallenge:', [
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'challenge_id' => $id
+        // Log authentication status
+        \Illuminate\Support\Facades\Log::info('User authentication status in submitChallenge:', [
+            'is_authenticated' => !!$user,
+            'user_id' => $user ? $user->id : null,
+            'session_id' => session()->getId(),
+            'auth_check' => Auth::check(),
         ]);
+
+        // If no user is authenticated, return error
+        if (!$user) {
+            return response()->json([
+                'message' => 'You must be logged in to submit a challenge'
+            ], 401);
+        }
 
         $userChallenge = UserInvestmentChallenge::where('id', $id)
             ->where('user_id', $user->id)
@@ -291,29 +259,23 @@ class InvestmentChallengeController extends Controller
      */
     public function deleteChallenge($id)
     {
-        // Always use the student user for development
-        $user = \App\Models\User::where('email', 'student@example.com')->first();
+        // Get the authenticated user
+        $user = Auth::user();
 
-        if (!$user) {
-            // Create a student user if it doesn't exist
-            $user = \App\Models\User::create([
-                'name' => 'Student User',
-                'email' => 'student@example.com',
-                'password' => bcrypt('password'),
-                'role' => 'student'
-            ]);
-
-            \Illuminate\Support\Facades\Log::info('Created student user for challenges', [
-                'user_id' => $user->id,
-                'email' => $user->email
-            ]);
-        }
-
-        \Illuminate\Support\Facades\Log::info('Using student user for deleteChallenge:', [
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'challenge_id' => $id
+        // Log authentication status
+        \Illuminate\Support\Facades\Log::info('User authentication status in deleteChallenge:', [
+            'is_authenticated' => !!$user,
+            'user_id' => $user ? $user->id : null,
+            'session_id' => session()->getId(),
+            'auth_check' => Auth::check(),
         ]);
+
+        // If no user is authenticated, return error
+        if (!$user) {
+            return response()->json([
+                'message' => 'You must be logged in to delete a challenge'
+            ], 401);
+        }
 
         $userChallenge = UserInvestmentChallenge::where('id', $id)
             ->where('user_id', $user->id)
