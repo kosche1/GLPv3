@@ -402,11 +402,27 @@ export default {
       }
     },
     formatDate(date) {
-      return new Date(date).toLocaleDateString('en-PH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      });
+      try {
+        if (!date) return 'N/A';
+
+        // Check if date is a valid date string or timestamp
+        const dateObj = new Date(date);
+
+        // Check if date is valid
+        if (isNaN(dateObj.getTime())) {
+          console.error('Invalid date in ChallengesView:', date);
+          return 'N/A';
+        }
+
+        return dateObj.toLocaleDateString('en-PH', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+      } catch (error) {
+        console.error('Error formatting date in ChallengesView:', error, date);
+        return 'N/A';
+      }
     },
     getGainLoss(stock) {
       try {
