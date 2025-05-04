@@ -194,6 +194,16 @@ Route::middleware(
     Route::get('typing-test/words', [\App\Http\Controllers\TypingTestController::class, 'getWords'])->name('typing-test.words');
     Route::post('typing-test/save-result', [\App\Http\Controllers\TypingTestController::class, 'saveResult'])->name('typing-test.save-result');
     Route::get('typing-test/history', [\App\Http\Controllers\TypingTestController::class, 'getHistory'])->name('typing-test.history');
+
+    // Recipe Builder routes
+    Route::get('recipe-builder', [\App\Http\Controllers\RecipeBuilderController::class, 'index'])->name('recipe-builder');
+    Route::get('recipe-builder/ingredients', [\App\Http\Controllers\RecipeBuilderController::class, 'getIngredients'])->name('recipe-builder.ingredients');
+    Route::get('recipe-builder/template/{id}', [\App\Http\Controllers\RecipeBuilderController::class, 'getTemplate'])->name('recipe-builder.template');
+    Route::post('recipe-builder/save', [\App\Http\Controllers\RecipeBuilderController::class, 'saveRecipe'])->name('recipe-builder.save');
+    Route::get('recipe-builder/user-recipe/{id}', [\App\Http\Controllers\RecipeBuilderController::class, 'getUserRecipe'])->name('recipe-builder.user-recipe');
+    Route::get('recipe-builder/user-recipes', [\App\Http\Controllers\RecipeBuilderController::class, 'getUserRecipes'])->name('recipe-builder.user-recipes');
+    Route::delete('recipe-builder/delete/{id}', [\App\Http\Controllers\RecipeBuilderController::class, 'deleteRecipe'])->name('recipe-builder.delete');
+
     Route::view('help-center', 'help-center')->name('help-center');
     Route::view('technical-support', 'technical-support')->name('technical-support');
 
