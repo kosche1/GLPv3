@@ -10,7 +10,8 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create("challenges", function (Blueprint $table) {
+        if (!Schema::hasTable('challenges')) {
+            Schema::create("challenges", function (Blueprint $table) {
             $table->id();
             $table->string("name");
             $table->text("description")->nullable();
@@ -23,7 +24,7 @@ return new class extends Migration {
             $table->json("completion_criteria")->nullable();
             $table->json("additional_rewards")->nullable();
             $table->integer("required_level")->default(1);
-            
+
             // IT-focused challenge types
             $table->string("challenge_type")->default("coding_challenge"); // coding_challenge, debugging, algorithm, quiz, flashcard, project, code_review, database, security, ui_design
             $table->string("programming_language")->nullable(); // python, javascript, java, csharp, cpp, php, ruby, swift, go, sql, multiple, none
@@ -32,8 +33,10 @@ return new class extends Migration {
             $table->json("challenge_content")->nullable(); // Structured content based on the challenge type
             $table->timestamps();
         });
-        
-        Schema::create("user_challenges", function (Blueprint $table) {
+        }
+
+        if (!Schema::hasTable('user_challenges')) {
+            Schema::create("user_challenges", function (Blueprint $table) {
             $table->id();
             $table->foreignId("user_id")->constrained()->onDelete("cascade");
             $table
@@ -51,9 +54,11 @@ return new class extends Migration {
 
             $table->unique(["user_id", "challenge_id"]);
         });
-        
+        }
+
         // For challenge-badge relationship
-        Schema::create("challenge_badges", function (Blueprint $table) {
+        if (!Schema::hasTable('challenge_badges')) {
+            Schema::create("challenge_badges", function (Blueprint $table) {
             $table->id();
             $table
                 ->foreignId("challenge_id")
@@ -64,9 +69,11 @@ return new class extends Migration {
 
             $table->unique(["challenge_id", "badge_id"]);
         });
+        }
 
         // For challenge-achievement relationship
-        Schema::create("challenge_achievements", function (Blueprint $table) {
+        if (!Schema::hasTable('challenge_achievements')) {
+            Schema::create("challenge_achievements", function (Blueprint $table) {
             $table->id();
             $table
                 ->foreignId("challenge_id")
@@ -80,9 +87,11 @@ return new class extends Migration {
 
             $table->unique(["challenge_id", "achievement_id"]);
         });
+        }
 
         // For challenge-activity relationship
-        Schema::create("challenge_activities", function (Blueprint $table) {
+        if (!Schema::hasTable('challenge_activities')) {
+            Schema::create("challenge_activities", function (Blueprint $table) {
             $table->id();
             $table
                 ->foreignId("challenge_id")
@@ -97,9 +106,11 @@ return new class extends Migration {
 
             $table->unique(["challenge_id", "activity_id"]);
         });
-        
+        }
+
         // For challenge submissions and feedback
-        Schema::create("challenge_submissions", function (Blueprint $table) {
+        if (!Schema::hasTable('challenge_submissions')) {
+            Schema::create("challenge_submissions", function (Blueprint $table) {
             $table->id();
             $table->foreignId("user_id")->constrained()->onDelete("cascade");
             $table->foreignId("challenge_id")->constrained()->onDelete("cascade");
@@ -108,9 +119,10 @@ return new class extends Migration {
             $table->text("feedback")->nullable(); // Instructor feedback
             $table->integer("score")->nullable();
             $table->timestamps();
-            
+
             $table->unique(["user_id", "challenge_id", "created_at"]);
         });
+        }
     }
 
     /**
