@@ -22,6 +22,10 @@
 <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/src-noconflict/snippets/python.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/ace-builds@1.39.1/css/ace.min.css" rel="stylesheet">
 
+<!-- Recipe Builder Fixes -->
+<script src="{{ asset('js/recipe-badge-fix.js') }}"></script>
+<link href="{{ asset('css/modal-fix.css') }}" rel="stylesheet">
+
 <!-- Custom Scrollbar Styles -->
 <style>
     /* Alpine.js x-cloak directive to hide elements until Alpine initializes */

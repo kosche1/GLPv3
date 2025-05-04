@@ -1,4 +1,5 @@
 <x-layouts.app>
+    <!-- Task and recipe approval notifications are now handled by global components -->
 
     <div class="relative flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg overflow-hidden backdrop-blur-sm">
         <!-- Optimized Background Elements - Single Element -->
@@ -1180,4 +1181,6 @@
             }
         }
     </style>
+
+    <!-- Task and recipe approval notifications are now handled by global Livewire components -->
 </x-layouts.app>

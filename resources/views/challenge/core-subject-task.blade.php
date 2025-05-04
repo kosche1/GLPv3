@@ -261,7 +261,7 @@
 
     <!-- Task Completion Modal -->
     <div id="task-completion-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
-        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-10 backdrop-blur-md"></div>
         <div class="relative bg-neutral-800 rounded-xl shadow-lg p-8 max-w-md w-full mx-4 border border-emerald-500/30 transform transition-all">
             <div class="absolute top-4 right-4">
                 <button id="close-task-modal" class="text-neutral-400 hover:text-white transition-colors">

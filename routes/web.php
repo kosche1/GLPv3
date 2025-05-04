@@ -141,6 +141,10 @@ Route::middleware(
     Route::post('api/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('api/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 
+    // Approval notification routes
+    Route::get('api/check-pending-approvals', [\App\Http\Controllers\ApprovalNotificationController::class, 'checkPendingApprovals'])->name('check-pending-approvals');
+    Route::get('api/check-pending-recipe-approvals', [\App\Http\Controllers\ApprovalNotificationController::class, 'checkPendingRecipeApprovals'])->name('check-pending-recipe-approvals');
+
 
     Route::get('courses', [CourseController::class, 'index'])->name('courses');
     Route::get('learning-materials', [\App\Http\Controllers\LearningMaterialController::class, 'index'])->name('learning-materials');

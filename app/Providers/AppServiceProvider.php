@@ -5,13 +5,18 @@ namespace App\Providers;
 use Livewire\Livewire;
 use Prism\Prism\Prism;
 use App\Models\StudentAnswer;
+use App\Models\UserRecipe;
 use Prism\Prism\Enums\Provider;
 use App\Livewire\GradesComponent;
+use App\Livewire\RecipeApprovalModal;
 use App\Livewire\SessionTimeout;
+use App\Livewire\StudentApprovalNotificationModal;
+use App\Livewire\TaskApprovalNotificationModal;
 use Prism\Prism\Facades\PrismServer;
 use Prism\Prism\Text\PendingRequest;
 use Illuminate\Support\ServiceProvider;
 use App\Observers\StudentAnswerObserver;
+use App\Observers\UserRecipeObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,10 +34,14 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         StudentAnswer::observe(StudentAnswerObserver::class);
+        UserRecipe::observe(UserRecipeObserver::class);
 
         // Register Livewire components
         Livewire::component('grades-component', GradesComponent::class);
         Livewire::component('session-timeout', SessionTimeout::class);
+        Livewire::component('student-approval-notification-modal', StudentApprovalNotificationModal::class);
+        Livewire::component('recipe-approval-modal', RecipeApprovalModal::class);
+        Livewire::component('task-approval-notification-modal', TaskApprovalNotificationModal::class);
 
         // Configure Prism providers
         $this->configurePrisms();

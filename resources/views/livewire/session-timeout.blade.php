@@ -213,7 +213,7 @@
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0">
-            <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+            <div class="absolute inset-0 bg-black bg-opacity-10 backdrop-blur-md"></div>
 
             <!-- Modal panel -->
             <div class="relative bg-neutral-800 rounded-xl shadow-lg p-8 max-w-md w-full mx-4 border border-emerald-500/30 transform transition-all">
