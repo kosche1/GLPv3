@@ -22,7 +22,7 @@
          x-transition:leave-end="opacity-0">
 
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-10 backdrop-blur-md"></div>
 
         <!-- Modal Content -->
         <div class="relative bg-neutral-800 rounded-xl shadow-lg p-8 max-w-md w-full mx-4 border border-emerald-500/30 transform transition-all max-h-[90vh] overflow-y-auto"

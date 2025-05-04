@@ -1,6 +1,6 @@
 <x-layouts.app>
-    <div id="recipe-builder-app" class="py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div id="recipe-builder-app">
+        <div class="max-w-8xl mx-auto">
             <!-- Animated Header with Orange Gradient Background -->
             <div class="relative mb-8 overflow-hidden rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 p-8 shadow-lg">
                 <div class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-white opacity-20 blur-3xl"></div>
@@ -203,7 +203,7 @@
                             <div class="mb-6">
                                 <div class="flex items-center justify-between mb-3">
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200">Macronutrient Balance</h3>
-                                    <div id="balance-status" class="text-xs font-medium px-2 py-1 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-full">Unbalanced</div>
+                                    <div id="balance-status" class="text-xs font-medium px-2 py-1 bg-red-200 text-red-800 dark:bg-red-600 dark:text-white rounded-full">Unbalanced</div>
                                 </div>
 
                                 <!-- Circular progress chart (visual enhancement) -->
@@ -294,7 +294,7 @@
             </div>
 
             <!-- Recipe Result Modal with Enhanced Design -->
-            <div id="recipe-result-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden backdrop-blur-sm transition-all duration-300">
+            <div id="recipe-result-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden transition-all duration-300">
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-500 scale-100 opacity-100">
                     <!-- Modal header with gradient -->
                     <div class="h-2 bg-gradient-to-r from-gray-500 to-gray-600 dark:from-gray-600 dark:to-gray-700 rounded-t-xl"></div>
@@ -328,7 +328,7 @@
             </div>
 
             <!-- Delete Confirmation Modal -->
-            <div id="delete-confirmation-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden backdrop-blur-sm transition-all duration-300">
+            <div id="delete-confirmation-modal" class="fixed inset-0 flex items-center justify-center z-50 hidden transition-all duration-300">
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all duration-500 scale-100 opacity-100">
                     <!-- Modal header with gradient -->
                     <div class="h-2 bg-gradient-to-r from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 rounded-t-xl"></div>
@@ -361,8 +361,11 @@
         </div>
     </div>
 
+    <!-- Recipe approval notifications are now handled by the global recipe-approval-modal component -->
+
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Recipe approval notifications are now handled by the global recipe-approval-modal component
         // Mock data for ingredients
         const ingredients = [
             {
@@ -826,20 +829,20 @@
 
             if (isBalanced) {
                 balanceStatus.textContent = 'Balanced';
-                balanceStatus.classList.remove('bg-gray-200', 'text-gray-800');
-                balanceStatus.classList.add('bg-green-200', 'text-green-800');
+                balanceStatus.classList.remove('bg-gray-200', 'text-gray-800', 'bg-red-200', 'text-red-800', 'dark:bg-red-600', 'dark:text-white');
+                balanceStatus.classList.add('bg-blue-200', 'text-blue-800', 'dark:bg-blue-600', 'dark:text-white');
 
                 nutritionStatus.textContent = 'Balanced';
-                nutritionStatus.classList.remove('bg-gray-200', 'text-gray-800');
-                nutritionStatus.classList.add('bg-green-200', 'text-green-800');
+                nutritionStatus.classList.remove('bg-gray-200', 'text-gray-800', 'bg-red-200', 'text-red-800', 'dark:bg-red-600', 'dark:text-white');
+                nutritionStatus.classList.add('bg-blue-200', 'text-blue-800', 'dark:bg-blue-600', 'dark:text-white');
             } else {
                 balanceStatus.textContent = 'Unbalanced';
-                balanceStatus.classList.remove('bg-green-200', 'text-green-800');
-                balanceStatus.classList.add('bg-gray-200', 'text-gray-800');
+                balanceStatus.classList.remove('bg-blue-200', 'text-blue-800', 'dark:bg-blue-600', 'dark:text-white');
+                balanceStatus.classList.add('bg-red-200', 'text-red-800', 'dark:bg-red-600', 'dark:text-white');
 
                 nutritionStatus.textContent = 'Unbalanced';
-                nutritionStatus.classList.remove('bg-green-200', 'text-green-800');
-                nutritionStatus.classList.add('bg-gray-200', 'text-gray-800');
+                nutritionStatus.classList.remove('bg-blue-200', 'text-blue-800', 'dark:bg-blue-600', 'dark:text-white');
+                nutritionStatus.classList.add('bg-red-200', 'text-red-800', 'dark:bg-red-600', 'dark:text-white');
             }
         }
 
@@ -932,11 +935,17 @@
                 <p class="mb-2">
                     Your recipe <span class="font-semibold">${recipe.name}</span> has been saved to your collection.
                 </p>
-                <p>
+                <p class="mb-2">
                     ${recipe.isBalanced
                         ? `Congratulations! Your recipe is nutritionally balanced with a score of ${recipe.score}%.`
                         : `Your recipe has a balance score of ${recipe.score}%. Try adding more ingredients to improve the balance.`
                     }
+                </p>
+                <p class="mt-4 text-amber-400 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Your recipe will be reviewed by a teacher. You'll receive ${recipe.potential_points} points after approval.
                 </p>
             `;
             recipeResultModal.classList.remove('hidden');
@@ -1009,7 +1018,7 @@
                     <div class="p-5">
                         <div class="flex justify-between items-start mb-3">
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white">${recipe.name}</h3>
-                            <span class="px-2 py-1 bg-${isBalanced ? 'green' : 'amber'}-200 text-${isBalanced ? 'green' : 'amber'}-800 dark:bg-${isBalanced ? 'green' : 'amber'}-900 dark:text-${isBalanced ? 'green' : 'amber'}-200 rounded-full text-xs font-medium">
+                            <span class="px-2 py-1 bg-${isBalanced ? 'blue' : 'red'}-200 text-${isBalanced ? 'blue' : 'red'}-800 dark:bg-${isBalanced ? 'blue' : 'red'}-600 dark:text-white rounded-full text-xs font-medium">
                                 ${isBalanced ? 'Balanced' : 'Unbalanced'}
                             </span>
                         </div>

@@ -1,0 +1,75 @@
+/* Modal backdrop fix for all modals */
+
+/* Target all modals with a black background */
+#recipe-result-modal,
+#delete-confirmation-modal,
+.fixed.inset-0.bg-black,
+.fixed.inset-0.z-50 .absolute.inset-0.bg-black {
+    background-color: transparent !important;
+    backdrop-filter: blur(8px);
+}
+
+/* Add a semi-transparent overlay that's not fully black */
+#recipe-result-modal::before,
+#delete-confirmation-modal::before,
+.fixed.inset-0.bg-black::before,
+.fixed.inset-0.z-50 .absolute.inset-0.bg-black::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: -1;
+}
+
+/* Make sure the modal content has proper background */
+#recipe-result-modal > div,
+#delete-confirmation-modal > div {
+    background-color: #1e293b !important; /* dark blue-gray-800 */
+    color: white;
+}
+
+/* Ensure text is visible */
+#recipe-result-modal h3,
+#delete-confirmation-modal h3 {
+    color: white !important;
+}
+
+#recipe-result-modal p,
+#delete-confirmation-modal p {
+    color: #cbd5e1 !important; /* slate-300 */
+}
+
+/* Make sure the modal is centered and properly sized */
+#recipe-result-modal > div,
+#delete-confirmation-modal > div {
+    max-width: 28rem;
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Welcome Modal Specific Fixes */
+.fixed.inset-0.z-50 .absolute.inset-0.bg-black.bg-opacity-10,
+.welcome-modal-backdrop {
+    background-color: transparent !important;
+    backdrop-filter: blur(8px);
+}
+
+.fixed.inset-0.z-50 .absolute.inset-0.bg-black.bg-opacity-10::before,
+.welcome-modal-backdrop::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: -1;
+}
+
+/* Add a subtle gradient to the welcome modal backdrop */
+.welcome-modal-backdrop::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.3) 100%);
+    z-index: -1;
+}

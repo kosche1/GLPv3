@@ -34,6 +34,12 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 "primary" => Color::Purple,
             ])
+            ->navigationGroups([
+                'User Management',
+                'Content',
+                'System',
+                'SHS Specialized Subjects',
+            ])
             ->discoverResources(
                 in: app_path("Filament/Resources"),
                 for: "App\\Filament\\Resources"

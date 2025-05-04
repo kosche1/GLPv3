@@ -28,6 +28,11 @@ class UserRecipe extends Model
         'is_balanced',
         'meets_requirements',
         'score',
+        'potential_points',
+        'points_awarded',
+        'notification_shown',
+        'points_awarded_at',
+        'approved_by',
     ];
 
     /**
@@ -38,6 +43,9 @@ class UserRecipe extends Model
     protected $casts = [
         'is_balanced' => 'boolean',
         'meets_requirements' => 'boolean',
+        'points_awarded' => 'boolean',
+        'notification_shown' => 'boolean',
+        'points_awarded_at' => 'datetime',
     ];
 
     /**
@@ -54,6 +62,14 @@ class UserRecipe extends Model
     public function recipeTemplate(): BelongsTo
     {
         return $this->belongsTo(RecipeTemplate::class);
+    }
+
+    /**
+     * Get the user who approved this recipe.
+     */
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     /**
@@ -106,7 +122,7 @@ class UserRecipe extends Model
         $meetsRequirements = true;
 
         // Check calorie range
-        if ($this->total_calories < $template->target_calories_min || 
+        if ($this->total_calories < $template->target_calories_min ||
             $this->total_calories > $template->target_calories_max) {
             $meetsRequirements = false;
         }
@@ -179,9 +195,9 @@ class UserRecipe extends Model
     public function checkBalance()
     {
         // Calculate macronutrient percentages
-        $totalCaloriesFromMacros = 
-            ($this->total_protein * 4) + 
-            ($this->total_carbs * 4) + 
+        $totalCaloriesFromMacros =
+            ($this->total_protein * 4) +
+            ($this->total_carbs * 4) +
             ($this->total_fat * 9);
 
         if ($totalCaloriesFromMacros == 0) {
@@ -195,7 +211,7 @@ class UserRecipe extends Model
 
         // Check if macros are within healthy ranges
         // Protein: 10-35%, Carbs: 45-65%, Fat: 20-35%
-        $isBalanced = 
+        $isBalanced =
             $proteinPercentage >= 10 && $proteinPercentage <= 35 &&
             $carbsPercentage >= 45 && $carbsPercentage <= 65 &&
             $fatPercentage >= 20 && $fatPercentage <= 35;

@@ -7,6 +7,7 @@ use App\Models\RecipeTemplate;
 use App\Models\UserRecipe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class RecipeBuilderController extends Controller
@@ -18,16 +19,16 @@ class RecipeBuilderController extends Controller
     {
         // Get all ingredients grouped by category
         $ingredients = RecipeIngredient::orderBy('name')->get()->groupBy('category');
-        
+
         // Get all recipe templates (challenges)
         $templates = RecipeTemplate::orderBy('difficulty_level')->orderBy('name')->get();
-        
+
         // Get user's recent recipes
         $userRecipes = UserRecipe::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
-        
+
         return view('recipe-builder.index', [
             'ingredients' => $ingredients,
             'templates' => $templates,
@@ -68,7 +69,7 @@ class RecipeBuilderController extends Controller
         ]);
 
         // Start a database transaction
-        \DB::beginTransaction();
+        DB::beginTransaction();
 
         try {
             // Create the user recipe
@@ -77,20 +78,20 @@ class RecipeBuilderController extends Controller
             $userRecipe->recipe_template_id = $request->template_id;
             $userRecipe->name = $request->name;
             $userRecipe->description = $request->description;
-            
+
             // Initialize nutritional values
             $userRecipe->total_calories = 0;
             $userRecipe->total_protein = 0;
             $userRecipe->total_carbs = 0;
             $userRecipe->total_fat = 0;
-            
+
             $userRecipe->save();
 
             // Add ingredients to the recipe
             foreach ($request->ingredients as $ingredientData) {
                 $ingredient = RecipeIngredient::find($ingredientData['id']);
                 $quantity = $ingredientData['quantity'];
-                
+
                 $userRecipe->ingredients()->attach($ingredient->id, ['quantity' => $quantity]);
             }
 
@@ -101,13 +102,14 @@ class RecipeBuilderController extends Controller
                 ->calculateScore()
                 ->save();
 
-            // Award points to the user if the recipe meets requirements
-            if ($userRecipe->meets_requirements) {
-                $pointsToAward = $userRecipe->recipeTemplate ? $userRecipe->recipeTemplate->points_reward : 50;
-                Auth::user()->addPoints($pointsToAward);
-            }
+            // Points will be awarded later by teacher/admin approval
+            // Store the potential points to award in the recipe metadata
+            $pointsToAward = $userRecipe->recipeTemplate ? $userRecipe->recipeTemplate->points_reward : 50;
+            $userRecipe->potential_points = $pointsToAward;
+            $userRecipe->points_awarded = false;
+            $userRecipe->save();
 
-            \DB::commit();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -115,7 +117,7 @@ class RecipeBuilderController extends Controller
                 'message' => 'Recipe saved successfully!',
             ]);
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Error saving recipe: ' . $e->getMessage(),
@@ -129,12 +131,12 @@ class RecipeBuilderController extends Controller
     public function getUserRecipe($id)
     {
         $recipe = UserRecipe::with('ingredients')->findOrFail($id);
-        
+
         // Check if the recipe belongs to the authenticated user
         if ($recipe->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-        
+
         return response()->json($recipe);
     }
 
@@ -146,7 +148,7 @@ class RecipeBuilderController extends Controller
         $recipes = UserRecipe::where('user_id', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
-            
+
         return response()->json($recipes);
     }
 
@@ -156,14 +158,14 @@ class RecipeBuilderController extends Controller
     public function deleteRecipe($id)
     {
         $recipe = UserRecipe::findOrFail($id);
-        
+
         // Check if the recipe belongs to the authenticated user
         if ($recipe->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-        
+
         $recipe->delete();
-        
+
         return response()->json(['success' => true, 'message' => 'Recipe deleted successfully']);
     }
 }

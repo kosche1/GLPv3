@@ -21,7 +21,8 @@
         @auth
             @livewire('session-timeout')
             @livewire('welcome-modals')
-            @livewire('task-approval-modal')
+            @livewire('recipe-approval-modal')
+            @livewire('task-approval-notification-modal')
         @endauth
     </flux:main>
 </x-layouts.app.sidebar>
