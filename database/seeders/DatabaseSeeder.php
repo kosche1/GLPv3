@@ -58,6 +58,9 @@ class DatabaseSeeder extends Seeder
             HeSubjectsSeeder::class,
             IctSubjectsSeeder::class,
 
+            // Investment Challenges
+            InvestmentChallengeSeeder::class,
+
             // ICT Computer Programming
             IctComputerProgrammingSeeder::class,
 

@@ -9,7 +9,17 @@ return new class extends Migration
     public function up()
     {
         Schema::table('student_answers', function (Blueprint $table) {
-            $table->dropColumn(['student_answer', 'is_correct']);
+            $columnsToDrop = [];
+            if (Schema::hasColumn('student_answers', 'student_answer')) {
+                $columnsToDrop[] = 'student_answer';
+            }
+            if (Schema::hasColumn('student_answers', 'is_correct')) {
+                $columnsToDrop[] = 'is_correct';
+            }
+
+            if (!empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 

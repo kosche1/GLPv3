@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('challenges', function (Blueprint $table) {
-            $table->string('subject_type')->nullable()->after('tech_category')->comment('core, applied, specialized');
+            if (!Schema::hasColumn('challenges', 'subject_type')) {
+                $table->string('subject_type')->nullable()->after('tech_category')->comment('core, applied, specialized');
+            }
         });
     }
 

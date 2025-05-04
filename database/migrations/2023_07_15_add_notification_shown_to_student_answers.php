@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('student_answers', function (Blueprint $table) {
-            $table->boolean('notification_shown')->nullable()->default(false);
+            if (!Schema::hasColumn('student_answers', 'notification_shown')) {
+                $table->boolean('notification_shown')->nullable()->default(false);
+            }
         });
     }
 

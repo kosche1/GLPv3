@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('challenges', function (Blueprint $table) {
-            if (!Schema::hasColumn('challenges', 'image')) {
-                $table->string('image')->nullable();
-            }
+        Schema::create('invest_smart_portfolios', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
         });
     }
 
@@ -23,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('challenges', function (Blueprint $table) {
-            $table->dropColumn('image');
-        });
+        Schema::dropIfExists('invest_smart_portfolios');
     }
 };

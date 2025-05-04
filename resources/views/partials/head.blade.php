@@ -3,6 +3,8 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @auth
 <meta name="user-role" content="{{ Auth::check() && method_exists(Auth::user(), 'hasRole') ? (Auth::user()->hasRole('faculty') ? 'faculty' : (Auth::user()->hasRole('admin') ? 'admin' : 'student')) : 'student' }}">
+<meta name="user-name" content="{{ Auth::user()->name }}">
+<meta name="user-id" content="{{ Auth::user()->id }}">
 @endauth
 
 <title>{{ $title ?? 'GameLearnPro' }}</title>
