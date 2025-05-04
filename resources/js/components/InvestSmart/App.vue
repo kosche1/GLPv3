@@ -13,7 +13,7 @@
         <button @click="activeView = 'challenges'" :class="{ active: activeView === 'challenges' }">Challenges</button>
       </nav>
       <div class="user-info">
-        <span class="balance">₱{{ formatNumber(balance) }}</span>
+        <span class="balance">Balance: ₱{{ formatNumber(balance) }}</span>
         <span class="username">{{ username }}</span>
       </div>
     </header>
@@ -30,7 +30,7 @@
     </main>
 
     <footer class="app-footer">
-      <p>InvestSmart © {{ new Date().getFullYear() }} | Educational Investment Simulation Game</p>
+      <p>InvestSmart © {{ new Date().getFullYear() }} | Educational Investment Simulation Game by GLP</p>
     </footer>
   </div>
 </template>
@@ -47,7 +47,7 @@ import ChallengesView from './views/ChallengesView.vue';
 // Data properties
 const activeView = ref('portfolio');
 const username = ref(document.querySelector('meta[name="user-name"]')?.getAttribute('content') || 'Student');
-const balance = ref(100000); // Starting with ₱100,000
+const balance = ref(100000); // Starting with ₱100,000 for testing
 const portfolio = ref([]);
 const transactions = ref([]);
 const loading = ref(true);
@@ -55,7 +55,7 @@ const error = ref(null);
 
 // Timer for price updates
 let priceUpdateTimer = null;
-const updateInterval = 60000; // Update prices every 60 seconds
+const updateInterval = 3000; // Update prices every 5 seconds
 
 // Computed properties
 const currentView = computed(() => {
@@ -131,6 +131,28 @@ const updateStockPrices = async () => {
     const response = await axios.post('/api/investsmart/update-prices');
     if (response.data.success) {
       console.log('Stock prices updated at', new Date().toLocaleTimeString());
+
+      // Show a brief notification that prices have been updated
+      //const notificationEl = document.createElement('div');
+      //notificationEl.textContent = 'Market prices updated';
+      //notificationEl.style.position = 'fixed';
+      //notificationEl.style.bottom = '20px';
+      //notificationEl.style.right = '20px';
+      //notificationEl.style.backgroundColor = 'rgba(52, 152, 219, 0.9)';
+      //notificationEl.style.color = 'white';
+     // notificationEl.style.padding = '10px 15px';
+      //notificationEl.style.borderRadius = '4px';
+      //notificationEl.style.zIndex = '9999';
+      //notificationEl.style.transition = 'opacity 0.5s';
+      //document.body.appendChild(notificationEl);
+
+      // Remove notification after 2 seconds
+      //setTimeout(() => {
+        //notificationEl.style.opacity = '0';
+        //setTimeout(() => {
+          //document.body.removeChild(notificationEl);
+        //}, 500);
+      //}, 2000);
 
       // Instead of reloading the entire portfolio, just update the current prices
       if (portfolio.value.length > 0) {

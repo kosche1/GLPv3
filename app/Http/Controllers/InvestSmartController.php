@@ -276,8 +276,8 @@ class InvestSmartController extends Controller
         $stocks = InvestSmartMarketData::all();
 
         foreach ($stocks as $stock) {
-            // Generate random price change between -2% and +2%
-            $changePercent = (mt_rand(-200, 200) / 10000);
+            // Generate random price change between -3% and +3% for more noticeable updates
+            $changePercent = (mt_rand(-300, 300) / 10000);
             $oldPrice = $stock->price;
             $newPrice = round($oldPrice * (1 + $changePercent), 2);
 

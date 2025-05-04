@@ -1,7 +1,7 @@
 <x-layouts.app>
     <div class="container mx-auto">
         <div class="bg-orange-500 rounded-lg shadow-lg p-6">
-            <h1 class="text-2xl font-bold mb-6">InvestSmart - Investment Strategy Game</h1>
+            <h1 class="text-2xl font-bold mb-6">InvestSmart - Investment Strategy Simulation</h1>
 
             <!-- InvestSmart Game Container -->
             <div id="invest-smart-app" class="bg-gray-50 rounded-lg overflow-hidden"></div>

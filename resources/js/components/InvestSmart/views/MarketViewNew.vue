@@ -308,18 +308,28 @@ export default {
       } else {
         // Generate sample data if not available
         for (let i = 365; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(today.getDate() - i);
+          try {
+            const date = new Date();
+            date.setDate(today.getDate() - i);
 
-          // Base price with some randomness
-          let basePrice = this.selectedStock.price * 0.7;
-          // Add trend over time (generally upward)
-          basePrice += (this.selectedStock.price - basePrice) * (1 - i/365);
-          // Add some randomness
-          const randomFactor = 0.98 + Math.random() * 0.04;
-          const price = basePrice * randomFactor;
+            // Validate date
+            if (isNaN(date.getTime())) {
+              console.error('Invalid date generated in chart data');
+              continue;
+            }
 
-          data.push([date.getTime(), price]);
+            // Base price with some randomness
+            let basePrice = this.selectedStock.price * 0.7;
+            // Add trend over time (generally upward)
+            basePrice += (this.selectedStock.price - basePrice) * (1 - i/365);
+            // Add some randomness
+            const randomFactor = 0.98 + Math.random() * 0.04;
+            const price = basePrice * randomFactor;
+
+            data.push([date.getTime(), price]);
+          } catch (error) {
+            console.error('Error generating chart data point:', error);
+          }
         }
       }
 
@@ -334,6 +344,9 @@ export default {
         },
         title: {
           text: `${this.selectedStock.symbol} Stock Price`
+        },
+        credits: {
+          enabled: false // Remove the Highcharts.com text
         },
         series: [{
           name: this.selectedStock.symbol,

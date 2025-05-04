@@ -60,7 +60,7 @@
         </thead>
         <tbody>
           <tr v-for="(transaction, index) in sortedTransactions" :key="index" :class="transaction.type">
-            <td>{{ formatDate(transaction.date) }}</td>
+            <td>{{ formatDate(transaction.transaction_date) }}</td>
             <td>
               <span class="transaction-type" :class="transaction.type">
                 {{ transaction.type === 'buy' ? 'Buy' : 'Sell' }}
@@ -116,7 +116,7 @@ export default {
 
         // Date range filter
         if (this.startDate) {
-          const transactionDate = new Date(transaction.date);
+          const transactionDate = new Date(transaction.transaction_date);
           const filterStartDate = new Date(this.startDate);
           if (transactionDate < filterStartDate) {
             return false;
@@ -124,7 +124,7 @@ export default {
         }
 
         if (this.endDate) {
-          const transactionDate = new Date(transaction.date);
+          const transactionDate = new Date(transaction.transaction_date);
           const filterEndDate = new Date(this.endDate);
           // Set end date to end of day
           filterEndDate.setHours(23, 59, 59, 999);
@@ -140,7 +140,7 @@ export default {
       const direction = this.sortOrder === 'asc' ? 1 : -1;
       return [...this.filteredTransactions].sort((a, b) => {
         if (this.sortKey === 'date') {
-          return direction * (new Date(a.date) - new Date(b.date));
+          return direction * (new Date(a.transaction_date) - new Date(b.transaction_date));
         }
 
         if (a[this.sortKey] < b[this.sortKey]) return -1 * direction;
@@ -188,13 +188,29 @@ export default {
       }
     },
     formatDate(date) {
-      return new Date(date).toLocaleDateString('en-PH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      try {
+        if (!date) return 'N/A';
+
+        // Check if date is a valid date string or timestamp
+        const dateObj = new Date(date);
+
+        // Check if date is valid
+        if (isNaN(dateObj.getTime())) {
+          console.error('Invalid date:', date);
+          return 'N/A';
+        }
+
+        return dateObj.toLocaleDateString('en-PH', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      } catch (error) {
+        console.error('Error formatting date:', error, date);
+        return 'N/A';
+      }
     },
     applyFilters() {
       // This method is called when filters change
