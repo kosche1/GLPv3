@@ -303,29 +303,17 @@ class InvestSmartController extends Controller
      */
     private function updateChallengeProgress($user, $stocks): void
     {
-        // Always use the student user for development
-        $user = \App\Models\User::where('email', 'student@example.com')->first();
-
-        if (!$user) {
-            // Create a student user if it doesn't exist
-            $user = \App\Models\User::create([
-                'name' => 'Student User',
-                'email' => 'student@example.com',
-                'password' => bcrypt('password'),
-                'role' => 'student'
-            ]);
-
-            \Illuminate\Support\Facades\Log::info('Created student user for challenges', [
-                'user_id' => $user->id,
-                'email' => $user->email
-            ]);
-        }
-
-        \Illuminate\Support\Facades\Log::info('Using student user for updateChallengeProgress:', [
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'stocks_count' => count($stocks)
+        // Log user authentication status
+        \Illuminate\Support\Facades\Log::info('User authentication status in updateChallengeProgress:', [
+            'user_id' => $user ? $user->id : null,
+            'stocks_count' => count($stocks),
         ]);
+
+        // If no user is provided, return early
+        if (!$user) {
+            \Illuminate\Support\Facades\Log::warning('No authenticated user for updateChallengeProgress');
+            return;
+        }
 
         // Get user's active challenges
         $userChallenges = UserInvestmentChallenge::with('challenge')
