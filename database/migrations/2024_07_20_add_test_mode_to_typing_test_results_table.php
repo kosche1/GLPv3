@@ -13,10 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('typing_test_results', function (Blueprint $table) {
-            $table->string('test_mode')->default('words')->after('word_count');
-            $table->integer('time_limit')->nullable()->after('test_mode');
-        });
+        if (Schema::hasTable('typing_test_results')) {
+            Schema::table('typing_test_results', function (Blueprint $table) {
+                if (!Schema::hasColumn('typing_test_results', 'test_mode')) {
+                    $table->string('test_mode')->default('words')->after('word_count');
+                }
+
+                if (!Schema::hasColumn('typing_test_results', 'time_limit')) {
+                    $table->integer('time_limit')->nullable()->after('test_mode');
+                }
+            });
+        }
     }
 
     /**
@@ -26,8 +33,22 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('typing_test_results', function (Blueprint $table) {
-            $table->dropColumn(['test_mode', 'time_limit']);
-        });
+        if (Schema::hasTable('typing_test_results')) {
+            Schema::table('typing_test_results', function (Blueprint $table) {
+                $columns = [];
+
+                if (Schema::hasColumn('typing_test_results', 'test_mode')) {
+                    $columns[] = 'test_mode';
+                }
+
+                if (Schema::hasColumn('typing_test_results', 'time_limit')) {
+                    $columns[] = 'time_limit';
+                }
+
+                if (!empty($columns)) {
+                    $table->dropColumn($columns);
+                }
+            });
+        }
     }
 };

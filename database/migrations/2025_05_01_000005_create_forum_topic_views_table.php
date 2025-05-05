@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('forum_topic_views', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('forum_topic_id')->constrained()->onDelete('cascade');
-            $table->timestamp('viewed_at');
-            
-            // Ensure a user can only have one view record per topic
-            $table->unique(['user_id', 'forum_topic_id']);
-        });
+        if (!Schema::hasTable('forum_topic_views')) {
+            Schema::create('forum_topic_views', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->foreignId('forum_topic_id')->constrained()->onDelete('cascade');
+                $table->timestamp('viewed_at');
+
+                // Ensure a user can only have one view record per topic
+                $table->unique(['user_id', 'forum_topic_id']);
+            });
+        }
     }
 
     /**

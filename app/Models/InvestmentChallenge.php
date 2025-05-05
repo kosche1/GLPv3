@@ -10,9 +10,26 @@ class InvestmentChallenge extends Model
         'title',
         'description',
         'difficulty',
-        'duration',
-        'points',
-        'is_active'
+        'duration_days',
+        'points_reward',
+        'is_active',
+        'starting_capital',
+        'target_return',
+        'required_stocks',
+        'forbidden_stocks'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'is_active' => 'boolean',
+        'starting_capital' => 'decimal:2',
+        'target_return' => 'decimal:2',
+        'required_stocks' => 'json',
+        'forbidden_stocks' => 'json'
     ];
 
     /**
