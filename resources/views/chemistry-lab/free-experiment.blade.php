@@ -134,9 +134,15 @@
 
                 <div class="lab-bench h-96 bg-neutral-700 rounded-lg relative">
                     <!-- This is where the interactive lab bench will be rendered -->
-                    <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="absolute inset-0 flex items-center justify-center" id="lab-bench-placeholder">
                         <p class="text-neutral-400">Drag chemicals and equipment here to start experimenting</p>
                     </div>
+
+                    <!-- p5.js sketch container -->
+                    <div id="p5-container" class="absolute inset-0 z-10"></div>
+
+                    <!-- Original lab bench content (will be hidden when p5.js is active) -->
+                    <div id="original-lab-bench" class="absolute inset-0 z-5"></div>
                 </div>
 
                 <div class="mt-4 grid grid-cols-2 gap-4">
@@ -197,6 +203,10 @@
     <!-- Include Matter.js for physics -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 
+    <!-- Include p5.js for better visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
+
     <!-- Include Vue.js and Chemistry Lab App -->
     @vite('resources/js/chemistry-lab-app.js')
 
@@ -213,6 +223,9 @@
     <!-- Include Direct Drag and Drop Functionality -->
     <link href="{{ asset('css/chemistry-lab-direct-drag.css') }}" rel="stylesheet">
     <script src="{{ asset('js/chemistry-lab-direct-drag.js') }}"></script>
+
+    <!-- Include p5.js Chemistry Lab Visualization -->
+    <script src="{{ asset('js/chemistry-lab-p5.js') }}"></script>
 
     <!-- Add CSS animations -->
     <style>

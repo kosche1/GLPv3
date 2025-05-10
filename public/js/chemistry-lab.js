@@ -1641,6 +1641,10 @@ class ChemistryLab {
      * Reset the lab bench
      */
     resetLabBench() {
+        // P5.JS INTEGRATION: Dispatch an event for the p5.js visualization
+        const benchResetEvent = new CustomEvent('benchReset');
+        document.dispatchEvent(benchResetEvent);
+
         // Clear all bodies from the Matter.js world
         Matter.Composite.clear(this.world);
 

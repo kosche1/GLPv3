@@ -1076,15 +1076,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 switch (id) {
                     case 'beaker':
                         name = 'Beaker';
-                        equipmentHTML = `<div class="w-16 h-16 border-2 border-gray-300 rounded-md flex items-center justify-center">
-                            <span class="text-gray-300">Beaker</span>
-                        </div>`;
+                        equipmentHTML = `
+                            <div class="equipment-container beaker-container w-16 h-16 relative">
+                                <!-- Beaker outline -->
+                                <div class="beaker-outline w-16 h-16 border-2 border-gray-300 rounded-md flex items-center justify-center absolute top-0 left-0 z-10">
+                                    <span class="text-gray-300 equipment-text">Beaker</span>
+                                </div>
+
+                                <!-- NEW APPROACH: Large color indicator circle -->
+                                <div class="absolute -left-6 top-0 bottom-0 my-auto flex flex-col items-center justify-center">
+                                    <div class="chemical-color-circle w-8 h-8 rounded-full border-2 border-white shadow-lg"
+                                         style="background-color: transparent; z-index: 20;"></div>
+                                    <div class="mt-1 text-xs font-bold text-white bg-black bg-opacity-70 px-1 py-0.5 rounded chemical-color-name">Empty</div>
+                                </div>
+
+                                <!-- Chemical Mixture Label (for better visibility) -->
+                                <div class="absolute -bottom-6 left-0 w-full text-center text-xs font-bold text-white bg-black bg-opacity-70 px-1 py-0.5 rounded">
+                                    <span class="chemical-mixture-label">Empty</span>
+                                </div>
+                            </div>`;
                         break;
                     case 'test-tube':
                         name = 'Test Tube';
-                        equipmentHTML = `<div class="w-16 h-16 border-2 border-gray-300 rounded-md flex items-center justify-center">
-                            <span class="text-gray-300">Test Tube</span>
-                        </div>`;
+                        equipmentHTML = `
+                            <div class="equipment-container test-tube-container w-16 h-16 relative">
+                                <!-- Test tube outline (in front) -->
+                                <div class="test-tube-outline w-10 h-16 mx-auto border-2 border-gray-300 rounded-full flex items-center justify-center absolute top-0 left-0 right-0 z-10">
+                                    <span class="text-gray-300 equipment-text">Test Tube</span>
+                                </div>
+
+                                <!-- NEW APPROACH: Large color indicator circle -->
+                                <div class="absolute -left-6 top-0 bottom-0 my-auto flex flex-col items-center justify-center">
+                                    <div class="chemical-color-circle w-8 h-8 rounded-full border-2 border-white shadow-lg"
+                                         style="background-color: transparent; z-index: 20;"></div>
+                                    <div class="mt-1 text-xs font-bold text-white bg-black bg-opacity-70 px-1 py-0.5 rounded chemical-color-name">Empty</div>
+                                </div>
+
+                                <!-- Chemical Mixture Label (for better visibility) -->
+                                <div class="absolute -bottom-6 left-0 w-full text-center text-xs font-bold text-white bg-black bg-opacity-70 px-1 py-0.5 rounded">
+                                    <span class="chemical-mixture-label">Empty</span>
+                                </div>
+                            </div>`;
                         break;
                     case 'bunsen-burner':
                         name = 'Bunsen Burner';
@@ -1941,6 +1973,81 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             console.log(`Pouring ${chemical} from source to target`);
 
+            // P5.JS INTEGRATION: Dispatch an event for the p5.js visualization
+            const chemicalPouredEvent = new CustomEvent('chemicalPoured', {
+                detail: {
+                    chemical: chemical,
+                    targetId: targetItem.id || '',
+                    sourceId: sourceItem.id || ''
+                }
+            });
+            document.dispatchEvent(chemicalPouredEvent);
+
+            // EMERGENCY FIX: Force specific colors for water and HCl
+            if (chemical === 'water') {
+                console.log("🔴 EMERGENCY FIX: POURING WATER - USING BRIGHT BLUE");
+
+                // DIRECT DOM MANIPULATION - Force the color to be visible
+                setTimeout(() => {
+                    const chemicalFill = targetItem.querySelector('.chemical-fill');
+                    if (chemicalFill) {
+                        chemicalFill.style.backgroundColor = '#3b82f6'; // blue-500
+                        chemicalFill.style.height = '80%';
+                        chemicalFill.style.opacity = '1';
+                        chemicalFill.style.zIndex = '5';
+                        chemicalFill.style.border = '2px solid white';
+                        chemicalFill.style.boxShadow = '0 0 15px #3b82f6';
+                        console.log("🔴 EMERGENCY FIX: Directly modified water fill");
+                    }
+
+                    // Also update the label
+                    const label = targetItem.querySelector('.chemical-mixture-label');
+                    if (label) {
+                        label.textContent = 'Water (Blue)';
+                        label.style.color = '#ffffff';
+                        label.style.fontWeight = 'bold';
+                    }
+
+                    // Update the color indicator
+                    const colorIndicator = targetItem.querySelector('.chemical-color-indicator');
+                    if (colorIndicator) {
+                        colorIndicator.style.backgroundColor = '#3b82f6';
+                        colorIndicator.style.boxShadow = '0 0 10px #3b82f6';
+                    }
+                }, 100);
+            } else if (chemical === 'hcl') {
+                console.log("🔴 EMERGENCY FIX: POURING HCL - USING BRIGHT YELLOW");
+
+                // DIRECT DOM MANIPULATION - Force the color to be visible
+                setTimeout(() => {
+                    const chemicalFill = targetItem.querySelector('.chemical-fill');
+                    if (chemicalFill) {
+                        chemicalFill.style.backgroundColor = '#eab308'; // yellow-500
+                        chemicalFill.style.height = '80%';
+                        chemicalFill.style.opacity = '1';
+                        chemicalFill.style.zIndex = '5';
+                        chemicalFill.style.border = '2px solid white';
+                        chemicalFill.style.boxShadow = '0 0 15px #eab308';
+                        console.log("🔴 EMERGENCY FIX: Directly modified HCl fill");
+                    }
+
+                    // Also update the label
+                    const label = targetItem.querySelector('.chemical-mixture-label');
+                    if (label) {
+                        label.textContent = 'HCl (Yellow)';
+                        label.style.color = '#ffffff';
+                        label.style.fontWeight = 'bold';
+                    }
+
+                    // Update the color indicator
+                    const colorIndicator = targetItem.querySelector('.chemical-color-indicator');
+                    if (colorIndicator) {
+                        colorIndicator.style.backgroundColor = '#eab308';
+                        colorIndicator.style.boxShadow = '0 0 10px #eab308';
+                    }
+                }, 100);
+            }
+
             // Update the target container
             targetItem.setAttribute('data-contains', chemical);
 
@@ -1950,12 +2057,142 @@ document.addEventListener('DOMContentLoaded', function() {
                 containerLabel.textContent = getChemicalName(chemical);
             }
 
-            // Update the container indicator
+            // Update the container indicator (legacy)
             const containerIndicator = targetItem.querySelector('.container-indicator');
             if (containerIndicator) {
-                containerIndicator.style.backgroundColor = getChemicalColor(chemical);
-                containerIndicator.style.height = '50%';
+                // DIRECT FIX: Use very bright, obvious colors
+                let indicatorColor;
+                if (chemical === 'water') {
+                    indicatorColor = '#3b82f6'; // blue-500 - bright blue for water
+                    console.log("POURING WATER - USING BRIGHT BLUE FOR INDICATOR");
+                } else if (chemical === 'hcl') {
+                    indicatorColor = '#eab308'; // yellow-500 - bright yellow for acid
+                    console.log("POURING HCL - USING BRIGHT YELLOW FOR INDICATOR");
+                } else if (chemical === 'naoh') {
+                    indicatorColor = '#a855f7'; // purple-500 - bright purple
+                    console.log("POURING NAOH - USING BRIGHT PURPLE FOR INDICATOR");
+                } else {
+                    indicatorColor = getChemicalColor(chemical);
+                }
+
+                containerIndicator.style.backgroundColor = indicatorColor;
+                containerIndicator.style.height = '60%'; // Increased height for better visibility
                 containerIndicator.classList.add('has-chemical');
+
+                // Make sure the indicator is visible
+                containerIndicator.style.opacity = '1';
+                containerIndicator.style.zIndex = '10';
+            }
+
+            // Update the new chemical fill element
+            const chemicalFill = targetItem.querySelector('.chemical-fill');
+            if (chemicalFill) {
+                // Set the color of the chemical with higher opacity and more vibrant colors
+                let chemicalColor;
+
+                // DIRECT FIX: Use very bright, obvious colors
+                if (chemical === 'water') {
+                    chemicalColor = '#3b82f6'; // blue-500 - bright blue for water
+                    console.log("POURING WATER - USING BRIGHT BLUE FOR CHEMICAL FILL");
+                } else if (chemical === 'hcl') {
+                    chemicalColor = '#eab308'; // yellow-500 - bright yellow for acid
+                    console.log("POURING HCL - USING BRIGHT YELLOW FOR CHEMICAL FILL");
+                } else if (chemical === 'naoh') {
+                    chemicalColor = '#a855f7'; // purple-500 - bright purple
+                    console.log("POURING NAOH - USING BRIGHT PURPLE FOR CHEMICAL FILL");
+                } else {
+                    chemicalColor = getChemicalColor(chemical);
+                }
+
+                console.log(`Using color for ${chemical}: ${chemicalColor}`);
+                chemicalFill.style.backgroundColor = chemicalColor;
+
+                // Set the opacity - make all chemicals fully visible
+                chemicalFill.style.opacity = '1'; // Full opacity for maximum visibility
+
+                // Make sure the chemical fill is visible
+                chemicalFill.style.display = 'block';
+                chemicalFill.style.zIndex = '5';
+
+                // Add a border to make the chemical more visible
+                chemicalFill.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+
+                // Add a glow effect based on the chemical color
+                const colorRGB = hexToRGB(chemicalColor);
+                if (colorRGB) {
+                    chemicalFill.style.boxShadow = `inset 0 0 10px rgba(${colorRGB.r}, ${colorRGB.g}, ${colorRGB.b}, 0.7)`;
+                }
+
+                // Animate filling the container - make it fill more of the container
+                setTimeout(() => {
+                    chemicalFill.style.height = '80%'; // Fill to 80% of the container for better visibility
+                }, 10);
+
+                // Add a class to indicate it contains a chemical
+                chemicalFill.classList.add('has-chemical');
+
+                // Add a subtle animation effect based on chemical type
+                if (chemical === 'hcl' || chemical === 'naoh') {
+                    // Add bubbling effect for acids and bases
+                    chemicalFill.classList.add('bubbling-chemical');
+                }
+
+                // Add a label to show what chemical is in the container
+                const containerLabel = document.createElement('div');
+                containerLabel.classList.add('container-label');
+                containerLabel.textContent = chemical.toUpperCase();
+
+                // Remove any existing labels
+                const existingLabel = targetItem.querySelector('.container-label');
+                if (existingLabel) {
+                    existingLabel.remove();
+                }
+
+                targetItem.appendChild(containerLabel);
+
+                // Update the chemical mixture label for better visibility
+                const mixtureLabelElement = targetItem.querySelector('.chemical-mixture-label');
+                if (mixtureLabelElement) {
+                    mixtureLabelElement.textContent = getChemicalName(chemical);
+                    mixtureLabelElement.style.color = '#ffffff';
+                    mixtureLabelElement.style.fontWeight = 'bold';
+                }
+
+                // Log that we've updated the chemical fill
+                console.log(`Updated chemical fill for ${chemical} with color ${chemicalColor}`);
+
+                // NEW APPROACH: Update the color circle
+                const colorCircle = targetItem.querySelector('.chemical-color-circle');
+                if (colorCircle) {
+                    colorCircle.style.backgroundColor = chemicalColor;
+                    colorCircle.style.boxShadow = `0 0 10px ${chemicalColor}`;
+                }
+
+                // Update the color name
+                const colorName = targetItem.querySelector('.chemical-color-name');
+                if (colorName) {
+                    if (chemical === 'water') {
+                        colorName.textContent = 'BLUE';
+                        colorName.style.color = '#3b82f6';
+                    } else if (chemical === 'hcl') {
+                        colorName.textContent = 'YELLOW';
+                        colorName.style.color = '#eab308';
+                    } else if (chemical === 'naoh') {
+                        colorName.textContent = 'PURPLE';
+                        colorName.style.color = '#a855f7';
+                    } else {
+                        colorName.textContent = chemical.toUpperCase();
+                    }
+                }
+            }
+
+            // Update the equipment text when it contains a chemical
+            const equipmentText = targetItem.querySelector('.equipment-text');
+            if (equipmentText) {
+                equipmentText.style.opacity = '0.3';
+                equipmentText.style.color = '#ffffff';
+                equipmentText.style.textShadow = '0 0 2px rgba(0, 0, 0, 0.5)';
+                equipmentText.style.zIndex = '15';
             }
 
             // Hide the equipment icon and label when it contains a chemical
@@ -1982,11 +2219,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     sourceLabel.textContent = 'Empty';
                 }
 
-                // Update the source container indicator
+                // Update the source container indicator (legacy)
                 const sourceIndicator = sourceItem.querySelector('.container-indicator');
                 if (sourceIndicator) {
                     sourceIndicator.style.height = '0%';
                     sourceIndicator.classList.remove('has-chemical');
+                }
+
+                // Update the source chemical fill
+                const sourceChemicalFill = sourceItem.querySelector('.chemical-fill');
+                if (sourceChemicalFill) {
+                    // Animate emptying the container
+                    sourceChemicalFill.style.height = '0';
+                    sourceChemicalFill.style.backgroundColor = 'transparent';
+                    sourceChemicalFill.style.opacity = '0';
+
+                    // Remove chemical-specific classes
+                    sourceChemicalFill.classList.remove('has-chemical');
+                    sourceChemicalFill.classList.remove('bubbling-chemical');
+                    sourceChemicalFill.classList.remove('neutralization-reaction');
+                    sourceChemicalFill.classList.remove('dilution-reaction');
+                    sourceChemicalFill.classList.remove('mixing-reaction');
+                }
+
+                // Reset the equipment text
+                const sourceEquipmentText = sourceItem.querySelector('.equipment-text');
+                if (sourceEquipmentText) {
+                    sourceEquipmentText.style.opacity = '1';
+                    sourceEquipmentText.style.color = '#9ca3af'; // gray-400
+                    sourceEquipmentText.style.textShadow = 'none';
                 }
 
                 // Show the equipment icon and label again
@@ -2022,23 +2283,107 @@ document.addEventListener('DOMContentLoaded', function() {
             // Define some basic reactions
             let resultChemical = '';
             let reaction = '';
+            let customColor = null;
 
-            if ((chemical1 === 'hcl' && chemical2 === 'naoh') ||
+            // EMERGENCY FIX: Force specific colors for all combinations
+            if ((chemical1 === 'water' && chemical2 === 'hcl') ||
+                (chemical1 === 'hcl' && chemical2 === 'water')) {
+                resultChemical = 'hcl-solution';
+                reaction = 'dilution';
+                customColor = '#10b981'; // emerald-500 - BRIGHT GREEN color (blue water + yellow acid)
+                console.log("🔴 EMERGENCY FIX: MIXING WATER AND HCL - USING BRIGHT GREEN COLOR");
+
+                // DIRECT DOM MANIPULATION - Force the color to be visible
+                setTimeout(() => {
+                    const allChemicalFills = document.querySelectorAll('.chemical-fill');
+                    allChemicalFills.forEach(fill => {
+                        if (fill.closest('.equipment-container')) {
+                            fill.style.backgroundColor = '#10b981';
+                            fill.style.height = '80%';
+                            fill.style.opacity = '1';
+                            fill.style.zIndex = '5';
+                            fill.style.border = '2px solid white';
+                            fill.style.boxShadow = '0 0 15px #10b981';
+                            console.log("🔴 EMERGENCY FIX: Directly modified chemical fill");
+                        }
+                    });
+
+                    // Also update the label
+                    const labels = document.querySelectorAll('.chemical-mixture-label');
+                    labels.forEach(label => {
+                        label.textContent = 'HCl Solution (Green)';
+                        label.style.color = '#ffffff';
+                        label.style.fontWeight = 'bold';
+                    });
+                }, 100);
+
+                // P5.JS INTEGRATION: Dispatch an event for the p5.js visualization
+                const chemicalsMixedEvent = new CustomEvent('chemicalsMixed', {
+                    detail: {
+                        chemical1: chemical1,
+                        chemical2: chemical2,
+                        resultChemical: resultChemical,
+                        reaction: reaction,
+                        containerId: container.id || ''
+                    }
+                });
+                document.dispatchEvent(chemicalsMixedEvent);
+            }
+            // Handle other specific reactions
+            else if ((chemical1 === 'hcl' && chemical2 === 'naoh') ||
                 (chemical1 === 'naoh' && chemical2 === 'hcl')) {
                 resultChemical = 'nacl';
                 reaction = 'neutralization';
-            } else if ((chemical1 === 'water' && chemical2 === 'hcl') ||
-                       (chemical1 === 'hcl' && chemical2 === 'water')) {
-                resultChemical = 'hcl-solution';
-                reaction = 'dilution';
+                customColor = '#f3f4f6'; // white/clear for salt solution
+
+                // P5.JS INTEGRATION: Dispatch an event for the p5.js visualization
+                const chemicalsMixedEvent = new CustomEvent('chemicalsMixed', {
+                    detail: {
+                        chemical1: chemical1,
+                        chemical2: chemical2,
+                        resultChemical: resultChemical,
+                        reaction: reaction,
+                        containerId: container.id || ''
+                    }
+                });
+                document.dispatchEvent(chemicalsMixedEvent);
             } else if ((chemical1 === 'water' && chemical2 === 'naoh') ||
                        (chemical1 === 'naoh' && chemical2 === 'water')) {
                 resultChemical = 'naoh-solution';
                 reaction = 'dilution';
+                customColor = '#a78bfa'; // violet-400 - brighter purple for better visibility
+
+                // P5.JS INTEGRATION: Dispatch an event for the p5.js visualization
+                const chemicalsMixedEvent = new CustomEvent('chemicalsMixed', {
+                    detail: {
+                        chemical1: chemical1,
+                        chemical2: chemical2,
+                        resultChemical: resultChemical,
+                        reaction: reaction,
+                        containerId: container.id || ''
+                    }
+                });
+                document.dispatchEvent(chemicalsMixedEvent);
             } else {
                 resultChemical = 'mixture';
                 reaction = 'mixing';
+                customColor = '#60a5fa'; // blue-400 - brighter blue for better visibility
+
+                // P5.JS INTEGRATION: Dispatch an event for the p5.js visualization
+                const chemicalsMixedEvent = new CustomEvent('chemicalsMixed', {
+                    detail: {
+                        chemical1: chemical1,
+                        chemical2: chemical2,
+                        resultChemical: resultChemical,
+                        reaction: reaction,
+                        containerId: container.id || ''
+                    }
+                });
+                document.dispatchEvent(chemicalsMixedEvent);
             }
+
+            // Log the reaction details
+            console.log(`Reaction: ${reaction}, Result: ${resultChemical}, Custom Color: ${customColor}`);
 
             // Update the container
             container.setAttribute('data-contains', resultChemical);
@@ -2050,15 +2395,129 @@ document.addEventListener('DOMContentLoaded', function() {
                 containerLabel.textContent = getChemicalName(resultChemical);
             }
 
-            // Update the container indicator
+            // Update the container indicator (legacy)
             const containerIndicator = container.querySelector('.container-indicator');
             if (containerIndicator) {
-                containerIndicator.style.backgroundColor = getChemicalColor(resultChemical);
+                // Use custom color if available, otherwise use the default color
+                const indicatorColor = customColor || getChemicalColor(resultChemical);
+                containerIndicator.style.backgroundColor = indicatorColor;
                 containerIndicator.style.height = '60%';
                 containerIndicator.classList.add('has-chemical');
 
+                // Make sure the indicator is visible
+                containerIndicator.style.opacity = '1';
+                containerIndicator.style.zIndex = '10';
+
                 // Add reaction class
                 containerIndicator.classList.add(`reaction-${reaction}`);
+            }
+
+            // Update the new chemical fill element
+            const chemicalFill = container.querySelector('.chemical-fill');
+            if (chemicalFill) {
+                // Set the color of the resulting chemical with higher opacity
+                // Use custom color if available, otherwise use the default color
+                const chemicalColor = customColor || getChemicalColor(resultChemical);
+                console.log(`Using color for ${resultChemical}: ${chemicalColor}`);
+                chemicalFill.style.backgroundColor = chemicalColor;
+
+                // Set the opacity - make all chemicals fully visible
+                chemicalFill.style.opacity = '1'; // Full opacity for maximum visibility
+
+                // Make sure the chemical fill is visible
+                chemicalFill.style.display = 'block';
+                chemicalFill.style.zIndex = '5';
+
+                // Add a border to make the chemical more visible
+                chemicalFill.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+
+                // Add a glow effect based on the chemical color
+                const colorRGB = hexToRGB(chemicalColor);
+                if (colorRGB) {
+                    chemicalFill.style.boxShadow = `inset 0 0 10px rgba(${colorRGB.r}, ${colorRGB.g}, ${colorRGB.b}, 0.7)`;
+                }
+
+                // Animate filling the container
+                setTimeout(() => {
+                    chemicalFill.style.height = '80%'; // Fill to 80% of the container for mixed chemicals
+                }, 10);
+
+                // Add a class to indicate it contains a chemical
+                chemicalFill.classList.add('has-chemical');
+
+                // Add reaction-specific effects
+                chemicalFill.classList.remove('bubbling-chemical'); // Remove any previous effects
+
+                if (reaction === 'neutralization') {
+                    // Add neutralization effect (salt formation)
+                    chemicalFill.classList.add('neutralization-reaction');
+                } else if (reaction === 'dilution') {
+                    // Add dilution effect
+                    chemicalFill.classList.add('dilution-reaction');
+                } else {
+                    // Add generic mixing effect
+                    chemicalFill.classList.add('mixing-reaction');
+                }
+
+                // Add a label to show what chemical is in the container
+                const containerLabel = document.createElement('div');
+                containerLabel.classList.add('container-label');
+                containerLabel.textContent = resultChemical.toUpperCase();
+
+                // Remove any existing labels
+                const existingLabel = container.querySelector('.container-label');
+                if (existingLabel) {
+                    existingLabel.remove();
+                }
+
+                container.appendChild(containerLabel);
+
+                // Update the chemical mixture label for better visibility
+                const mixtureLabelElement = container.querySelector('.chemical-mixture-label');
+                if (mixtureLabelElement) {
+                    mixtureLabelElement.textContent = getChemicalName(resultChemical);
+                    mixtureLabelElement.style.color = '#ffffff';
+                    mixtureLabelElement.style.fontWeight = 'bold';
+                }
+
+                // Log that we've updated the chemical fill
+                console.log(`Updated chemical fill for mixed ${resultChemical} with color ${chemicalColor}`);
+
+                // NEW APPROACH: Update the color circle
+                const colorCircle = container.querySelector('.chemical-color-circle');
+                if (colorCircle) {
+                    colorCircle.style.backgroundColor = chemicalColor;
+                    colorCircle.style.boxShadow = `0 0 10px ${chemicalColor}`;
+                }
+
+                // Update the color name
+                const colorName = container.querySelector('.chemical-color-name');
+                if (colorName) {
+                    if ((chemical1 === 'water' && chemical2 === 'hcl') ||
+                        (chemical1 === 'hcl' && chemical2 === 'water')) {
+                        colorName.textContent = 'GREEN';
+                        colorName.style.color = '#10b981';
+                    } else if ((chemical1 === 'hcl' && chemical2 === 'naoh') ||
+                               (chemical1 === 'naoh' && chemical2 === 'hcl')) {
+                        colorName.textContent = 'WHITE';
+                        colorName.style.color = '#f3f4f6';
+                    } else if ((chemical1 === 'water' && chemical2 === 'naoh') ||
+                               (chemical1 === 'naoh' && chemical2 === 'water')) {
+                        colorName.textContent = 'LIGHT PURPLE';
+                        colorName.style.color = '#a78bfa';
+                    } else {
+                        colorName.textContent = resultChemical.toUpperCase();
+                    }
+                }
+            }
+
+            // Update the equipment text when it contains a chemical
+            const equipmentText = container.querySelector('.equipment-text');
+            if (equipmentText) {
+                equipmentText.style.opacity = '0.3';
+                equipmentText.style.color = '#ffffff';
+                equipmentText.style.textShadow = '0 0 2px rgba(0, 0, 0, 0.5)';
+                equipmentText.style.zIndex = '15';
             }
 
             // Hide the equipment icon and label when it contains a chemical
@@ -2353,21 +2812,66 @@ document.addEventListener('DOMContentLoaded', function() {
     function getChemicalColor(chemical) {
         switch (chemical) {
             case 'water':
-                return '#3b82f6'; // blue-500
+                return '#3b82f6'; // blue-500 - bright blue for water
             case 'hcl':
-                return '#eab308'; // yellow-500
+                return '#eab308'; // yellow-500 - bright yellow for acid
             case 'naoh':
-                return '#a855f7'; // purple-500
+                return '#a855f7'; // purple-500 - bright purple for base
             case 'nacl':
-                return '#f3f4f6'; // white
+                return '#f3f4f6'; // white - for salt solution
             case 'hcl-solution':
-                return '#fcd34d'; // yellow-300
+                return '#34d399'; // emerald-400 - green for HCl solution (blue water + yellow acid)
             case 'naoh-solution':
-                return '#c084fc'; // purple-300
+                return '#c084fc'; // purple-300 - lighter purple for NaOH solution
             case 'mixture':
-                return '#6b7280'; // gray-500
+                return '#60a5fa'; // blue-400 - bright blue for generic mixture
             default:
                 return '#6b7280'; // gray-500
+        }
+    }
+
+    /**
+     * Convert hex color to RGB
+     */
+    function hexToRGB(hex) {
+        // Remove the hash if it exists
+        hex = hex.replace('#', '');
+
+        // Parse the hex values
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+
+        // Check if the parsing was successful
+        if (isNaN(r) || isNaN(g) || isNaN(b)) {
+            console.error('Invalid hex color:', hex);
+            return null;
+        }
+
+        return { r, g, b };
+    }
+
+    /**
+     * Get a human-readable name for a chemical
+     */
+    function getChemicalName(chemical) {
+        switch (chemical) {
+            case 'water':
+                return 'Water (H₂O)';
+            case 'hcl':
+                return 'Hydrochloric Acid (HCl)';
+            case 'naoh':
+                return 'Sodium Hydroxide (NaOH)';
+            case 'nacl':
+                return 'Sodium Chloride (NaCl)';
+            case 'hcl-solution':
+                return 'HCl Solution (Green)';
+            case 'naoh-solution':
+                return 'NaOH Solution';
+            case 'mixture':
+                return 'Chemical Mixture';
+            default:
+                return chemical.toUpperCase();
         }
     }
 
