@@ -128,6 +128,10 @@ Route::middleware(
     Route::get('subjects/specialized/he', [\App\Http\Controllers\SubjectsController::class, 'heTrack'])->name('subjects.specialized.he');
     Route::get('subjects/specialized/humms', [\App\Http\Controllers\SubjectsController::class, 'hummsTrack'])->name('subjects.specialized.humms');
     Route::get('subjects/specialized/stem', [\App\Http\Controllers\SubjectsController::class, 'stemTrack'])->name('subjects.specialized.stem');
+    Route::get('subjects/specialized/stem/chemistry-lab', [\App\Http\Controllers\ChemistryLabController::class, 'index'])->name('subjects.specialized.stem.chemistry-lab');
+    Route::get('subjects/specialized/stem/chemistry-lab/free-experiment', [\App\Http\Controllers\ChemistryLabController::class, 'freeExperiment'])->name('subjects.specialized.stem.chemistry-lab.free-experiment');
+    Route::get('subjects/specialized/stem/chemistry-lab/challenge/{challenge}', [\App\Http\Controllers\ChemistryLabController::class, 'showChallenge'])->name('subjects.specialized.stem.chemistry-lab.challenge');
+    Route::post('subjects/specialized/stem/chemistry-lab/challenge/{challenge}/submit', [\App\Http\Controllers\ChemistryLabController::class, 'submitChallenge'])->name('subjects.specialized.stem.chemistry-lab.submit');
     Route::get('subjects/specialized/ict', [\App\Http\Controllers\SubjectsController::class, 'ictTrack'])->name('subjects.specialized.ict');
 
     // Dynamic route for any strand - must be after specific strand routes

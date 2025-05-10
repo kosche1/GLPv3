@@ -26,6 +26,10 @@
 <script src="{{ asset('js/recipe-badge-fix.js') }}"></script>
 <link href="{{ asset('css/modal-fix.css') }}" rel="stylesheet">
 
+<!-- Chemistry Lab Fixes -->
+<link rel="preload" href="{{ asset('css/chemistry-lab-drag-fix.css') }}" as="style">
+<link rel="preload" href="{{ asset('js/chemistry-lab-drag-fix.js') }}" as="script">
+
 <!-- Custom Scrollbar Styles -->
 <style>
     /* Alpine.js x-cloak directive to hide elements until Alpine initializes */

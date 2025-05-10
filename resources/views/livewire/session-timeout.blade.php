@@ -7,6 +7,7 @@
         warningTimer: null,
         lastActivity: Date.now(),
         isLocked: false,
+        uniqueId: 'session-' + Math.random().toString(36).substring(2, 10),
 
         init() {
             // Check if this is a fresh login
@@ -233,13 +234,13 @@
                     <h3 class="text-2xl font-bold text-white mb-2">Session Locked</h3>
                     <p class="text-neutral-300 mb-6">Your session has been locked due to inactivity. Please enter your password to continue.</p>
 
-                    <form id="unlock-form" wire:submit.prevent="verifyPassword" class="space-y-4 mb-6">
+                    <form :id="'unlock-form-' + uniqueId" wire:submit.prevent="verifyPassword" class="space-y-4 mb-6">
                         <div>
-                            <label for="password" class="block text-sm font-medium text-neutral-300 mb-2">Password</label>
+                            <label :for="'password-' + uniqueId" class="block text-sm font-medium text-neutral-300 mb-2">Password</label>
                             <input
                                 type="password"
                                 wire:model.lazy="password"
-                                id="password"
+                                :id="'password-' + uniqueId"
                                 name="password"
                                 class="w-full p-3 rounded-lg bg-neutral-700 border border-neutral-600 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                                 x-on:keydown.enter.prevent="$wire.verifyPassword()"

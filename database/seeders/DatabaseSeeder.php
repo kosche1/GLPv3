@@ -68,6 +68,9 @@ class DatabaseSeeder extends Seeder
             RecipeIngredientsSeeder::class,
             RecipeTemplatesSeeder::class,
 
+            // Chemistry Lab Game
+            ChemistryChallengesSeeder::class,
+
             // Forum categories
             ForumCategorySeeder::class,
 

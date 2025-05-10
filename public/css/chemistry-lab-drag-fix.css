@@ -1,0 +1,370 @@
+/**
+ * Chemistry Lab Drag and Drop Fix CSS
+ */
+
+/* Lab bench styles */
+.lab-bench {
+    position: relative;
+    min-height: 300px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.lab-bench.drag-over {
+    border-color: #10b981; /* emerald-500 */
+    background-color: rgba(16, 185, 129, 0.1); /* emerald-500 with opacity */
+}
+
+/* Lab item styles */
+.lab-item {
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    z-index: 10;
+    transition: transform 0.2s ease;
+}
+
+.lab-item:hover {
+    transform: scale(1.05);
+}
+
+.lab-item:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+/* Chemical styles */
+.lab-chemical .chemical-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.lab-chemical .chemical-label {
+    margin-top: 4px;
+    font-size: 12px;
+    color: white;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Equipment styles */
+.lab-equipment .equipment-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.lab-equipment .equipment-label {
+    margin-top: 4px;
+    font-size: 12px;
+    color: white;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Cursor styles */
+.cursor-grab {
+    cursor: grab;
+}
+
+.cursor-grabbing {
+    cursor: grabbing;
+}
+
+/* Fix for drag ghost image */
+[draggable="true"] {
+    -webkit-user-drag: element;
+    user-select: none;
+}
+
+/* Hide drag ghost image */
+.hide-drag-image {
+    opacity: 0 !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+}
+
+/* Animation for new items */
+@keyframes pop-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    70% {
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.lab-item {
+    animation: pop-in 0.3s ease-out forwards;
+}
+
+/* Reaction styles */
+.reaction-area {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.reaction-neutralization {
+    background-color: rgba(236, 72, 153, 0.3); /* pink-500 with opacity */
+    animation: pulse 2s infinite;
+}
+
+.reaction-boiling {
+    background-color: rgba(59, 130, 246, 0.3); /* blue-500 with opacity */
+    animation: bubble 3s infinite;
+}
+
+.reaction-hcl-decomposition {
+    background-color: rgba(234, 179, 8, 0.3); /* yellow-500 with opacity */
+    animation: pulse 2s infinite;
+}
+
+.reaction-naoh-dissolution {
+    background-color: rgba(168, 85, 247, 0.3); /* purple-500 with opacity */
+    animation: swirl 4s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+}
+
+@keyframes bubble {
+    0% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.1) translateY(-5px);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+}
+
+@keyframes swirl {
+    0% {
+        transform: rotate(0deg) scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: rotate(180deg) scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+        opacity: 0.3;
+    }
+}
+
+/* Drag and drop feedback styles */
+.chemical-droppable {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.drag-over-equipment {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.7); /* emerald-500 with opacity */
+    z-index: 20;
+}
+
+/* Container indicator styles */
+.container-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background-color: transparent;
+    transition: height 0.5s ease, background-color 0.5s ease;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    z-index: 5;
+    opacity: 0.7;
+}
+
+.container-indicator.has-chemical {
+    opacity: 0.7;
+}
+
+.container-label {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 6;
+}
+
+/* Drop feedback animations */
+@keyframes drop-pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.7);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.drop-pulse {
+    animation: drop-pulse 0.6s ease-out;
+    z-index: 20;
+}
+
+@keyframes ripple {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.7;
+    }
+    100% {
+        width: 200%;
+        height: 200%;
+        opacity: 0;
+    }
+}
+
+.drop-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    background-color: rgba(16, 185, 129, 0.3);
+    border-radius: 50%;
+    z-index: 4;
+    animation: ripple 0.8s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes highlight-indicator {
+    0% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.5);
+    }
+    100% {
+        filter: brightness(1);
+    }
+}
+
+.highlight-indicator {
+    animation: highlight-indicator 0.8s ease-out;
+}
+
+/* Pour button styles */
+.lab-action-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: #374151; /* gray-700 */
+    border: 1px solid #4b5563; /* gray-600 */
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lab-action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pour-button-enabled {
+    background-color: #10b981; /* emerald-500 */
+    border-color: #059669; /* emerald-600 */
+    box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+}
+
+.pour-button-enabled:hover {
+    background-color: #059669; /* emerald-600 */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(16, 185, 129, 0.4);
+}
+
+.lab-action-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.lab-action-text {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.pour-instructions {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #9ca3af; /* gray-400 */
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.ready-to-pour {
+    color: #10b981; /* emerald-500 */
+    font-weight: bold;
+}
+
+/* Tab highlight animation */
+@keyframes tab-highlight {
+    0% {
+        background-color: transparent;
+        color: inherit;
+    }
+    50% {
+        background-color: rgba(16, 185, 129, 0.3); /* emerald-500 with opacity */
+        color: #10b981; /* emerald-500 */
+    }
+    100% {
+        background-color: transparent;
+        color: inherit;
+    }
+}
+
+.highlight-tab {
+    animation: tab-highlight 1s ease-in-out 2;
+    border-color: #10b981 !important; /* emerald-500 */
+}
