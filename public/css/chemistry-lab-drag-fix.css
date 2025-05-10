@@ -188,12 +188,31 @@
 .chemical-droppable {
     position: relative;
     transition: all 0.3s ease;
+    /* Increase the visual size of droppable areas */
+    outline: 2px dashed rgba(16, 185, 129, 0.5);
+    outline-offset: 2px;
+}
+
+/* Add a hover effect to make droppable areas more obvious */
+.chemical-droppable:hover {
+    outline: 3px dashed rgba(16, 185, 129, 0.8);
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
 }
 
 .drag-over-equipment {
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.7); /* emerald-500 with opacity */
+    transform: scale(1.15) !important;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.9) !important; /* emerald-500 with opacity */
     z-index: 20;
+    outline: 4px solid rgba(16, 185, 129, 1) !important;
+    outline-offset: 4px;
+    /* Add animation to make it more noticeable */
+    animation: pulse-droppable 0.6s infinite alternate;
+}
+
+@keyframes pulse-droppable {
+    from { box-shadow: 0 0 15px rgba(16, 185, 129, 0.7); }
+    to { box-shadow: 0 0 25px rgba(16, 185, 129, 1); }
 }
 
 /* Container indicator styles */

@@ -369,22 +369,29 @@ document.addEventListener('DOMContentLoaded', function() {
                             id: chemicalId
                         }));
 
-                        // Set drag image
+                        // Set effectAllowed to all to ensure it works across browsers and zoom levels
+                        event.dataTransfer.effectAllowed = 'all';
+
+                        // Create a larger drag image for better visibility at all zoom levels
                         const dragImage = document.createElement('div');
                         dragImage.textContent = chemicalId.toUpperCase();
                         dragImage.style.backgroundColor = getChemicalColor(chemicalId);
                         dragImage.style.color = 'black';
-                        dragImage.style.padding = '10px';
+                        dragImage.style.padding = '15px'; // Increased padding
                         dragImage.style.borderRadius = '50%';
-                        dragImage.style.width = '40px';
-                        dragImage.style.height = '40px';
+                        dragImage.style.width = '60px'; // Increased size
+                        dragImage.style.height = '60px'; // Increased size
                         dragImage.style.display = 'flex';
                         dragImage.style.alignItems = 'center';
                         dragImage.style.justifyContent = 'center';
                         dragImage.style.fontWeight = 'bold';
+                        dragImage.style.fontSize = '16px'; // Increased font size
+                        dragImage.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)'; // Added shadow for better visibility
+                        dragImage.style.zIndex = '9999';
+                        dragImage.classList.add('chemical-drag-image');
 
                         document.body.appendChild(dragImage);
-                        event.dataTransfer.setDragImage(dragImage, 20, 20);
+                        event.dataTransfer.setDragImage(dragImage, 30, 30); // Adjusted offset for larger image
 
                         // Remove the drag image element after it's been used
                         setTimeout(() => {
@@ -393,6 +400,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         // Visual feedback
                         newItem.classList.add('dragging');
+
+                        // Highlight all valid drop targets to make them more obvious
+                        highlightAvailableEquipment();
 
                         console.log(`Started dragging chemical: ${chemicalId}`);
                     } catch (error) {
@@ -634,6 +644,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Instead, we'll just highlight the equipment item
                 item.classList.add('drag-over-equipment');
 
+                // Use the helper function to check if cursor is within the expanded hit area
+                const isInExpandedArea = isPointInElement(event.clientX, event.clientY, item, 20);
+
+                if (isInExpandedArea) {
+                    // Ensure the item is highlighted
+                    item.classList.add('drag-over-equipment');
+                }
+
                 console.log('Dragover event on equipment:', item);
             });
 
@@ -650,7 +668,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Drop event on equipment item:', item);
                 console.log('Drop event target:', event.target);
                 console.log('Current target:', event.currentTarget);
+
+                // Remove highlight class
                 item.classList.remove('drag-over-equipment');
+
+                // Use the helper function to check if drop is within the expanded hit area
+                const isInExpandedArea = isPointInElement(event.clientX, event.clientY, item, 25);
+
+                // If not in expanded area, don't process the drop
+                if (!isInExpandedArea) {
+                    console.log('Drop outside expanded hit area, ignoring');
+                    return;
+                }
+
+                // Add visual feedback to show where the drop occurred
+                const dropIndicator = document.createElement('div');
+                dropIndicator.style.position = 'absolute';
+                dropIndicator.style.width = '30px';
+                dropIndicator.style.height = '30px';
+                dropIndicator.style.borderRadius = '50%';
+                dropIndicator.style.backgroundColor = 'rgba(16, 185, 129, 0.5)';
+                dropIndicator.style.left = (event.clientX - item.getBoundingClientRect().left) + 'px';
+                dropIndicator.style.top = (event.clientY - item.getBoundingClientRect().top) + 'px';
+                dropIndicator.style.transform = 'translate(-50%, -50%)';
+                dropIndicator.style.pointerEvents = 'none';
+                dropIndicator.style.zIndex = '1000';
+                dropIndicator.style.animation = 'ripple 0.6s ease-out forwards';
+
+                item.appendChild(dropIndicator);
+
+                // Remove the indicator after animation completes
+                setTimeout(() => {
+                    if (dropIndicator.parentNode) {
+                        dropIndicator.parentNode.removeChild(dropIndicator);
+                    }
+                }, 600);
 
                 // Drop indicator removed as status display is used instead
 
@@ -2331,18 +2383,52 @@ document.addEventListener('DOMContentLoaded', function() {
             equipmentItems.forEach(item => {
                 const equipmentType = item.getAttribute('data-equipment');
                 if (equipmentType === 'beaker' || equipmentType === 'test-tube') {
-                    // Add a pulsing highlight effect
-                    item.classList.add('drop-pulse');
+                    // Add a stronger highlight effect for better visibility at all zoom levels
+                    item.classList.add('equipment-highlight');
                     hasEquipment = true;
+
+                    // Add a "Drop Here" label for better visibility
+                    if (!item.querySelector('.drop-here-label')) {
+                        const dropLabel = document.createElement('div');
+                        dropLabel.classList.add('drop-here-label');
+                        dropLabel.textContent = 'DROP HERE';
+                        dropLabel.style.position = 'absolute';
+                        dropLabel.style.top = '-25px';
+                        dropLabel.style.left = '50%';
+                        dropLabel.style.transform = 'translateX(-50%)';
+                        dropLabel.style.backgroundColor = 'rgba(16, 185, 129, 0.9)';
+                        dropLabel.style.color = 'white';
+                        dropLabel.style.padding = '3px 8px';
+                        dropLabel.style.borderRadius = '4px';
+                        dropLabel.style.fontSize = '12px';
+                        dropLabel.style.fontWeight = 'bold';
+                        dropLabel.style.zIndex = '100';
+                        dropLabel.style.whiteSpace = 'nowrap';
+                        dropLabel.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.3)';
+
+                        // Make sure the item has relative positioning for absolute positioning of the label
+                        if (item.style.position !== 'relative' && item.style.position !== 'absolute') {
+                            item.style.position = 'relative';
+                        }
+
+                        item.appendChild(dropLabel);
+
+                        // Remove the label after a delay
+                        setTimeout(() => {
+                            if (dropLabel.parentNode) {
+                                dropLabel.parentNode.removeChild(dropLabel);
+                            }
+                        }, 3000);
+                    }
 
                     // Remove the highlight after a delay
                     setTimeout(() => {
-                        item.classList.remove('drop-pulse');
-                    }, 2000);
+                        item.classList.remove('equipment-highlight');
+                    }, 3000); // Increased time for better visibility
                 }
             });
 
-            // If no equipment is found, suggest adding some
+            // If no equipment is found, suggest adding some with a more prominent message
             if (!hasEquipment) {
                 showMessage('Add a beaker or test tube from the Equipment tab first', true);
 
@@ -2351,9 +2437,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (equipmentTab) {
                     equipmentTab.classList.add('highlight-tab');
 
+                    // Make the tab pulse to draw attention
+                    equipmentTab.style.animation = 'pulse 1s infinite alternate';
+
                     setTimeout(() => {
                         equipmentTab.classList.remove('highlight-tab');
-                    }, 2000);
+                        equipmentTab.style.animation = '';
+                    }, 3000);
+                }
+
+                // Show a more prominent message in the lab bench area
+                const labBench = document.querySelector('.lab-bench');
+                if (labBench) {
+                    const noEquipmentMsg = document.createElement('div');
+                    noEquipmentMsg.classList.add('no-equipment-message');
+                    noEquipmentMsg.textContent = 'Add beakers or test tubes first!';
+                    noEquipmentMsg.style.position = 'absolute';
+                    noEquipmentMsg.style.top = '50%';
+                    noEquipmentMsg.style.left = '50%';
+                    noEquipmentMsg.style.transform = 'translate(-50%, -50%)';
+                    noEquipmentMsg.style.backgroundColor = 'rgba(239, 68, 68, 0.9)'; // red
+                    noEquipmentMsg.style.color = 'white';
+                    noEquipmentMsg.style.padding = '10px 20px';
+                    noEquipmentMsg.style.borderRadius = '8px';
+                    noEquipmentMsg.style.fontSize = '16px';
+                    noEquipmentMsg.style.fontWeight = 'bold';
+                    noEquipmentMsg.style.zIndex = '100';
+                    noEquipmentMsg.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
+
+                    labBench.appendChild(noEquipmentMsg);
+
+                    // Remove the message after a delay
+                    setTimeout(() => {
+                        if (noEquipmentMsg.parentNode) {
+                            noEquipmentMsg.parentNode.removeChild(noEquipmentMsg);
+                        }
+                    }, 3000);
                 }
             }
         } catch (error) {
@@ -2443,6 +2562,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error showing bench placeholder:', error);
+        }
+    }
+
+    /**
+     * Helper function to check if a point is inside an element with expanded hit area
+     * This helps with drag and drop at different zoom levels
+     */
+    function isPointInElement(x, y, element, expandBy = 20) {
+        try {
+            if (!element) return false;
+
+            const rect = element.getBoundingClientRect();
+
+            // Expand the hit area by the specified amount
+            return (
+                x >= rect.left - expandBy &&
+                x <= rect.right + expandBy &&
+                y >= rect.top - expandBy &&
+                y <= rect.bottom + expandBy
+            );
+        } catch (error) {
+            console.error('Error in isPointInElement:', error);
+            return false;
         }
     }
 
