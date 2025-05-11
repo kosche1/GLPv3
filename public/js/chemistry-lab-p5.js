@@ -4,7 +4,7 @@
  * using the p5.js library for better rendering of colors and effects.
  */
 
-// Global variables
+// Global variables for the sketch (can be kept here or moved into createChemistryLabSketch if preferred)
 let labSketch;
 let beakers = [];
 let testTubes = [];
@@ -19,30 +19,37 @@ let chemicals = {
     'mixture': { color: [96, 165, 250], symbol: 'Mix', name: 'Mixture' }
 };
 
-// Create a new p5 instance
+// Create a new p5 instance function
 const createChemistryLabSketch = (p) => {
     // Setup function - runs once at the beginning
     p.setup = function() {
-        // Create canvas that fills the container
-        const container = document.getElementById('p5-container');
-        const canvas = p.createCanvas(container.offsetWidth, container.offsetHeight);
-        canvas.parent('p5-container');
+        const container = document.getElementById('p5-container'); // Assumes 'p5-container' is fixed for now
         
-        // Set up initial beakers and test tubes
+        if (!container) {
+            console.error("#p5-container not found during p5.setup(). Canvas will not be created.");
+            return; // Exit setup if container is not found
+        }
+        
+        const canvas = p.createCanvas(container.offsetWidth, container.offsetHeight);
+        canvas.parent(container); // Pass the element itself
+        
         setupEquipment();
         
-        // Hide the placeholder text
         const placeholder = document.getElementById('lab-bench-placeholder');
         if (placeholder) {
             placeholder.style.display = 'none';
         }
         
-        // Set text properties
         p.textAlign(p.CENTER, p.CENTER);
         p.textSize(12);
-        
-        // Set frame rate
         p.frameRate(30);
+    };
+
+    p.windowResized = function() {
+        const container = document.getElementById('p5-container');
+        if (container) {
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+        }
     };
 
     // Draw function - runs continuously
@@ -70,6 +77,7 @@ const createChemistryLabSketch = (p) => {
     
     // Function to draw a beaker
     function drawBeaker(beaker) {
+        console.log('[p5] drawBeaker - Received:', JSON.stringify(beaker)); // Log 1: What drawBeaker receives
         p.push(); // Save current drawing state
         
         // Draw beaker outline
@@ -80,30 +88,35 @@ const createChemistryLabSketch = (p) => {
         
         // Draw chemical if beaker contains something
         if (beaker.contains) {
-            const chemicalInfo = chemicals[beaker.contains];
-            
-            // Fill with chemical color
-            p.fill(chemicalInfo.color[0], chemicalInfo.color[1], chemicalInfo.color[2], 200);
-            p.noStroke();
-            
-            // Calculate fill height based on volume
-            const fillHeight = beaker.height * (beaker.fillLevel / 100);
-            p.rect(beaker.x, beaker.y + beaker.height - fillHeight, beaker.width, fillHeight, 0, 0, 2, 2);
-            
-            // Add chemical symbol
-            p.fill(255);
-            p.textSize(14);
-            p.text(chemicalInfo.symbol, beaker.x + beaker.width/2, beaker.y + beaker.height - fillHeight/2);
-            
-            // Add chemical name below beaker
-            p.textSize(10);
-            p.text(chemicalInfo.name, beaker.x + beaker.width/2, beaker.y + beaker.height + 15);
-            
-            // Add bubbles or other effects if needed
-            if (beaker.reaction) {
-                addReactionEffects(beaker);
+            const chemicalKey = beaker.contains ? beaker.contains.toLowerCase() : null;
+            console.log('[p5] drawBeaker - chemicalKey:', chemicalKey); // Log 2: The key used for lookup
+            const chemicalInfo = chemicalKey ? chemicals[chemicalKey] : null;
+            console.log('[p5] drawBeaker - chemicalInfo:', JSON.stringify(chemicalInfo)); // Log 3: The result of lookup
+            if (chemicalInfo && chemicalInfo.color) {
+                console.log('[p5] drawBeaker - Drawing with chemical color:', chemicalInfo.color); // Log 4a: Path for color
+                p.fill(chemicalInfo.color[0], chemicalInfo.color[1], chemicalInfo.color[2], 200);
+                p.noStroke();
+                
+                // Calculate fill height based on volume
+                const fillHeight = beaker.height * (beaker.fillLevel / 100);
+                p.rect(beaker.x, beaker.y + beaker.height - fillHeight, beaker.width, fillHeight, 0, 0, 2, 2);
+                
+                // Add chemical symbol
+                p.fill(255);
+                p.textSize(14);
+                p.text(chemicalInfo.symbol, beaker.x + beaker.width/2, beaker.y + beaker.height - fillHeight/2);
+                
+                // Add chemical name below beaker
+                p.textSize(10);
+                p.text(chemicalInfo.name, beaker.x + beaker.width/2, beaker.y + beaker.height + 15);
+                
+                // Add bubbles or other effects if needed
+                if (beaker.reaction) {
+                    addReactionEffects(beaker);
+                }
             }
         } else {
+            console.log('[p5] drawBeaker - beaker.contains is FALSY. Drawing empty.'); // Log 4b: Path for gray
             // Empty beaker label
             p.fill(150);
             p.textSize(12);
@@ -115,6 +128,7 @@ const createChemistryLabSketch = (p) => {
     
     // Function to draw a test tube
     function drawTestTube(testTube) {
+        console.log('[p5] drawTestTube - Received:', JSON.stringify(testTube)); // Log 1
         p.push(); // Save current drawing state
         
         // Draw test tube outline
@@ -138,47 +152,52 @@ const createChemistryLabSketch = (p) => {
         
         // Draw chemical if test tube contains something
         if (testTube.contains) {
-            const chemicalInfo = chemicals[testTube.contains];
-            
-            // Fill with chemical color
-            p.fill(chemicalInfo.color[0], chemicalInfo.color[1], chemicalInfo.color[2], 200);
-            p.noStroke();
-            
-            // Calculate fill height based on volume
-            const fillHeight = testTube.height * (testTube.fillLevel / 100);
-            
-            // Draw the filled portion
-            p.beginShape();
-            p.vertex(centerX - tubeWidth/2, testTube.y + testTube.height - fillHeight); // Top left
-            p.vertex(centerX + tubeWidth/2, testTube.y + testTube.height - fillHeight); // Top right
-            
-            if (fillHeight >= testTube.height - 5) {
-                // If fill reaches the curved bottom
-                p.vertex(centerX + tubeWidth/2, testTube.y + testTube.height - 5); // Bottom right before curve
-                p.vertex(centerX, testTube.y + testTube.height); // Bottom center
-                p.vertex(centerX - tubeWidth/2, testTube.y + testTube.height - 5); // Bottom left before curve
-            } else {
-                // Straight bottom for the fill
-                p.vertex(centerX + tubeWidth/2, testTube.y + testTube.height - fillHeight); // Bottom right
-                p.vertex(centerX - tubeWidth/2, testTube.y + testTube.height - fillHeight); // Bottom left
-            }
-            
-            p.endShape(p.CLOSE);
-            
-            // Add chemical symbol
-            p.fill(255);
-            p.textSize(12);
-            p.text(chemicalInfo.symbol, centerX, testTube.y + testTube.height - fillHeight/2);
-            
-            // Add chemical name below test tube
-            p.textSize(10);
-            p.text(chemicalInfo.name, centerX, testTube.y + testTube.height + 15);
-            
-            // Add bubbles or other effects if needed
-            if (testTube.reaction) {
-                addReactionEffects(testTube);
+            const chemicalKey = testTube.contains ? testTube.contains.toLowerCase() : null;
+            console.log('[p5] drawTestTube - chemicalKey:', chemicalKey); // Log 2
+            const chemicalInfo = chemicalKey ? chemicals[chemicalKey] : null;
+            console.log('[p5] drawTestTube - chemicalInfo:', JSON.stringify(chemicalInfo)); // Log 3
+            if (chemicalInfo && chemicalInfo.color) {
+                console.log('[p5] drawTestTube - Drawing with chemical color:', chemicalInfo.color); // Log 4a
+                p.fill(chemicalInfo.color[0], chemicalInfo.color[1], chemicalInfo.color[2], 200);
+                p.noStroke();
+                
+                // Calculate fill height based on volume
+                const fillHeight = testTube.height * (testTube.fillLevel / 100);
+                
+                // Draw the filled portion
+                p.beginShape();
+                p.vertex(centerX - tubeWidth/2, testTube.y + testTube.height - fillHeight); // Top left
+                p.vertex(centerX + tubeWidth/2, testTube.y + testTube.height - fillHeight); // Top right
+                
+                if (fillHeight >= testTube.height - 5) {
+                    // If fill reaches the curved bottom
+                    p.vertex(centerX + tubeWidth/2, testTube.y + testTube.height - 5); // Bottom right before curve
+                    p.vertex(centerX, testTube.y + testTube.height); // Bottom center
+                    p.vertex(centerX - tubeWidth/2, testTube.y + testTube.height - 5); // Bottom left before curve
+                } else {
+                    // Straight bottom for the fill
+                    p.vertex(centerX + tubeWidth/2, testTube.y + testTube.height - fillHeight); // Bottom right
+                    p.vertex(centerX - tubeWidth/2, testTube.y + testTube.height - fillHeight); // Bottom left
+                }
+                
+                p.endShape(p.CLOSE);
+                
+                // Add chemical symbol
+                p.fill(255);
+                p.textSize(12);
+                p.text(chemicalInfo.symbol, centerX, testTube.y + testTube.height - fillHeight/2);
+                
+                // Add chemical name below test tube
+                p.textSize(10);
+                p.text(chemicalInfo.name, centerX, testTube.y + testTube.height + 15);
+                
+                // Add bubbles or other effects if needed
+                if (testTube.reaction) {
+                    addReactionEffects(testTube);
+                }
             }
         } else {
+            console.log('[p5] drawTestTube - testTube.contains is FALSY. Drawing empty.'); // Log 4b
             // Empty test tube label
             p.fill(150);
             p.textSize(10);
@@ -335,27 +354,55 @@ const createChemistryLabSketch = (p) => {
     }
 };
 
-// Initialize the p5.js sketch when the page is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Create the p5 sketch
-    labSketch = new p5(createChemistryLabSketch, 'p5-container');
-    
-    // Set up communication with the existing chemistry lab code
-    setupChemistryLabIntegration();
-});
+// Export a function to initialize the p5 lab
+function initP5Lab(containerId) {
+    console.log('[p5] initP5Lab CALLED with containerId:', containerId); // Log: initP5Lab entry
+    const p5Container = document.getElementById(containerId);
 
-// Function to set up integration with existing chemistry lab code
+    if (!p5Container) {
+        console.error(`#${containerId} not found. P5 sketch cannot be initialized.`);
+        return;
+    }
+
+    // Create the p5 sketch, ensuring it targets the correct container for canvas creation if not hardcoded
+    // The createChemistryLabSketch function internally uses getElementById('p5-container'), 
+    // so ensure containerId passed to initP5Lab matches this or modify createChemistryLabSketch.
+    // For now, we assume createChemistryLabSketch will always look for 'p5-container'.
+    if (containerId !== 'p5-container') {
+        console.warn(`initP5Lab called with containerId '${containerId}', but sketch internally uses 'p5-container'. Ensure these match or update sketch.`);
+    }
+
+    labSketch = new p5(createChemistryLabSketch, p5Container); // Pass the DOM element to p5
+    
+    setupChemistryLabIntegration(); // This likely also needs access to labSketch or DOM elements
+
+    // Observe the p5-container for size changes
+    if (typeof ResizeObserver !== 'undefined') {
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                const newWidth = entry.contentRect ? entry.contentRect.width : entry.target.getBoundingClientRect().width;
+                const newHeight = entry.contentRect ? entry.contentRect.height : entry.target.getBoundingClientRect().height;
+
+                if (labSketch && newWidth > 0 && newHeight > 0) {
+                    labSketch.resizeCanvas(newWidth, newHeight);
+                }
+            }
+        });
+        resizeObserver.observe(p5Container);
+    } else {
+        console.warn('ResizeObserver API not supported. Canvas might not resize correctly.');
+    }
+}
+
+// Functions for integration (handleChemicalPoured, etc.) should be defined or imported here
+// These might need to be adjusted if they rely on global `labSketch` and it's now initialized differently.
 function setupChemistryLabIntegration() {
-    // Listen for events from the existing chemistry lab code
     document.addEventListener('chemicalPoured', handleChemicalPoured);
     document.addEventListener('chemicalsMixed', handleChemicalsMixed);
     document.addEventListener('benchReset', handleBenchReset);
-    
-    // Create a MutationObserver to watch for changes to the lab bench
     observeLabBench();
 }
 
-// Function to handle chemical poured event
 function handleChemicalPoured(event) {
     const { chemical, targetId, sourceId } = event.detail;
     console.log('Chemical poured:', chemical, 'into', targetId, 'from', sourceId);
@@ -364,7 +411,6 @@ function handleChemicalPoured(event) {
     updateVisualization();
 }
 
-// Function to handle chemicals mixed event
 function handleChemicalsMixed(event) {
     const { chemical1, chemical2, resultChemical, containerId } = event.detail;
     console.log('Chemicals mixed:', chemical1, '+', chemical2, '=', resultChemical, 'in', containerId);
@@ -373,7 +419,6 @@ function handleChemicalsMixed(event) {
     updateVisualization();
 }
 
-// Function to handle bench reset event
 function handleBenchReset() {
     console.log('Bench reset');
     
@@ -384,7 +429,6 @@ function handleBenchReset() {
     }
 }
 
-// Function to observe changes to the lab bench
 function observeLabBench() {
     const labBench = document.querySelector('.lab-bench');
     if (!labBench) return;
@@ -401,9 +445,9 @@ function observeLabBench() {
     });
 }
 
-// Function to update the p5.js visualization based on the current state
 function updateVisualization() {
     if (!labSketch) return;
+    console.log('[p5] updateVisualization CALLED'); // Log UV Call
     
     // Clear existing equipment
     labSketch.beakers = [];
@@ -416,6 +460,12 @@ function updateVisualization() {
         const labBench = document.querySelector('.lab-bench');
         const labRect = labBench.getBoundingClientRect();
         
+        const labItemElement = element.closest('.lab-item');
+        // console.log('[p5] updateVisualization - Beaker - Found lab-item:', labItemElement); // Optional: log element
+        const currentDataContains = labItemElement ? labItemElement.getAttribute('data-contains') : null;
+        console.log(`[p5] updateVisualization - Beaker id: ${element.id || `beaker-${index}`}, data-contains from DOM: '${currentDataContains}'`); // Log UV data read
+        const currentDataReaction = labItemElement ? labItemElement.getAttribute('data-reaction') : null;
+        
         // Create a beaker object for p5.js
         const beaker = {
             id: element.id || `beaker-${index}`,
@@ -423,9 +473,9 @@ function updateVisualization() {
             y: rect.top - labRect.top,
             width: rect.width,
             height: rect.height,
-            contains: element.getAttribute('data-contains') || '',
-            reaction: element.getAttribute('data-reaction') || '',
-            fillLevel: element.contains ? 80 : 0
+            contains: currentDataContains || '',
+            reaction: currentDataReaction || '',
+            fillLevel: (currentDataContains && currentDataContains !== '') ? 80 : 0,
         };
         
         labSketch.beakers.push(beaker);
@@ -438,6 +488,12 @@ function updateVisualization() {
         const labBench = document.querySelector('.lab-bench');
         const labRect = labBench.getBoundingClientRect();
         
+        const labItemElement = element.closest('.lab-item');
+        // console.log('[p5] updateVisualization - TestTube - Found lab-item:', labItemElement); // Optional: log element
+        const currentDataContains = labItemElement ? labItemElement.getAttribute('data-contains') : null;
+        console.log(`[p5] updateVisualization - TestTube id: ${element.id || `test-tube-${index}`}, data-contains from DOM: '${currentDataContains}'`); // Log UV data read
+        const currentDataReaction = labItemElement ? labItemElement.getAttribute('data-reaction') : null;
+        
         // Create a test tube object for p5.js
         const testTube = {
             id: element.id || `test-tube-${index}`,
@@ -445,9 +501,9 @@ function updateVisualization() {
             y: rect.top - labRect.top,
             width: rect.width,
             height: rect.height,
-            contains: element.getAttribute('data-contains') || '',
-            reaction: element.getAttribute('data-reaction') || '',
-            fillLevel: element.contains ? 80 : 0
+            contains: currentDataContains || '',
+            reaction: currentDataReaction || '',
+            fillLevel: (currentDataContains && currentDataContains !== '') ? 80 : 0,
         };
         
         labSketch.testTubes.push(testTube);

@@ -1,4 +1,6 @@
 <x-layouts.app>
+    @include('partials.head')
+    {{-- ... style and animated background divs ... --}}
     <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg">
         <!-- Header Section -->
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -21,9 +23,9 @@
         </div>
 
         <!-- Lab Interface -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
             <!-- Left Panel: Chemicals and Equipment -->
-            <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-4 shadow-lg">
+            <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-4 shadow-lg h-full">
                 <h2 class="text-lg font-semibold text-white mb-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -124,7 +126,7 @@
             </div>
 
             <!-- Middle Panel: Lab Bench -->
-            <div class="lg:col-span-2 bg-neutral-800 rounded-xl border border-neutral-700 p-4 shadow-lg">
+            <div class="lg:col-span-2 bg-neutral-800 rounded-xl border border-neutral-700 p-4 shadow-lg h-full flex flex-col">
                 <h2 class="text-lg font-semibold text-white mb-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -132,7 +134,7 @@
                     Lab Bench
                 </h2>
 
-                <div class="lab-bench h-96 bg-neutral-700 rounded-lg relative">
+                <div class="lab-bench flex-1 bg-neutral-700 rounded-lg relative">
                     <!-- This is where the interactive lab bench will be rendered -->
                     <div class="absolute inset-0 flex items-center justify-center" id="lab-bench-placeholder">
                         <p class="text-neutral-400">Drag chemicals and equipment here to start experimenting</p>
@@ -227,74 +229,19 @@
     <!-- Include p5.js Chemistry Lab Visualization -->
     <script src="{{ asset('js/chemistry-lab-p5.js') }}"></script>
 
-    <!-- Add CSS animations -->
-    <style>
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(-20px); }
-            10% { opacity: 1; transform: translateY(0); }
-            90% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
-        }
+    {{-- <!-- Add CSS animations --> --}}
+    {{-- <link href="{{ asset('css/animations.css') }}" rel="stylesheet"> --}}
 
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        .animate-fade-in-out {
-            animation: fadeInOut 3.5s ease-in-out;
-        }
-
-        .animate-fade-out {
-            animation: fadeOut 0.5s ease-in-out forwards;
-        }
-
-        /* Additional styles for Matter.js canvas */
-        .lab-bench {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .lab-bench canvas {
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            z-index: 1 !important;
-            cursor: grab;
-        }
-
-        .lab-bench canvas:active {
-            cursor: grabbing;
-        }
-
-        .chemical-label {
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 30px;
-            height: 20px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            padding: 2px 5px;
-            pointer-events: none;
-        }
-
-        .equipment-visual {
-            pointer-events: none;
-        }
-
-        /* Fix for drag image overlay */
-        [draggable="true"] {
-            user-select: none;
-        }
-
-        /* Ensure drag images don't cause overlay issues */
-        .chemical-item {
-            position: relative;
-            z-index: 1;
-        }
-    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the p5.js lab visualization
+            console.log('DOMContentLoaded: Attempting to initialize p5.js sketch.');
+            if (typeof initP5Lab === 'function') {
+                console.log('initP5Lab function found. Calling initP5Lab(\'p5-container\').');
+                initP5Lab('p5-container');
+            } else {
+                console.error('initP5Lab function not found on DOMContentLoaded. p5.js sketch will not be initialized.');
+            }
+        });
+    </script>
 </x-layouts.app>

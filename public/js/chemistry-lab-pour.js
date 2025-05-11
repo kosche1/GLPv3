@@ -1973,88 +1973,35 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             console.log(`Pouring ${chemical} from source to target`);
 
-            // P5.JS INTEGRATION: Dispatch an event for the p5.js visualization
+            // Determine existing chemical in target and potential reaction
+            const existingChemicalInTarget = targetItem.getAttribute('data-contains');
+            const reactionResult = determineReaction(chemical, existingChemicalInTarget);
+            const resultChemical = reactionResult ? reactionResult.product : null;
+
+            // Update the target container with the original or resulting chemical
+            targetItem.setAttribute('data-contains', resultChemical || chemical);
+            updateTargetContainer(targetItem, chemical, resultChemical);
+
+            // P5.JS INTEGRATION: Dispatch an event for the p5.js visualization AFTER attributes are set
             const chemicalPouredEvent = new CustomEvent('chemicalPoured', {
                 detail: {
-                    chemical: chemical,
+                    chemical: resultChemical || chemical, // Send the final chemical
                     targetId: targetItem.id || '',
                     sourceId: sourceItem.id || ''
                 }
             });
             document.dispatchEvent(chemicalPouredEvent);
 
-            // EMERGENCY FIX: Force specific colors for water and HCl
-            if (chemical === 'water') {
-                console.log("🔴 EMERGENCY FIX: POURING WATER - USING BRIGHT BLUE");
-
-                // DIRECT DOM MANIPULATION - Force the color to be visible
-                setTimeout(() => {
-                    const chemicalFill = targetItem.querySelector('.chemical-fill');
-                    if (chemicalFill) {
-                        chemicalFill.style.backgroundColor = '#3b82f6'; // blue-500
-                        chemicalFill.style.height = '80%';
-                        chemicalFill.style.opacity = '1';
-                        chemicalFill.style.zIndex = '5';
-                        chemicalFill.style.border = '2px solid white';
-                        chemicalFill.style.boxShadow = '0 0 15px #3b82f6';
-                        console.log("🔴 EMERGENCY FIX: Directly modified water fill");
-                    }
-
-                    // Also update the label
-                    const label = targetItem.querySelector('.chemical-mixture-label');
-                    if (label) {
-                        label.textContent = 'Water (Blue)';
-                        label.style.color = '#ffffff';
-                        label.style.fontWeight = 'bold';
-                    }
-
-                    // Update the color indicator
-                    const colorIndicator = targetItem.querySelector('.chemical-color-indicator');
-                    if (colorIndicator) {
-                        colorIndicator.style.backgroundColor = '#3b82f6';
-                        colorIndicator.style.boxShadow = '0 0 10px #3b82f6';
-                    }
-                }, 100);
-            } else if (chemical === 'hcl') {
-                console.log("🔴 EMERGENCY FIX: POURING HCL - USING BRIGHT YELLOW");
-
-                // DIRECT DOM MANIPULATION - Force the color to be visible
-                setTimeout(() => {
-                    const chemicalFill = targetItem.querySelector('.chemical-fill');
-                    if (chemicalFill) {
-                        chemicalFill.style.backgroundColor = '#eab308'; // yellow-500
-                        chemicalFill.style.height = '80%';
-                        chemicalFill.style.opacity = '1';
-                        chemicalFill.style.zIndex = '5';
-                        chemicalFill.style.border = '2px solid white';
-                        chemicalFill.style.boxShadow = '0 0 15px #eab308';
-                        console.log("🔴 EMERGENCY FIX: Directly modified HCl fill");
-                    }
-
-                    // Also update the label
-                    const label = targetItem.querySelector('.chemical-mixture-label');
-                    if (label) {
-                        label.textContent = 'HCl (Yellow)';
-                        label.style.color = '#ffffff';
-                        label.style.fontWeight = 'bold';
-                    }
-
-                    // Update the color indicator
-                    const colorIndicator = targetItem.querySelector('.chemical-color-indicator');
-                    if (colorIndicator) {
-                        colorIndicator.style.backgroundColor = '#eab308';
-                        colorIndicator.style.boxShadow = '0 0 10px #eab308';
-                    }
-                }, 100);
+            // If there was a reaction, show it
+            if (reactionResult) {
+                // Add visual feedback for the reaction
+                addReactionFeedback(targetItem, reactionResult);
             }
 
-            // Update the target container
-            targetItem.setAttribute('data-contains', chemical);
-
-            // Update the container label
+            // Update the target container label
             const containerLabel = targetItem.querySelector('.container-label');
             if (containerLabel) {
-                containerLabel.textContent = getChemicalName(chemical);
+                containerLabel.textContent = getChemicalName(resultChemical || chemical);
             }
 
             // Update the container indicator (legacy)
@@ -2153,8 +2100,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update the chemical mixture label for better visibility
                 const mixtureLabelElement = targetItem.querySelector('.chemical-mixture-label');
                 if (mixtureLabelElement) {
-                    mixtureLabelElement.textContent = getChemicalName(chemical);
-                    mixtureLabelElement.style.color = '#ffffff';
+                    mixtureLabelElement.textContent = getChemicalName(chemical); // Uses the more descriptive getChemicalName
+                    mixtureLabelElement.style.color = getChemicalColor(chemical); // Ensure label color matches chemical
                     mixtureLabelElement.style.fontWeight = 'bold';
                 }
 
@@ -2475,8 +2422,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update the chemical mixture label for better visibility
                 const mixtureLabelElement = container.querySelector('.chemical-mixture-label');
                 if (mixtureLabelElement) {
-                    mixtureLabelElement.textContent = getChemicalName(resultChemical);
-                    mixtureLabelElement.style.color = '#ffffff';
+                    mixtureLabelElement.textContent = getChemicalName(resultChemical); // Uses the more descriptive getChemicalName
+                    mixtureLabelElement.style.color = chemicalColor; // Ensure label color matches chemical color
                     mixtureLabelElement.style.fontWeight = 'bold';
                 }
 

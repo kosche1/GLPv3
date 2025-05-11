@@ -22,8 +22,8 @@
 
         <!-- Description Section -->
         <div class="p-4 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
-            <div class="flex flex-col md:flex-row md:items-center gap-4">
-                <div class="flex-shrink-0">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex-1 min-w-0">
                     <h2 class="text-lg font-semibold text-white">About {{ $trackName }}</h2>
                     <p class="text-sm text-neutral-300">
                         @if($trackName == 'ABM')
@@ -39,8 +39,7 @@
                         @endif
                     </p>
                 </div>
-                <div class="flex flex-wrap gap-3 md:ml-auto">
-                <div class="flex flex-wrap gap-3 md:ml-auto">
+                <div class="flex-none">
                     @if($trackName == 'ABM')
                     @elseif($trackName == 'HE')
                     @elseif($trackName == 'HUMMS')
@@ -53,7 +52,6 @@
                         </a>
                     @elseif($trackName == 'ICT')
                     @endif
-                </div>
                 </div>
             </div>
         </div>
@@ -160,3 +158,4 @@
         </div>
     </div>
 </x-layouts.app>
+

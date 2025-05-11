@@ -22,14 +22,14 @@
 
         <!-- Description Section -->
         <div class="p-4 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
-            <div class="flex flex-col md:flex-row md:items-center gap-4">
-                <div class="flex-shrink-0">
-                    <h2 class="text-lg font-semibold text-white">About Chemistry Lab</h2>
-                    <p class="text-sm text-neutral-300">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex-1 min-w-0">
+                    <h2 class="text-lg font-semibold text-white mb-2">About Chemistry Lab</h2>
+                    <p class="text-sm text-neutral-300 leading-relaxed">
                         Welcome to the virtual Chemistry Lab! Conduct experiments, mix chemicals, and learn about chemical reactions in a safe, interactive environment. Complete challenges to earn points and demonstrate your chemistry knowledge.
                     </p>
                 </div>
-                <div class="flex flex-wrap gap-3 md:ml-auto">
+                <div class="flex-none">
                     <a href="{{ route('subjects.specialized.stem.chemistry-lab.free-experiment') }}" class="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
                         Free Experiment
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -90,3 +90,4 @@
         </div>
     </div>
 </x-layouts.app>
+

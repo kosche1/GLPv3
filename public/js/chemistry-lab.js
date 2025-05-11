@@ -86,10 +86,13 @@ class ChemistryLab {
             }
         });
 
-        // Clear any existing content
-        while (this.labBench.firstChild) {
-            this.labBench.removeChild(this.labBench.firstChild);
-        }
+        // Clear any existing content, but preserve p5-container
+        const children = Array.from(this.labBench.childNodes); // Iterate over a static copy
+        children.forEach(child => {
+            if (child.nodeType === Node.ELEMENT_NODE && child.id !== 'p5-container') {
+                this.labBench.removeChild(child);
+            }
+        });
 
         // Create walls to keep objects within the lab bench
         const wallThickness = 50;

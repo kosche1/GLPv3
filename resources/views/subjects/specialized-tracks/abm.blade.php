@@ -22,8 +22,8 @@
 
         <!-- Description Section -->
         <div class="p-4 bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl border border-neutral-700 shadow-lg">
-            <div class="flex flex-col md:flex-row md:items-center gap-4">
-                <div class="flex-shrink-0">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex-1 min-w-0">
                     <h2 class="text-lg font-semibold text-white">About {{ $trackName }}</h2>
                     <p class="text-sm text-neutral-300">
                         @if($trackName == 'ABM')
@@ -39,15 +39,14 @@
                         @endif
                     </p>
                 </div>
-                <div class="flex flex-wrap gap-3 md:ml-auto">
+                <div class="flex-none">
                     @if($trackName == 'ABM')
-                        <a href="{{ route('subjects.specialized.abm.investsmart') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-md shadow-sm transition-colors duration-300 mr-2">
+                        <a href="{{ route('subjects.specialized.abm.investsmart') }}" class="inline-flex items-center px-6 py-2 text-base font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-all duration-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             InvestSmart Game
                         </a>
-
                     @elseif($trackName == 'HE')
                     @elseif($trackName == 'HUMMS')
                     @elseif($trackName == 'STEM')

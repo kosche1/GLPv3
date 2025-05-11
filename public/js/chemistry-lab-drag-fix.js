@@ -310,7 +310,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 `;
             }
-            }
 
             // Make the item draggable within the lab bench
             makeLabItemDraggable(item);
