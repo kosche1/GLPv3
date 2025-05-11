@@ -843,7 +843,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 equipmentTable.style.gap = '20px';
                 equipmentTable.style.padding = '20px';
                 equipmentTable.style.position = 'absolute';
-                equipmentTable.style.bottom = '20px';
+                equipmentTable.style.bottom = '70px'; // Moved up to make space for the label below
                 equipmentTable.style.left = '50%';
                 equipmentTable.style.transform = 'translateX(-50%)';
                 equipmentTable.style.width = '90%';
@@ -869,6 +869,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 equipmentTable.appendChild(tableLabel);
 
                 labBench.appendChild(equipmentTable);
+
+                // Add shared label for equipment contents below the table
+                let sharedContentsLabel = document.getElementById('shared-equipment-contents-label');
+                if (!sharedContentsLabel) {
+                    sharedContentsLabel = document.createElement('div');
+                    sharedContentsLabel.id = 'shared-equipment-contents-label';
+                    sharedContentsLabel.textContent = 'Select equipment to view contents'; // Default text
+                    sharedContentsLabel.style.position = 'absolute';
+                    sharedContentsLabel.style.bottom = '20px'; // Positioned in the space below the table
+                    sharedContentsLabel.style.left = '50%';
+                    sharedContentsLabel.style.transform = 'translateX(-50%)';
+                    sharedContentsLabel.style.padding = '8px 15px';
+                    sharedContentsLabel.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+                    sharedContentsLabel.style.color = 'white';
+                    sharedContentsLabel.style.borderRadius = '6px';
+                    sharedContentsLabel.style.textAlign = 'center';
+                    sharedContentsLabel.style.fontSize = '14px';
+                    sharedContentsLabel.style.fontWeight = 'bold';
+                    sharedContentsLabel.style.minWidth = '250px'; // Ensure it's wide enough
+                    sharedContentsLabel.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+                    sharedContentsLabel.style.zIndex = '5'; // Ensure it's appropriately layered
+                    labBench.appendChild(sharedContentsLabel);
+                }
 
                 // Hide the placeholder text
                 hideBenchPlaceholder();
@@ -1453,6 +1476,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Update the pour button state
             updatePourButtonState();
+
+            // Update shared equipment label based on current selection
+            const currentlySelectedEquipment = document.querySelector('.lab-item[data-type="equipment"][data-selected="true"]');
+            updateSharedEquipmentLabel(currentlySelectedEquipment);
+
         } catch (error) {
             console.error('Error handling lab item click:', error);
         }
@@ -1795,17 +1823,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Add the item content
                 if (type === 'equipment') {
-                    let icon = '🧪';
+                    let icon = '🧪'; // Restoring this line
                     let label = id.replace('-', ' ');
                     label = label.charAt(0).toUpperCase() + label.slice(1);
 
+                    // Ensure labItem arranges its children vertically and centered
+                    labItem.classList.add('flex', 'flex-col', 'items-center');
+
                     labItem.innerHTML = `
-                        <div class="equipment-visual">
+                        <div class="equipment-visual" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%;"> 
+                            <!-- This div contains the main icon and symbol, and would get the green outline -->
                             <div class="equipment-icon ${id}-icon">${icon}</div>
                             <div class="equipment-label">${id === 'beaker' ? 'B' : 'T'}</div>
                             <div class="container-indicator"></div>
-                            <div class="container-label">Empty</div>
                         </div>
+                        <!-- Individual container-label removed from here -->
                     `;
                 } else if (type === 'chemical') {
                     let color, symbol, name;
@@ -2160,10 +2192,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Empty the source container
                 sourceItem.setAttribute('data-contains', '');
 
-                // Update the source container label
-                const sourceLabel = sourceItem.querySelector('.container-label');
-                if (sourceLabel) {
-                    sourceLabel.textContent = 'Empty';
+                // Update the source container label (no longer individual)
+                // const sourceLabel = sourceItem.querySelector('.container-label');
+                // if (sourceLabel) {
+                // sourceLabel.textContent = 'Empty';
+                // }
+
+                // If the source item (which was emptied) is currently selected, update the shared label
+                if (sourceItem.getAttribute('data-selected') === 'true') {
+                    updateSharedEquipmentLabel(sourceItem);
                 }
 
                 // Update the source container indicator (legacy)
@@ -3040,6 +3077,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
+     * Update the shared label that displays the contents of the selected equipment.
+     */
+    function updateSharedEquipmentLabel(equipmentItem) {
+        const sharedLabel = document.getElementById('shared-equipment-contents-label');
+        if (!sharedLabel) {
+            console.warn('Shared equipment contents label not found.');
+            return;
+        }
+
+        if (equipmentItem && equipmentItem.getAttribute('data-type') === 'equipment') {
+            const contains = equipmentItem.getAttribute('data-contains');
+            const equipmentId = equipmentItem.getAttribute('data-equipment');
+            const equipmentName = equipmentId ? equipmentId.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Equipment';
+
+            if (contains) {
+                sharedLabel.textContent = `${equipmentName} contains: ${getChemicalName(contains)}`;
+            } else {
+                sharedLabel.textContent = `${equipmentName} is Empty`;
+            }
+        } else {
+            // No equipment selected or invalid item
+            sharedLabel.textContent = 'Select equipment to view contents';
+        }
+    }
+
+    /**
      * Add custom CSS for pour functionality
      */
     function addPourStyles() {
@@ -3386,7 +3449,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 .equipment-label, .chemical-label {
-                    font-size: 14px;
+                    font-size: 13px; /* Reduced font size */
                     color: white;
                     text-align: center;
                     transition: opacity 0.3s ease;
@@ -3396,6 +3459,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     margin-top: 2px;
                     font-weight: bold;
                     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+                    white-space: normal; /* Allow wrapping */
+                    word-break: break-word; /* Break words if necessary */
+                    max-width: 70px; /* Max width to encourage wrapping */
+                    line-height: 1.2; /* Adjust line height for wrapped text */
                 }
 
                 .container-label {
@@ -3405,11 +3472,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     transform: translateX(-50%);
                     background-color: rgba(0, 0, 0, 0.7);
                     color: white;
-                    padding: 2px 6px;
+                    padding: 3px 8px;         /* Updated padding */
                     border-radius: 4px;
-                    font-size: 10px;
-                    white-space: nowrap;
+                    font-size: 12px;
+                    white-space: normal;
+                    max-width: 80px;          /* Updated max-width */
+                    line-height: 1.2;
+                    text-align: center;
                     z-index: 5;
+                    display: flex;            /* Added */
+                    justify-content: center;  /* Added */
+                    align-items: center;      /* Added */
                 }
 
                 .cursor-grab {
