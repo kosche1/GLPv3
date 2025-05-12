@@ -10,6 +10,7 @@ use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ActivityGoalController;
 use App\Http\Controllers\MoleculeBuilderController;
+use App\Http\Controllers\EquationDropController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -224,7 +225,8 @@ Route::middleware(
 
     // STEM Specialized Subject Routes
     Route::prefix('subjects/specialized/stem')->name('subjects.specialized.stem.')->group(function () {
-        Route::get('/molecule-builder', [MoleculeBuilderController::class, 'index'])->name('molecule-builder.index');
+        // Route::get('/molecule-builder', [MoleculeBuilderController::class, 'index'])->name('molecule-builder.index'); // Comment out or remove old route
+        Route::get('/equation-drop', [EquationDropController::class, 'index'])->name('equation-drop.index'); // Add new route
     });
 });
 
