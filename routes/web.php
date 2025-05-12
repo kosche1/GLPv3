@@ -11,6 +11,7 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ActivityGoalController;
 use App\Http\Controllers\MoleculeBuilderController;
 use App\Http\Controllers\EquationDropController;
+use App\Http\Controllers\HistoricalTimelineMazeController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -227,6 +228,13 @@ Route::middleware(
     Route::prefix('subjects/specialized/stem')->name('subjects.specialized.stem.')->group(function () {
         // Route::get('/molecule-builder', [MoleculeBuilderController::class, 'index'])->name('molecule-builder.index'); // Comment out or remove old route
         Route::get('/equation-drop', [EquationDropController::class, 'index'])->name('equation-drop.index'); // Add new route
+    });
+
+    // HUMMS Specialized Subject Routes
+    Route::prefix('subjects/specialized/humms')->name('subjects.specialized.humms.')->group(function () {
+        Route::get('/historical-timeline-maze', [HistoricalTimelineMazeController::class, 'index'])->name('historical-timeline-maze.index');
+        Route::get('/historical-timeline-maze/events', [HistoricalTimelineMazeController::class, 'getEvents'])->name('historical-timeline-maze.events');
+        Route::post('/historical-timeline-maze/save-progress', [HistoricalTimelineMazeController::class, 'saveProgress'])->name('historical-timeline-maze.save-progress');
     });
 });
 
