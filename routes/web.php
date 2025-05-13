@@ -217,6 +217,8 @@ Route::middleware(
 
     Route::view('help-center', 'help-center')->name('help-center');
     Route::view('technical-support', 'technical-support')->name('technical-support');
+    Route::get('rate-us', [\App\Http\Controllers\RateUsController::class, 'index'])->name('rate-us');
+    Route::post('rate-us', [\App\Http\Controllers\RateUsController::class, 'store'])->name('rate-us.store');
 
     Route::redirect('settings', 'settings/profile');
 
