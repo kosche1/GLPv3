@@ -218,7 +218,8 @@
                                     </div>
                                 </div>
                                 <h3 class="text-xl font-bold text-white text-center mb-2">Level Complete!</h3>
-                                <p class="text-neutral-400 text-center mb-6">You've successfully navigated this era of history!</p>
+                                <p class="text-neutral-400 text-center mb-2">You've successfully navigated this era of history!</p>
+                                <p id="completed-level-info" class="text-emerald-400 text-center mb-6">Ancient History - Easy</p>
 
                                 <div class="grid grid-cols-2 gap-4 mb-6">
                                     <div class="bg-neutral-700/50 p-3 rounded-lg text-center">
@@ -441,6 +442,410 @@
                     'The Cold War was a period of geopolitical tension between the Soviet Union and the United States from 1947 to 1991.',
                     'The Internet was developed in the late 20th century and revolutionized global communication.'
                 ]
+            };
+
+            // Questions database organized by era and difficulty
+            let questionsDatabase = {
+                'ancient': {
+                    'easy': [
+                        {
+                            question: "Which of these events happened first in ancient history?",
+                            options: [
+                                { id: 1, title: 'Building of the Great Pyramid of Giza', year: '2560 BCE', correct: true },
+                                { id: 2, title: 'Code of Hammurabi', year: '1754 BCE', correct: false },
+                                { id: 3, title: 'Founding of the Roman Republic', year: '509 BCE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which ancient civilization development came next?",
+                            options: [
+                                { id: 1, title: 'Code of Hammurabi', year: '1754 BCE', correct: true },
+                                { id: 2, title: 'Trojan War', year: '1200 BCE', correct: false },
+                                { id: 3, title: 'First Olympic Games', year: '776 BCE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which of these events occurred last in the ancient world?",
+                            options: [
+                                { id: 1, title: 'Birth of Jesus Christ', year: '~4 BCE', correct: true },
+                                { id: 2, title: 'Founding of the Roman Republic', year: '509 BCE', correct: false },
+                                { id: 3, title: 'Birth of Democracy in Athens', year: '508 BCE', correct: false }
+                            ]
+                        }
+                    ],
+                    'medium': [
+                        {
+                            question: "Place these ancient events in chronological order. Which came first?",
+                            options: [
+                                { id: 1, title: 'Construction of the Great Wall of China', year: '700-214 BCE', correct: true },
+                                { id: 2, title: 'Alexander the Great conquers Persia', year: '330 BCE', correct: false },
+                                { id: 3, title: 'Julius Caesar becomes dictator of Rome', year: '49 BCE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which of these ancient inventions was developed first?",
+                            options: [
+                                { id: 1, title: 'Invention of Paper in China', year: '105 CE', correct: true },
+                                { id: 2, title: 'First use of concrete by Romans', year: '300 BCE', correct: false },
+                                { id: 3, title: 'Development of the Compass', year: '200 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which ancient empire reached its peak first?",
+                            options: [
+                                { id: 1, title: 'Persian Empire under Darius I', year: '522-486 BCE', correct: true },
+                                { id: 2, title: 'Roman Empire under Augustus', year: '27 BCE-14 CE', correct: false },
+                                { id: 3, title: 'Han Dynasty in China', year: '206 BCE-220 CE', correct: false }
+                            ]
+                        }
+                    ],
+                    'hard': [
+                        {
+                            question: "Which of these lesser-known ancient events occurred first?",
+                            options: [
+                                { id: 1, title: 'Ashoka the Great converts to Buddhism', year: '263 BCE', correct: true },
+                                { id: 2, title: 'The Silk Road trade route established', year: '130 BCE', correct: false },
+                                { id: 3, title: 'Ptolemy creates his world map', year: '150 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Arrange these ancient battles chronologically. Which happened first?",
+                            options: [
+                                { id: 1, title: 'Battle of Marathon', year: '490 BCE', correct: true },
+                                { id: 2, title: 'Battle of Thermopylae', year: '480 BCE', correct: false },
+                                { id: 3, title: 'Battle of Gaugamela', year: '331 BCE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which of these ancient scientific achievements came first?",
+                            options: [
+                                { id: 1, title: 'Eratosthenes measures Earth\'s circumference', year: '240 BCE', correct: true },
+                                { id: 2, title: 'Archimedes\' principle of buoyancy', year: '212 BCE', correct: false },
+                                { id: 3, title: 'Hipparchus creates trigonometry', year: '150 BCE', correct: false }
+                            ]
+                        }
+                    ]
+                },
+                'medieval': {
+                    'easy': [
+                        {
+                            question: "Which event marked the beginning of the Medieval period?",
+                            options: [
+                                { id: 1, title: 'Fall of the Western Roman Empire', year: '476 CE', correct: true },
+                                { id: 2, title: 'Crowning of Charlemagne', year: '800 CE', correct: false },
+                                { id: 3, title: 'Beginning of the First Crusade', year: '1096 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which medieval development came next?",
+                            options: [
+                                { id: 1, title: 'Magna Carta Signed', year: '1215 CE', correct: true },
+                                { id: 2, title: 'Black Death Pandemic', year: '1347 CE', correct: false },
+                                { id: 3, title: 'Hundred Years\' War Begins', year: '1337 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which event signaled the end of the Medieval period?",
+                            options: [
+                                { id: 1, title: 'Fall of Constantinople', year: '1453 CE', correct: true },
+                                { id: 2, title: 'Columbus reaches the Americas', year: '1492 CE', correct: false },
+                                { id: 3, title: 'Protestant Reformation Begins', year: '1517 CE', correct: false }
+                            ]
+                        }
+                    ],
+                    'medium': [
+                        {
+                            question: "Which medieval empire was established first?",
+                            options: [
+                                { id: 1, title: 'Byzantine Empire under Justinian', year: '527-565 CE', correct: true },
+                                { id: 2, title: 'Carolingian Empire under Charlemagne', year: '800-814 CE', correct: false },
+                                { id: 3, title: 'Holy Roman Empire under Otto I', year: '962 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which medieval university was founded first?",
+                            options: [
+                                { id: 1, title: 'University of Bologna', year: '1088 CE', correct: true },
+                                { id: 2, title: 'University of Oxford', year: '1096 CE', correct: false },
+                                { id: 3, title: 'University of Paris', year: '1150 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which medieval technological innovation came first?",
+                            options: [
+                                { id: 1, title: 'Heavy Plow in Europe', year: '~700 CE', correct: true },
+                                { id: 2, title: 'Mechanical Clock', year: '~1300 CE', correct: false },
+                                { id: 3, title: 'Gunpowder weapons in Europe', year: '~1320 CE', correct: false }
+                            ]
+                        }
+                    ],
+                    'hard': [
+                        {
+                            question: "Which medieval scholar's work was completed first?",
+                            options: [
+                                { id: 1, title: 'Al-Khwarizmi\'s algebra treatise', year: '~820 CE', correct: true },
+                                { id: 2, title: 'Avicenna\'s Canon of Medicine', year: '1025 CE', correct: false },
+                                { id: 3, title: 'Thomas Aquinas\' Summa Theologica', year: '1274 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which medieval trade network was established first?",
+                            options: [
+                                { id: 1, title: 'Viking trade routes in Northern Europe', year: '~800 CE', correct: true },
+                                { id: 2, title: 'Hanseatic League', year: '~1150 CE', correct: false },
+                                { id: 3, title: 'Venetian trade monopoly in Mediterranean', year: '~1200 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which medieval military order was founded first?",
+                            options: [
+                                { id: 1, title: 'Knights Hospitaller', year: '1099 CE', correct: true },
+                                { id: 2, title: 'Knights Templar', year: '1119 CE', correct: false },
+                                { id: 3, title: 'Teutonic Knights', year: '1190 CE', correct: false }
+                            ]
+                        }
+                    ]
+                },
+                'renaissance': {
+                    'easy': [
+                        {
+                            question: "Which Renaissance invention came first?",
+                            options: [
+                                { id: 1, title: 'Gutenberg Prints the Bible', year: '1455 CE', correct: true },
+                                { id: 2, title: 'First Mechanical Watch', year: '1510 CE', correct: false },
+                                { id: 3, title: 'Telescope Invented by Hans Lippershey', year: '1608 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which Renaissance exploration happened first?",
+                            options: [
+                                { id: 1, title: 'Columbus Reaches the Americas', year: '1492 CE', correct: true },
+                                { id: 2, title: 'Magellan\'s Circumnavigation Begins', year: '1519 CE', correct: false },
+                                { id: 3, title: 'Cortés Conquers the Aztec Empire', year: '1521 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which Renaissance artistic achievement came first?",
+                            options: [
+                                { id: 1, title: 'Leonardo da Vinci Paints the Mona Lisa', year: '1503 CE', correct: true },
+                                { id: 2, title: 'Michelangelo Completes the Sistine Chapel Ceiling', year: '1512 CE', correct: false },
+                                { id: 3, title: 'Shakespeare Writes Romeo and Juliet', year: '1595 CE', correct: false }
+                            ]
+                        }
+                    ],
+                    'medium': [
+                        {
+                            question: "Which Renaissance scientific discovery came first?",
+                            options: [
+                                { id: 1, title: 'Copernicus\' Heliocentric Model', year: '1543 CE', correct: true },
+                                { id: 2, title: 'Vesalius\' Anatomy Book', year: '1543 CE', correct: false },
+                                { id: 3, title: 'Kepler\'s Laws of Planetary Motion', year: '1609 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which Renaissance political development happened first?",
+                            options: [
+                                { id: 1, title: 'Machiavelli Writes The Prince', year: '1513 CE', correct: true },
+                                { id: 2, title: 'Peace of Augsburg', year: '1555 CE', correct: false },
+                                { id: 3, title: 'Dutch Declaration of Independence', year: '1581 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which Renaissance architectural achievement was completed first?",
+                            options: [
+                                { id: 1, title: 'Brunelleschi\'s Dome in Florence', year: '1436 CE', correct: true },
+                                { id: 2, title: 'St. Peter\'s Basilica in Rome', year: '1626 CE', correct: false },
+                                { id: 3, title: 'Palace of Versailles Construction Begins', year: '1631 CE', correct: false }
+                            ]
+                        }
+                    ],
+                    'hard': [
+                        {
+                            question: "Which Renaissance philosophical work was published first?",
+                            options: [
+                                { id: 1, title: 'Erasmus\' In Praise of Folly', year: '1511 CE', correct: true },
+                                { id: 2, title: 'Thomas More\'s Utopia', year: '1516 CE', correct: false },
+                                { id: 3, title: 'Francis Bacon\'s Novum Organum', year: '1620 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which Renaissance banking innovation came first?",
+                            options: [
+                                { id: 1, title: 'Medici Bank Founded', year: '1397 CE', correct: true },
+                                { id: 2, title: 'First Stock Exchange in Amsterdam', year: '1602 CE', correct: false },
+                                { id: 3, title: 'Bank of England Established', year: '1694 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which Renaissance musical development came first?",
+                            options: [
+                                { id: 1, title: 'Palestrina\'s Pope Marcellus Mass', year: '1562 CE', correct: true },
+                                { id: 2, title: 'Monteverdi\'s L\'Orfeo (First Major Opera)', year: '1607 CE', correct: false },
+                                { id: 3, title: 'First Violin Concerto by Torelli', year: '1698 CE', correct: false }
+                            ]
+                        }
+                    ]
+                },
+                'modern': {
+                    'easy': [
+                        {
+                            question: "Which modern revolution happened first?",
+                            options: [
+                                { id: 1, title: 'American Revolution', year: '1775-1783 CE', correct: true },
+                                { id: 2, title: 'French Revolution', year: '1789-1799 CE', correct: false },
+                                { id: 3, title: 'Latin American Independence Wars', year: '1808-1826 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which modern invention came first?",
+                            options: [
+                                { id: 1, title: 'Steam Engine by James Watt', year: '1769 CE', correct: true },
+                                { id: 2, title: 'Telegraph by Samuel Morse', year: '1837 CE', correct: false },
+                                { id: 3, title: 'Telephone by Alexander Graham Bell', year: '1876 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which modern war began first?",
+                            options: [
+                                { id: 1, title: 'First World War', year: '1914 CE', correct: true },
+                                { id: 2, title: 'Russian Civil War', year: '1917 CE', correct: false },
+                                { id: 3, title: 'Spanish Civil War', year: '1936 CE', correct: false }
+                            ]
+                        }
+                    ],
+                    'medium': [
+                        {
+                            question: "Which modern scientific theory was proposed first?",
+                            options: [
+                                { id: 1, title: 'Darwin\'s Theory of Evolution', year: '1859 CE', correct: true },
+                                { id: 2, title: 'Mendeleev\'s Periodic Table', year: '1869 CE', correct: false },
+                                { id: 3, title: 'Einstein\'s Theory of Relativity', year: '1905 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which modern political movement began first?",
+                            options: [
+                                { id: 1, title: 'Abolition Movement in Britain', year: '1787 CE', correct: true },
+                                { id: 2, title: 'Women\'s Suffrage Movement', year: '~1840s CE', correct: false },
+                                { id: 3, title: 'Labor Movement', year: '~1860s CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which modern transportation development came first?",
+                            options: [
+                                { id: 1, title: 'First Commercial Railway', year: '1825 CE', correct: true },
+                                { id: 2, title: 'First Automobile by Karl Benz', year: '1885 CE', correct: false },
+                                { id: 3, title: 'Wright Brothers\' First Flight', year: '1903 CE', correct: false }
+                            ]
+                        }
+                    ],
+                    'hard': [
+                        {
+                            question: "Which modern philosophical work was published first?",
+                            options: [
+                                { id: 1, title: 'Kant\'s Critique of Pure Reason', year: '1781 CE', correct: true },
+                                { id: 2, title: 'Hegel\'s Phenomenology of Spirit', year: '1807 CE', correct: false },
+                                { id: 3, title: 'Marx\'s Das Kapital', year: '1867 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which modern medical breakthrough came first?",
+                            options: [
+                                { id: 1, title: 'Jenner\'s Smallpox Vaccine', year: '1796 CE', correct: true },
+                                { id: 2, title: 'Pasteur\'s Germ Theory', year: '1862 CE', correct: false },
+                                { id: 3, title: 'Fleming\'s Discovery of Penicillin', year: '1928 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which modern international organization was founded first?",
+                            options: [
+                                { id: 1, title: 'International Red Cross', year: '1863 CE', correct: true },
+                                { id: 2, title: 'League of Nations', year: '1920 CE', correct: false },
+                                { id: 3, title: 'International Labour Organization', year: '1919 CE', correct: false }
+                            ]
+                        }
+                    ]
+                },
+                'contemporary': {
+                    'easy': [
+                        {
+                            question: "Which contemporary event happened first?",
+                            options: [
+                                { id: 1, title: 'United Nations Founded', year: '1945 CE', correct: true },
+                                { id: 2, title: 'NATO Established', year: '1949 CE', correct: false },
+                                { id: 3, title: 'European Union Formed', year: '1993 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which space exploration milestone came first?",
+                            options: [
+                                { id: 1, title: 'First Human in Space (Yuri Gagarin)', year: '1961 CE', correct: true },
+                                { id: 2, title: 'First Moon Landing', year: '1969 CE', correct: false },
+                                { id: 3, title: 'First Space Station (Salyut 1)', year: '1971 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which technological innovation came first?",
+                            options: [
+                                { id: 1, title: 'World Wide Web Invented', year: '1989 CE', correct: true },
+                                { id: 2, title: 'First Smartphone (iPhone)', year: '2007 CE', correct: false },
+                                { id: 3, title: 'Social Media (Facebook)', year: '2004 CE', correct: false }
+                            ]
+                        }
+                    ],
+                    'medium': [
+                        {
+                            question: "Which Cold War event happened first?",
+                            options: [
+                                { id: 1, title: 'Berlin Blockade', year: '1948-1949 CE', correct: true },
+                                { id: 2, title: 'Cuban Missile Crisis', year: '1962 CE', correct: false },
+                                { id: 3, title: 'Vietnam War U.S. Involvement', year: '1955-1975 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which environmental milestone came first?",
+                            options: [
+                                { id: 1, title: 'First Earth Day', year: '1970 CE', correct: true },
+                                { id: 2, title: 'Montreal Protocol on Ozone Depletion', year: '1987 CE', correct: false },
+                                { id: 3, title: 'Kyoto Protocol on Climate Change', year: '1997 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which medical advancement came first?",
+                            options: [
+                                { id: 1, title: 'First Heart Transplant', year: '1967 CE', correct: true },
+                                { id: 2, title: 'First Test Tube Baby', year: '1978 CE', correct: false },
+                                { id: 3, title: 'Human Genome Project Completed', year: '2003 CE', correct: false }
+                            ]
+                        }
+                    ],
+                    'hard': [
+                        {
+                            question: "Which economic development came first?",
+                            options: [
+                                { id: 1, title: 'Bretton Woods System', year: '1944 CE', correct: true },
+                                { id: 2, title: 'Nixon Shock (End of Gold Standard)', year: '1971 CE', correct: false },
+                                { id: 3, title: 'Formation of World Trade Organization', year: '1995 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which political transformation happened first?",
+                            options: [
+                                { id: 1, title: 'Decolonization of Africa Begins', year: '~1957 CE', correct: true },
+                                { id: 2, title: 'Fall of the Berlin Wall', year: '1989 CE', correct: false },
+                                { id: 3, title: 'Dissolution of the Soviet Union', year: '1991 CE', correct: false }
+                            ]
+                        },
+                        {
+                            question: "Which technological breakthrough came first?",
+                            options: [
+                                { id: 1, title: 'First Commercial Computer (UNIVAC I)', year: '1951 CE', correct: true },
+                                { id: 2, title: 'First Personal Computer (Altair 8800)', year: '1975 CE', correct: false },
+                                { id: 3, title: 'First Artificial Intelligence Program', year: '1956 CE', correct: false }
+                            ]
+                        }
+                    ]
+                }
             };
 
             // Timeline data
@@ -777,7 +1182,7 @@
             function showEventChoiceModal() {
                 console.log("showEventChoiceModal called, currentQuestionIndex:", currentQuestionIndex);
 
-                // In a real implementation, this would show real historical events based on the current era
+                // Clear previous choices
                 eventChoices.innerHTML = '';
 
                 // Make sure the feedback is hidden
@@ -785,44 +1190,46 @@
                     choiceFeedback.classList.add('hidden');
                 }
 
-                // Get events based on the current question index
-                let sampleEvents;
+                // Get questions based on the current era and difficulty
+                const era = currentEra;
+                const difficulty = currentDifficulty;
 
-                if (currentQuestionIndex === 0) {
-                    console.log("Loading first question set");
-                    sampleEvents = [
-                        { id: 1, title: 'Building of the Great Pyramid of Giza', year: '2560 BCE' },
-                        { id: 2, title: 'Birth of Democracy in Athens', year: '508 BCE' },
-                        { id: 3, title: 'Founding of the Roman Republic', year: '509 BCE' }
-                    ];
-                } else if (currentQuestionIndex === 1) {
-                    console.log("Loading second question set");
-                    sampleEvents = [
-                        { id: 1, title: 'Code of Hammurabi', year: '1754 BCE' },
-                        { id: 2, title: 'Trojan War', year: '1200 BCE' },
-                        { id: 3, title: 'First Olympic Games', year: '776 BCE' }
-                    ];
-                } else {
-                    console.log("Loading third question set");
-                    sampleEvents = [
-                        { id: 1, title: 'Birth of Jesus Christ', year: '~4 BCE' },
-                        { id: 2, title: 'Assassination of Julius Caesar', year: '44 BCE' },
-                        { id: 3, title: 'Construction of the Colosseum', year: '80 CE' }
-                    ];
+                console.log(`Loading question for era: ${era}, difficulty: ${difficulty}, index: ${currentQuestionIndex}`);
+
+                // Get the questions for the current era and difficulty
+                const questions = questionsDatabase[era][difficulty];
+
+                // Make sure we don't exceed the available questions
+                if (currentQuestionIndex >= questions.length) {
+                    console.log("No more questions available, showing level complete");
+                    showLevelCompleteModal();
+                    return;
                 }
 
-                // Store the current sample events in a global variable for reference
-                window.sampleEvents = sampleEvents;
+                // Get the current question
+                const currentQuestion = questions[currentQuestionIndex];
+
+                // Update the question text
+                const questionTitle = document.querySelector('#event-choice-modal h3');
+                const questionDescription = document.querySelector('#event-choice-modal p');
+
+                if (questionTitle && questionDescription) {
+                    questionTitle.textContent = "Choose the Next Event";
+                    questionDescription.textContent = currentQuestion.question;
+                }
+
+                // Store the current options in a global variable for reference
+                window.sampleEvents = currentQuestion.options;
 
                 // Create choice buttons
-                sampleEvents.forEach(event => {
+                currentQuestion.options.forEach(option => {
                     const button = document.createElement('button');
-                    button.className = 'w-full text-left p-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg transition-colors';
+                    button.className = 'w-full text-left p-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg transition-colors mb-2';
                     button.innerHTML = `
-                        <div class="font-medium text-white">${event.title}</div>
-                        <div class="text-xs text-neutral-400">${event.year}</div>
+                        <div class="font-medium text-white">${option.title}</div>
+                        <div class="text-xs text-neutral-400">${option.year}</div>
                     `;
-                    button.addEventListener('click', () => makeChoice(event.id));
+                    button.addEventListener('click', () => makeChoice(option.id));
                     eventChoices.appendChild(button);
                 });
 
@@ -835,8 +1242,9 @@
                 totalChoices++;
                 console.log("makeChoice called with eventId:", eventId);
 
-                // For demo purposes, let's say event ID 1 is always correct
-                const isCorrect = eventId === 1;
+                // Check if the selected option is correct based on the 'correct' property
+                const selectedOption = window.sampleEvents.find(option => option.id === eventId);
+                const isCorrect = selectedOption && selectedOption.correct === true;
 
                 if (isCorrect) {
                     correctChoices++;
@@ -876,7 +1284,7 @@
                 } else {
                     streak = 0;
                     // Get the correct event dynamically
-                    const correctEvent = window.sampleEvents.find(event => event.id === 1);
+                    const correctEvent = window.sampleEvents.find(option => option.correct === true);
 
                     choiceFeedback.innerHTML = `
                         <div class="text-red-400 font-medium">Incorrect!</div>
@@ -937,8 +1345,8 @@
 
                 // Disable all choice buttons
                 const buttons = eventChoices.querySelectorAll('button');
-                const correctEvent = window.sampleEvents.find(event => event.id === 1);
-                const selectedEvent = window.sampleEvents.find(event => event.id === eventId);
+                const correctEvent = window.sampleEvents.find(option => option.correct === true);
+                const selectedEvent = window.sampleEvents.find(option => option.id === eventId);
 
                 buttons.forEach(button => {
                     button.disabled = true;
@@ -948,7 +1356,7 @@
                         button.classList.remove('bg-neutral-700', 'hover:bg-neutral-600');
                     }
                     // Highlight the incorrect selected answer in red
-                    else if (eventId !== 1 && button.textContent.includes(selectedEvent.title)) {
+                    else if (!isCorrect && button.textContent.includes(selectedEvent.title)) {
                         button.classList.add('bg-red-600');
                         button.classList.remove('bg-neutral-700', 'hover:bg-neutral-600');
                     }
@@ -1019,9 +1427,10 @@
                 currentQuestionIndex++;
                 console.log("Incremented currentQuestionIndex to:", currentQuestionIndex);
 
-                // For demo purposes, show the level complete modal after 3 choices
-                if (totalChoices >= 3) {
-                    console.log("Showing level complete modal");
+                // Check if we've reached the end of questions for this era and difficulty
+                const questions = questionsDatabase[currentEra][currentDifficulty];
+                if (currentQuestionIndex >= questions.length) {
+                    console.log("No more questions available, showing level complete modal");
                     showLevelCompleteModal();
                 } else {
                     console.log("Preparing to show next question");
@@ -1048,9 +1457,20 @@
                 const seconds = elapsedTime % 60;
                 const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
+                // Format era name for display
+                const eraNames = {
+                    'ancient': 'Ancient History',
+                    'medieval': 'Medieval Period',
+                    'renaissance': 'Renaissance Era',
+                    'modern': 'Modern Era',
+                    'contemporary': 'Contemporary History'
+                };
+
                 // Update UI
                 document.getElementById('final-score').textContent = score;
                 document.getElementById('final-time').textContent = timeString;
+                document.getElementById('completed-level-info').textContent =
+                    `${eraNames[currentEra]} - ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}`;
 
                 // Show the modal
                 levelCompleteModal.classList.remove('hidden');
@@ -1061,6 +1481,44 @@
                 currentLevel++;
                 levelCompleteModal.classList.add('hidden');
 
+                // Reset question index for the new level
+                currentQuestionIndex = 0;
+
+                // Determine if we should move to the next era or increase difficulty
+                const eras = ['ancient', 'medieval', 'renaissance', 'modern', 'contemporary'];
+                const difficulties = ['easy', 'medium', 'hard'];
+
+                // Get current era and difficulty indices
+                const currentEraIndex = eras.indexOf(currentEra);
+                const currentDifficultyIndex = difficulties.indexOf(currentDifficulty);
+
+                // If we've completed all difficulties for this era, move to the next era
+                if (currentDifficultyIndex >= difficulties.length - 1) {
+                    // Move to the next era if available
+                    if (currentEraIndex < eras.length - 1) {
+                        currentEra = eras[currentEraIndex + 1];
+                        currentTimelineEra = currentEra;
+                        currentDifficulty = 'easy'; // Reset to easy difficulty for the new era
+
+                        // Update the era selector
+                        eraSelector.value = currentEra;
+                    } else {
+                        // Player has completed all eras and difficulties
+                        alert("Congratulations! You've completed all historical eras!");
+                        resetGame();
+                        return;
+                    }
+                } else {
+                    // Move to the next difficulty level
+                    currentDifficulty = difficulties[currentDifficultyIndex + 1];
+                }
+
+                // Update difficulty buttons
+                setDifficulty(currentDifficulty);
+
+                // Clear student answers for the new level
+                studentAnswers = [];
+
                 // Start a new timer
                 startTime = Date.now();
                 startTimer();
@@ -1068,7 +1526,10 @@
                 // Load the next level
                 loadLevel();
 
-                // For demo purposes, show the event choice modal after a short delay
+                // Update the timeline
+                updateTimeline();
+
+                // Show the event choice modal after a short delay
                 setTimeout(showEventChoiceModal, 1000);
             }
 
