@@ -172,7 +172,10 @@
                                     <!-- Feedback will be shown here -->
                                 </div>
 
-                                <div class="flex justify-end">
+                                <div class="flex justify-between items-center">
+                                    <div id="auto-continue-indicator" class="text-xs text-neutral-400 hidden">
+                                        Continuing automatically... <span id="countdown">2</span>
+                                    </div>
                                     <button id="continue-btn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors hidden">
                                         Continue
                                     </button>
@@ -935,9 +938,34 @@
 
                 // Update UI
                 choiceFeedback.classList.remove('hidden');
-                continueBtn.classList.remove('hidden');
+                // Hide the continue button since we're auto-continuing
+                continueBtn.classList.add('hidden');
                 document.getElementById('score-display').textContent = score;
                 document.getElementById('streak-display').textContent = streak;
+
+                // Try to show auto-continue indicator with countdown if it exists
+                const autoContinueIndicator = document.getElementById('auto-continue-indicator');
+                const countdownElement = document.getElementById('countdown');
+
+                if (autoContinueIndicator && countdownElement) {
+                    autoContinueIndicator.classList.remove('hidden');
+                    countdownElement.textContent = '2';
+
+                    // Start countdown
+                    let countdown = 2;
+                    // Clear any existing countdown interval
+                    if (window.countdownInterval) {
+                        clearInterval(window.countdownInterval);
+                    }
+                    window.countdownInterval = setInterval(() => {
+                        countdown--;
+                        if (countdown <= 0) {
+                            clearInterval(window.countdownInterval);
+                        } else {
+                            countdownElement.textContent = countdown;
+                        }
+                    }, 1000);
+                }
 
                 // Disable all choice buttons
                 const buttons = eventChoices.querySelectorAll('button');
@@ -955,6 +983,14 @@
                 // Update accuracy
                 const accuracy = Math.round((correctChoices / totalChoices) * 100);
                 document.getElementById('accuracy-display').textContent = `${accuracy}%`;
+
+                // Automatically continue to the next question after a short delay
+                if (window.autoContinueTimer) {
+                    clearTimeout(window.autoContinueTimer);
+                }
+                window.autoContinueTimer = setTimeout(() => {
+                    continueGame();
+                }, 2000); // 2 seconds delay
             }
 
             // Update the timeline with student's answer
@@ -990,8 +1026,29 @@
 
             // Continue the game after making a choice
             function continueGame() {
-                choiceFeedback.classList.add('hidden');
-                continueBtn.classList.add('hidden');
+                // Clear any existing auto-continue timers to prevent multiple calls
+                if (window.autoContinueTimer) {
+                    clearTimeout(window.autoContinueTimer);
+                    window.autoContinueTimer = null;
+                }
+
+                // Clear any countdown intervals
+                if (window.countdownInterval) {
+                    clearInterval(window.countdownInterval);
+                    window.countdownInterval = null;
+                }
+
+                // Hide feedback and continue button
+                if (choiceFeedback) choiceFeedback.classList.add('hidden');
+                if (continueBtn) continueBtn.classList.add('hidden');
+
+                // Try to hide auto-continue indicator if it exists
+                const autoContinueIndicator = document.getElementById('auto-continue-indicator');
+                if (autoContinueIndicator) {
+                    autoContinueIndicator.classList.add('hidden');
+                }
+
+                // Hide the event choice modal
                 eventChoiceModal.classList.add('hidden');
 
                 // Increment the question index for the next question
