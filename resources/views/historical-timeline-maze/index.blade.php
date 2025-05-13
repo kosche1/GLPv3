@@ -481,6 +481,8 @@
             let timerInterval;
             let correctChoices = 0;
             let totalChoices = 0;
+            let timerPaused = false;
+            let pauseStartTime;
 
             // New state variables for added features
             let hintsRemaining = 3;
@@ -775,6 +777,7 @@
             function resetGame() {
                 gameActive = false;
                 clearInterval(timerInterval);
+                timerPaused = false;
                 streak = 0;
                 hintsRemaining = 3;
                 powerupsAvailable = 3;
@@ -805,11 +808,35 @@
             // Start the timer
             function startTimer() {
                 clearInterval(timerInterval);
+                timerPaused = false;
                 timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            // Pause the timer
+            function pauseTimer() {
+                if (!timerPaused) {
+                    timerPaused = true;
+                    pauseStartTime = Date.now();
+                    console.log("Timer paused");
+                }
+            }
+
+            // Resume the timer
+            function resumeTimer() {
+                if (timerPaused) {
+                    // Adjust the start time to account for the pause duration
+                    const pauseDuration = Date.now() - pauseStartTime;
+                    startTime += pauseDuration;
+                    timerPaused = false;
+                    console.log("Timer resumed, adjusted by", Math.floor(pauseDuration / 1000), "seconds");
+                }
             }
 
             // Update the timer display
             function updateTimer() {
+                // Don't update the timer if it's paused
+                if (timerPaused) return;
+
                 const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
                 const minutes = Math.floor(elapsedTime / 60);
                 const seconds = elapsedTime % 60;
@@ -828,31 +855,44 @@
 
             // Show the event choice modal
             function showEventChoiceModal() {
+                console.log("showEventChoiceModal called, currentQuestionIndex:", currentQuestionIndex);
+
                 // In a real implementation, this would show real historical events based on the current era
                 eventChoices.innerHTML = '';
+
+                // Make sure the feedback is hidden
+                if (choiceFeedback) {
+                    choiceFeedback.classList.add('hidden');
+                }
 
                 // Get events based on the current question index
                 let sampleEvents;
 
                 if (currentQuestionIndex === 0) {
+                    console.log("Loading first question set");
                     sampleEvents = [
                         { id: 1, title: 'Building of the Great Pyramid of Giza', year: '2560 BCE' },
                         { id: 2, title: 'Birth of Democracy in Athens', year: '508 BCE' },
                         { id: 3, title: 'Founding of the Roman Republic', year: '509 BCE' }
                     ];
                 } else if (currentQuestionIndex === 1) {
+                    console.log("Loading second question set");
                     sampleEvents = [
                         { id: 1, title: 'Code of Hammurabi', year: '1754 BCE' },
                         { id: 2, title: 'Trojan War', year: '1200 BCE' },
                         { id: 3, title: 'First Olympic Games', year: '776 BCE' }
                     ];
                 } else {
+                    console.log("Loading third question set");
                     sampleEvents = [
                         { id: 1, title: 'Birth of Jesus Christ', year: '~4 BCE' },
                         { id: 2, title: 'Assassination of Julius Caesar', year: '44 BCE' },
                         { id: 3, title: 'Construction of the Colosseum', year: '80 CE' }
                     ];
                 }
+
+                // Store the current sample events in a global variable for reference
+                window.sampleEvents = sampleEvents;
 
                 // Create choice buttons
                 sampleEvents.forEach(event => {
@@ -873,6 +913,7 @@
             // Handle player's choice
             function makeChoice(eventId) {
                 totalChoices++;
+                console.log("makeChoice called with eventId:", eventId);
 
                 // For demo purposes, let's say event ID 1 is always correct
                 const isCorrect = eventId === 1;
@@ -901,7 +942,8 @@
                     choiceFeedback.className = 'p-3 rounded-lg mb-4 bg-green-500/20 border border-green-500/30';
 
                     // Record the student's answer
-                    const selectedEvent = sampleEvents.find(event => event.id === eventId);
+                    // Use the global sampleEvents variable to ensure we have access to the current events
+                    const selectedEvent = window.sampleEvents.find(event => event.id === eventId);
                     studentAnswers.push({
                         question: currentQuestionIndex,
                         answer: selectedEvent.title,
@@ -913,15 +955,18 @@
                     updateTimelineWithStudentAnswer(selectedEvent.title, selectedEvent.year, true);
                 } else {
                     streak = 0;
+                    // Get the correct event dynamically
+                    const correctEvent = window.sampleEvents.find(event => event.id === 1);
+
                     choiceFeedback.innerHTML = `
                         <div class="text-red-400 font-medium">Incorrect!</div>
-                        <div class="text-xs text-neutral-300">The correct answer was: Building of the Great Pyramid of Giza (2560 BCE)</div>
+                        <div class="text-xs text-neutral-300">The correct answer was: ${correctEvent.title} (${correctEvent.year})</div>
                     `;
                     choiceFeedback.className = 'p-3 rounded-lg mb-4 bg-red-500/20 border border-red-500/30';
 
                     // Record the student's incorrect answer
-                    const selectedEvent = sampleEvents.find(event => event.id === eventId);
-                    const correctEvent = sampleEvents.find(event => event.id === 1); // Assuming ID 1 is always correct
+                    const selectedEvent = window.sampleEvents.find(event => event.id === eventId);
+                    // correctEvent is already defined above
 
                     studentAnswers.push({
                         question: currentQuestionIndex,
@@ -943,10 +988,14 @@
                 document.getElementById('score-display').textContent = score;
                 document.getElementById('streak-display').textContent = streak;
 
-                // Try to show auto-continue indicator with countdown if it exists
+                // Pause the timer while showing feedback
+                pauseTimer();
+
+                // Show auto-continue indicator with countdown
                 const autoContinueIndicator = document.getElementById('auto-continue-indicator');
                 const countdownElement = document.getElementById('countdown');
 
+                // Make sure the auto-continue indicator is visible
                 if (autoContinueIndicator && countdownElement) {
                     autoContinueIndicator.classList.remove('hidden');
                     countdownElement.textContent = '2';
@@ -959,22 +1008,27 @@
                     }
                     window.countdownInterval = setInterval(() => {
                         countdown--;
+                        countdownElement.textContent = countdown;
                         if (countdown <= 0) {
                             clearInterval(window.countdownInterval);
-                        } else {
-                            countdownElement.textContent = countdown;
                         }
                     }, 1000);
                 }
 
                 // Disable all choice buttons
                 const buttons = eventChoices.querySelectorAll('button');
+                const correctEvent = window.sampleEvents.find(event => event.id === 1);
+                const selectedEvent = window.sampleEvents.find(event => event.id === eventId);
+
                 buttons.forEach(button => {
                     button.disabled = true;
-                    if (button.textContent.includes('Great Pyramid')) {
+                    // Highlight the correct answer in green
+                    if (button.textContent.includes(correctEvent.title)) {
                         button.classList.add('bg-green-600');
                         button.classList.remove('bg-neutral-700', 'hover:bg-neutral-600');
-                    } else if (eventId !== 1 && button.textContent.includes(eventId === 2 ? 'Democracy' : 'Roman Republic')) {
+                    }
+                    // Highlight the incorrect selected answer in red
+                    else if (eventId !== 1 && button.textContent.includes(selectedEvent.title)) {
                         button.classList.add('bg-red-600');
                         button.classList.remove('bg-neutral-700', 'hover:bg-neutral-600');
                     }
@@ -988,9 +1042,13 @@
                 if (window.autoContinueTimer) {
                     clearTimeout(window.autoContinueTimer);
                 }
+
+                console.log("Setting up auto-continue timer");
+                // Force the game to continue after a delay
                 window.autoContinueTimer = setTimeout(() => {
+                    console.log("Auto-continue timer triggered");
                     continueGame();
-                }, 2000); // 2 seconds delay
+                }, 3000); // 3 seconds delay to ensure countdown completes
             }
 
             // Update the timeline with student's answer
@@ -1026,6 +1084,8 @@
 
             // Continue the game after making a choice
             function continueGame() {
+                console.log("continueGame called, currentQuestionIndex:", currentQuestionIndex);
+
                 // Clear any existing auto-continue timers to prevent multiple calls
                 if (window.autoContinueTimer) {
                     clearTimeout(window.autoContinueTimer);
@@ -1042,7 +1102,7 @@
                 if (choiceFeedback) choiceFeedback.classList.add('hidden');
                 if (continueBtn) continueBtn.classList.add('hidden');
 
-                // Try to hide auto-continue indicator if it exists
+                // Hide auto-continue indicator
                 const autoContinueIndicator = document.getElementById('auto-continue-indicator');
                 if (autoContinueIndicator) {
                     autoContinueIndicator.classList.add('hidden');
@@ -1051,20 +1111,34 @@
                 // Hide the event choice modal
                 eventChoiceModal.classList.add('hidden');
 
+                // Resume the timer
+                resumeTimer();
+
                 // Increment the question index for the next question
                 currentQuestionIndex++;
+                console.log("Incremented currentQuestionIndex to:", currentQuestionIndex);
 
                 // For demo purposes, show the level complete modal after 3 choices
                 if (totalChoices >= 3) {
+                    console.log("Showing level complete modal");
                     showLevelCompleteModal();
                 } else {
+                    console.log("Preparing to show next question");
+                    // Reset the event choice modal
+                    eventChoices.innerHTML = '';
+
                     // Show another event choice after a short delay
-                    setTimeout(showEventChoiceModal, 1000);
+                    setTimeout(() => {
+                        console.log("Showing next question");
+                        showEventChoiceModal();
+                    }, 500);
                 }
             }
 
             // Show the level complete modal
             function showLevelCompleteModal() {
+                // Pause the timer
+                pauseTimer();
                 clearInterval(timerInterval);
 
                 // Calculate final time
@@ -1174,6 +1248,9 @@
                 // Skip the current question
                 eventChoiceModal.classList.add('hidden');
 
+                // Increment the question index for the next question
+                currentQuestionIndex++;
+
                 // Show a notification
                 const notification = document.createElement('div');
                 notification.className = 'fixed top-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
@@ -1186,7 +1263,9 @@
                 }, 2000);
 
                 // Show another event choice after a short delay
-                setTimeout(showEventChoiceModal, 1000);
+                setTimeout(() => {
+                    showEventChoiceModal();
+                }, 500);
             }
 
             // Save score to leaderboard
@@ -1380,7 +1459,8 @@
                 // Update timeline
                 updateTimeline();
 
-                // Start the timer
+                // Reset and start the timer
+                timerPaused = false;
                 startTime = Date.now();
                 startTimer();
 
