@@ -43,14 +43,17 @@
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-neutral-300 mb-2">Difficulty Level</label>
                         <div class="flex gap-2">
-                            <button id="easy-btn" class="flex-1 px-4 py-2 text-white rounded-lg border border-green-500/30 bg-green-500/10 transition-all duration-300 hover:bg-green-500/20 hover:border-green-500/50 hover:shadow-lg hover:shadow-green-900/20 group active">
-                                <span class="text-green-400 group-hover:text-green-300 transition-colors">Easy</span>
+                            <button id="easy-btn" class="flex-1 px-4 py-3 text-white rounded-lg border-2 border-green-500/30 bg-green-500/10 transition-all duration-300 hover:bg-green-500/20 hover:border-green-500/50 hover:shadow-lg hover:shadow-green-900/20 group difficulty-btn">
+                                <span class="text-green-400 group-hover:text-green-300 transition-colors font-medium">Easy</span>
+                                <div class="difficulty-indicator w-full h-1 bg-green-500/50 mt-2 rounded-full hidden"></div>
                             </button>
-                            <button id="medium-btn" class="flex-1 px-4 py-2 text-white rounded-lg border border-yellow-500/30 bg-yellow-500/10 transition-all duration-300 hover:bg-yellow-500/20 hover:border-yellow-500/50 hover:shadow-lg hover:shadow-yellow-900/20 group">
-                                <span class="text-yellow-400 group-hover:text-yellow-300 transition-colors">Medium</span>
+                            <button id="medium-btn" class="flex-1 px-4 py-3 text-white rounded-lg border-2 border-yellow-500/30 bg-yellow-500/10 transition-all duration-300 hover:bg-yellow-500/20 hover:border-yellow-500/50 hover:shadow-lg hover:shadow-yellow-900/20 group difficulty-btn">
+                                <span class="text-yellow-400 group-hover:text-yellow-300 transition-colors font-medium">Medium</span>
+                                <div class="difficulty-indicator w-full h-1 bg-yellow-500/50 mt-2 rounded-full hidden"></div>
                             </button>
-                            <button id="hard-btn" class="flex-1 px-4 py-2 text-white rounded-lg border border-red-500/30 bg-red-500/10 transition-all duration-300 hover:bg-red-500/20 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-900/20 group">
-                                <span class="text-red-400 group-hover:text-red-300 transition-colors">Hard</span>
+                            <button id="hard-btn" class="flex-1 px-4 py-3 text-white rounded-lg border-2 border-red-500/30 bg-red-500/10 transition-all duration-300 hover:bg-red-500/20 hover:border-red-500/50 hover:shadow-lg hover:shadow-red-900/20 group difficulty-btn">
+                                <span class="text-red-400 group-hover:text-red-300 transition-colors font-medium">Hard</span>
+                                <div class="difficulty-indicator w-full h-1 bg-red-500/50 mt-2 rounded-full hidden"></div>
                             </button>
                         </div>
                     </div>
@@ -107,6 +110,10 @@
                                 <span class="text-xs text-neutral-400">Streak</span>
                                 <span id="streak-display" class="text-lg font-bold text-emerald-400">0</span>
                             </div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-neutral-400">Difficulty</span>
+                                <span id="difficulty-display" class="text-lg font-bold text-green-400">Easy</span>
+                            </div>
                         </div>
                     </div>
 
@@ -132,7 +139,12 @@
             <!-- Middle Column: Game Area -->
             <div class="lg:col-span-1">
                 <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-3 shadow-lg h-full flex flex-col">
-                    <h2 class="text-lg font-semibold text-white mb-2">Timeline Maze</h2>
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-lg font-semibold text-white">Timeline Maze</h2>
+                        <div id="current-difficulty-badge" class="px-3 py-1 rounded-full bg-green-500/20 border border-green-500/30">
+                            <span class="text-xs font-medium text-green-400">Easy Mode</span>
+                        </div>
+                    </div>
 
                     <!-- Game Canvas Container -->
                     <div id="game-container" class="flex-1 bg-neutral-900 rounded-lg overflow-hidden relative">
@@ -1051,9 +1063,29 @@
                 // Set up event listeners
                 startBtn.addEventListener('click', startGame);
                 resetBtn.addEventListener('click', resetGame);
-                easyBtn.addEventListener('click', () => setDifficulty('easy'));
-                mediumBtn.addEventListener('click', () => setDifficulty('medium'));
-                hardBtn.addEventListener('click', () => setDifficulty('hard'));
+
+                // Add click events for difficulty buttons with visual feedback
+                easyBtn.addEventListener('click', () => {
+                    setDifficulty('easy');
+                    // Add a brief animation to show the button was clicked
+                    easyBtn.classList.add('scale-95');
+                    setTimeout(() => easyBtn.classList.remove('scale-95'), 150);
+                });
+
+                mediumBtn.addEventListener('click', () => {
+                    setDifficulty('medium');
+                    // Add a brief animation to show the button was clicked
+                    mediumBtn.classList.add('scale-95');
+                    setTimeout(() => mediumBtn.classList.remove('scale-95'), 150);
+                });
+
+                hardBtn.addEventListener('click', () => {
+                    setDifficulty('hard');
+                    // Add a brief animation to show the button was clicked
+                    hardBtn.classList.add('scale-95');
+                    setTimeout(() => hardBtn.classList.remove('scale-95'), 150);
+                });
+
                 continueBtn.addEventListener('click', continueGame);
                 nextLevelBtn.addEventListener('click', nextLevel);
                 exitBtn.addEventListener('click', exitGame);
@@ -1082,18 +1114,91 @@
             function setDifficulty(difficulty) {
                 currentDifficulty = difficulty;
 
-                // Update UI
-                easyBtn.classList.remove('active');
-                mediumBtn.classList.remove('active');
-                hardBtn.classList.remove('active');
+                // Update UI - reset all buttons first
+                const allButtons = document.querySelectorAll('.difficulty-btn');
+                allButtons.forEach(btn => {
+                    // Remove active styling
+                    btn.classList.remove('active');
+                    btn.classList.remove('bg-green-500/30', 'bg-yellow-500/30', 'bg-red-500/30');
+                    btn.classList.remove('border-green-500/70', 'border-yellow-500/70', 'border-red-500/70');
 
+                    // Hide all indicators
+                    const indicator = btn.querySelector('.difficulty-indicator');
+                    if (indicator) {
+                        indicator.classList.add('hidden');
+                    }
+                });
+
+                // Apply active styling to the selected difficulty
+                let activeBtn;
                 if (difficulty === 'easy') {
-                    easyBtn.classList.add('active');
+                    activeBtn = easyBtn;
+                    activeBtn.classList.add('bg-green-500/30', 'border-green-500/70');
                 } else if (difficulty === 'medium') {
-                    mediumBtn.classList.add('active');
+                    activeBtn = mediumBtn;
+                    activeBtn.classList.add('bg-yellow-500/30', 'border-yellow-500/70');
                 } else {
-                    hardBtn.classList.add('active');
+                    activeBtn = hardBtn;
+                    activeBtn.classList.add('bg-red-500/30', 'border-red-500/70');
                 }
+
+                // Show the indicator for the active button
+                const activeIndicator = activeBtn.querySelector('.difficulty-indicator');
+                if (activeIndicator) {
+                    activeIndicator.classList.remove('hidden');
+                }
+
+                // Add a visual label to show the current difficulty
+                const difficultyLabel = document.createElement('div');
+                difficultyLabel.className = 'absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 px-2 py-1 rounded-full text-xs font-bold';
+
+                // Update the game difficulty display in the stats section
+                const difficultyDisplay = document.getElementById('difficulty-display');
+                if (difficultyDisplay) {
+                    let difficultyText = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
+                    let difficultyColor = difficulty === 'easy' ? 'text-green-400' :
+                                         difficulty === 'medium' ? 'text-yellow-400' : 'text-red-400';
+                    difficultyDisplay.textContent = difficultyText;
+                    difficultyDisplay.className = `text-lg font-bold ${difficultyColor}`;
+                }
+
+                // Update the difficulty badge in the game header
+                const difficultyBadge = document.getElementById('current-difficulty-badge');
+                const difficultyBadgeText = difficultyBadge.querySelector('span');
+
+                if (difficultyBadge && difficultyBadgeText) {
+                    // Remove all previous styling
+                    difficultyBadge.classList.remove(
+                        'bg-green-500/20', 'border-green-500/30',
+                        'bg-yellow-500/20', 'border-yellow-500/30',
+                        'bg-red-500/20', 'border-red-500/30'
+                    );
+
+                    difficultyBadgeText.classList.remove(
+                        'text-green-400', 'text-yellow-400', 'text-red-400'
+                    );
+
+                    // Apply new styling based on difficulty
+                    if (difficulty === 'easy') {
+                        difficultyBadge.classList.add('bg-green-500/20', 'border-green-500/30');
+                        difficultyBadgeText.classList.add('text-green-400');
+                        difficultyBadgeText.textContent = 'Easy Mode';
+                    } else if (difficulty === 'medium') {
+                        difficultyBadge.classList.add('bg-yellow-500/20', 'border-yellow-500/30');
+                        difficultyBadgeText.classList.add('text-yellow-400');
+                        difficultyBadgeText.textContent = 'Medium Mode';
+                    } else {
+                        difficultyBadge.classList.add('bg-red-500/20', 'border-red-500/30');
+                        difficultyBadgeText.classList.add('text-red-400');
+                        difficultyBadgeText.textContent = 'Hard Mode';
+                    }
+
+                    // Add a subtle animation to draw attention
+                    difficultyBadge.classList.add('animate-pulse');
+                    setTimeout(() => difficultyBadge.classList.remove('animate-pulse'), 1000);
+                }
+
+                console.log(`Difficulty set to: ${difficulty}`);
             }
 
             // Start the game function is now defined at the bottom of the script
