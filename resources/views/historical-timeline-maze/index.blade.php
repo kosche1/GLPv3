@@ -258,12 +258,12 @@
             <!-- Right Column: Historical Timeline -->
             <div class="lg:col-span-1">
                 <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-3 shadow-lg h-full flex flex-col">
-                    <h2 class="text-lg font-semibold text-white mb-2">Historical Timeline</h2>
+                    <h2 class="text-lg font-semibold text-white mb-2">Your Answers</h2>
 
-                    <!-- Era Overview -->
+                    <!-- Progress Overview -->
                     <div class="mb-2 p-2 bg-neutral-700/30 rounded-lg">
                         <h3 id="current-era-title" class="text-base font-semibold text-emerald-400 mb-2">Ancient History (3000 BCE - 500 CE)</h3>
-                        <p id="era-description" class="text-sm text-neutral-300 mb-3">The ancient period saw the rise of early civilizations, the development of writing, and the foundation of major philosophical and religious traditions.</p>
+                        <p id="era-description" class="text-sm text-neutral-300 mb-3">Your Progress: Showing your answers as you complete questions</p>
                     </div>
 
                     <!-- Timeline Visualization -->
@@ -274,104 +274,24 @@
 
                             <!-- Timeline Events -->
                             <div id="timeline-events" class="space-y-2 pl-12 relative">
-                                <!-- Event 1 -->
-                                <div class="timeline-event">
-                                    <div class="absolute left-2 w-6 h-6 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center -translate-x-1/2">
-                                        <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                    </div>
-                                    <div class="bg-neutral-800 p-2 rounded-lg border border-neutral-700">
-                                        <div class="flex justify-between items-start mb-1">
-                                            <h4 class="text-sm font-medium text-white">Building of the Great Pyramid of Giza</h4>
-                                            <span class="text-xs text-emerald-400">2560 BCE</span>
-                                        </div>
-                                        <p class="text-xs text-neutral-400">One of the Seven Wonders of the Ancient World, built as a tomb for Pharaoh Khufu.</p>
-                                    </div>
-                                </div>
-
-                                <!-- Event 2 -->
-                                <div class="timeline-event">
-                                    <div class="absolute left-2 w-6 h-6 rounded-full bg-neutral-700 border-2 border-neutral-600 flex items-center justify-center -translate-x-1/2">
-                                        <div class="w-2 h-2 rounded-full bg-neutral-500"></div>
-                                    </div>
-                                    <div class="bg-neutral-800 p-2 rounded-lg border border-neutral-700">
-                                        <div class="flex justify-between items-start mb-1">
-                                            <h4 class="text-sm font-medium text-white">Code of Hammurabi</h4>
-                                            <span class="text-xs text-neutral-400">1754 BCE</span>
-                                        </div>
-                                        <p class="text-xs text-neutral-400">One of the earliest and most complete legal codes from ancient Mesopotamia.</p>
-                                    </div>
-                                </div>
-
-                                <!-- Event 3 -->
-                                <div class="timeline-event">
-                                    <div class="absolute left-2 w-6 h-6 rounded-full bg-neutral-700 border-2 border-neutral-600 flex items-center justify-center -translate-x-1/2">
-                                        <div class="w-2 h-2 rounded-full bg-neutral-500"></div>
-                                    </div>
-                                    <div class="bg-neutral-800 p-2 rounded-lg border border-neutral-700">
-                                        <div class="flex justify-between items-start mb-1">
-                                            <h4 class="text-sm font-medium text-white">Founding of the Roman Republic</h4>
-                                            <span class="text-xs text-neutral-400">509 BCE</span>
-                                        </div>
-                                        <p class="text-xs text-neutral-400">Established after the overthrow of the Roman Kingdom, introducing a new system of government.</p>
-                                    </div>
-                                </div>
-
-                                <!-- Event 4 -->
-                                <div class="timeline-event">
-                                    <div class="absolute left-2 w-6 h-6 rounded-full bg-neutral-700 border-2 border-neutral-600 flex items-center justify-center -translate-x-1/2">
-                                        <div class="w-2 h-2 rounded-full bg-neutral-500"></div>
-                                    </div>
-                                    <div class="bg-neutral-800 p-2 rounded-lg border border-neutral-700">
-                                        <div class="flex justify-between items-start mb-1">
-                                            <h4 class="text-sm font-medium text-white">Birth of Democracy in Athens</h4>
-                                            <span class="text-xs text-neutral-400">508 BCE</span>
-                                        </div>
-                                        <p class="text-xs text-neutral-400">Cleisthenes introduces democratic reforms in Athens, creating the world's first democratic system.</p>
-                                    </div>
-                                </div>
-
-                                <!-- Event 5 -->
-                                <div class="timeline-event">
-                                    <div class="absolute left-2 w-6 h-6 rounded-full bg-neutral-700 border-2 border-neutral-600 flex items-center justify-center -translate-x-1/2">
-                                        <div class="w-2 h-2 rounded-full bg-neutral-500"></div>
-                                    </div>
-                                    <div class="bg-neutral-800 p-2 rounded-lg border border-neutral-700">
-                                        <div class="flex justify-between items-start mb-1">
-                                            <h4 class="text-sm font-medium text-white">Birth of Jesus Christ</h4>
-                                            <span class="text-xs text-neutral-400">~4 BCE</span>
-                                        </div>
-                                        <p class="text-xs text-neutral-400">The birth of Jesus of Nazareth, central figure of Christianity and basis for the Western calendar system.</p>
-                                    </div>
-                                </div>
-
-                                <!-- Event 6 -->
-                                <div class="timeline-event">
-                                    <div class="absolute left-2 w-6 h-6 rounded-full bg-neutral-700 border-2 border-neutral-600 flex items-center justify-center -translate-x-1/2">
-                                        <div class="w-2 h-2 rounded-full bg-neutral-500"></div>
-                                    </div>
-                                    <div class="bg-neutral-800 p-2 rounded-lg border border-neutral-700">
-                                        <div class="flex justify-between items-start mb-1">
-                                            <h4 class="text-sm font-medium text-white">Fall of the Western Roman Empire</h4>
-                                            <span class="text-xs text-neutral-400">476 CE</span>
-                                        </div>
-                                        <p class="text-xs text-neutral-400">The Western Roman Empire falls when Emperor Romulus Augustus is deposed by Odoacer, marking the end of Ancient Rome.</p>
-                                    </div>
+                                <div class="p-4 text-center">
+                                    <p class="text-neutral-400">Answer questions to see your progress here</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Timeline Controls -->
+                    <!-- Answer Navigation Controls -->
                     <div class="mt-2 flex justify-between items-center">
                         <button id="prev-event-btn" class="px-2 py-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/20 flex items-center gap-1 group">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 group-hover:text-emerald-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                             </svg>
-                            <span class="text-sm font-medium text-emerald-400 group-hover:text-emerald-300 transition-colors">Previous</span>
+                            <span class="text-sm font-medium text-emerald-400 group-hover:text-emerald-300 transition-colors">Previous Answer</span>
                         </button>
-                        <span id="timeline-progress" class="text-xs text-neutral-400">1/6 Events</span>
+                        <span id="timeline-progress" class="text-xs text-neutral-400">0/0 Answers</span>
                         <button id="next-event-btn" class="px-2 py-1 rounded-lg border border-emerald-500/30 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/20 flex items-center gap-1 group">
-                            <span class="text-sm font-medium text-emerald-400 group-hover:text-emerald-300 transition-colors">Next</span>
+                            <span class="text-sm font-medium text-emerald-400 group-hover:text-emerald-300 transition-colors">Next Answer</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 group-hover:text-emerald-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                             </svg>
@@ -1053,32 +973,13 @@
 
             // Update the timeline with student's answer
             function updateTimelineWithStudentAnswer(answerTitle, answerYear, isCorrect, correctTitle, correctYear) {
-                // Create a new event for the timeline
-                const studentAnswerEvent = {
-                    title: isCorrect ? `✓ ${answerTitle}` : `✗ ${answerTitle}`,
-                    year: answerYear,
-                    description: isCorrect
-                        ? `You correctly identified this historical event.`
-                        : `You selected this event, but the correct answer was: ${correctTitle} (${correctYear}).`
-                };
+                console.log("Updating timeline with student answer:", answerTitle, isCorrect);
 
-                // Add the student's answer to the timeline data
-                const currentEvents = timelineData[currentTimelineEra].events;
-
-                // If we're at the beginning of the game, replace the first event
-                // Otherwise, add a new event
-                if (currentQuestionIndex === 0) {
-                    timelineData[currentTimelineEra].events[0] = studentAnswerEvent;
-                } else if (currentQuestionIndex < currentEvents.length) {
-                    // Replace an existing event
-                    timelineData[currentTimelineEra].events[currentQuestionIndex] = studentAnswerEvent;
-                } else {
-                    // Add a new event
-                    timelineData[currentTimelineEra].events.push(studentAnswerEvent);
-                }
+                // We don't need to modify the timeline data anymore since we're using studentAnswers
+                // Just update the currentTimelineEventIndex to point to the latest answer
+                currentTimelineEventIndex = studentAnswers.length - 1;
 
                 // Update the timeline display
-                currentTimelineEventIndex = currentQuestionIndex;
                 updateTimeline();
             }
 
@@ -1348,64 +1249,99 @@
                 updateTimeline();
             }
 
-            // Update the timeline display
+            // Update the timeline display to show student answers
             function updateTimeline() {
                 const era = timelineData[currentTimelineEra];
-                const events = era.events;
-                const totalEvents = events.length;
 
                 // Update era information
                 currentEraTitle.textContent = era.title;
-                eraDescription.textContent = era.description;
+                eraDescription.textContent = "Your Progress: Showing your answers as you complete questions";
 
-                // Update progress indicator
-                timelineProgress.textContent = `${currentTimelineEventIndex + 1}/${totalEvents} Events`;
-
-                // Enable/disable navigation buttons
-                prevEventBtn.disabled = currentTimelineEventIndex === 0;
-                nextEventBtn.disabled = currentTimelineEventIndex === totalEvents - 1;
-
-                if (prevEventBtn.disabled) {
-                    prevEventBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
-                    prevEventBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
-
-                if (nextEventBtn.disabled) {
-                    nextEventBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
-                    nextEventBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
-
-                // Generate timeline HTML
+                // Generate timeline HTML based on student answers
                 let timelineHTML = '';
 
-                events.forEach((event, index) => {
-                    const isActive = index === currentTimelineEventIndex;
-                    const isPast = index < currentTimelineEventIndex;
-
-                    timelineHTML += `
-                        <div class="timeline-event">
-                            <div class="absolute left-2 w-6 h-6 rounded-full ${isActive ? 'bg-emerald-500/20 border-2 border-emerald-500' : isPast ? 'bg-emerald-700/20 border-2 border-emerald-700' : 'bg-neutral-700 border-2 border-neutral-600'} flex items-center justify-center -translate-x-1/2">
-                                <div class="w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500' : isPast ? 'bg-emerald-700' : 'bg-neutral-500'}"></div>
-                            </div>
-                            <div class="bg-neutral-800 p-3 rounded-lg border ${isActive ? 'border-emerald-500/30' : 'border-neutral-700'}">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h4 class="text-sm font-medium ${isActive ? 'text-emerald-400' : 'text-white'}">${event.title}</h4>
-                                    <span class="text-xs ${isActive ? 'text-emerald-400' : 'text-neutral-400'}">${event.year}</span>
-                                </div>
-                                <p class="text-xs text-neutral-400">${event.description}</p>
-                            </div>
+                // Only show answers that have been given so far
+                if (studentAnswers.length === 0) {
+                    timelineHTML = `
+                        <div class="p-4 text-center">
+                            <p class="text-neutral-400">Answer questions to see your progress here</p>
                         </div>
                     `;
-                });
+
+                    // Update progress indicator for empty timeline
+                    timelineProgress.textContent = `0/0 Answers`;
+
+                    // Disable navigation buttons when no answers
+                    prevEventBtn.disabled = true;
+                    nextEventBtn.disabled = true;
+                    prevEventBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    nextEventBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    // Update progress indicator
+                    timelineProgress.textContent = `${currentTimelineEventIndex + 1}/${studentAnswers.length} Answers`;
+
+                    // Enable/disable navigation buttons
+                    prevEventBtn.disabled = currentTimelineEventIndex === 0;
+                    nextEventBtn.disabled = currentTimelineEventIndex === studentAnswers.length - 1;
+
+                    if (prevEventBtn.disabled) {
+                        prevEventBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        prevEventBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+
+                    if (nextEventBtn.disabled) {
+                        nextEventBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        nextEventBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+
+                    // Generate HTML for each student answer
+                    studentAnswers.forEach((answer, index) => {
+                        const isActive = index === currentTimelineEventIndex;
+                        const isPast = index < currentTimelineEventIndex;
+
+                        // Determine the icon and colors based on correctness
+                        const icon = answer.isCorrect ? '✓' : '✗';
+                        const iconColor = answer.isCorrect ? 'text-green-500' : 'text-red-500';
+                        const borderColor = answer.isCorrect ? 'border-green-500/30' : 'border-red-500/30';
+                        const bgColor = isActive
+                            ? (answer.isCorrect ? 'bg-green-500/20' : 'bg-red-500/20')
+                            : 'bg-neutral-800';
+
+                        // Create the description text
+                        let description = '';
+                        if (answer.isCorrect) {
+                            description = `You correctly identified this historical event.`;
+                        } else {
+                            description = `You selected this event, but the correct answer was: ${answer.correctAnswer} (${answer.correctYear}).`;
+                        }
+
+                        timelineHTML += `
+                            <div class="timeline-event">
+                                <div class="absolute left-2 w-6 h-6 rounded-full ${isActive ? (answer.isCorrect ? 'bg-green-500/20 border-2 border-green-500' : 'bg-red-500/20 border-2 border-red-500') : isPast ? (answer.isCorrect ? 'bg-green-700/20 border-2 border-green-700' : 'bg-red-700/20 border-2 border-red-700') : 'bg-neutral-700 border-2 border-neutral-600'} flex items-center justify-center -translate-x-1/2">
+                                    <div class="w-2 h-2 rounded-full ${isActive ? (answer.isCorrect ? 'bg-green-500' : 'bg-red-500') : isPast ? (answer.isCorrect ? 'bg-green-700' : 'bg-red-700') : 'bg-neutral-500'}"></div>
+                                </div>
+                                <div class="${bgColor} p-3 rounded-lg border ${isActive ? borderColor : 'border-neutral-700'}">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h4 class="text-sm font-medium ${isActive ? iconColor : 'text-white'}">${icon} ${answer.answer}</h4>
+                                        <span class="text-xs ${isActive ? iconColor : 'text-neutral-400'}">${answer.year}</span>
+                                    </div>
+                                    <p class="text-xs text-neutral-400">${description}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
 
                 timelineEvents.innerHTML = timelineHTML;
 
-                // Scroll to the active event
-                const activeEvent = timelineEvents.querySelector('.timeline-event:nth-child(' + (currentTimelineEventIndex + 1) + ')');
-                if (activeEvent) {
-                    activeEvent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Scroll to the active event if there are answers
+                if (studentAnswers.length > 0) {
+                    const activeEvent = timelineEvents.querySelector('.timeline-event:nth-child(' + (currentTimelineEventIndex + 1) + ')');
+                    if (activeEvent) {
+                        activeEvent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                 }
             }
 
@@ -1456,7 +1392,8 @@
                 hintsRemainingDisplay.textContent = hintsRemaining;
                 powerupsAvailableDisplay.textContent = powerupsAvailable;
 
-                // Update timeline
+                // Clear the timeline events and update
+                timelineEvents.innerHTML = '';
                 updateTimeline();
 
                 // Reset and start the timer
