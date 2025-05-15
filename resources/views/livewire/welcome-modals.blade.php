@@ -1,5 +1,3 @@
-
-
 <div
     wire:poll.visible.750ms
     x-data="{

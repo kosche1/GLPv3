@@ -9,6 +9,9 @@ use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ActivityGoalController;
+use App\Http\Controllers\MoleculeBuilderController;
+use App\Http\Controllers\EquationDropController;
+use App\Http\Controllers\HistoricalTimelineMazeController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -128,6 +131,10 @@ Route::middleware(
     Route::get('subjects/specialized/he', [\App\Http\Controllers\SubjectsController::class, 'heTrack'])->name('subjects.specialized.he');
     Route::get('subjects/specialized/humms', [\App\Http\Controllers\SubjectsController::class, 'hummsTrack'])->name('subjects.specialized.humms');
     Route::get('subjects/specialized/stem', [\App\Http\Controllers\SubjectsController::class, 'stemTrack'])->name('subjects.specialized.stem');
+    // Route::get('subjects/specialized/stem/chemistry-lab', [\App\Http\Controllers\ChemistryLabController::class, 'index'])->name('subjects.specialized.stem.chemistry-lab');
+    // Route::get('subjects/specialized/stem/chemistry-lab/free-experiment', [\App\Http\Controllers\ChemistryLabController::class, 'freeExperiment'])->name('subjects.specialized.stem.chemistry-lab.free-experiment');
+    // Route::get('subjects/specialized/stem/chemistry-lab/challenge/{challenge}', [\App\Http\Controllers\ChemistryLabController::class, 'showChallenge'])->name('subjects.specialized.stem.chemistry-lab.challenge');
+    // Route::post('subjects/specialized/stem/chemistry-lab/challenge/{challenge}/submit', [\App\Http\Controllers\ChemistryLabController::class, 'submitChallenge'])->name('subjects.specialized.stem.chemistry-lab.submit');
     Route::get('subjects/specialized/ict', [\App\Http\Controllers\SubjectsController::class, 'ictTrack'])->name('subjects.specialized.ict');
 
     // Dynamic route for any strand - must be after specific strand routes
@@ -210,12 +217,27 @@ Route::middleware(
 
     Route::view('help-center', 'help-center')->name('help-center');
     Route::view('technical-support', 'technical-support')->name('technical-support');
+    Route::get('rate-us', [\App\Http\Controllers\RateUsController::class, 'index'])->name('rate-us');
+    Route::post('rate-us', [\App\Http\Controllers\RateUsController::class, 'store'])->name('rate-us.store');
 
     Route::redirect('settings', 'settings/profile');
 
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
+
+    // STEM Specialized Subject Routes
+    Route::prefix('subjects/specialized/stem')->name('subjects.specialized.stem.')->group(function () {
+        // Route::get('/molecule-builder', [MoleculeBuilderController::class, 'index'])->name('molecule-builder.index'); // Comment out or remove old route
+        Route::get('/equation-drop', [EquationDropController::class, 'index'])->name('equation-drop.index'); // Add new route
+    });
+
+    // HUMMS Specialized Subject Routes
+    Route::prefix('subjects/specialized/humms')->name('subjects.specialized.humms.')->group(function () {
+        Route::get('/historical-timeline-maze', [HistoricalTimelineMazeController::class, 'index'])->name('historical-timeline-maze.index');
+        Route::get('/historical-timeline-maze/events', [HistoricalTimelineMazeController::class, 'getEvents'])->name('historical-timeline-maze.events');
+        Route::post('/historical-timeline-maze/save-progress', [HistoricalTimelineMazeController::class, 'saveProgress'])->name('historical-timeline-maze.save-progress');
+    });
 });
 
 // Add this debug route temporarily

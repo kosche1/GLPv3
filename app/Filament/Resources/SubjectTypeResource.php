@@ -3,15 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SubjectTypeResource\Pages;
-use App\Filament\Resources\SubjectTypeResource\RelationManagers;
 use App\Models\SubjectType;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SubjectTypeResource extends Resource
 {
@@ -43,17 +41,41 @@ class SubjectTypeResource extends Resource
                     ]),
                 Forms\Components\Section::make('Appearance')
                     ->schema([
-                        Forms\Components\ColorPicker::make('color')
-                            ->helperText('Color for UI styling'),
-                        Forms\Components\TextInput::make('icon')
-                            ->helperText('Icon class or name'),
-                        Forms\Components\Toggle::make('is_active')
-                            ->required()
-                            ->default(true),
-                        Forms\Components\TextInput::make('order')
-                            ->numeric()
-                            ->default(0)
-                            ->helperText('Order for sorting'),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\ColorPicker::make('color')
+                                    ->helperText('Color for UI styling'),
+                                Forms\Components\TextInput::make('icon')
+                                    ->helperText('Icon class or name'),
+                            ]),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Toggle::make('is_active')
+                                    ->required()
+                                    ->default(true),
+                                Forms\Components\TextInput::make('order')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->helperText('Order for sorting'),
+                            ]),
+                        FileUpload::make('image')
+                            ->disk('public')
+                            ->directory('images/subject-type-images')
+                            ->visibility('public')
+                            ->image()
+                            ->imageEditor()
+                            ->maxSize(5120) // 5MB max size
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+                            ->uploadProgressIndicatorPosition('left')
+                            ->panelLayout('compact')
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('1:1')
+                            ->imageResizeTargetWidth('200')
+                            ->imageResizeTargetHeight('200')
+                            ->uploadButtonPosition('left')
+                            ->removeUploadedFileButtonPosition('right')
+                            ->helperText('Upload an image (saved to public/images)')
+                            ->label('Image'),
                     ])
             ]);
     }
@@ -68,6 +90,11 @@ class SubjectTypeResource extends Resource
                 Tables\Columns\TextColumn::make('code')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\ImageColumn::make('image')
+                    ->disk('public')
+                    ->size(40)
+                    ->circular()
+                    ->defaultImageUrl(fn (SubjectType $record) => $record->icon ? null : asset('images/default-subject.png')),
                 Tables\Columns\ColorColumn::make('color'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()

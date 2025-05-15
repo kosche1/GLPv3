@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
-        
+
 
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -43,6 +43,7 @@
             <flux:navlist.group heading="Support" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
                 <flux:navlist.item icon="question-mark-circle" :href="route('help-center')" :current="request()->routeIs('help-center')" wire:navigate class="py-1">{{ __('Help Center') }}</flux:navlist.item>
                 <flux:navlist.item icon="lifebuoy" :href="route('technical-support')" :current="request()->routeIs('technical-support')" wire:navigate class="py-1">{{ __('Technical Support') }}</flux:navlist.item>
+                <flux:navlist.item icon="star" :href="route('rate-us')" :current="request()->routeIs('rate-us')" wire:navigate class="py-1">{{ __('Rate Us') }}</flux:navlist.item>
             </flux:navlist.group>
             <flux:spacer />
 
