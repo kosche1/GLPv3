@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\EquationDropResource\Pages;
+use App\Filament\Resources\EquationDropResource\RelationManagers;
 use App\Models\EquationDrop;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -78,7 +79,7 @@ class EquationDropResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\QuestionsRelationManager::class,
         ];
     }
 

@@ -68,6 +68,9 @@ class DatabaseSeeder extends Seeder
             RecipeIngredientsSeeder::class,
             RecipeTemplatesSeeder::class,
 
+            // Equation Drop Game
+            EquationDropSeeder::class,
+
             // Forum categories
             ForumCategorySeeder::class,
 

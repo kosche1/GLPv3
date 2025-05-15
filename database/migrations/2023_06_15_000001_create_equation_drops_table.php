@@ -18,6 +18,19 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+
+        Schema::create('equation_drop_questions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('equation_drop_id')->constrained()->onDelete('cascade');
+            $table->string('difficulty')->default('easy'); // easy, medium, hard
+            $table->json('display_elements'); // JSON array of equation elements
+            $table->string('answer');
+            $table->string('hint');
+            $table->json('options'); // JSON array of answer options
+            $table->integer('order')->default(0);
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
     }
 
     /**
@@ -25,6 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('equation_drop_questions');
         Schema::dropIfExists('equation_drops');
     }
 };

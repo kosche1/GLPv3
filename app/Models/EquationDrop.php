@@ -35,4 +35,36 @@ class EquationDrop extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Get the questions for the equation drop.
+     */
+    public function questions()
+    {
+        return $this->hasMany(EquationDropQuestion::class);
+    }
+
+    /**
+     * Get easy difficulty questions.
+     */
+    public function easyQuestions()
+    {
+        return $this->questions()->where('difficulty', 'easy')->where('is_active', true)->orderBy('order');
+    }
+
+    /**
+     * Get medium difficulty questions.
+     */
+    public function mediumQuestions()
+    {
+        return $this->questions()->where('difficulty', 'medium')->where('is_active', true)->orderBy('order');
+    }
+
+    /**
+     * Get hard difficulty questions.
+     */
+    public function hardQuestions()
+    {
+        return $this->questions()->where('difficulty', 'hard')->where('is_active', true)->orderBy('order');
+    }
 }

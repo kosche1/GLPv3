@@ -229,7 +229,9 @@ Route::middleware(
     // STEM Specialized Subject Routes
     Route::prefix('subjects/specialized/stem')->name('subjects.specialized.stem.')->group(function () {
         // Route::get('/molecule-builder', [MoleculeBuilderController::class, 'index'])->name('molecule-builder.index'); // Comment out or remove old route
-        Route::get('/equation-drop', [EquationDropController::class, 'index'])->name('equation-drop.index'); // Add new route
+        Route::get('/equation-drop', [EquationDropController::class, 'index'])->name('equation-drop.index');
+        Route::get('/equation-drop/questions', [EquationDropController::class, 'getQuestions'])->name('equation-drop.questions');
+        Route::post('/equation-drop/save-score', [EquationDropController::class, 'saveScore'])->name('equation-drop.save-score');
     });
 
     // HUMMS Specialized Subject Routes
