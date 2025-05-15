@@ -102,7 +102,7 @@
 
                 <!-- Game Controls -->
                 <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-4 shadow-lg">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <button id="check-answer-btn" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors flex items-center justify-center text-base font-medium" onclick="checkAnswer()">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -115,7 +115,12 @@
                             </svg>
                             Reset
                         </button>
-                        <!-- Next button removed as we auto-advance -->
+                        <button id="next-btn" class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors flex items-center justify-center text-base font-medium" onclick="nextEquation()" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                            </svg>
+                            Next Equation
+                        </button>
                     </div>
                 </div>
             </div>
@@ -187,6 +192,97 @@
                 hard: []
             };
 
+            // Function to load questions from the server
+            function loadQuestionsFromServer(difficulty) {
+                return fetch(`{{ route('subjects.specialized.stem.equation-drop.questions') }}?difficulty=${difficulty}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.questions && data.questions.length > 0) {
+                            // Transform the data to match our expected format
+                            return data.questions.map(q => {
+                                return {
+                                    display: q.display_elements.map(el => el.element),
+                                    answer: q.answer,
+                                    hint: q.hint,
+                                    options: q.options,
+                                    points: q.points || 100
+                                };
+                            });
+                        } else {
+                            console.error('No questions found for difficulty:', difficulty);
+                            // Fallback to default questions if server returns none
+                            return getDefaultQuestions(difficulty);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading questions:', error);
+                        // Fallback to default questions if there's an error
+                        return getDefaultQuestions(difficulty);
+                    });
+            }
+
+            // Fallback questions in case the server request fails
+            function getDefaultQuestions(difficulty) {
+                const defaultQuestions = {
+                    easy: [
+                        {
+                            display: ['F', '=', '?', '×', 'a'],
+                            answer: 'm',
+                            hint: "Hint: Newton's Second Law of Motion",
+                            options: [
+                                { value: 'm', type: 'Variable' },
+                                { value: 'p', type: 'Variable' },
+                                { value: 'E', type: 'Variable' },
+                                { value: 'v', type: 'Variable' }
+                            ],
+                            points: 100
+                        },
+                        {
+                            display: ['H', '<sub>2</sub>', '+', 'O', '<sub>2</sub>', '=', '?'],
+                            answer: 'H₂O',
+                            hint: "Hint: Water formation chemical equation",
+                            options: [
+                                { value: 'H₂O', type: 'Compound' },
+                                { value: 'CO₂', type: 'Compound' },
+                                { value: 'O₃', type: 'Compound' },
+                                { value: 'H₂O₂', type: 'Compound' }
+                            ],
+                            points: 100
+                        }
+                    ],
+                    medium: [
+                        {
+                            display: ['P', '×', 'V', '=', 'n', '×', 'R', '×', '?'],
+                            answer: 'T',
+                            hint: "Hint: Ideal Gas Law",
+                            options: [
+                                { value: 'T', type: 'Variable' },
+                                { value: 'P', type: 'Variable' },
+                                { value: 'm', type: 'Variable' },
+                                { value: 'V', type: 'Variable' }
+                            ],
+                            points: 200
+                        }
+                    ],
+                    hard: [
+                        {
+                            display: ['∇', '×', 'E', '=', '-', '?', '∂B', '/', '∂t'],
+                            answer: '∂',
+                            hint: "Hint: Maxwell's equations (Faraday's law)",
+                            options: [
+                                { value: '∂', type: 'Operator' },
+                                { value: '∇', type: 'Operator' },
+                                { value: 'ρ', type: 'Variable' },
+                                { value: 'μ', type: 'Constant' }
+                            ],
+                            points: 300
+                        }
+                    ]
+                };
+
+                return defaultQuestions[difficulty] || [];
+            }
+
             // DOM elements
             const difficultyModal = document.getElementById('difficulty-modal');
             const difficultyButtons = document.querySelectorAll('.difficulty-btn');
@@ -202,32 +298,6 @@
             const levelDisplay = document.getElementById('level-display');
             const scoreDisplay = document.getElementById('score-display');
             const timerDisplay = document.getElementById('timer-display');
-
-            // Load questions from the server
-            function loadQuestionsFromServer(difficulty) {
-                return fetch(`{{ route('subjects.specialized.stem.equation-drop.questions') }}?difficulty=${difficulty}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.questions && data.questions.length > 0) {
-                            // Transform the data to match our expected format
-                            return data.questions.map(q => {
-                                return {
-                                    display: q.display_elements.map(el => el.element),
-                                    answer: q.answer,
-                                    hint: q.hint,
-                                    options: q.options
-                                };
-                            });
-                        } else {
-                            console.error('No questions found for difficulty:', difficulty);
-                            return [];
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading questions:', error);
-                        return [];
-                    });
-            }
 
             // Initialize difficulty selection
             difficultyButtons.forEach(button => {
@@ -263,14 +333,13 @@
                 currentEquationIndex = 0;
                 score = 0;
                 level = 1;
-                timer = 60;
 
                 updateScoreDisplay();
                 updateLevelDisplay();
 
                 if (equations[difficulty].length > 0) {
                     loadEquation(difficulty, currentEquationIndex);
-                    startTimer();
+                    startTimer(); // This will set the timer based on difficulty
                 } else {
                     updateFeedback("No questions available. Please try again later.", "text-red-400");
                 }
@@ -410,18 +479,74 @@
 
             // Start the timer
             function startTimer() {
+                // Clear any existing timer
                 clearInterval(timerInterval);
-                timer = 60;
+
+                // Set timer based on difficulty if not already set
+                if (currentDifficulty === 'easy') {
+                    timer = 60;
+                } else if (currentDifficulty === 'medium') {
+                    timer = 45;
+                } else if (currentDifficulty === 'hard') {
+                    timer = 30;
+                }
+
                 updateTimerDisplay();
 
+                // Create a new timer that ticks every second
                 timerInterval = setInterval(function() {
                     timer--;
                     updateTimerDisplay();
 
                     if (timer <= 0) {
+                        // Stop the timer when it reaches zero
                         clearInterval(timerInterval);
                         updateFeedback("Time's up! Try again.", "text-red-400");
-                        resetEquation();
+
+                        // Disable check answer button
+                        checkAnswerBtn.disabled = true;
+
+                        // Show the correct answer
+                        const correctAnswer = equations[currentDifficulty][currentEquationIndex].answer;
+                        setTimeout(() => {
+                            updateFeedback(`The correct answer was "${correctAnswer}". Moving to next question...`, "text-yellow-400");
+
+                            // Move to next question after a delay
+                            setTimeout(() => {
+                                currentEquationIndex++;
+
+                                // Check if we've completed all equations
+                                if (currentEquationIndex >= equations[currentDifficulty].length) {
+                                    // Game over - all questions completed
+                                    updateFeedback(`Game completed! Your final score: ${score}`, "text-emerald-400");
+
+                                    // Save score to the server
+                                    saveScoreToServer(score, currentDifficulty, true);
+
+                                    // Show difficulty modal again after delay
+                                    setTimeout(() => {
+                                        difficultyModal.style.display = 'flex';
+
+                                        // Reset buttons
+                                        checkAnswerBtn.disabled = false;
+                                        resetBtn.disabled = false;
+                                    }, 3000);
+
+                                    return;
+                                }
+
+                                // Load next equation
+                                level++;
+                                updateLevelDisplay();
+                                loadEquation(currentDifficulty, currentEquationIndex);
+
+                                // Reset timer for next equation
+                                startTimer();
+
+                                // Re-enable buttons for next question
+                                checkAnswerBtn.disabled = false;
+                            }, 2000);
+                        }, 2000);
                     }
                 }, 1000);
             }
@@ -481,63 +606,20 @@
                     // Update the dropzone styling and remove animations
                     equationDropzone.className = "w-16 h-16 border-2 border-solid border-green-500 rounded-lg flex items-center justify-center bg-green-500/20";
 
+                    // Enable next button
+                    nextBtn.disabled = false;
+
                     // Add animation to score
                     scoreDisplay.classList.add('animate-pulse');
                     setTimeout(() => {
                         scoreDisplay.classList.remove('animate-pulse');
                     }, 1000);
 
-                    // Automatically move to next equation after a delay
-                    setTimeout(() => {
-                        // Move to next equation
-                        currentEquationIndex++;
+                    // Save progress to the server if this is the last question
+                    if (currentEquationIndex >= equations[currentDifficulty].length - 1) {
+                        saveScoreToServer(score, currentDifficulty, true);
+                    }
 
-                        // Check if we've completed all equations
-                        if (currentEquationIndex >= equations[currentDifficulty].length) {
-                            // Game over - all questions completed
-                            clearInterval(timerInterval);
-
-                            // Show completion message
-                            updateFeedback(`Game completed! Your final score: ${score}`, "text-emerald-400");
-
-                            // Save score to the server
-                            fetch('{{ route('subjects.specialized.stem.equation-drop.save-score') }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({
-                                    score: score,
-                                    difficulty: currentDifficulty,
-                                    completed: true
-                                })
-                            });
-
-                            // Show difficulty modal again after delay
-                            setTimeout(() => {
-                                difficultyModal.style.display = 'flex';
-
-                                // Reset buttons
-                                checkAnswerBtn.disabled = false;
-                                resetBtn.disabled = false;
-                            }, 3000);
-
-                            return;
-                        }
-
-                        // Load next equation
-                        level++;
-                        updateLevelDisplay();
-                        loadEquation(currentDifficulty, currentEquationIndex);
-
-                        // Reset timer for next equation
-                        startTimer();
-
-                        // Re-enable buttons for next question
-                        checkAnswerBtn.disabled = false;
-                        resetBtn.disabled = false;
-                    }, 2000);
                 } else {
                     // Wrong answer
                     updateFeedback(`Incorrect. "${currentAnswer}" is not the right answer. The correct answer was "${correctAnswer}".`, "text-red-400");
@@ -545,63 +627,36 @@
                     // Update the dropzone styling to indicate error
                     equationDropzone.className = "w-16 h-16 border-2 border-solid border-red-500 rounded-lg flex items-center justify-center bg-red-500/20";
 
-                    // Disable reset button and stop timer
-                    resetBtn.disabled = true;
-                    clearInterval(timerInterval);
-
-                    // Move to next equation after a delay
+                    // Re-enable the check answer button after a delay
                     setTimeout(() => {
-                        // Move to next equation
-                        currentEquationIndex++;
-
-                        // Check if we've completed all equations
-                        if (currentEquationIndex >= equations[currentDifficulty].length) {
-                            // Game over - all questions completed
-                            clearInterval(timerInterval);
-
-                            // Show completion message
-                            updateFeedback(`Game completed! Your final score: ${score}`, "text-emerald-400");
-
-                            // Save score to the server
-                            fetch('{{ route('subjects.specialized.stem.equation-drop.save-score') }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                },
-                                body: JSON.stringify({
-                                    score: score,
-                                    difficulty: currentDifficulty,
-                                    completed: true
-                                })
-                            });
-
-                            // Show difficulty modal again after delay
-                            setTimeout(() => {
-                                difficultyModal.style.display = 'flex';
-
-                                // Reset buttons
-                                checkAnswerBtn.disabled = false;
-                                resetBtn.disabled = false;
-                            }, 3000);
-
-                            return;
-                        }
-
-                        // Load next equation
-                        level++;
-                        updateLevelDisplay();
-                        loadEquation(currentDifficulty, currentEquationIndex);
-
-                        // Reset timer for next equation
-                        startTimer();
-
-                        // Re-enable buttons for next question
                         checkAnswerBtn.disabled = false;
-                        resetBtn.disabled = false;
-                    }, 3000);
+                        resetEquation();
+                    }, 2000);
                 }
             };
+
+            // Function to save score to the server
+            function saveScoreToServer(finalScore, difficulty, completed) {
+                fetch('{{ route('subjects.specialized.stem.equation-drop.save-score') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        score: finalScore,
+                        difficulty: difficulty,
+                        completed: completed
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Score saved:', data);
+                })
+                .catch(error => {
+                    console.error('Error saving score:', error);
+                });
+            }
 
             // Reset equation function
             window.resetEquation = function() {
@@ -664,25 +719,7 @@
                     nextBtn.disabled = true;
 
                     // Save score to the server
-                    fetch('{{ route('subjects.specialized.stem.equation-drop.save-score') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            score: score,
-                            difficulty: currentDifficulty,
-                            completed: true
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Score saved:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error saving score:', error);
-                    });
+                    saveScoreToServer(score, currentDifficulty, true);
 
                     // Show difficulty modal again after delay
                     setTimeout(() => {
