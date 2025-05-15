@@ -68,4 +68,20 @@ class HistoricalTimelineMaze extends Model
     {
         return $this->questions()->where('difficulty', 'hard');
     }
+
+    /**
+     * Get all events for the historical timeline maze.
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(HistoricalTimelineMazeEvent::class);
+    }
+
+    /**
+     * Get events for a specific era.
+     */
+    public function eraEvents(string $era): HasMany
+    {
+        return $this->events()->where('era', $era)->orderBy('order');
+    }
 }

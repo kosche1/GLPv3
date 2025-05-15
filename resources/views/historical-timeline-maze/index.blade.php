@@ -486,8 +486,15 @@
             // Function to load questions from the API
             async function loadQuestions(era, difficulty) {
                 try {
+                    console.log(`Fetching questions for ${era} - ${difficulty}...`);
                     const response = await fetch(`{{ route('subjects.specialized.humms.historical-timeline-maze.questions') }}?era=${era}&difficulty=${difficulty}`);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
                     const data = await response.json();
+                    console.log(`API response for ${era} - ${difficulty}:`, data);
 
                     if (data.questions && data.questions.length > 0) {
                         // Transform the data to match our expected format
@@ -495,197 +502,83 @@
                             question: q.question,
                             options: q.options
                         }));
+                        console.log(`Successfully loaded ${data.questions.length} questions for ${era} - ${difficulty}`);
+                    } else {
+                        console.warn(`No questions found in API response for ${era} - ${difficulty}`);
+                        // Initialize with an empty array to prevent null errors
+                        questionsDatabase[era][difficulty] = [];
                     }
                 } catch (error) {
-                    console.error('Error loading questions:', error);
+                    console.error(`Error loading questions for ${era} - ${difficulty}:`, error);
+                    // Initialize with an empty array to prevent null errors
+                    questionsDatabase[era][difficulty] = [];
+
+                    // Show an error notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                    notification.textContent = `Failed to load questions for ${era} - ${difficulty}. Please check the console for details.`;
+                    document.body.appendChild(notification);
+
+                    // Remove the notification after 5 seconds
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 5000);
                 }
             }
 
-            // Timeline data
+            // Timeline data structure
             let timelineData = {
                 'ancient': {
                     title: 'Ancient History (3000 BCE - 500 CE)',
                     description: 'The ancient period saw the rise of early civilizations, the development of writing, and the foundation of major philosophical and religious traditions.',
-                    events: [
-                        {
-                            title: 'Building of the Great Pyramid of Giza',
-                            year: '2560 BCE',
-                            description: 'One of the Seven Wonders of the Ancient World, built as a tomb for Pharaoh Khufu.'
-                        },
-                        {
-                            title: 'Code of Hammurabi',
-                            year: '1754 BCE',
-                            description: 'One of the earliest and most complete legal codes from ancient Mesopotamia.'
-                        },
-                        {
-                            title: 'Founding of the Roman Republic',
-                            year: '509 BCE',
-                            description: 'Established after the overthrow of the Roman Kingdom, introducing a new system of government.'
-                        },
-                        {
-                            title: 'Birth of Democracy in Athens',
-                            year: '508 BCE',
-                            description: 'Cleisthenes introduces democratic reforms in Athens, creating the world\'s first democratic system.'
-                        },
-                        {
-                            title: 'Birth of Jesus Christ',
-                            year: '~4 BCE',
-                            description: 'The birth of Jesus of Nazareth, central figure of Christianity and basis for the Western calendar system.'
-                        },
-                        {
-                            title: 'Fall of the Western Roman Empire',
-                            year: '476 CE',
-                            description: 'The Western Roman Empire falls when Emperor Romulus Augustus is deposed by Odoacer, marking the end of Ancient Rome.'
-                        }
-                    ]
+                    events: []
                 },
                 'medieval': {
                     title: 'Medieval Period (500 - 1500 CE)',
                     description: 'The medieval period was characterized by feudalism, the rise of powerful empires, and significant religious developments across the world.',
-                    events: [
-                        {
-                            title: 'Justinian\'s Code',
-                            year: '529 CE',
-                            description: 'Emperor Justinian I codifies Roman law, creating a unified legal system for the Byzantine Empire.'
-                        },
-                        {
-                            title: 'Rise of Islam',
-                            year: '622 CE',
-                            description: 'Muhammad\'s migration from Mecca to Medina marks the beginning of the Islamic calendar.'
-                        },
-                        {
-                            title: 'Charlemagne Crowned Emperor',
-                            year: '800 CE',
-                            description: 'Charlemagne is crowned Emperor of the Romans by Pope Leo III, reviving the concept of a Western European empire.'
-                        },
-                        {
-                            title: 'Magna Carta Signed',
-                            year: '1215 CE',
-                            description: 'King John of England signs the Magna Carta, limiting royal power and establishing that everyone is subject to the law.'
-                        },
-                        {
-                            title: 'Black Death Pandemic',
-                            year: '1347-1351 CE',
-                            description: 'The bubonic plague kills an estimated 75-200 million people across Eurasia and North Africa.'
-                        },
-                        {
-                            title: 'Fall of Constantinople',
-                            year: '1453 CE',
-                            description: 'The Byzantine Empire falls when Constantinople is captured by the Ottoman Empire, marking the end of the Medieval Period.'
-                        }
-                    ]
+                    events: []
                 },
                 'renaissance': {
                     title: 'Renaissance & Early Modern (1500 - 1800 CE)',
                     description: 'A period of cultural, artistic, political, and economic "rebirth" following the Middle Ages, marked by renewed interest in classical learning.',
-                    events: [
-                        {
-                            title: 'Gutenberg Prints the Bible',
-                            year: '1455 CE',
-                            description: 'Johannes Gutenberg produces the first printed Bible using movable type, revolutionizing information sharing.'
-                        },
-                        {
-                            title: 'Columbus Reaches the Americas',
-                            year: '1492 CE',
-                            description: 'Christopher Columbus reaches the Americas, beginning the Columbian Exchange and European colonization.'
-                        },
-                        {
-                            title: 'Leonardo da Vinci Paints the Mona Lisa',
-                            year: '1503 CE',
-                            description: 'Leonardo da Vinci begins painting the Mona Lisa, one of the most famous paintings in the world.'
-                        },
-                        {
-                            title: 'Protestant Reformation Begins',
-                            year: '1517 CE',
-                            description: 'Martin Luther publishes his Ninety-five Theses, challenging the Catholic Church and starting the Protestant Reformation.'
-                        },
-                        {
-                            title: 'Scientific Revolution',
-                            year: '1543 CE',
-                            description: 'Copernicus publishes "On the Revolutions of the Celestial Spheres," proposing a heliocentric model of the universe.'
-                        },
-                        {
-                            title: 'American Declaration of Independence',
-                            year: '1776 CE',
-                            description: 'The United States declares independence from Great Britain, establishing a new nation.'
-                        }
-                    ]
+                    events: []
                 },
                 'modern': {
                     title: 'Modern Era (1800 - 1945 CE)',
                     description: 'A period of rapid industrialization, technological advancement, and significant political and social changes across the globe.',
-                    events: [
-                        {
-                            title: 'French Revolution',
-                            year: '1789 CE',
-                            description: 'The French Revolution begins with the storming of the Bastille, leading to radical social and political change.'
-                        },
-                        {
-                            title: 'Industrial Revolution',
-                            year: '1760-1840 CE',
-                            description: 'A period of transition to new manufacturing processes in Europe and the United States.'
-                        },
-                        {
-                            title: 'Abolition of Slavery in the US',
-                            year: '1865 CE',
-                            description: 'The 13th Amendment to the US Constitution abolishes slavery following the American Civil War.'
-                        },
-                        {
-                            title: 'First World War',
-                            year: '1914-1918 CE',
-                            description: 'A global conflict that led to major political changes and the redrawing of national boundaries.'
-                        },
-                        {
-                            title: 'Russian Revolution',
-                            year: '1917 CE',
-                            description: 'The Russian Revolution overthrows the Tsarist autocracy and leads to the creation of the Soviet Union.'
-                        },
-                        {
-                            title: 'End of World War II',
-                            year: '1945 CE',
-                            description: 'World War II ends with the surrender of Nazi Germany and Imperial Japan, leading to a new global order.'
-                        }
-                    ]
+                    events: []
                 },
                 'contemporary': {
                     title: 'Contemporary History (1945 - Present)',
                     description: 'The post-World War II era characterized by the Cold War, decolonization, rapid technological advancement, and globalization.',
-                    events: [
-                        {
-                            title: 'United Nations Founded',
-                            year: '1945 CE',
-                            description: 'The United Nations is established to promote international cooperation after World War II.'
-                        },
-                        {
-                            title: 'First Human in Space',
-                            year: '1961 CE',
-                            description: 'Yuri Gagarin becomes the first human to journey into outer space, completing one orbit of Earth.'
-                        },
-                        {
-                            title: 'Moon Landing',
-                            year: '1969 CE',
-                            description: 'Neil Armstrong becomes the first person to walk on the Moon during the Apollo 11 mission.'
-                        },
-                        {
-                            title: 'Fall of the Berlin Wall',
-                            year: '1989 CE',
-                            description: 'The Berlin Wall falls, symbolizing the end of the Cold War and the reunification of Germany.'
-                        },
-                        {
-                            title: 'World Wide Web Invented',
-                            year: '1989 CE',
-                            description: 'Tim Berners-Lee invents the World Wide Web, revolutionizing global communication and information sharing.'
-                        },
-                        {
-                            title: 'COVID-19 Pandemic',
-                            year: '2019-2023 CE',
-                            description: 'A global pandemic caused by the SARS-CoV-2 virus, leading to significant social and economic disruption worldwide.'
-                        }
-                    ]
+                    events: []
                 }
             };
 
-            // Create a deep copy of the original timeline data for resetting
+            // Function to load timeline events from the API
+            async function loadTimelineEvents(era) {
+                try {
+                    const response = await fetch(`{{ route('subjects.specialized.humms.historical-timeline-maze.events') }}?era=${era}`);
+                    const data = await response.json();
+
+                    if (data.events && data.events.length > 0) {
+                        // Update the timeline data with events from the API
+                        timelineData[era].title = data.title;
+                        timelineData[era].description = data.description;
+                        timelineData[era].events = data.events;
+                    }
+                } catch (error) {
+                    console.error('Error loading timeline events:', error);
+                }
+            }
+
+            // Load initial timeline data for the default era
+            loadTimelineEvents('ancient').then(() => {
+                // Update the timeline display after loading
+                updateTimelineEra();
+            });
+
+            // Create a deep copy of the timeline data structure for resetting
             const originalTimelineData = JSON.parse(JSON.stringify(timelineData));
 
             // Current timeline state
@@ -878,9 +771,21 @@
 
             // Start the timer
             function startTimer() {
-                clearInterval(timerInterval);
+                // Clear any existing timer interval
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    console.log("Cleared existing timer interval");
+                }
+
+                // Make sure timer is not paused
                 timerPaused = false;
+
+                // Start a new timer interval
                 timerInterval = setInterval(updateTimer, 1000);
+                console.log("Started new timer interval");
+
+                // Update the timer immediately
+                updateTimer();
             }
 
             // Pause the timer
@@ -911,8 +816,16 @@
                 const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
                 const minutes = Math.floor(elapsedTime / 60);
                 const seconds = elapsedTime % 60;
-                document.getElementById('time-display').textContent =
-                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                // Update the display
+                const timeDisplay = document.getElementById('time-display');
+                timeDisplay.textContent = timeString;
+
+                // Log every 5 seconds for debugging
+                if (seconds % 5 === 0 && seconds > 0) {
+                    console.log("Timer updated:", timeString);
+                }
             }
 
             // Load a level
@@ -944,6 +857,28 @@
 
                 // Get the questions for the current era and difficulty
                 const questions = questionsDatabase[era][difficulty];
+
+                console.log("Questions for", era, difficulty, ":", questions);
+
+                // Check if questions array exists and has items
+                if (!questions || !Array.isArray(questions) || questions.length === 0) {
+                    console.error(`No questions found for era: ${era}, difficulty: ${difficulty}`);
+
+                    // Show an error message to the user
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                    notification.textContent = `No questions available for ${era} - ${difficulty}. Please try a different era or difficulty.`;
+                    document.body.appendChild(notification);
+
+                    // Remove the notification after 5 seconds
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 5000);
+
+                    // Return to game instructions instead of showing level complete
+                    resetGame();
+                    return;
+                }
 
                 // Make sure we don't exceed the available questions
                 if (currentQuestionIndex >= questions.length) {
@@ -1175,6 +1110,29 @@
 
                 // Check if we've reached the end of questions for this era and difficulty
                 const questions = questionsDatabase[currentEra][currentDifficulty];
+
+                console.log("Questions for", currentEra, currentDifficulty, ":", questions);
+
+                // Check if questions array exists and has items
+                if (!questions || !Array.isArray(questions) || questions.length === 0) {
+                    console.error(`No questions found for era: ${currentEra}, difficulty: ${currentDifficulty}`);
+
+                    // Show an error message to the user
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                    notification.textContent = `No questions available for ${currentEra} - ${currentDifficulty}. Please try a different era or difficulty.`;
+                    document.body.appendChild(notification);
+
+                    // Remove the notification after 5 seconds
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 5000);
+
+                    // Return to game instructions instead of showing level complete
+                    resetGame();
+                    return;
+                }
+
                 if (currentQuestionIndex >= questions.length) {
                     console.log("No more questions available, showing level complete modal");
                     showLevelCompleteModal();
@@ -1197,11 +1155,9 @@
                 pauseTimer();
                 clearInterval(timerInterval);
 
-                // Calculate final time
-                const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-                const minutes = Math.floor(elapsedTime / 60);
-                const seconds = elapsedTime % 60;
-                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                // Get the current time from the display element to ensure consistency
+                const timeString = document.getElementById('time-display').textContent;
+                console.log("Using time from display for level complete:", timeString);
 
                 // Format era name for display
                 const eraNames = {
@@ -1215,6 +1171,12 @@
                 // Update UI
                 document.getElementById('final-score').textContent = score;
                 document.getElementById('final-time').textContent = timeString;
+
+                // Log the time values for debugging
+                console.log("Time values at level complete:");
+                console.log("- Display time:", document.getElementById('time-display').textContent);
+                console.log("- Final time:", timeString);
+
                 document.getElementById('completed-level-info').textContent =
                     `${eraNames[currentEra]} - ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}`;
 
@@ -1387,11 +1349,8 @@
                 // Calculate accuracy
                 const accuracy = Math.round((correctChoices / totalChoices) * 100);
 
-                // Get time
-                const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-                const minutes = Math.floor(elapsedTime / 60);
-                const seconds = elapsedTime % 60;
-                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                // Get time from the final-time element to ensure consistency
+                const timeString = document.getElementById('final-time').textContent;
 
                 // Create new score entry
                 const newScore = {
@@ -1450,9 +1409,21 @@
             }
 
             // Update the timeline based on the selected era
-            function updateTimelineEra() {
+            async function updateTimelineEra() {
                 currentTimelineEra = eraSelector.value;
                 currentTimelineEventIndex = 0;
+
+                // Show loading state
+                timelineEvents.innerHTML = `
+                    <div class="p-4 text-center">
+                        <p class="text-neutral-400">Loading timeline events...</p>
+                    </div>
+                `;
+
+                // Load the timeline events for the selected era
+                await loadTimelineEvents(currentTimelineEra);
+
+                // Update the timeline display
                 updateTimeline();
             }
 
@@ -1562,10 +1533,19 @@
 
             // Show the next timeline event
             function showNextTimelineEvent() {
-                const totalEvents = timelineData[currentTimelineEra].events.length;
-                if (currentTimelineEventIndex < totalEvents - 1) {
-                    currentTimelineEventIndex++;
-                    updateTimeline();
+                if (studentAnswers.length > 0) {
+                    // For student answers mode
+                    if (currentTimelineEventIndex < studentAnswers.length - 1) {
+                        currentTimelineEventIndex++;
+                        updateTimeline();
+                    }
+                } else {
+                    // For timeline events mode
+                    const totalEvents = timelineData[currentTimelineEra].events.length;
+                    if (currentTimelineEventIndex < totalEvents - 1) {
+                        currentTimelineEventIndex++;
+                        updateTimeline();
+                    }
                 }
             }
 
@@ -1606,6 +1586,17 @@
                 // Reset and start the timer
                 timerPaused = false;
                 startTime = Date.now();
+                console.log("Game started at:", new Date(startTime).toISOString());
+
+                // Clear any existing timer interval
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+
+                // Initialize the timer display immediately
+                updateTimer();
+
+                // Then start the timer interval
                 startTimer();
 
                 // Load the first level
@@ -1620,12 +1611,25 @@
                 const eras = ['ancient', 'medieval', 'renaissance', 'modern', 'contemporary'];
                 const difficulties = ['easy', 'medium', 'hard'];
 
+                console.log("Starting to load all questions...");
+
                 // Load questions for each era and difficulty
                 for (const era of eras) {
                     for (const difficulty of difficulties) {
+                        console.log(`Loading questions for ${era} - ${difficulty}...`);
                         await loadQuestions(era, difficulty);
+
+                        // Check if questions were loaded successfully
+                        if (!questionsDatabase[era][difficulty] || questionsDatabase[era][difficulty].length === 0) {
+                            console.warn(`No questions loaded for ${era} - ${difficulty}`);
+                        } else {
+                            console.log(`Loaded ${questionsDatabase[era][difficulty].length} questions for ${era} - ${difficulty}`);
+                        }
                     }
                 }
+
+                // Log the loaded questions database
+                console.log("Loaded questions database:", questionsDatabase);
 
                 // Initialize the timeline
                 updateTimeline();

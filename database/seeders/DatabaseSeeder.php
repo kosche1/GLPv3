@@ -73,6 +73,7 @@ class DatabaseSeeder extends Seeder
 
             // Historical Timeline Maze Game
             HistoricalTimelineMazeSeeder::class,
+            HistoricalTimelineMazeEventSeeder::class,
 
             // Forum categories
             ForumCategorySeeder::class,

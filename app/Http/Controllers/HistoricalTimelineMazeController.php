@@ -64,6 +64,60 @@ class HistoricalTimelineMazeController extends Controller
     }
 
     /**
+     * Get events for the Historical Timeline Maze game.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getEvents(Request $request)
+    {
+        // Get the active Historical Timeline Maze game
+        $historicalTimelineMaze = HistoricalTimelineMaze::where('is_active', true)->first();
+
+        if (!$historicalTimelineMaze) {
+            return response()->json(['error' => 'Game not found'], 404);
+        }
+
+        // Get events by era
+        $era = $request->input('era', 'ancient');
+
+        $events = $historicalTimelineMaze->eraEvents($era)
+            ->where('is_active', true)
+            ->get();
+
+        // Format the response with era information
+        $eraInfo = [
+            'ancient' => [
+                'title' => 'Ancient History (3000 BCE - 500 CE)',
+                'description' => 'The ancient period saw the rise of early civilizations, the development of writing, and the foundation of major philosophical and religious traditions.',
+            ],
+            'medieval' => [
+                'title' => 'Medieval Period (500 - 1500 CE)',
+                'description' => 'The medieval period was characterized by feudalism, the rise of powerful empires, and significant religious developments across the world.',
+            ],
+            'renaissance' => [
+                'title' => 'Renaissance & Early Modern (1500 - 1800 CE)',
+                'description' => 'A period of cultural, artistic, political, and economic "rebirth" following the Middle Ages, marked by renewed interest in classical learning.',
+            ],
+            'modern' => [
+                'title' => 'Modern Era (1800 - 1945 CE)',
+                'description' => 'A period of rapid industrialization, technological advancement, and significant political and social changes across the globe.',
+            ],
+            'contemporary' => [
+                'title' => 'Contemporary History (1945 - Present)',
+                'description' => 'The post-World War II era characterized by the Cold War, decolonization, rapid technological advancement, and globalization.',
+            ],
+        ];
+
+        return response()->json([
+            'era' => $era,
+            'title' => $eraInfo[$era]['title'],
+            'description' => $eraInfo[$era]['description'],
+            'events' => $events
+        ]);
+    }
+
+    /**
      * Save user's game progress and score.
      *
      * @param Request $request

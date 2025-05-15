@@ -80,6 +80,7 @@ class HistoricalTimelineMazeResource extends Resource
     {
         return [
             RelationManagers\QuestionsRelationManager::class,
+            RelationManagers\EventsRelationManager::class,
         ];
     }
 
