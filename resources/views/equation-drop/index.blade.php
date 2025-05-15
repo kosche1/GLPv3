@@ -93,7 +93,8 @@
                 <!-- Feedback Area -->
                 <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-4 shadow-lg">
                     <h2 class="text-lg font-semibold text-white mb-3">Instructions</h2>
-                    <p class="text-gray-300 mb-4">Drag the correct symbol to complete the equation. The question mark shows where to drop your answer.</p>
+                    <p class="text-gray-300 mb-2">Drag the correct symbol to complete the equation. The question mark shows where to drop your answer.</p>
+                    <p class="text-yellow-400 font-bold mb-2">Remember: You only get one try per question!</p>
                     <div id="feedback-area" class="p-3 rounded-lg bg-neutral-900/70 text-center min-h-[60px] flex items-center justify-center">
                         <p class="text-neutral-400">Drag an element to the question mark...</p>
                     </div>
@@ -101,7 +102,7 @@
 
                 <!-- Game Controls -->
                 <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-4 shadow-lg">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <button id="check-answer-btn" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors flex items-center justify-center text-base font-medium" onclick="checkAnswer()">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -114,12 +115,7 @@
                             </svg>
                             Reset
                         </button>
-                        <button id="next-btn" class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors flex items-center justify-center text-base font-medium" onclick="nextEquation()" disabled>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                            </svg>
-                            Next Equation
-                        </button>
+                        <!-- Next button removed as we auto-advance -->
                     </div>
                 </div>
             </div>
@@ -129,7 +125,16 @@
         <div id="difficulty-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
             <div class="bg-neutral-800 rounded-xl border border-emerald-500 p-6 shadow-lg max-w-md w-full">
                 <h2 class="text-2xl font-bold text-white mb-4 text-center">Select Difficulty</h2>
-                <p class="text-gray-300 mb-6 text-center">Choose a difficulty level to start the game:</p>
+                <p class="text-gray-300 mb-4 text-center">Choose a difficulty level to start the game:</p>
+
+                <!-- How to Play Instructions -->
+                <div class="bg-neutral-900/70 p-4 rounded-lg mb-6">
+                    <h3 class="text-lg font-bold text-white mb-2 text-center">How to Play</h3>
+                    <p class="text-gray-300 mb-2">1. Drag the correct answer to the question mark</p>
+                    <p class="text-gray-300 mb-2">2. Click "Check Answer" to verify</p>
+                    <p class="text-gray-300">3. The game will automatically move to the next question</p>
+                    <p class="text-gray-300 font-bold mt-2 text-center text-yellow-400">Remember: You only get one try per question!</p>
+                </div>
 
                 <div class="grid grid-cols-1 gap-4 mb-6">
                     <button class="difficulty-btn w-full px-4 py-4 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors text-lg font-medium" data-difficulty="easy">
@@ -476,29 +481,125 @@
                     // Update the dropzone styling and remove animations
                     equationDropzone.className = "w-16 h-16 border-2 border-solid border-green-500 rounded-lg flex items-center justify-center bg-green-500/20";
 
-                    // Enable next button
-                    nextBtn.disabled = false;
-
                     // Add animation to score
                     scoreDisplay.classList.add('animate-pulse');
                     setTimeout(() => {
                         scoreDisplay.classList.remove('animate-pulse');
                     }, 1000);
 
-                    // Keep check button disabled until next question
+                    // Automatically move to next equation after a delay
+                    setTimeout(() => {
+                        // Move to next equation
+                        currentEquationIndex++;
+
+                        // Check if we've completed all equations
+                        if (currentEquationIndex >= equations[currentDifficulty].length) {
+                            // Game over - all questions completed
+                            clearInterval(timerInterval);
+
+                            // Show completion message
+                            updateFeedback(`Game completed! Your final score: ${score}`, "text-emerald-400");
+
+                            // Save score to the server
+                            fetch('{{ route('subjects.specialized.stem.equation-drop.save-score') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    score: score,
+                                    difficulty: currentDifficulty,
+                                    completed: true
+                                })
+                            });
+
+                            // Show difficulty modal again after delay
+                            setTimeout(() => {
+                                difficultyModal.style.display = 'flex';
+
+                                // Reset buttons
+                                checkAnswerBtn.disabled = false;
+                                resetBtn.disabled = false;
+                            }, 3000);
+
+                            return;
+                        }
+
+                        // Load next equation
+                        level++;
+                        updateLevelDisplay();
+                        loadEquation(currentDifficulty, currentEquationIndex);
+
+                        // Reset timer for next equation
+                        startTimer();
+
+                        // Re-enable buttons for next question
+                        checkAnswerBtn.disabled = false;
+                        resetBtn.disabled = false;
+                    }, 2000);
                 } else {
                     // Wrong answer
-                    updateFeedback(`Incorrect. "${currentAnswer}" is not the right answer. Try again!`, "text-red-400");
+                    updateFeedback(`Incorrect. "${currentAnswer}" is not the right answer. The correct answer was "${correctAnswer}".`, "text-red-400");
 
                     // Update the dropzone styling to indicate error
                     equationDropzone.className = "w-16 h-16 border-2 border-solid border-red-500 rounded-lg flex items-center justify-center bg-red-500/20";
 
-                    // Reset after a delay
+                    // Disable reset button and stop timer
+                    resetBtn.disabled = true;
+                    clearInterval(timerInterval);
+
+                    // Move to next equation after a delay
                     setTimeout(() => {
-                        resetEquation();
-                        // Re-enable the check answer button after reset
+                        // Move to next equation
+                        currentEquationIndex++;
+
+                        // Check if we've completed all equations
+                        if (currentEquationIndex >= equations[currentDifficulty].length) {
+                            // Game over - all questions completed
+                            clearInterval(timerInterval);
+
+                            // Show completion message
+                            updateFeedback(`Game completed! Your final score: ${score}`, "text-emerald-400");
+
+                            // Save score to the server
+                            fetch('{{ route('subjects.specialized.stem.equation-drop.save-score') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                },
+                                body: JSON.stringify({
+                                    score: score,
+                                    difficulty: currentDifficulty,
+                                    completed: true
+                                })
+                            });
+
+                            // Show difficulty modal again after delay
+                            setTimeout(() => {
+                                difficultyModal.style.display = 'flex';
+
+                                // Reset buttons
+                                checkAnswerBtn.disabled = false;
+                                resetBtn.disabled = false;
+                            }, 3000);
+
+                            return;
+                        }
+
+                        // Load next equation
+                        level++;
+                        updateLevelDisplay();
+                        loadEquation(currentDifficulty, currentEquationIndex);
+
+                        // Reset timer for next equation
+                        startTimer();
+
+                        // Re-enable buttons for next question
                         checkAnswerBtn.disabled = false;
-                    }, 2000);
+                        resetBtn.disabled = false;
+                    }, 3000);
                 }
             };
 

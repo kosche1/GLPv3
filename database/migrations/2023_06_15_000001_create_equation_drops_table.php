@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
+            $table->integer('easy_timer_seconds')->default(60);
+            $table->integer('medium_timer_seconds')->default(45);
+            $table->integer('hard_timer_seconds')->default(30);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
