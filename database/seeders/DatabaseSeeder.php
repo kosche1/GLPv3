@@ -71,6 +71,9 @@ class DatabaseSeeder extends Seeder
             // Equation Drop Game
             EquationDropSeeder::class,
 
+            // Historical Timeline Maze Game
+            HistoricalTimelineMazeSeeder::class,
+
             // Forum categories
             ForumCategorySeeder::class,
 

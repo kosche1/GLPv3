@@ -3,6 +3,7 @@
 namespace App\Filament\Teacher\Resources;
 
 use App\Filament\Teacher\Resources\HistoricalTimelineMazeResource\Pages;
+use App\Filament\Teacher\Resources\HistoricalTimelineMazeResource\RelationManagers;
 use App\Models\HistoricalTimelineMaze;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -78,7 +79,7 @@ class HistoricalTimelineMazeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\QuestionsRelationManager::class,
         ];
     }
 

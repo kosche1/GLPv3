@@ -237,6 +237,7 @@ Route::middleware(
     // HUMMS Specialized Subject Routes
     Route::prefix('subjects/specialized/humms')->name('subjects.specialized.humms.')->group(function () {
         Route::get('/historical-timeline-maze', [HistoricalTimelineMazeController::class, 'index'])->name('historical-timeline-maze.index');
+        Route::get('/historical-timeline-maze/questions', [HistoricalTimelineMazeController::class, 'getQuestions'])->name('historical-timeline-maze.questions');
         Route::get('/historical-timeline-maze/events', [HistoricalTimelineMazeController::class, 'getEvents'])->name('historical-timeline-maze.events');
         Route::post('/historical-timeline-maze/save-progress', [HistoricalTimelineMazeController::class, 'saveProgress'])->name('historical-timeline-maze.save-progress');
     });

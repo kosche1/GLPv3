@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class HistoricalTimelineMaze extends Model
 {
@@ -35,4 +36,36 @@ class HistoricalTimelineMaze extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Get all questions for the historical timeline maze.
+     */
+    public function questions(): HasMany
+    {
+        return $this->hasMany(HistoricalTimelineMazeQuestion::class);
+    }
+
+    /**
+     * Get easy difficulty questions for the historical timeline maze.
+     */
+    public function easyQuestions(): HasMany
+    {
+        return $this->questions()->where('difficulty', 'easy');
+    }
+
+    /**
+     * Get medium difficulty questions for the historical timeline maze.
+     */
+    public function mediumQuestions(): HasMany
+    {
+        return $this->questions()->where('difficulty', 'medium');
+    }
+
+    /**
+     * Get hard difficulty questions for the historical timeline maze.
+     */
+    public function hardQuestions(): HasMany
+    {
+        return $this->questions()->where('difficulty', 'hard');
+    }
 }
