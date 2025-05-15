@@ -352,4 +352,6 @@ Route::get('/debug-investment-challenges', function() {
     ]);
 });
 
+// Historical Timeline Maze routes removed
+
 require __DIR__.'/auth.php';

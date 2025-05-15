@@ -54,8 +54,8 @@ class QuestionsRelationManager extends RelationManager
                     ->maxLength(255)
                     ->columnSpanFull(),
 
-                Forms\Components\Section::make('Answer Options')
-                    ->description('Define the answer options. Mark one option as correct.')
+                Forms\Components\Section::make('Answers')
+                    ->description('Define the possible answers. Mark one option as correct.')
                     ->schema([
                         Forms\Components\Repeater::make('options')
                             ->schema([
@@ -83,7 +83,32 @@ class QuestionsRelationManager extends RelationManager
                             ->minItems(2)
                             ->maxItems(4)
                             ->defaultItems(3)
-                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null),
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                            ->afterStateHydrated(function ($state, callable $set) {
+                                // If options is NULL, initialize it with default structure
+                                if (is_null($state)) {
+                                    $set('options', [
+                                        [
+                                            'id' => 1,
+                                            'title' => 'Option 1',
+                                            'year' => '1000 BCE',
+                                            'correct' => true
+                                        ],
+                                        [
+                                            'id' => 2,
+                                            'title' => 'Option 2',
+                                            'year' => '500 BCE',
+                                            'correct' => false
+                                        ],
+                                        [
+                                            'id' => 3,
+                                            'title' => 'Option 3',
+                                            'year' => '100 BCE',
+                                            'correct' => false
+                                        ]
+                                    ]);
+                                }
+                            }),
                     ]),
 
                 Forms\Components\Grid::make(2)
@@ -128,22 +153,7 @@ class QuestionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('question')
                     ->searchable()
                     ->limit(30),
-                Tables\Columns\TextColumn::make('options')
-                    ->label('Answer Options')
-                    ->formatStateUsing(function ($state) {
-                        $options = collect($state);
-                        $correctOption = $options->where('correct', true)->first();
-                        return $correctOption ? $correctOption['title'] . ' (' . $correctOption['year'] . ')' : 'No correct answer set';
-                    })
-                    ->tooltip(function ($state) {
-                        $options = collect($state);
-                        $optionsText = $options->map(function ($option) {
-                            $marker = $option['correct'] ? '✓ ' : '';
-                            return $marker . $option['title'] . ' (' . $option['year'] . ')';
-                        })->implode("\n");
-                        return $optionsText;
-                    })
-                    ->limit(30),
+                // Answer column removed
                 Tables\Columns\TextColumn::make('points')
                     ->label('Points')
                     ->sortable()
