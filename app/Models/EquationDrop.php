@@ -25,6 +25,9 @@ class EquationDrop extends Model
         'title',
         'description',
         'is_active',
+        'easy_timer_seconds',
+        'medium_timer_seconds',
+        'hard_timer_seconds',
     ];
 
     /**

@@ -57,8 +57,16 @@ class EquationDropController extends Controller
                 $questions = $equationDrop->easyQuestions()->get();
         }
 
+        // Include timer settings for the selected difficulty
+        $timerSettings = [
+            'easy_timer_seconds' => $equationDrop->easy_timer_seconds ?? 60,
+            'medium_timer_seconds' => $equationDrop->medium_timer_seconds ?? 45,
+            'hard_timer_seconds' => $equationDrop->hard_timer_seconds ?? 30,
+        ];
+
         return response()->json([
-            'questions' => $questions
+            'questions' => $questions,
+            'timer_settings' => $timerSettings
         ]);
     }
 

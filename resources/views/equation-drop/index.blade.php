@@ -143,13 +143,13 @@
 
                 <div class="grid grid-cols-1 gap-4 mb-6">
                     <button class="difficulty-btn w-full px-4 py-4 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors text-lg font-medium" data-difficulty="easy">
-                        Easy
+                        Easy <span class="text-sm">(<span class="easy-timer-display">60</span>s)</span>
                     </button>
                     <button class="difficulty-btn w-full px-4 py-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg transition-colors text-lg font-medium" data-difficulty="medium">
-                        Medium
+                        Medium <span class="text-sm">(<span class="medium-timer-display">45</span>s)</span>
                     </button>
                     <button class="difficulty-btn w-full px-4 py-4 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors text-lg font-medium" data-difficulty="hard">
-                        Hard
+                        Hard <span class="text-sm">(<span class="hard-timer-display">30</span>s)</span>
                     </button>
                 </div>
 
@@ -172,6 +172,15 @@
         }
     </style>
 
+    <script>
+        // Pass PHP variables to JavaScript
+        window.equationDropSettings = {
+            easy_timer_seconds: {{ $equationDrop->easy_timer_seconds ?? 60 }},
+            medium_timer_seconds: {{ $equationDrop->medium_timer_seconds ?? 45 }},
+            hard_timer_seconds: {{ $equationDrop->hard_timer_seconds ?? 30 }}
+        };
+    </script>
+
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -184,6 +193,18 @@
             let timerInterval = null;
             let isCorrect = false;
             let currentDifficulty = null;
+
+            // Timer settings from database (defaults will be overridden when loaded from server)
+            let timerSettings = {
+                easy_timer_seconds: 60,
+                medium_timer_seconds: 45,
+                hard_timer_seconds: 30
+            };
+
+            // Get timer settings from the window object (set in the separate script tag)
+            if (window.equationDropSettings) {
+                timerSettings = window.equationDropSettings;
+            }
 
             // Game equations by difficulty - will be loaded from the server
             let equations = {
@@ -198,6 +219,12 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.questions && data.questions.length > 0) {
+                            // Store timer settings from the server
+                            if (data.timer_settings) {
+                                timerSettings = data.timer_settings;
+                                console.log('Timer settings loaded:', timerSettings);
+                            }
+
                             // Transform the data to match our expected format
                             return data.questions.map(q => {
                                 return {
@@ -299,6 +326,16 @@
             const scoreDisplay = document.getElementById('score-display');
             const timerDisplay = document.getElementById('timer-display');
 
+            // Update timer displays in difficulty buttons
+            function updateTimerDisplaysInButtons() {
+                document.querySelector('.easy-timer-display').textContent = timerSettings.easy_timer_seconds;
+                document.querySelector('.medium-timer-display').textContent = timerSettings.medium_timer_seconds;
+                document.querySelector('.hard-timer-display').textContent = timerSettings.hard_timer_seconds;
+            }
+
+            // Update timer displays when the page loads
+            updateTimerDisplaysInButtons();
+
             // Initialize difficulty selection
             difficultyButtons.forEach(button => {
                 button.addEventListener('click', function() {
@@ -312,6 +349,9 @@
                     loadQuestionsFromServer(currentDifficulty)
                         .then(loadedQuestions => {
                             equations[currentDifficulty] = loadedQuestions;
+
+                            // Update timer displays with values from database
+                            updateTimerDisplaysInButtons();
 
                             if (equations[currentDifficulty].length === 0) {
                                 // If no questions were loaded, show an error and reopen the difficulty modal
@@ -482,13 +522,13 @@
                 // Clear any existing timer
                 clearInterval(timerInterval);
 
-                // Set timer based on difficulty if not already set
+                // Set timer based on difficulty using values from database
                 if (currentDifficulty === 'easy') {
-                    timer = 60;
+                    timer = timerSettings.easy_timer_seconds;
                 } else if (currentDifficulty === 'medium') {
-                    timer = 45;
+                    timer = timerSettings.medium_timer_seconds;
                 } else if (currentDifficulty === 'hard') {
-                    timer = 30;
+                    timer = timerSettings.hard_timer_seconds;
                 }
 
                 updateTimerDisplay();

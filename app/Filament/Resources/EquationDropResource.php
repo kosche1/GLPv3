@@ -40,6 +40,27 @@ class EquationDropResource extends Resource
                             ->label('Active')
                             ->default(true),
                     ]),
+                Forms\Components\Section::make('Timer Settings')
+                    ->schema([
+                        Forms\Components\TextInput::make('easy_timer_seconds')
+                            ->label('Easy Difficulty Timer (seconds)')
+                            ->required()
+                            ->numeric()
+                            ->minValue(10)
+                            ->default(60),
+                        Forms\Components\TextInput::make('medium_timer_seconds')
+                            ->label('Medium Difficulty Timer (seconds)')
+                            ->required()
+                            ->numeric()
+                            ->minValue(10)
+                            ->default(45),
+                        Forms\Components\TextInput::make('hard_timer_seconds')
+                            ->label('Hard Difficulty Timer (seconds)')
+                            ->required()
+                            ->numeric()
+                            ->minValue(10)
+                            ->default(30),
+                    ]),
             ]);
     }
 
