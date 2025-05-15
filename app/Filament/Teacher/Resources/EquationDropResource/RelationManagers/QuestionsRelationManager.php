@@ -90,8 +90,14 @@ class QuestionsRelationManager extends RelationManager
                             ]),
                     ]),
 
-                Forms\Components\Grid::make(2)
+                Forms\Components\Grid::make(3)
                     ->schema([
+                        Forms\Components\TextInput::make('points')
+                            ->numeric()
+                            ->label('Points Value')
+                            ->helperText('Base points for correct answer')
+                            ->default(100)
+                            ->required(),
                         Forms\Components\TextInput::make('order')
                             ->numeric()
                             ->default(0),
@@ -133,6 +139,10 @@ class QuestionsRelationManager extends RelationManager
                         return implode(' ', $elements);
                     })
                     ->limit(30),
+                Tables\Columns\TextColumn::make('points')
+                    ->label('Points')
+                    ->sortable()
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('order')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')

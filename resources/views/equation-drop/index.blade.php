@@ -445,23 +445,32 @@
 
             // Check answer function
             window.checkAnswer = function() {
+                // Prevent multiple clicks
+                if (checkAnswerBtn.disabled) return;
+
                 if (!currentAnswer) {
                     updateFeedback("Please drag an answer to the question mark first!", "text-yellow-400");
                     return;
                 }
 
+                // Disable the check answer button to prevent multiple clicks
+                checkAnswerBtn.disabled = true;
+
                 const correctAnswer = equations[currentDifficulty][currentEquationIndex].answer;
+
+                // Get points value for this question (default to 100 if not set)
+                const basePoints = equations[currentDifficulty][currentEquationIndex].points || 100;
 
                 if (currentAnswer === correctAnswer) {
                     // Correct answer
                     isCorrect = true;
 
-                    // Calculate score based on time remaining
+                    // Calculate score based on time remaining and question points
                     const timeBonus = Math.floor(timer / 10) * 10;
-                    const pointsEarned = 100 + timeBonus;
+                    const pointsEarned = basePoints + timeBonus;
                     score += pointsEarned;
 
-                    updateFeedback(`Correct! +${pointsEarned} points (100 base + ${timeBonus} time bonus)`, "text-green-400");
+                    updateFeedback(`Correct! +${pointsEarned} points (${basePoints} base + ${timeBonus} time bonus)`, "text-green-400");
                     updateScoreDisplay();
 
                     // Update the dropzone styling and remove animations
@@ -476,6 +485,7 @@
                         scoreDisplay.classList.remove('animate-pulse');
                     }, 1000);
 
+                    // Keep check button disabled until next question
                 } else {
                     // Wrong answer
                     updateFeedback(`Incorrect. "${currentAnswer}" is not the right answer. Try again!`, "text-red-400");
@@ -484,7 +494,11 @@
                     equationDropzone.className = "w-16 h-16 border-2 border-solid border-red-500 rounded-lg flex items-center justify-center bg-red-500/20";
 
                     // Reset after a delay
-                    setTimeout(resetEquation, 2000);
+                    setTimeout(() => {
+                        resetEquation();
+                        // Re-enable the check answer button after reset
+                        checkAnswerBtn.disabled = false;
+                    }, 2000);
                 }
             };
 
@@ -591,6 +605,9 @@
 
                 // Reset correct flag
                 isCorrect = false;
+
+                // Re-enable check answer button for the new question
+                checkAnswerBtn.disabled = false;
             };
 
             // Drag and Drop functions

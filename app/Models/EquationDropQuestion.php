@@ -21,6 +21,7 @@ class EquationDropQuestion extends Model
         'answer',
         'hint',
         'options',
+        'points',
         'order',
         'is_active',
     ];

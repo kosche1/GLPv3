@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\EquationDrop;
-use App\Models\EquationDropQuestion;
 
 class EquationDropSeeder extends Seeder
 {
@@ -23,10 +21,10 @@ class EquationDropSeeder extends Seeder
 
         // Create easy difficulty questions
         $this->createEasyQuestions($equationDrop);
-        
+
         // Create medium difficulty questions
         $this->createMediumQuestions($equationDrop);
-        
+
         // Create hard difficulty questions
         $this->createHardQuestions($equationDrop);
     }
@@ -53,6 +51,7 @@ class EquationDropSeeder extends Seeder
                     ['value' => 'E', 'type' => 'Variable'],
                     ['value' => 'v', 'type' => 'Variable'],
                 ],
+                'points' => 100,
                 'order' => 1,
             ],
             [
@@ -73,6 +72,7 @@ class EquationDropSeeder extends Seeder
                     ['value' => 'O₃', 'type' => 'Compound'],
                     ['value' => 'H₂O₂', 'type' => 'Compound'],
                 ],
+                'points' => 120,
                 'order' => 2,
             ],
             [
@@ -92,6 +92,7 @@ class EquationDropSeeder extends Seeder
                     ['value' => 'g', 'type' => 'Constant'],
                     ['value' => 'a', 'type' => 'Variable'],
                 ],
+                'points' => 150,
                 'order' => 3,
             ],
         ];
@@ -135,6 +136,7 @@ class EquationDropSeeder extends Seeder
                     ['value' => 'm', 'type' => 'Variable'],
                     ['value' => 'V', 'type' => 'Variable'],
                 ],
+                'points' => 200,
                 'order' => 1,
             ],
             [
@@ -155,6 +157,7 @@ class EquationDropSeeder extends Seeder
                     ['value' => 'ab', 'type' => 'Expression'],
                     ['value' => '2ab', 'type' => 'Expression'],
                 ],
+                'points' => 250,
                 'order' => 2,
             ],
             [
@@ -179,6 +182,7 @@ class EquationDropSeeder extends Seeder
                     ['value' => 'd²', 'type' => 'Expression'],
                     ['value' => 't²', 'type' => 'Expression'],
                 ],
+                'points' => 300,
                 'order' => 3,
             ],
         ];
@@ -222,6 +226,7 @@ class EquationDropSeeder extends Seeder
                     ['value' => 'ρ', 'type' => 'Variable'],
                     ['value' => 'μ', 'type' => 'Constant'],
                 ],
+                'points' => 400,
                 'order' => 1,
             ],
             [
@@ -242,6 +247,7 @@ class EquationDropSeeder extends Seeder
                     ['value' => 'x', 'type' => 'Variable'],
                     ['value' => '0', 'type' => 'Number'],
                 ],
+                'points' => 450,
                 'order' => 2,
             ],
             [
@@ -261,6 +267,7 @@ class EquationDropSeeder extends Seeder
                     ['value' => 'π', 'type' => 'Constant'],
                     ['value' => 'i', 'type' => 'Number'],
                 ],
+                'points' => 500,
                 'order' => 3,
             ],
         ];
