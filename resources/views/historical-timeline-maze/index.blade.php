@@ -171,8 +171,8 @@
                         <canvas id="maze-canvas" class="w-full h-full hidden"></canvas>
 
                         <!-- Event Choice Modal (Hidden initially) -->
-                        <div id="event-choice-modal" class="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 hidden">
-                            <div class="bg-neutral-800 rounded-xl border border-emerald-500/30 p-6 max-w-md w-full">
+                        <div id="event-choice-modal" class="absolute inset-0 backdrop-blur-sm flex items-center justify-center p-6 hidden">
+                            <div class="bg-transparent rounded-xl border border-emerald-500/30 p-6 max-w-md w-full">
                                 <h3 class="text-lg font-semibold text-white mb-2">Choose the Next Event</h3>
                                 <p class="text-sm text-neutral-400 mb-4">Which of these events happened next in history?</p>
 
@@ -196,8 +196,8 @@
                         </div>
 
                         <!-- Hint Modal (Hidden initially) -->
-                        <div id="hint-modal" class="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 hidden">
-                            <div class="bg-neutral-800 rounded-xl border border-yellow-500/30 p-6 max-w-md w-full">
+                        <div id="hint-modal" class="absolute inset-0 backdrop-blur-sm flex items-center justify-center p-6 hidden">
+                            <div class="bg-transparent rounded-xl border border-yellow-500/30 p-6 max-w-md w-full">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-lg font-semibold text-white">Historical Hint</h3>
                                     <button id="close-hint-btn" class="text-neutral-400 hover:text-white">
@@ -220,8 +220,8 @@
                         </div>
 
                         <!-- Level Complete Modal (Hidden initially) -->
-                        <div id="level-complete-modal" class="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 hidden">
-                            <div class="bg-neutral-800 rounded-xl border border-emerald-500/30 p-6 max-w-md w-full">
+                        <div id="level-complete-modal" class="absolute inset-0 backdrop-blur-sm flex items-center justify-center p-6 hidden">
+                            <div class="bg-transparent rounded-xl border border-emerald-500/30 p-6 max-w-sm w-full">
                                 <div class="flex justify-center mb-4">
                                     <div class="p-3 bg-emerald-500/20 rounded-full">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -230,28 +230,26 @@
                                     </div>
                                 </div>
                                 <h3 class="text-xl font-bold text-white text-center mb-2">Level Complete!</h3>
-                                <p class="text-neutral-400 text-center mb-2">You've successfully navigated this era of history!</p>
-                                <p id="completed-level-info" class="text-emerald-400 text-center mb-6">Ancient History - Easy</p>
+                                <p class="text-white text-center mb-2">You've successfully navigated this era of history!</p>
+                                <p id="completed-level-info" class="text-emerald-400 text-center mb-4 font-semibold">Ancient History - Hard</p>
 
-                                <div class="grid grid-cols-2 gap-4 mb-6">
-                                    <div class="bg-neutral-700/50 p-3 rounded-lg text-center">
-                                        <span class="text-xs text-neutral-400">Score</span>
-                                        <p id="final-score" class="text-xl font-bold text-emerald-400">850</p>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div class="bg-neutral-900/70 p-3 rounded-lg text-center">
+                                        <span class="text-xs text-neutral-300">Score</span>
+                                        <p id="final-score" class="text-xl font-bold text-emerald-400">350</p>
                                     </div>
-                                    <div class="bg-neutral-700/50 p-3 rounded-lg text-center">
-                                        <span class="text-xs text-neutral-400">Time</span>
-                                        <p id="final-time" class="text-xl font-bold text-emerald-400">01:45</p>
+                                    <div class="bg-neutral-900/70 p-3 rounded-lg text-center">
+                                        <span class="text-xs text-neutral-300">Time</span>
+                                        <p id="final-time" class="text-xl font-bold text-emerald-400">00:05</p>
                                     </div>
                                 </div>
 
-                                <div class="mb-6">
-                                    <label for="player-name" class="block text-sm font-medium text-neutral-300 mb-2">Save your score:</label>
-                                    <div class="flex gap-2">
-                                        <input type="text" id="player-name" placeholder="Enter your name" class="flex-1 px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                                        <button id="save-score-btn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors">
-                                            Save
-                                        </button>
-                                    </div>
+                                <div class="mb-4">
+                                    <label for="player-name" class="block text-sm font-medium text-white mb-2">Save your score:</label>
+                                    <input type="text" id="player-name" placeholder="Enter your name" class="w-full px-4 py-2 mb-2 bg-neutral-900/70 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                                    <button id="save-score-btn" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors">
+                                        Save
+                                    </button>
                                 </div>
 
                                 <div class="flex gap-3">
