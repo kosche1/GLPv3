@@ -95,6 +95,7 @@ class ChallengeResource extends Resource
                     ->directory('challenge-images')
                     ->image()
                     ->imageEditor()
+                    ->helperText('Upload an image (saved to public/images)')
                     ->columnSpanFull(),
                 Forms\Components\Toggle::make("is_active")
                     ->default(true),

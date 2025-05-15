@@ -24,35 +24,48 @@
 
         <!-- Subject Categories Section -->
         <div class="mt-6">
-            <!-- <div class="flex items-center gap-3 mb-4">
+            <div class="flex items-center gap-3 mb-4">
                 <div class="p-2 bg-emerald-500/10 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                 </div>
                 <h2 class="text-xl font-semibold text-white">Subject Categories</h2>
-            </div> -->
+            </div>
 
             <div class="grid gap-5 md:grid-cols-3">
                 @foreach($subjectTypes as $subjectType)
                 <!-- {{ $subjectType->name }} Card -->
                 <div class="group flex flex-col rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
-                    <div class="p-5 flex flex-col grow">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="p-2 rounded-lg bg-emerald-500/10">
-                                @if($subjectType->icon)
-                                    <!-- If there's a custom icon, use it -->
-                                    <i class="{{ $subjectType->icon }} h-6 w-6 text-emerald-400"></i>
-                                @else
-                                    <!-- Default icon if none is specified -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                    </svg>
-                                @endif
+                    <!-- Top image banner section -->
+                    @if($subjectType->image)
+                        <!-- If there's an uploaded image, use it as a banner -->
+                        <div class="h-48 w-full overflow-hidden relative">
+                            <img src="{{ asset($subjectType->image) }}" alt="{{ $subjectType->name }}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-neutral-900/80"></div>
+                            <div class="absolute bottom-3 right-3 p-2 rounded-full bg-neutral-800/70 text-xs text-white">
+                                {{ $subjectType->code }}
                             </div>
-                            <h3 class="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">{{ $subjectType->name }}</h3>
                         </div>
+                    @else
+                        <!-- If no image, use a colored background with icon -->
+                        <div class="h-48 w-full overflow-hidden relative flex justify-center items-center" style="background-color: {{ $subjectType->color ?? '#10B981' }}">
+                            @if($subjectType->icon)
+                                <i class="{{ $subjectType->icon }} h-16 w-16 text-white opacity-80"></i>
+                            @else
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-white opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            @endif
+                            <div class="absolute bottom-3 right-3 p-2 rounded-full bg-neutral-800/70 text-xs text-white">
+                                {{ $subjectType->code }}
+                            </div>
+                        </div>
+                    @endif
 
+                    <!-- Content section -->
+                    <div class="p-5 flex flex-col grow">
+                        <h3 class="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300 mb-2">{{ $subjectType->name }}</h3>
                         <p class="text-sm text-neutral-400 mb-4">{{ $subjectType->description }}</p>
 
                         <div class="mt-auto pt-4 border-t border-neutral-700">

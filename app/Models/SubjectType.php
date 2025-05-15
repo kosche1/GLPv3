@@ -21,6 +21,7 @@ class SubjectType extends Model
         'description',
         'color',
         'icon',
+        'image',
         'is_active',
         'order',
     ];
