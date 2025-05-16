@@ -68,6 +68,13 @@ class DatabaseSeeder extends Seeder
             RecipeIngredientsSeeder::class,
             RecipeTemplatesSeeder::class,
 
+            // Equation Drop Game
+            EquationDropSeeder::class,
+
+            // Historical Timeline Maze Game
+            HistoricalTimelineMazeSeeder::class,
+            HistoricalTimelineMazeEventSeeder::class,
+
             // Forum categories
             ForumCategorySeeder::class,
 

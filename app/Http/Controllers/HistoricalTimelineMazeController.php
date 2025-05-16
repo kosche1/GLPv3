@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\HistoricalTimelineMaze;
+use App\Models\HistoricalTimelineMazeQuestion;
 
 class HistoricalTimelineMazeController extends Controller
 {
@@ -14,151 +16,105 @@ class HistoricalTimelineMazeController extends Controller
      */
     public function index(): View
     {
+        // Get the active Historical Timeline Maze game
+        $historicalTimelineMaze = HistoricalTimelineMaze::where('is_active', true)
+            ->with(['easyQuestions', 'mediumQuestions', 'hardQuestions'])
+            ->first();
+
         // Data for the Historical Timeline Maze game
         $data = [
             'trackName' => 'HUMMS',
             'pageTitle' => 'Historical Timeline Maze',
-            'user' => Auth::user()
+            'user' => Auth::user(),
+            'historicalTimelineMaze' => $historicalTimelineMaze
         ];
-        
+
         return view('historical-timeline-maze.index', $data);
     }
-    
+
     /**
-     * Get historical events for the maze.
+     * Get questions for the Historical Timeline Maze game.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getQuestions(Request $request)
+    {
+        // Get the active Historical Timeline Maze game
+        $historicalTimelineMaze = HistoricalTimelineMaze::where('is_active', true)->first();
+
+        if (!$historicalTimelineMaze) {
+            return response()->json(['error' => 'Game not found'], 404);
+        }
+
+        // Get questions by era and difficulty
+        $era = $request->input('era', 'ancient');
+        $difficulty = $request->input('difficulty', 'easy');
+
+        $questions = HistoricalTimelineMazeQuestion::where('historical_timeline_maze_id', $historicalTimelineMaze->id)
+            ->where('era', $era)
+            ->where('difficulty', $difficulty)
+            ->where('is_active', true)
+            ->orderBy('order')
+            ->get();
+
+        return response()->json([
+            'questions' => $questions
+        ]);
+    }
+
+    /**
+     * Get events for the Historical Timeline Maze game.
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function getEvents(Request $request)
     {
-        // Sample historical events data
-        // In a production environment, this would come from a database
-        $events = [
+        // Get the active Historical Timeline Maze game
+        $historicalTimelineMaze = HistoricalTimelineMaze::where('is_active', true)->first();
+
+        if (!$historicalTimelineMaze) {
+            return response()->json(['error' => 'Game not found'], 404);
+        }
+
+        // Get events by era
+        $era = $request->input('era', 'ancient');
+
+        $events = $historicalTimelineMaze->eraEvents($era)
+            ->where('is_active', true)
+            ->get();
+
+        // Format the response with era information
+        $eraInfo = [
             'ancient' => [
-                [
-                    'id' => 1,
-                    'title' => 'Building of the Great Pyramid of Giza',
-                    'year' => '2560 BCE',
-                    'description' => 'Construction of the Great Pyramid of Giza, one of the Seven Wonders of the Ancient World.',
-                    'difficulty' => 'easy'
-                ],
-                [
-                    'id' => 2,
-                    'title' => 'Birth of Democracy in Athens',
-                    'year' => '508 BCE',
-                    'description' => 'Cleisthenes introduces democratic reforms in Athens, creating the world\'s first democratic system.',
-                    'difficulty' => 'medium'
-                ],
-                [
-                    'id' => 3,
-                    'title' => 'Founding of the Roman Republic',
-                    'year' => '509 BCE',
-                    'description' => 'The Roman Republic is established after the overthrow of the Roman Kingdom.',
-                    'difficulty' => 'medium'
-                ],
+                'title' => 'Ancient History (3000 BCE - 500 CE)',
+                'description' => 'The ancient period saw the rise of early civilizations, the development of writing, and the foundation of major philosophical and religious traditions.',
             ],
             'medieval' => [
-                [
-                    'id' => 4,
-                    'title' => 'Fall of the Western Roman Empire',
-                    'year' => '476 CE',
-                    'description' => 'The Western Roman Empire falls when Emperor Romulus Augustus is deposed by Odoacer.',
-                    'difficulty' => 'medium'
-                ],
-                [
-                    'id' => 5,
-                    'title' => 'Charlemagne Crowned Emperor',
-                    'year' => '800 CE',
-                    'description' => 'Charlemagne is crowned Emperor of the Romans by Pope Leo III, reviving the concept of a Western European empire.',
-                    'difficulty' => 'medium'
-                ],
-                [
-                    'id' => 6,
-                    'title' => 'Magna Carta Signed',
-                    'year' => '1215 CE',
-                    'description' => 'King John of England signs the Magna Carta, limiting royal power and establishing that everyone is subject to the law.',
-                    'difficulty' => 'easy'
-                ],
+                'title' => 'Medieval Period (500 - 1500 CE)',
+                'description' => 'The medieval period was characterized by feudalism, the rise of powerful empires, and significant religious developments across the world.',
             ],
             'renaissance' => [
-                [
-                    'id' => 7,
-                    'title' => 'Gutenberg Prints the Bible',
-                    'year' => '1455 CE',
-                    'description' => 'Johannes Gutenberg produces the first printed Bible using movable type, revolutionizing information sharing.',
-                    'difficulty' => 'easy'
-                ],
-                [
-                    'id' => 8,
-                    'title' => 'Columbus Reaches the Americas',
-                    'year' => '1492 CE',
-                    'description' => 'Christopher Columbus reaches the Americas, beginning the Columbian Exchange and European colonization.',
-                    'difficulty' => 'easy'
-                ],
-                [
-                    'id' => 9,
-                    'title' => 'Leonardo da Vinci Paints the Mona Lisa',
-                    'year' => '1503 CE',
-                    'description' => 'Leonardo da Vinci begins painting the Mona Lisa, one of the most famous paintings in the world.',
-                    'difficulty' => 'medium'
-                ],
+                'title' => 'Renaissance & Early Modern (1500 - 1800 CE)',
+                'description' => 'A period of cultural, artistic, political, and economic "rebirth" following the Middle Ages, marked by renewed interest in classical learning.',
             ],
             'modern' => [
-                [
-                    'id' => 10,
-                    'title' => 'American Declaration of Independence',
-                    'year' => '1776 CE',
-                    'description' => 'The United States declares independence from Great Britain, establishing a new nation.',
-                    'difficulty' => 'easy'
-                ],
-                [
-                    'id' => 11,
-                    'title' => 'French Revolution Begins',
-                    'year' => '1789 CE',
-                    'description' => 'The French Revolution begins with the storming of the Bastille, leading to radical social and political change.',
-                    'difficulty' => 'medium'
-                ],
-                [
-                    'id' => 12,
-                    'title' => 'World War I Begins',
-                    'year' => '1914 CE',
-                    'description' => 'World War I begins, involving many of the world\'s nations in a global conflict.',
-                    'difficulty' => 'easy'
-                ],
+                'title' => 'Modern Era (1800 - 1945 CE)',
+                'description' => 'A period of rapid industrialization, technological advancement, and significant political and social changes across the globe.',
             ],
             'contemporary' => [
-                [
-                    'id' => 13,
-                    'title' => 'United Nations Founded',
-                    'year' => '1945 CE',
-                    'description' => 'The United Nations is established to promote international cooperation after World War II.',
-                    'difficulty' => 'easy'
-                ],
-                [
-                    'id' => 14,
-                    'title' => 'Fall of the Berlin Wall',
-                    'year' => '1989 CE',
-                    'description' => 'The Berlin Wall falls, symbolizing the end of the Cold War and the reunification of Germany.',
-                    'difficulty' => 'easy'
-                ],
-                [
-                    'id' => 15,
-                    'title' => 'World Wide Web Invented',
-                    'year' => '1989 CE',
-                    'description' => 'Tim Berners-Lee invents the World Wide Web, revolutionizing global communication and information sharing.',
-                    'difficulty' => 'medium'
-                ],
+                'title' => 'Contemporary History (1945 - Present)',
+                'description' => 'The post-World War II era characterized by the Cold War, decolonization, rapid technological advancement, and globalization.',
             ],
         ];
 
-        // Get the requested era or return all eras
-        $era = $request->input('era', null);
-        if ($era && isset($events[$era])) {
-            return response()->json(['events' => $events[$era]]);
-        }
-
-        return response()->json(['events' => $events]);
+        return response()->json([
+            'era' => $era,
+            'title' => $eraInfo[$era]['title'],
+            'description' => $eraInfo[$era]['description'],
+            'events' => $events
+        ]);
     }
 
     /**

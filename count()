@@ -15,8 +15,8 @@
     895▕     /**
 
   1   vendor\psy\psysh\src\Shell.php:1390
-      Psy\Shell::setCode("App\Models\User::role('student')-")
+      Psy\Shell::setCode("DB::table('historical_timeline_maze_questions')-")
 
   2   vendor\laravel\tinker\src\Console\TinkerCommand.php:76
-      Psy\Shell::execute("App\Models\User::role('student')-")
+      Psy\Shell::execute("DB::table('historical_timeline_maze_questions')-")
 
