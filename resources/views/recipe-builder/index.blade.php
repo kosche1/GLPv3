@@ -26,8 +26,76 @@
                 </div>
             </div>
 
+            <!-- Recipe Challenges Section -->
+            <div id="recipe-challenges" class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 mb-8 border border-orange-200 dark:border-orange-900">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Recipe Challenges</h2>
+                    </div>
+                    <span id="challenge-count" class="px-3 py-1 bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 rounded-full text-sm font-medium">
+                        Available Challenges
+                    </span>
+                </div>
+
+                <div id="challenge-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Challenge cards will be populated here via JavaScript -->
+                </div>
+
+                <div id="empty-challenge-message" class="hidden bg-white dark:bg-gray-800 rounded-xl p-8 text-center border border-gray-300 dark:border-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-2">No Challenges Available</h3>
+                    <p class="text-gray-700 dark:text-gray-400 mb-6">There are no recipe challenges available at the moment. Check back later!</p>
+                </div>
+            </div>
+
             <!-- Recipe Builder Game Interface -->
             <div id="recipe-builder-container" class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 mb-6 hidden transform transition-all duration-500 ease-in-out">
+                <!-- Active Challenge Info Panel (hidden by default) -->
+                <div id="active-challenge-panel" class="mb-6 hidden">
+                    <div class="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-lg border border-orange-200 dark:border-orange-800 p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                <h3 id="active-challenge-name" class="text-lg font-bold text-gray-900 dark:text-white">Challenge Name</h3>
+                            </div>
+                            <button id="cancel-challenge" class="text-sm text-gray-500 hover:text-red-500 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Cancel Challenge
+                            </button>
+                        </div>
+                        <p id="active-challenge-description" class="text-sm text-black dark:text-gray-300 mb-3">Challenge description goes here.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
+                                <h4 class="text-sm font-semibold mb-2 text-black dark:text-gray-200">Requirements</h4>
+                                <ul id="challenge-requirements" class="text-xs space-y-1 text-black dark:text-gray-300">
+                                    <!-- Requirements will be populated here -->
+                                </ul>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm">
+                                <h4 class="text-sm font-semibold mb-2 text-black dark:text-gray-200">Progress</h4>
+                                <ul id="challenge-progress" class="text-xs space-y-1 text-black dark:text-gray-300">
+                                    <!-- Progress will be populated here -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs text-black dark:text-gray-300">
+                            <span>Difficulty: <span id="challenge-difficulty" class="font-medium">Beginner</span></span>
+                            <span>Reward: <span id="challenge-reward" class="font-medium text-amber-600 dark:text-amber-400">100 points</span></span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Left Column: Ingredients -->
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 h-full">
@@ -1190,6 +1258,440 @@
                 alert('Error deleting recipe. Please try again.');
             });
         }
+
+        // Challenge-related variables
+        let availableChallenges = [];
+        let activeChallenge = null;
+
+        // Challenge-related DOM elements
+        const challengeList = document.getElementById('challenge-list');
+        const emptyChallengeMessage = document.getElementById('empty-challenge-message');
+        const challengeCount = document.getElementById('challenge-count');
+        const activeChallengePanel = document.getElementById('active-challenge-panel');
+        const activeChallengeName = document.getElementById('active-challenge-name');
+        const activeChallengeDescription = document.getElementById('active-challenge-description');
+        const challengeRequirements = document.getElementById('challenge-requirements');
+        const challengeProgress = document.getElementById('challenge-progress');
+        const challengeDifficulty = document.getElementById('challenge-difficulty');
+        const challengeReward = document.getElementById('challenge-reward');
+        const cancelChallengeBtn = document.getElementById('cancel-challenge');
+
+        // Load available challenges
+        function loadChallenges() {
+            fetch('/recipe-builder/templates')
+                .then(response => response.json())
+                .then(data => {
+                    availableChallenges = data;
+                    updateChallengeList();
+                })
+                .catch(error => {
+                    console.error('Error loading challenges:', error);
+                });
+        }
+
+        // Update challenge list
+        function updateChallengeList() {
+            challengeCount.textContent = `${availableChallenges.length} ${availableChallenges.length === 1 ? 'Challenge' : 'Challenges'}`;
+
+            if (availableChallenges.length === 0) {
+                challengeList.innerHTML = '';
+                emptyChallengeMessage.classList.remove('hidden');
+                return;
+            }
+
+            emptyChallengeMessage.classList.add('hidden');
+            challengeList.innerHTML = '';
+
+            availableChallenges.forEach(challenge => {
+                const challengeEl = document.createElement('div');
+                challengeEl.className = 'group bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] overflow-hidden border border-orange-200 dark:border-orange-900';
+
+                // Determine difficulty badge color
+                let difficultyColor = 'green';
+                if (challenge.difficulty_level === 'intermediate') {
+                    difficultyColor = 'yellow';
+                } else if (challenge.difficulty_level === 'advanced') {
+                    difficultyColor = 'red';
+                }
+
+                challengeEl.innerHTML = `
+                    <div class="h-2 bg-orange-400"></div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">${challenge.name}</h3>
+                            <span class="px-2 py-1 bg-${difficultyColor}-200 text-black dark:bg-${difficultyColor}-600 dark:text-black rounded-full text-xs font-medium">
+                                ${challenge.difficulty_level.charAt(0).toUpperCase() + challenge.difficulty_level.slice(1)}
+                            </span>
+                        </div>
+
+                        <p class="text-sm text-black dark:text-gray-400 mb-4 line-clamp-2">${challenge.description}</p>
+
+                        <div class="flex items-center justify-between mb-4 text-xs text-black dark:text-gray-400">
+                            <span>Calories: ${challenge.target_calories_min}-${challenge.target_calories_max}</span>
+                            <span>Reward: ${challenge.points_reward} pts</span>
+                        </div>
+
+                        <button class="start-challenge-btn w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center justify-center" data-id="${challenge.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Start Challenge
+                        </button>
+                    </div>
+                `;
+
+                challengeList.appendChild(challengeEl);
+
+                // Add event listener to start challenge button
+                challengeEl.querySelector('.start-challenge-btn').addEventListener('click', function() {
+                    const challengeId = this.dataset.id;
+                    startChallenge(challengeId);
+                });
+            });
+        }
+
+        // Start a challenge
+        function startChallenge(challengeId) {
+            const challenge = availableChallenges.find(c => c.id == challengeId);
+            if (!challenge) return;
+
+            activeChallenge = challenge;
+
+            // Update active challenge panel
+            activeChallengeName.textContent = challenge.name;
+            activeChallengeDescription.textContent = challenge.description;
+            challengeDifficulty.textContent = challenge.difficulty_level.charAt(0).toUpperCase() + challenge.difficulty_level.slice(1);
+            challengeReward.textContent = `${challenge.points_reward} points`;
+
+            // Update requirements list
+            challengeRequirements.innerHTML = '';
+
+            // Add calorie requirement
+            const calorieItem = document.createElement('li');
+            calorieItem.className = 'flex items-center justify-between';
+            calorieItem.innerHTML = `
+                <span>Calories:</span>
+                <span class="font-medium">${challenge.target_calories_min} - ${challenge.target_calories_max}</span>
+            `;
+            challengeRequirements.appendChild(calorieItem);
+
+            // Add macronutrient requirements if they exist
+            if (challenge.target_protein_min) {
+                const proteinItem = document.createElement('li');
+                proteinItem.className = 'flex items-center justify-between';
+                proteinItem.innerHTML = `
+                    <span>Protein:</span>
+                    <span class="font-medium">${challenge.target_protein_min}g - ${challenge.target_protein_max}g</span>
+                `;
+                challengeRequirements.appendChild(proteinItem);
+            }
+
+            if (challenge.target_carbs_min) {
+                const carbsItem = document.createElement('li');
+                carbsItem.className = 'flex items-center justify-between';
+                carbsItem.innerHTML = `
+                    <span>Carbs:</span>
+                    <span class="font-medium">${challenge.target_carbs_min}g - ${challenge.target_carbs_max}g</span>
+                `;
+                challengeRequirements.appendChild(carbsItem);
+            }
+
+            if (challenge.target_fat_min) {
+                const fatItem = document.createElement('li');
+                fatItem.className = 'flex items-center justify-between';
+                fatItem.innerHTML = `
+                    <span>Fat:</span>
+                    <span class="font-medium">${challenge.target_fat_min}g - ${challenge.target_fat_max}g</span>
+                `;
+                challengeRequirements.appendChild(fatItem);
+            }
+
+            // Add required categories if they exist
+            if (challenge.required_categories && challenge.required_categories.length > 0) {
+                const categoriesItem = document.createElement('li');
+                categoriesItem.className = 'flex items-center justify-between';
+                categoriesItem.innerHTML = `
+                    <span>Required Categories:</span>
+                    <span class="font-medium">${challenge.required_categories.join(', ')}</span>
+                `;
+                challengeRequirements.appendChild(categoriesItem);
+            }
+
+            // Add max ingredients if it exists
+            if (challenge.max_ingredients) {
+                const maxIngredientsItem = document.createElement('li');
+                maxIngredientsItem.className = 'flex items-center justify-between';
+                maxIngredientsItem.innerHTML = `
+                    <span>Max Ingredients:</span>
+                    <span class="font-medium">${challenge.max_ingredients}</span>
+                `;
+                challengeRequirements.appendChild(maxIngredientsItem);
+            }
+
+            // Show active challenge panel
+            activeChallengePanel.classList.remove('hidden');
+
+            // Start a new recipe
+            startNewRecipe();
+
+            // Update progress (initially all requirements are not met)
+            updateChallengeProgress();
+        }
+
+        // Cancel active challenge
+        function cancelChallenge() {
+            activeChallenge = null;
+            activeChallengePanel.classList.add('hidden');
+        }
+
+        // Update challenge progress based on current recipe
+        function updateChallengeProgress() {
+            if (!activeChallenge) return;
+
+            challengeProgress.innerHTML = '';
+
+            // Calculate current nutritional values
+            const totalCals = selectedIngredients.reduce((sum, item) => sum + item.calories, 0);
+            const totalProt = selectedIngredients.reduce((sum, item) => sum + item.protein, 0);
+            const totalCarb = selectedIngredients.reduce((sum, item) => sum + item.carbs, 0);
+            const totalFats = selectedIngredients.reduce((sum, item) => sum + item.fat, 0);
+
+            // Check calorie requirement
+            const calorieItem = document.createElement('li');
+            calorieItem.className = 'flex items-center justify-between';
+            const caloriesInRange = totalCals >= activeChallenge.target_calories_min && totalCals <= activeChallenge.target_calories_max;
+            calorieItem.innerHTML = `
+                <span>Calories:</span>
+                <span class="font-medium flex items-center">
+                    ${totalCals}
+                    ${caloriesInRange
+                        ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>'
+                        : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>'}
+                </span>
+            `;
+            challengeProgress.appendChild(calorieItem);
+
+            // Check protein requirement if it exists
+            if (activeChallenge.target_protein_min) {
+                const proteinItem = document.createElement('li');
+                proteinItem.className = 'flex items-center justify-between';
+                const proteinInRange = totalProt >= activeChallenge.target_protein_min && totalProt <= activeChallenge.target_protein_max;
+                proteinItem.innerHTML = `
+                    <span>Protein:</span>
+                    <span class="font-medium flex items-center">
+                        ${totalProt.toFixed(1)}g
+                        ${proteinInRange
+                            ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>'
+                            : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>'}
+                    </span>
+                `;
+                challengeProgress.appendChild(proteinItem);
+            }
+
+            // Check carbs requirement if it exists
+            if (activeChallenge.target_carbs_min) {
+                const carbsItem = document.createElement('li');
+                carbsItem.className = 'flex items-center justify-between';
+                const carbsInRange = totalCarb >= activeChallenge.target_carbs_min && totalCarb <= activeChallenge.target_carbs_max;
+                carbsItem.innerHTML = `
+                    <span>Carbs:</span>
+                    <span class="font-medium flex items-center">
+                        ${totalCarb.toFixed(1)}g
+                        ${carbsInRange
+                            ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>'
+                            : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>'}
+                    </span>
+                `;
+                challengeProgress.appendChild(carbsItem);
+            }
+
+            // Check fat requirement if it exists
+            if (activeChallenge.target_fat_min) {
+                const fatItem = document.createElement('li');
+                fatItem.className = 'flex items-center justify-between';
+                const fatInRange = totalFats >= activeChallenge.target_fat_min && totalFats <= activeChallenge.target_fat_max;
+                fatItem.innerHTML = `
+                    <span>Fat:</span>
+                    <span class="font-medium flex items-center">
+                        ${totalFats.toFixed(1)}g
+                        ${fatInRange
+                            ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>'
+                            : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>'}
+                    </span>
+                `;
+                challengeProgress.appendChild(fatItem);
+            }
+
+            // Check required categories if they exist
+            if (activeChallenge.required_categories && activeChallenge.required_categories.length > 0) {
+                const categoriesItem = document.createElement('li');
+                categoriesItem.className = 'flex items-center justify-between';
+
+                // Get unique categories from selected ingredients
+                const selectedCategories = [...new Set(selectedIngredients.map(ingredient => ingredient.category))];
+
+                // Check if all required categories are included
+                const allCategoriesIncluded = activeChallenge.required_categories.every(category =>
+                    selectedCategories.includes(category)
+                );
+
+                categoriesItem.innerHTML = `
+                    <span>Categories:</span>
+                    <span class="font-medium flex items-center">
+                        ${selectedCategories.join(', ')}
+                        ${allCategoriesIncluded
+                            ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>'
+                            : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>'}
+                    </span>
+                `;
+                challengeProgress.appendChild(categoriesItem);
+            }
+
+            // Check max ingredients if it exists
+            if (activeChallenge.max_ingredients) {
+                const maxIngredientsItem = document.createElement('li');
+                maxIngredientsItem.className = 'flex items-center justify-between';
+                const withinMaxIngredients = selectedIngredients.length <= activeChallenge.max_ingredients;
+                maxIngredientsItem.innerHTML = `
+                    <span>Ingredients Count:</span>
+                    <span class="font-medium flex items-center">
+                        ${selectedIngredients.length}/${activeChallenge.max_ingredients}
+                        ${withinMaxIngredients
+                            ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>'
+                            : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>'}
+                    </span>
+                `;
+                challengeProgress.appendChild(maxIngredientsItem);
+            }
+        }
+
+        // Add ingredient to recipe (override the existing function)
+        function addIngredient(ingredient) {
+            if (!selectedIngredients.some(item => item.id === ingredient.id)) {
+                selectedIngredients.push(ingredient);
+                updateSelectedIngredients();
+                updateNutrition();
+
+                // Update challenge progress if a challenge is active
+                if (activeChallenge) {
+                    updateChallengeProgress();
+                }
+            }
+        }
+
+        // Remove ingredient from recipe (override the existing function)
+        function removeIngredient(ingredientId) {
+            selectedIngredients = selectedIngredients.filter(item => item.id !== ingredientId);
+            updateSelectedIngredients();
+            updateNutrition();
+
+            // Update challenge progress if a challenge is active
+            if (activeChallenge) {
+                updateChallengeProgress();
+            }
+        }
+
+        // Save recipe (override the existing function)
+        function saveRecipe() {
+            if (recipeName.value.trim() === '') {
+                alert('Please enter a recipe name');
+                return;
+            }
+
+            if (selectedIngredients.length === 0) {
+                alert('Please add at least one ingredient');
+                return;
+            }
+
+            // Calculate nutrition values for display
+            const totalCals = selectedIngredients.reduce((sum, item) => sum + item.calories, 0);
+            const totalProt = selectedIngredients.reduce((sum, item) => sum + item.protein, 0);
+            const totalCarb = selectedIngredients.reduce((sum, item) => sum + item.carbs, 0);
+            const totalFats = selectedIngredients.reduce((sum, item) => sum + item.fat, 0);
+
+            const totalMacros = totalProt + totalCarb + totalFats;
+            const protPercent = totalMacros > 0 ? Math.round((totalProt / totalMacros) * 100) : 0;
+            const carbPercent = totalMacros > 0 ? Math.round((totalCarb / totalMacros) * 100) : 0;
+            const fatPercent = totalMacros > 0 ? Math.round((totalFats / totalMacros) * 100) : 0;
+
+            const isBalanced =
+                protPercent >= 10 &&
+                protPercent <= 35 &&
+                carbPercent >= 45 &&
+                carbPercent <= 65 &&
+                fatPercent >= 20 &&
+                fatPercent <= 35;
+
+            // Calculate balance percentage
+            const idealProtein = 20;
+            const idealCarbs = 55;
+            const idealFat = 25;
+
+            const proteinDiff = Math.abs(protPercent - idealProtein);
+            const carbsDiff = Math.abs(carbPercent - idealCarbs);
+            const fatDiff = Math.abs(fatPercent - idealFat);
+
+            const maxPossibleDiff = 100;
+            const actualDiff = proteinDiff + carbsDiff + fatDiff;
+            const balancePercentValue = Math.max(0, Math.round(100 - (actualDiff / maxPossibleDiff) * 100));
+
+            // Prepare recipe data for server
+            const recipeData = {
+                name: recipeName.value,
+                description: recipeDescription.value,
+                template_id: activeChallenge ? activeChallenge.id : null,
+                ingredients: selectedIngredients.map(ingredient => ({
+                    id: ingredient.id,
+                    quantity: 1 // Default quantity
+                }))
+            };
+
+            // Send to server using AJAX
+            fetch('/recipe-builder/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(recipeData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Recipe saved to database:', data.recipe);
+                    // Show success modal
+                    showResultModal(data.recipe);
+                    // Reload recipes from server
+                    loadUserRecipes();
+                    // Reset active challenge if there was one
+                    if (activeChallenge) {
+                        cancelChallenge();
+                    }
+                } else {
+                    alert('Error saving recipe: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving recipe:', error);
+                alert('Error saving recipe. Please try again.');
+            });
+        }
+
+        // Add event listeners for challenge-related elements
+        function setupChallengeEventListeners() {
+            // Cancel challenge button
+            if (cancelChallengeBtn) {
+                cancelChallengeBtn.addEventListener('click', cancelChallenge);
+            }
+        }
+
+        // Extend the init function to include challenge initialization
+        const originalInit = init;
+        init = function() {
+            originalInit();
+            loadChallenges();
+            setupChallengeEventListeners();
+        };
 
         // Initialize the app
         init();

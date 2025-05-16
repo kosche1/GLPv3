@@ -209,6 +209,7 @@ Route::middleware(
     // Recipe Builder routes
     Route::get('recipe-builder', [\App\Http\Controllers\RecipeBuilderController::class, 'index'])->name('recipe-builder');
     Route::get('recipe-builder/ingredients', [\App\Http\Controllers\RecipeBuilderController::class, 'getIngredients'])->name('recipe-builder.ingredients');
+    Route::get('recipe-builder/templates', [\App\Http\Controllers\RecipeBuilderController::class, 'getTemplates'])->name('recipe-builder.templates');
     Route::get('recipe-builder/template/{id}', [\App\Http\Controllers\RecipeBuilderController::class, 'getTemplate'])->name('recipe-builder.template');
     Route::post('recipe-builder/save', [\App\Http\Controllers\RecipeBuilderController::class, 'saveRecipe'])->name('recipe-builder.save');
     Route::get('recipe-builder/user-recipe/{id}', [\App\Http\Controllers\RecipeBuilderController::class, 'getUserRecipe'])->name('recipe-builder.user-recipe');
