@@ -23,6 +23,7 @@
             @livewire('welcome-modals')
             @livewire('recipe-approval-modal')
             @livewire('task-approval-notification-modal')
+            @livewire('user-activity-history-modal')
         @endauth
     </flux:main>
 </x-layouts.app.sidebar>
