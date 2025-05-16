@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Models\User;
 use Livewire\Component;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UserActivityHistoryModal extends Component
 {
@@ -65,10 +67,11 @@ class UserActivityHistoryModal extends Component
             $this->userLevel = $user->getLevel();
             $this->userPoints = $user->getPoints();
 
-            // Get experience history if available
-            if (method_exists($user, 'experienceHistory')) {
-                $this->activityHistory = $user->experienceHistory()
-                    ->latest()
+            // Get experience history from experience_audits table
+            try {
+                $this->activityHistory = DB::table('experience_audits')
+                    ->where('user_id', $user->id)
+                    ->orderBy('created_at', 'desc')
                     ->take(20)
                     ->get()
                     ->map(function ($entry) {
@@ -82,6 +85,42 @@ class UserActivityHistoryModal extends Component
                         ];
                     })
                     ->toArray();
+
+                // Also check for daily login rewards
+                $dailyRewards = DB::table('user_daily_rewards')
+                    ->where('user_id', $user->id)
+                    ->orderBy('claimed_at', 'desc')
+                    ->take(10)
+                    ->get();
+
+                foreach ($dailyRewards as $reward) {
+                    // Get the reward tier to determine points
+                    $rewardTier = DB::table('daily_reward_tiers')
+                        ->where('id', $reward->daily_reward_tier_id)
+                        ->first();
+
+                    $points = $rewardTier ? $rewardTier->points_reward : 10;
+
+                    // Add to activity history
+                    $this->activityHistory[] = [
+                        'id' => 'dr_' . $reward->id, // Prefix to distinguish from experience audits
+                        'points' => $points,
+                        'type' => 'add',
+                        'reason' => "Daily login reward - Day {$reward->current_streak}",
+                        'date' => Carbon::parse($reward->claimed_at)->format('M d, Y h:i A'),
+                        'time_ago' => Carbon::parse($reward->claimed_at)->diffForHumans(),
+                    ];
+                }
+
+                // Sort combined history by date (newest first)
+                usort($this->activityHistory, function($a, $b) {
+                    return strtotime($b['date']) - strtotime($a['date']);
+                });
+
+                // Limit to 20 entries after combining
+                $this->activityHistory = array_slice($this->activityHistory, 0, 20);
+            } catch (\Exception $e) {
+                Log::error('Error fetching activity history: ' . $e->getMessage());
             }
         } catch (\Exception $e) {
             // Handle error
