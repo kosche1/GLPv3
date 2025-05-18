@@ -27,6 +27,33 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
 
     public ?string $rewardMessage = null;
 
+    // Login attempt tracking
+    public int $remainingAttempts = 5;
+    public bool $isLocked = false;
+    public int $lockoutSeconds = 0;
+
+    /**
+     * Initialize component state
+     */
+    public function mount(): void
+    {
+        // Check if there's a stored throttle key in the session
+        if (session()->has('login_throttle_key')) {
+            $throttleKey = session('login_throttle_key');
+
+            // Check if the user is rate limited
+            if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+                $this->isLocked = true;
+                $this->remainingAttempts = 0;
+                $this->lockoutSeconds = RateLimiter::availableIn($throttleKey);
+            } else {
+                // Get the number of attempts made
+                $attempts = RateLimiter::attempts($throttleKey);
+                $this->remainingAttempts = max(5 - $attempts, 0);
+            }
+        }
+    }
+
     /**
      * Handle an incoming authentication request.
      */
@@ -34,34 +61,59 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
     {
         $this->validate();
 
-        $this->ensureIsNotRateLimited();
+        // Store the throttle key in session to persist across page refreshes
+        $throttleKey = $this->throttleKey();
+        session()->put('login_throttle_key', $throttleKey);
 
-        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
-            RateLimiter::hit($this->throttleKey());
+        try {
+            $this->ensureIsNotRateLimited();
 
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
-        }
+            if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+                RateLimiter::hit($throttleKey);
 
-        RateLimiter::clear($this->throttleKey());
-        Session::regenerate();
+                // Update remaining attempts
+                $this->remainingAttempts = max(5 - RateLimiter::attempts($throttleKey), 0);
 
-        // Set a session flag to indicate a fresh login
-        session()->put('justLoggedIn', true);
+                // Check if we've hit the limit after this attempt
+                if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+                    $this->isLocked = true;
+                    $this->lockoutSeconds = RateLimiter::availableIn($throttleKey);
 
-        // Process daily login reward
-        $this->processDailyLoginReward();
+                    // Store the lockout end time in the session
+                    session()->put('login_lockout_end_time', time() + $this->lockoutSeconds);
 
-        // Check for achievements
-        $this->checkForAchievements();
+                    // Dispatch the lockout event with the seconds remaining
+                    $this->dispatch('lockout-started', seconds: $this->lockoutSeconds);
+                }
 
-        // Check for redirect parameter
-        $redirect = request()->query('redirect');
-        if ($redirect) {
-            $this->redirect($redirect);
-        } else {
-            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+                throw ValidationException::withMessages([
+                    'email' => __('auth.failed'),
+                ]);
+            }
+
+            RateLimiter::clear($throttleKey);
+            Session::regenerate();
+
+            // Set a session flag to indicate a fresh login
+            session()->put('justLoggedIn', true);
+
+            // Process daily login reward
+            $this->processDailyLoginReward();
+
+            // Check for achievements
+            $this->checkForAchievements();
+
+            // Check for redirect parameter
+            $redirect = request()->query('redirect');
+            if ($redirect) {
+                $this->redirect($redirect);
+            } else {
+                $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+            }
+        } catch (\Exception $e) {
+            // If any error occurs during login process, ensure we update the attempts
+            $this->remainingAttempts = max(5 - RateLimiter::attempts($throttleKey), 0);
+            throw $e;
         }
     }
 
@@ -240,13 +292,28 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
      */
     protected function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        $throttleKey = $this->throttleKey();
+
+        // Update remaining attempts
+        $attempts = RateLimiter::attempts($throttleKey);
+        $this->remainingAttempts = max(5 - $attempts, 0);
+
+        if (! RateLimiter::tooManyAttempts($throttleKey, 5)) {
             return;
         }
 
         event(new Lockout(request()));
 
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        $seconds = RateLimiter::availableIn($throttleKey);
+        $this->lockoutSeconds = $seconds;
+        $this->isLocked = true;
+
+        // Store the lockout end time in the session
+        session()->put('login_lockout_end_time', time() + $seconds);
+
+        // Dispatch an event for the JavaScript to handle the countdown
+        // This will trigger the client-side countdown timer
+        $this->dispatch('lockout-started', seconds: $seconds);
 
         throw ValidationException::withMessages([
             'email' => __('auth.throttle', [
@@ -262,6 +329,23 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
     protected function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+    }
+
+    /**
+     * Reset the lockout when the cooldown period is over
+     */
+    public function resetLockout(): void
+    {
+        $this->isLocked = false;
+        $this->lockoutSeconds = 0;
+        $this->remainingAttempts = 5;
+
+        // Clear the throttle key from the session
+        if (session()->has('login_throttle_key')) {
+            $throttleKey = session('login_throttle_key');
+            RateLimiter::clear($throttleKey);
+            session()->forget('login_throttle_key');
+        }
     }
 }; ?>
 
@@ -325,9 +409,40 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
         <!-- Remember Me -->
         <flux:checkbox wire:model="remember" label="{{ __('Remember me') }}" />
 
+        <!-- Login Attempts Counter -->
+        @if($remainingAttempts < 5 && !$isLocked)
+        <div class="text-sm text-amber-400 text-center">
+            {{ $remainingAttempts }} {{ Str::plural('attempt', $remainingAttempts) }} remaining
+        </div>
+        @endif
+
+        <!-- Lockout Timer - This will be dynamically managed by JavaScript -->
+        @if($isLocked)
+        <div class="p-3 bg-red-900/30 border border-red-500/30 rounded-lg text-center lockout-message-container">
+            <div class="text-red-300 mb-1">Too many failed attempts</div>
+            <div class="text-red-300">
+                Please wait <span id="lockout-timer" class="font-bold" data-seconds="{{ $lockoutSeconds }}"
+                    data-end-time="{{ session('login_lockout_end_time', time() + $lockoutSeconds) }}">{{ $lockoutSeconds }}</span> seconds before trying again
+            </div>
+        </div>
+        @endif
+
         <div class="flex items-center justify-end">
-        <flux:button variant="primary" type="submit" class="w-full bg-linear-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 transition-all duration-300">
-            {{ __('Log in') }}
+        <flux:button
+            variant="primary"
+            type="submit"
+            class="w-full bg-linear-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="$isLocked"
+            wire:loading.attr="disabled"
+        >
+            <span wire:loading.remove>{{ __('Log in') }}</span>
+            <span wire:loading class="inline-flex items-center">
+                <svg class="animate-spin mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>{{ __('Logging in...') }}</span>
+            </span>
         </flux:button>
         </div>
     </form>
@@ -338,7 +453,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
     </div>
 
     <script>
-        // Clear session lock state on login page
+        // Handle login attempts and lockout timer
         document.addEventListener('DOMContentLoaded', function() {
             localStorage.removeItem('sessionLocked');
             console.log('Session lock state cleared on login page');
@@ -352,6 +467,174 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
                     console.log('Login form submitted, marked as fresh login');
                 });
             }
+
+            // Global variable to store the countdown interval
+            let countdownInterval;
+
+            // Function to create and show the lockout message with timer
+            function showLockoutMessage(seconds) {
+                // Check if the lockout message already exists
+                let lockoutContainer = document.querySelector('.lockout-message-container');
+
+                if (!lockoutContainer) {
+                    // Create the lockout message container if it doesn't exist
+                    lockoutContainer = document.createElement('div');
+                    lockoutContainer.className = 'p-3 bg-red-900/30 border border-red-500/30 rounded-lg text-center lockout-message-container';
+
+                    // Create the message elements
+                    const titleDiv = document.createElement('div');
+                    titleDiv.className = 'text-red-300 mb-1';
+                    titleDiv.textContent = 'Too many failed attempts';
+
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'text-red-300';
+                    messageDiv.innerHTML = 'Please wait <span id="lockout-timer" class="font-bold"></span> seconds before trying again';
+
+                    // Append the elements to the container
+                    lockoutContainer.appendChild(titleDiv);
+                    lockoutContainer.appendChild(messageDiv);
+
+                    // Find the submit button container to insert before
+                    const submitButtonContainer = document.querySelector('form[wire\\:submit="login"] > div.flex.items-center');
+                    if (submitButtonContainer) {
+                        submitButtonContainer.parentNode.insertBefore(lockoutContainer, submitButtonContainer);
+                    } else {
+                        // Fallback: append to the form
+                        const form = document.querySelector('form[wire\\:submit="login"]');
+                        if (form) {
+                            form.appendChild(lockoutContainer);
+                        }
+                    }
+                }
+
+                // Get or create the timer element
+                let timerElement = document.getElementById('lockout-timer');
+                if (!timerElement) {
+                    timerElement = lockoutContainer.querySelector('.text-red-300:last-child').appendChild(document.createElement('span'));
+                    timerElement.id = 'lockout-timer';
+                    timerElement.className = 'font-bold';
+                }
+
+                // Set the initial seconds
+                timerElement.textContent = seconds;
+                timerElement.setAttribute('data-seconds', seconds);
+
+                // Calculate and store the end time
+                const endTime = Date.now() + (seconds * 1000);
+                timerElement.setAttribute('data-end-time', Math.floor(endTime / 1000));
+                localStorage.setItem('login_lockout_end_time', endTime.toString());
+
+                // Disable the login button
+                const loginButton = document.querySelector('form[wire\\:submit="login"] button[type="submit"]');
+                if (loginButton) {
+                    loginButton.setAttribute('disabled', 'disabled');
+                }
+
+                // Start the countdown
+                startCountdown();
+            }
+
+            // Function to start the countdown timer
+            function startCountdown() {
+                const timerElement = document.getElementById('lockout-timer');
+                if (!timerElement) return;
+
+                // Clear any existing interval
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
+
+                // Get the end time from the data attribute or from localStorage
+                let endTime;
+                if (timerElement.hasAttribute('data-end-time')) {
+                    endTime = parseInt(timerElement.getAttribute('data-end-time')) * 1000; // Convert to milliseconds
+                } else {
+                    const storedEndTime = localStorage.getItem('login_lockout_end_time');
+                    if (storedEndTime) {
+                        endTime = parseInt(storedEndTime);
+                    } else {
+                        // Fallback to using the seconds attribute
+                        const seconds = parseInt(timerElement.getAttribute('data-seconds') || timerElement.textContent);
+                        endTime = Date.now() + (seconds * 1000);
+                    }
+                }
+
+                // Store the end time in localStorage
+                localStorage.setItem('login_lockout_end_time', endTime.toString());
+
+                // Update the timer immediately
+                updateTimer(timerElement, endTime);
+
+                // Update the timer every second
+                countdownInterval = setInterval(() => {
+                    if (!updateTimer(timerElement, endTime)) {
+                        // If timer is complete, clear the interval
+                        clearInterval(countdownInterval);
+
+                        // Reset the lockout state
+                        resetLockout();
+                    }
+                }, 1000);
+            }
+
+            // Function to update the timer display
+            function updateTimer(timerElement, endTime) {
+                // Calculate remaining time
+                const now = Date.now();
+                const timeLeft = Math.max(0, Math.ceil((endTime - now) / 1000));
+
+                // Update the display
+                timerElement.textContent = timeLeft;
+
+                // If countdown is complete
+                if (timeLeft <= 0) {
+                    return false;
+                }
+                return true;
+            }
+
+            // Function to reset the lockout state
+            function resetLockout() {
+                localStorage.removeItem('login_lockout_end_time');
+
+                // Remove the lockout message if it exists
+                const lockoutContainer = document.querySelector('.lockout-message-container');
+                if (lockoutContainer) {
+                    lockoutContainer.remove();
+                }
+
+                // Enable the login button
+                const loginButton = document.querySelector('form[wire\\:submit="login"] button[type="submit"]');
+                if (loginButton) {
+                    loginButton.removeAttribute('disabled');
+                }
+
+                // Reset the lockout state via Livewire if available
+                if (typeof Livewire !== 'undefined') {
+                    try {
+                        const component = Livewire.find(document.querySelector('[wire\\:id]')?.getAttribute('wire:id'));
+                        if (component && typeof component.resetLockout === 'function') {
+                            component.resetLockout();
+                        }
+                    } catch (e) {
+                        console.error('Error resetting lockout via Livewire:', e);
+                    }
+                }
+            }
+
+            // Start the countdown timer if the lockout element exists
+            const timerElement = document.getElementById('lockout-timer');
+            if (timerElement) {
+                startCountdown();
+            }
+
+            // Listen for lockout events from Livewire
+            document.addEventListener('livewire:initialized', () => {
+                Livewire.on('lockout-started', (event) => {
+                    console.log('Lockout started, seconds:', event.seconds);
+                    showLockoutMessage(event.seconds);
+                });
+            });
         });
     </script>
 
