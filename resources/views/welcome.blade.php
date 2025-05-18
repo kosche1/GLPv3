@@ -326,8 +326,9 @@
                     </div>
                 </div>
             </div>
+            
 
-            <!-- Newsletter -->
+            {{-- <!-- Newsletter -->
             <div class="w-full max-w-4xl mb-20">
                 <div class="p-8 rounded-2xl bg-linear-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20">
                     <h3 class="text-2xl font-bold text-white mb-4 text-center">Stay Updated</h3>
@@ -337,7 +338,7 @@
                         <button type="submit" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors">Subscribe</button>
                     </form>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Footer -->
             <div class="w-full max-w-6xl border-t border-neutral-800 pt-8">
@@ -390,6 +391,7 @@
                 </div>
             </div>
         </div>
+
 
         @fluxScripts
         <script>
