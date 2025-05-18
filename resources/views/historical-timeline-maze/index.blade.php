@@ -635,7 +635,86 @@
                 // Timeline event listeners
                 prevEventBtn.addEventListener('click', showPreviousTimelineEvent);
                 nextEventBtn.addEventListener('click', showNextTimelineEvent);
-                eraSelector.addEventListener('change', updateTimelineEra);
+
+                // Enhanced Era selector with loading indicator and difficulty button management
+                eraSelector.addEventListener('change', async function(e) {
+                    // Get the selected era
+                    const selectedEra = e.target.value;
+                    currentEra = selectedEra;
+
+                    // Show loading indicator
+                    const difficultySection = document.querySelector('.difficulty-btn').closest('.mb-3');
+                    const loadingIndicator = document.createElement('div');
+                    loadingIndicator.id = 'era-loading-indicator';
+                    loadingIndicator.className = 'text-xs text-emerald-400 mb-2 flex items-center';
+                    loadingIndicator.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Loading ${selectedEra} era data...
+                    `;
+
+                    // Temporarily disable difficulty buttons
+                    const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+                    difficultyButtons.forEach(btn => {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    });
+
+                    // Insert loading indicator before difficulty buttons
+                    difficultySection.insertBefore(loadingIndicator, difficultySection.firstChild);
+
+                    try {
+                        // Load timeline events for the selected era
+                        await loadTimelineEvents(selectedEra);
+
+                        // Update the timeline display
+                        updateTimelineEra();
+
+                        // Preload questions for this era (all difficulties)
+                        const difficulties = ['easy', 'medium', 'hard'];
+                        for (const difficulty of difficulties) {
+                            await loadQuestions(selectedEra, difficulty);
+                        }
+                    } catch (error) {
+                        console.error('Error loading era data:', error);
+                    } finally {
+                        // Remove loading indicator
+                        const indicator = document.getElementById('era-loading-indicator');
+                        if (indicator) {
+                            indicator.remove();
+                        }
+
+                        // Re-enable difficulty buttons
+                        difficultyButtons.forEach(btn => {
+                            btn.disabled = false;
+                            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        });
+
+                        // Add a subtle animation to show buttons are ready
+                        difficultyButtons.forEach(btn => {
+                            btn.classList.add('animate-pulse');
+                            setTimeout(() => btn.classList.remove('animate-pulse'), 1000);
+                        });
+
+                        // Show a success notification
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed top-4 right-4 bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                        notification.innerHTML = `
+                            <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            ${selectedEra.charAt(0).toUpperCase() + selectedEra.slice(1)} era loaded! Choose a difficulty to continue.
+                        `;
+                        document.body.appendChild(notification);
+
+                        // Remove the notification after 3 seconds
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 3000);
+                    }
+                });
 
                 // Set initial difficulty
                 setDifficulty('easy');
@@ -1606,36 +1685,66 @@
                 setTimeout(showEventChoiceModal, 1500);
             }
 
-            // Function to load all questions for all eras and difficulties
-            async function loadAllQuestions() {
-                const eras = ['ancient', 'medieval', 'renaissance', 'modern', 'contemporary'];
+            // Function to load questions for a specific era and all difficulties
+            async function loadQuestionsForEra(era) {
                 const difficulties = ['easy', 'medium', 'hard'];
 
-                console.log("Starting to load all questions...");
+                console.log(`Starting to load questions for ${era}...`);
 
-                // Load questions for each era and difficulty
-                for (const era of eras) {
-                    for (const difficulty of difficulties) {
-                        console.log(`Loading questions for ${era} - ${difficulty}...`);
-                        await loadQuestions(era, difficulty);
+                // Create an array of promises for parallel loading
+                const loadPromises = difficulties.map(difficulty => {
+                    return loadQuestions(era, difficulty);
+                });
 
-                        // Check if questions were loaded successfully
-                        if (!questionsDatabase[era][difficulty] || questionsDatabase[era][difficulty].length === 0) {
-                            console.warn(`No questions loaded for ${era} - ${difficulty}`);
-                        } else {
-                            console.log(`Loaded ${questionsDatabase[era][difficulty].length} questions for ${era} - ${difficulty}`);
-                        }
-                    }
+                // Wait for all questions to load in parallel
+                await Promise.all(loadPromises);
+
+                // Log the loaded questions for this era
+                console.log(`Completed loading questions for ${era}:`, questionsDatabase[era]);
+
+                return true;
+            }
+
+            // Function to initialize the game with only the default era's questions
+            async function loadAllQuestions() {
+                const defaultEra = 'ancient';
+
+                console.log("Starting game initialization...");
+
+                try {
+                    // Load questions only for the default era to start
+                    await loadQuestionsForEra(defaultEra);
+
+                    // Initialize the timeline
+                    updateTimeline();
+
+                    // Initialize the game
+                    initGame();
+
+                    // Preload other eras in the background after the game is initialized
+                    setTimeout(() => {
+                        const otherEras = ['medieval', 'renaissance', 'modern', 'contemporary'];
+                        otherEras.forEach(era => {
+                            loadQuestionsForEra(era).catch(err => {
+                                console.warn(`Background loading of ${era} questions failed:`, err);
+                            });
+                        });
+                    }, 5000); // Start background loading 5 seconds after initialization
+
+                } catch (error) {
+                    console.error("Error during game initialization:", error);
+
+                    // Show an error notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                    notification.textContent = `Failed to initialize the game. Please try refreshing the page.`;
+                    document.body.appendChild(notification);
+
+                    // Remove the notification after 5 seconds
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 5000);
                 }
-
-                // Log the loaded questions database
-                console.log("Loaded questions database:", questionsDatabase);
-
-                // Initialize the timeline
-                updateTimeline();
-
-                // Initialize the game
-                initGame();
             }
 
             // Load all questions and initialize the game
