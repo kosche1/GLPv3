@@ -246,10 +246,11 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="player-name" class="block text-sm font-medium text-white mb-2">Save your score:</label>
-                                    <input type="text" id="player-name" placeholder="Enter your name" class="w-full px-4 py-2 mb-2 bg-neutral-900/70 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                                    <button id="save-score-btn" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors">
-                                        Save
+                                    <button id="save-score-btn" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                        </svg>
+                                        Save Score to Leaderboard
                                     </button>
                                 </div>
 
@@ -827,7 +828,11 @@
                 setDifficulty('easy');
 
                 // Initialize leaderboard
-                updateLeaderboard();
+                try {
+                    updateLeaderboard();
+                } catch (error) {
+                    console.error("Error initializing leaderboard:", error);
+                }
             }
 
             // Set the game difficulty
@@ -1435,6 +1440,9 @@
                 document.getElementById('completed-level-info').textContent =
                     `${eraNames[currentEra]} - ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}`;
 
+                // Load the leaderboard for this era and difficulty
+                loadLeaderboard();
+
                 // Show the modal
                 levelCompleteModal.classList.remove('hidden');
             }
@@ -1744,74 +1752,257 @@
                 }, 500);
             }
 
-            // Save score to leaderboard
-            function saveScore() {
-                const playerName = playerNameInput.value.trim();
-                if (!playerName) {
-                    alert('Please enter your name to save your score.');
-                    return;
-                }
-
+            // Save score to database
+            async function saveScore() {
                 // Calculate accuracy
                 const accuracy = Math.round((correctChoices / totalChoices) * 100);
 
                 // Get time from the final-time element to ensure consistency
                 const timeString = document.getElementById('final-time').textContent;
 
-                // Create new score entry
-                const newScore = {
-                    player: playerName,
-                    era: currentEra.charAt(0).toUpperCase() + currentEra.slice(1),
+                // Convert time string (MM:SS) to seconds
+                const timeParts = timeString.split(':');
+                const timeInSeconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
+
+                // Prepare data to send to the server
+                const progressData = {
                     score: score,
-                    time: timeString,
-                    accuracy: `${accuracy}%`
+                    era: currentEra,
+                    difficulty: currentDifficulty,
+                    time_taken: timeInSeconds,
+                    questions_answered: totalChoices,
+                    correct_answers: correctChoices,
+                    max_streak: streak,
+                    answers: studentAnswers,
+                    completed: true
                 };
 
-                // Add to leaderboard and sort
-                leaderboard.push(newScore);
-                leaderboard.sort((a, b) => b.score - a.score);
+                try {
+                    // Show loading indicator
+                    const saveButton = document.getElementById('save-score-btn');
+                    if (saveButton) {
+                        saveButton.disabled = true;
+                        saveButton.textContent = 'Saving...';
+                    }
 
-                // Update ranks
-                leaderboard = leaderboard.map((entry, index) => {
-                    return { ...entry, rank: index + 1 };
-                });
+                    // Create a form data object for the request
+                    const formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('score', progressData.score);
+                    formData.append('era', progressData.era);
+                    formData.append('difficulty', progressData.difficulty);
+                    formData.append('time_taken', progressData.time_taken);
+                    formData.append('questions_answered', progressData.questions_answered);
+                    formData.append('correct_answers', progressData.correct_answers);
+                    formData.append('max_streak', progressData.max_streak);
+                    formData.append('completed', progressData.completed ? 1 : 0);
 
-                // Keep only top 10
-                if (leaderboard.length > 10) {
-                    leaderboard = leaderboard.slice(0, 10);
+                    // Convert answers array to JSON string and append
+                    if (progressData.answers && progressData.answers.length > 0) {
+                        formData.append('answers', JSON.stringify(progressData.answers));
+                    } else {
+                        formData.append('answers', JSON.stringify([]));
+                    }
+
+                    // Send data to the server
+                    const response = await fetch('{{ route('subjects.specialized.humms.historical-timeline-maze.save-progress') }}', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Show success notification
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                        notification.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Progress saved successfully!
+                        `;
+                        document.body.appendChild(notification);
+
+                        // Remove the notification after 3 seconds
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 3000);
+
+                        // Load and update the leaderboard
+                        loadLeaderboard();
+                    } else {
+                        throw new Error(data.message || 'Failed to save progress');
+                    }
+                } catch (error) {
+                    console.error('Error saving progress:', error);
+
+                    // Show error notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                    notification.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Error saving progress: ${error.message}
+                    `;
+                    document.body.appendChild(notification);
+
+                    // Remove the notification after 5 seconds
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 5000);
+                } finally {
+                    // Re-enable the save button
+                    if (saveButton) {
+                        saveButton.disabled = false;
+                        saveButton.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                            </svg>
+                            Save Score to Leaderboard
+                        `;
+                    }
                 }
-
-                // Update leaderboard display
-                updateLeaderboard();
-
-                // Clear input and show confirmation
-                playerNameInput.value = '';
-                alert('Score saved successfully!');
-
-                // In a real application, you would send this data to your server
-                // to be stored in a database
-                console.log('Score saved:', newScore);
             }
 
-            // Update leaderboard display
+            // Load leaderboard data from the server
+            async function loadLeaderboard() {
+                try {
+                    // Show loading state
+                    leaderboardBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
+                                Loading leaderboard data...
+                            </td>
+                        </tr>
+                    `;
+
+                    // Make sure we have valid era and difficulty
+                    if (!currentEra || !currentDifficulty) {
+                        console.warn('Cannot load leaderboard: missing era or difficulty');
+                        leaderboardBody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
+                                    Select an era and difficulty to view leaderboard.
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    // Fetch leaderboard data from the server
+                    const response = await fetch(`{{ route('subjects.specialized.humms.historical-timeline-maze.leaderboard') }}?era=${currentEra}&difficulty=${currentDifficulty}`);
+
+                    if (!response.ok) {
+                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    // Update the leaderboard display
+                    updateLeaderboardDisplay(data.leaderboard, data.user_rank);
+                } catch (error) {
+                    console.error('Error loading leaderboard:', error);
+
+                    // Show error state
+                    leaderboardBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-4 py-4 text-center text-red-400">
+                                Error loading leaderboard data. Please try again later.
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            // Initialize the leaderboard with default data
             function updateLeaderboard() {
+                // Check if leaderboardBody exists
+                if (!leaderboardBody) {
+                    console.error("Leaderboard body element not found");
+                    return;
+                }
+
+                // Show loading state
+                leaderboardBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
+                            Select an era and difficulty to view leaderboard.
+                        </td>
+                    </tr>
+                `;
+
+                // If we have a current era and difficulty, try to load the leaderboard
+                if (currentEra && currentDifficulty) {
+                    loadLeaderboard();
+                }
+            }
+
+            // Update leaderboard display with data from the server
+            function updateLeaderboardDisplay(leaderboardData, userRank) {
                 leaderboardBody.innerHTML = '';
 
-                leaderboard.forEach(entry => {
+                if (!leaderboardData || leaderboardData.length === 0) {
+                    leaderboardBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
+                                No leaderboard entries yet. Be the first to complete this level!
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // Display leaderboard entries
+                leaderboardData.forEach(entry => {
                     const row = document.createElement('tr');
                     row.className = 'border-b border-neutral-700';
 
+                    // Format time from seconds to MM:SS
+                    const minutes = Math.floor(entry.time_taken / 60);
+                    const seconds = entry.time_taken % 60;
+                    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                    // Highlight the current user's entry
+                    const isCurrentUser = entry.user_id === {{ Auth::id() ?? 'null' }};
+                    const rowClass = isCurrentUser ? 'bg-emerald-900/20' : '';
+
+                    row.className = `border-b border-neutral-700 ${rowClass}`;
+
                     row.innerHTML = `
                         <td class="px-4 py-2 text-sm text-neutral-300">${entry.rank}</td>
-                        <td class="px-4 py-2 text-sm text-white">${entry.player}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.era}</td>
+                        <td class="px-4 py-2 text-sm text-white">${entry.username || 'Anonymous'}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.era.charAt(0).toUpperCase() + entry.era.slice(1)}</td>
                         <td class="px-4 py-2 text-sm text-emerald-400">${entry.score}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.time}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.accuracy}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${formattedTime}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${Math.round(entry.accuracy)}%</td>
                     `;
 
                     leaderboardBody.appendChild(row);
                 });
+
+                // Display user's rank if available but not in top 10
+                if (userRank && !leaderboardData.some(entry => entry.user_id === {{ Auth::id() ?? 'null' }})) {
+                    const userRow = document.createElement('tr');
+                    userRow.className = 'border-t-2 border-neutral-600 bg-emerald-900/20';
+
+                    // Format time from seconds to MM:SS
+                    const minutes = Math.floor(userRank.time_taken / 60);
+                    const seconds = userRank.time_taken % 60;
+                    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                    userRow.innerHTML = `
+                        <td class="px-4 py-2 text-sm text-neutral-300">${userRank.rank}</td>
+                        <td class="px-4 py-2 text-sm text-white">You</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${currentEra.charAt(0).toUpperCase() + currentEra.slice(1)}</td>
+                        <td class="px-4 py-2 text-sm text-emerald-400">${userRank.score}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${formattedTime}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${Math.round(userRank.accuracy)}%</td>
+                    `;
+
+                    leaderboardBody.appendChild(userRow);
+                }
             }
 
             // Update the timeline based on the selected era
@@ -2117,7 +2308,41 @@
             async function loadAllQuestions() {
                 console.log("Starting game initialization...");
 
+                // Create a persistent error banner that stays until initialization is complete
+                const errorBanner = document.createElement('div');
+                errorBanner.className = 'fixed top-0 left-0 right-0 bg-red-600 text-white px-4 py-2 text-center font-medium z-50 flex items-center justify-center';
+                errorBanner.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Initializing game... Please wait.
+                `;
+
                 try {
+                    // Check if all required DOM elements exist
+                    const requiredElements = [
+                        { name: 'startBtn', element: startBtn },
+                        { name: 'resetBtn', element: resetBtn },
+                        { name: 'easyBtn', element: easyBtn },
+                        { name: 'mediumBtn', element: mediumBtn },
+                        { name: 'hardBtn', element: hardBtn },
+                        { name: 'eraSelector', element: eraSelector },
+                        { name: 'gameInstructions', element: gameInstructions },
+                        { name: 'mazeCanvas', element: mazeCanvas },
+                        { name: 'hintBtn', element: hintBtn },
+                        { name: 'timeBtn', element: timeBtn },
+                        { name: 'skipBtn', element: skipBtn }
+                    ];
+
+                    // Check for missing elements
+                    const missingElements = requiredElements.filter(item => !item.element);
+                    if (missingElements.length > 0) {
+                        throw new Error(`Missing required DOM elements: ${missingElements.map(item => item.name).join(', ')}`);
+                    }
+
+                    // Add the error banner to the page before initialization
+                    document.body.appendChild(errorBanner);
+
                     // Initialize the game UI without loading any questions yet
                     // This makes the initial page load much faster
                     initGame();
@@ -2135,22 +2360,72 @@
                     // Initialize the timeline with empty data
                     updateTimeline();
 
+                    // Remove the error banner since initialization was successful
+                    errorBanner.remove();
+
+                    // Show success notification
+                    const successNotification = document.createElement('div');
+                    successNotification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                    successNotification.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Game initialized successfully! Select an Era to begin.
+                    `;
+                    document.body.appendChild(successNotification);
+
+                    // Remove the success notification after 3 seconds
+                    setTimeout(() => {
+                        successNotification.remove();
+                    }, 3000);
+
                     // We'll load questions on-demand when an era is selected
                     console.log("Game initialized successfully. Questions will be loaded when an era is selected.");
 
                 } catch (error) {
                     console.error("Error during game initialization:", error);
 
-                    // Show an error notification
-                    const notification = document.createElement('div');
-                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                    notification.textContent = `Failed to initialize the game. Please try refreshing the page.`;
-                    document.body.appendChild(notification);
+                    // Update the error banner with the specific error
+                    errorBanner.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Failed to initialize the game. Please try refreshing the page.
+                    `;
 
-                    // Remove the notification after 5 seconds
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 5000);
+                    // Try to initialize a minimal version of the game
+                    try {
+                        // Basic initialization of UI elements that are available
+                        if (gameInstructions) {
+                            gameInstructions.innerHTML = `
+                                <div class="p-6 bg-red-900/30 rounded-lg border border-red-500/30 max-w-md mx-auto">
+                                    <h3 class="text-xl font-bold text-white mb-4">Game Initialization Error</h3>
+                                    <p class="text-white mb-4">There was a problem initializing the game. This might be due to:</p>
+                                    <ul class="text-white list-disc pl-5 mb-4 space-y-2">
+                                        <li>Missing game elements</li>
+                                        <li>JavaScript errors</li>
+                                        <li>Network connectivity issues</li>
+                                    </ul>
+                                    <p class="text-white mb-6">Please try refreshing the page or contact support if the problem persists.</p>
+                                    <button onclick="window.location.reload()" class="w-full px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors">
+                                        Refresh Page
+                                    </button>
+                                </div>
+                            `;
+                            gameInstructions.classList.remove('hidden');
+                        }
+
+                        // Disable any buttons that might exist
+                        [startBtn, resetBtn, easyBtn, mediumBtn, hardBtn].forEach(btn => {
+                            if (btn) {
+                                btn.disabled = true;
+                                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                            }
+                        });
+
+                    } catch (fallbackError) {
+                        console.error("Failed to initialize fallback UI:", fallbackError);
+                    }
                 }
             }
 

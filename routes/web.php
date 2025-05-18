@@ -241,6 +241,7 @@ Route::middleware(
         Route::get('/historical-timeline-maze/questions', [HistoricalTimelineMazeController::class, 'getQuestions'])->name('historical-timeline-maze.questions');
         Route::get('/historical-timeline-maze/events', [HistoricalTimelineMazeController::class, 'getEvents'])->name('historical-timeline-maze.events');
         Route::post('/historical-timeline-maze/save-progress', [HistoricalTimelineMazeController::class, 'saveProgress'])->name('historical-timeline-maze.save-progress');
+        Route::get('/historical-timeline-maze/leaderboard', [HistoricalTimelineMazeController::class, 'getLeaderboard'])->name('historical-timeline-maze.leaderboard');
     });
 
     // Collaborative Learning Routes

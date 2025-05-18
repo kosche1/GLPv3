@@ -438,6 +438,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the historical timeline maze progress records for the user.
+     */
+    public function historicalTimelineMazeProgress()
+    {
+        return $this->hasMany(HistoricalTimelineMazeProgress::class);
+    }
+
+    /**
+     * Get the historical timeline maze leaderboard entries for the user.
+     */
+    public function historicalTimelineMazeLeaderboard()
+    {
+        return $this->hasMany(HistoricalTimelineMazeLeaderboard::class);
+    }
+
+    /**
      * Get the group challenges the user is participating in.
      */
     public function groupChallenges()

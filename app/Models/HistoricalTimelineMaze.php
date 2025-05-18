@@ -84,4 +84,20 @@ class HistoricalTimelineMaze extends Model
     {
         return $this->events()->where('era', $era)->orderBy('order');
     }
+
+    /**
+     * Get all progress records for the historical timeline maze.
+     */
+    public function progress(): HasMany
+    {
+        return $this->hasMany(HistoricalTimelineMazeProgress::class);
+    }
+
+    /**
+     * Get all leaderboard entries for the historical timeline maze.
+     */
+    public function leaderboard(): HasMany
+    {
+        return $this->hasMany(HistoricalTimelineMazeLeaderboard::class);
+    }
 }
