@@ -55,6 +55,15 @@ class RecipeBuilderController extends Controller
     }
 
     /**
+     * Get all recipe templates (challenges).
+     */
+    public function getTemplates()
+    {
+        $templates = RecipeTemplate::orderBy('difficulty_level')->orderBy('name')->get();
+        return response()->json($templates);
+    }
+
+    /**
      * Save a user recipe.
      */
     public function saveRecipe(Request $request)
