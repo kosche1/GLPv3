@@ -33,6 +33,11 @@
                 <flux:navlist.item icon="clock" :href="route('attendance.my-attendance')" :current="request()->routeIs('attendance.my-attendance')" wire:navigate class="py-1">{{ __('Attendance') }}</flux:navlist.item>
             </flux:navlist.group>
 
+            <!-- Collaborative Learning -->
+            <flux:navlist.group heading="Collaborative Learning" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
+                <flux:navlist.item icon="user-group" :href="route('study-groups.index')" :current="request()->routeIs('study-groups.*')" wire:navigate class="py-1">{{ __('Study Groups') }}</flux:navlist.item>
+            </flux:navlist.group>
+
             <!-- Communication -->
             <flux:navlist.group heading="Communication" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
                 <flux:navlist.item icon="users" :href="route('forums')" :current="request()->routeIs('forums')" wire:navigate class="py-1">{{ __('Forums') }}</flux:navlist.item>

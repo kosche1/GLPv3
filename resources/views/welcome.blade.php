@@ -20,6 +20,38 @@
             .animation-delay-4000 {
                 animation-delay: 4s;
             }
+
+            /* Scroll animation styles */
+            .animate-on-scroll {
+                opacity: 0;
+                transform: translateY(20px);
+                transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            }
+            .animate-fade-in {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Staggered animation delays for children */
+            .stagger-children > *:nth-child(1) { transition-delay: 0.1s; }
+            .stagger-children > *:nth-child(2) { transition-delay: 0.2s; }
+            .stagger-children > *:nth-child(3) { transition-delay: 0.3s; }
+            .stagger-children > *:nth-child(4) { transition-delay: 0.4s; }
+            .stagger-children > *:nth-child(5) { transition-delay: 0.5s; }
+            .stagger-children > *:nth-child(6) { transition-delay: 0.6s; }
+            .stagger-children > *:nth-child(7) { transition-delay: 0.7s; }
+            .stagger-children > *:nth-child(8) { transition-delay: 0.8s; }
+
+            /* Special animation for CTA */
+            .animate-cta {
+                animation: pulse-subtle 3s infinite ease-in-out;
+            }
+
+            @keyframes pulse-subtle {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.02); }
+                100% { transform: scale(1); }
+            }
         </style>
     </head>
     <body class="min-h-screen bg-zinc-900 antialiased">
@@ -83,7 +115,7 @@
         <!-- Main Content -->
         <div class="relative min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 z-10">
             <!-- Logo and Header -->
-            <div class="text-center mb-8 pt-20">
+            <div class="text-center mb-8 pt-20 animate-on-scroll">
                 <div class="flex justify-center mb-4">
                     <div class="relative animate-float">
                         <div class="absolute -inset-0.5 bg-linear-to-r from-emerald-500 to-blue-500 rounded-full blur-sm opacity-75 animate-pulse-slow"></div>
@@ -111,7 +143,7 @@
 
                 <p class="text-xl text-neutral-400 max-w-2xl mx-auto mb-4">Master new skills through gamified challenges, earn rewards, and track your progress in a fun, engaging environment.</p>
                 <p class="text-lg text-emerald-400 font-medium max-w-2xl mx-auto mb-8">Join thousands of learners who've leveled up their skills with our platform.</p>
-                <div class="flex flex-wrap justify-center gap-8 text-center">
+                <div class="flex flex-wrap justify-center gap-8 text-center stagger-children">
                     <div class="bg-zinc-800/50 p-6 rounded-xl border border-neutral-700">
                         <div class="text-3xl font-bold text-emerald-400 mb-2">{{ number_format($stats['users']) }}+</div>
                         <div class="text-neutral-400">Active Learners</div>
@@ -132,9 +164,9 @@
             </div>
 
             <!-- How It Works Section -->
-            <div id="how-it-works" class="w-full max-w-6xl mb-20">
+            <div id="how-it-works" class="w-full max-w-6xl mb-20 animate-on-scroll">
                 <h2 class="text-3xl font-bold text-white mb-8 text-center">How It Works</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 stagger-children">
                     @foreach($learningPaths as $path)
                     <!-- Step {{ $path['step'] }} -->
                     <div class="relative flex flex-col items-center text-center">
@@ -154,7 +186,7 @@
             </div>
 
             <!-- Features Grid -->
-            <div id="features" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full mb-20">
+            <div id="features" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full mb-20 animate-on-scroll stagger-children">
                 <!-- Feature Card 1 -->
                 <div class="group p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
                     <div class="p-3 bg-emerald-500/10 rounded-lg w-14 h-14 flex items-center justify-center mb-4">
@@ -190,10 +222,10 @@
             </div>
 
             <!-- Subjects we teach Section -->
-            <div class="w-full max-w-6xl mb-20">
+            <div class="w-full max-w-6xl mb-20 animate-on-scroll">
                 <h2 class="text-3xl font-bold text-white mb-8 text-center">Subjects We Teach</h2>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 stagger-children">
                     @foreach($technologies as $tech)
                     <!-- Subject: {{ $tech['name'] }} from {{ $tech['strand'] }} -->
                     <div class="flex flex-col items-center p-4 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:border-{{ $tech['color'] }}-500/30 hover:bg-neutral-800 transition-all duration-300 group">
@@ -232,9 +264,9 @@
             </div>
 
             <!-- Featured Courses -->
-            <div id="courses" class="w-full max-w-6xl mb-20">
+            <div id="courses" class="w-full max-w-6xl mb-20 animate-on-scroll">
                 <h2 class="text-3xl font-bold text-white mb-8 text-center">Featured Courses</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
                     @foreach($challenges as $challenge)
                     <div class="group bg-zinc-800 rounded-xl overflow-hidden border border-neutral-700 transition-all duration-300 hover:border-emerald-500/30">
                         <div class="aspect-video bg-neutral-900 relative overflow-hidden">
@@ -298,8 +330,8 @@
             </div> -->
 
             <!-- CTA Banner -->
-            <div class="w-full max-w-6xl mb-20">
-                <div class="p-8 md:p-12 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-blue-500/20 border border-emerald-500/30 relative overflow-hidden">
+            <div class="w-full max-w-6xl mb-20 animate-on-scroll">
+                <div class="p-8 md:p-12 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-blue-500/20 border border-emerald-500/30 relative overflow-hidden animate-cta">
                     <!-- Background elements -->
                     <div class="absolute -top-24 -right-24 w-48 h-48 rounded-full bg-emerald-500/10 blur-3xl"></div>
                     <div class="absolute -bottom-24 -left-24 w-48 h-48 rounded-full bg-blue-500/10 blur-3xl"></div>
@@ -326,7 +358,7 @@
                     </div>
                 </div>
             </div>
-            
+
 
             {{-- <!-- Newsletter -->
             <div class="w-full max-w-4xl mb-20">
@@ -341,7 +373,7 @@
             </div> --}}
 
             <!-- Footer -->
-            <div class="w-full max-w-6xl border-t border-neutral-800 pt-8">
+            <div class="w-full max-w-6xl border-t border-neutral-800 pt-8 animate-on-scroll">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     <div>
                         <h4 class="text-white font-semibold mb-4">About GLP</h4>
@@ -419,6 +451,26 @@
                         }, 500);
                     }
                 }, 300);
+            });
+
+            // Scroll animations
+            document.addEventListener('DOMContentLoaded', function() {
+                const animatedElements = document.querySelectorAll('.animate-on-scroll');
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('animate-fade-in');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.1
+                });
+
+                animatedElements.forEach(element => {
+                    observer.observe(element);
+                });
             });
         </script>
     </body>

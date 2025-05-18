@@ -242,6 +242,38 @@ Route::middleware(
         Route::get('/historical-timeline-maze/events', [HistoricalTimelineMazeController::class, 'getEvents'])->name('historical-timeline-maze.events');
         Route::post('/historical-timeline-maze/save-progress', [HistoricalTimelineMazeController::class, 'saveProgress'])->name('historical-timeline-maze.save-progress');
     });
+
+    // Collaborative Learning Routes
+    Route::prefix('study-groups')->name('study-groups.')->group(function () {
+        // Study Group Routes
+        Route::get('/', [\App\Http\Controllers\StudyGroupController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\StudyGroupController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\StudyGroupController::class, 'store'])->name('store');
+        Route::get('/{studyGroup}', [\App\Http\Controllers\StudyGroupController::class, 'show'])->name('show');
+        Route::get('/{studyGroup}/edit', [\App\Http\Controllers\StudyGroupController::class, 'edit'])->name('edit');
+        Route::put('/{studyGroup}', [\App\Http\Controllers\StudyGroupController::class, 'update'])->name('update');
+        Route::post('/join', [\App\Http\Controllers\StudyGroupController::class, 'join'])->name('join');
+        Route::post('/{studyGroup}/leave', [\App\Http\Controllers\StudyGroupController::class, 'leave'])->name('leave');
+
+        // Group Challenge Routes
+        Route::get('/{studyGroup}/challenges/create', [\App\Http\Controllers\GroupChallengeController::class, 'create'])->name('challenges.create');
+        Route::post('/{studyGroup}/challenges', [\App\Http\Controllers\GroupChallengeController::class, 'store'])->name('challenges.store');
+        Route::get('/{studyGroup}/challenges/{groupChallenge}', [\App\Http\Controllers\GroupChallengeController::class, 'show'])->name('challenges.show');
+        Route::get('/{studyGroup}/challenges/{groupChallenge}/edit', [\App\Http\Controllers\GroupChallengeController::class, 'edit'])->name('challenges.edit');
+        Route::put('/{studyGroup}/challenges/{groupChallenge}', [\App\Http\Controllers\GroupChallengeController::class, 'update'])->name('challenges.update');
+        Route::post('/{studyGroup}/challenges/{groupChallenge}/join', [\App\Http\Controllers\GroupChallengeController::class, 'join'])->name('challenges.join');
+        Route::post('/{studyGroup}/challenges/{groupChallenge}/progress', [\App\Http\Controllers\GroupChallengeController::class, 'updateProgress'])->name('challenges.progress');
+
+        // Group Discussion Routes
+        Route::get('/{studyGroup}/discussions', [\App\Http\Controllers\GroupDiscussionController::class, 'index'])->name('discussions.index');
+        Route::get('/{studyGroup}/discussions/create', [\App\Http\Controllers\GroupDiscussionController::class, 'create'])->name('discussions.create');
+        Route::post('/{studyGroup}/discussions', [\App\Http\Controllers\GroupDiscussionController::class, 'store'])->name('discussions.store');
+        Route::get('/{studyGroup}/discussions/{discussion}', [\App\Http\Controllers\GroupDiscussionController::class, 'show'])->name('discussions.show');
+        Route::get('/{studyGroup}/discussions/{discussion}/edit', [\App\Http\Controllers\GroupDiscussionController::class, 'edit'])->name('discussions.edit');
+        Route::put('/{studyGroup}/discussions/{discussion}', [\App\Http\Controllers\GroupDiscussionController::class, 'update'])->name('discussions.update');
+        Route::post('/{studyGroup}/discussions/{discussion}/pin', [\App\Http\Controllers\GroupDiscussionController::class, 'togglePin'])->name('discussions.pin');
+        Route::post('/{studyGroup}/discussions/{discussion}/comment', [\App\Http\Controllers\GroupDiscussionController::class, 'addComment'])->name('discussions.comment');
+    });
 });
 
 // Add this debug route temporarily

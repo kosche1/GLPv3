@@ -418,4 +418,55 @@ class User extends Authenticatable
     {
         return $this->customNotifications();
     }
+
+    /**
+     * Get the study groups the user is a member of.
+     */
+    public function studyGroups()
+    {
+        return $this->belongsToMany(StudyGroup::class, 'study_group_user')
+            ->withPivot('role', 'joined_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the study groups created by the user.
+     */
+    public function createdStudyGroups()
+    {
+        return $this->hasMany(StudyGroup::class, 'created_by');
+    }
+
+    /**
+     * Get the group challenges the user is participating in.
+     */
+    public function groupChallenges()
+    {
+        return $this->belongsToMany(GroupChallenge::class, 'user_group_challenges')
+            ->withPivot(
+                'status',
+                'progress',
+                'completed_at',
+                'reward_claimed',
+                'reward_claimed_at',
+                'attempts'
+            )
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the group discussions created by the user.
+     */
+    public function groupDiscussions()
+    {
+        return $this->hasMany(GroupDiscussion::class);
+    }
+
+    /**
+     * Get the group discussion comments created by the user.
+     */
+    public function groupDiscussionComments()
+    {
+        return $this->hasMany(GroupDiscussionComment::class);
+    }
 }
