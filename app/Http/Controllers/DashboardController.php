@@ -129,7 +129,8 @@ class DashboardController extends Controller
             'currentLoginStreak' => $currentLoginStreak,
             'timeRanges' => $timeRanges,
             'selectedTimeRange' => $timeRange,
-            'selectedActivityType' => $activityType
+            'selectedActivityType' => $activityType,
+            'activityData' => $activityData // Pass the full activity data to the view
         ], $dashboardData));
     }
 }
