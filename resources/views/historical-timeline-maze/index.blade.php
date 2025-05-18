@@ -931,6 +931,13 @@
                 studentAnswers = [];
                 currentQuestionIndex = 0;
 
+                // Reset power-up usage tracking
+                usedPowerups = {
+                    hint: 0, // Reset to 0 uses
+                    time: false,
+                    skip: false
+                };
+
                 // Restore original timeline data
                 resetTimelineData();
 
@@ -947,8 +954,67 @@
                 hintsRemainingDisplay.textContent = hintsRemaining;
                 powerupsAvailableDisplay.textContent = powerupsAvailable;
 
+                // Reset power-up buttons
+                resetPowerupButtons();
+
                 // Reset timeline
                 updateTimeline();
+            }
+
+            // Function to reset power-up buttons
+            function resetPowerupButtons() {
+                // Reset hint button
+                const hintButton = document.getElementById('hint-btn');
+                if (hintButton) {
+                    hintButton.disabled = false;
+                    hintButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    hintButton.classList.add('hover:bg-yellow-500/50');
+
+                    // Remove any "Used" labels
+                    const usedLabel = hintButton.querySelector('.used-label');
+                    if (usedLabel) {
+                        usedLabel.remove();
+                    }
+
+                    // Remove any hint count indicators
+                    const hintCount = hintButton.querySelector('.hint-count');
+                    if (hintCount) {
+                        hintCount.remove();
+                    }
+
+                    // Add a fresh hint count indicator
+                    const newHintCount = document.createElement('div');
+                    newHintCount.className = 'hint-count absolute bottom-0 right-0 bg-yellow-800 text-white text-xs px-1 rounded-full';
+                    newHintCount.textContent = '3';
+                    hintButton.style.position = 'relative';
+                    hintButton.appendChild(newHintCount);
+                }
+
+                // Reset time button
+                const timeButton = document.getElementById('time-btn');
+                if (timeButton) {
+                    timeButton.disabled = false;
+                    timeButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    timeButton.classList.add('hover:bg-blue-500/50');
+                    // Remove any "Used" labels
+                    const usedLabel = timeButton.querySelector('div');
+                    if (usedLabel) {
+                        usedLabel.remove();
+                    }
+                }
+
+                // Reset skip button
+                const skipButton = document.getElementById('skip-btn');
+                if (skipButton) {
+                    skipButton.disabled = false;
+                    skipButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    skipButton.classList.add('hover:bg-purple-500/50');
+                    // Remove any "Used" labels
+                    const usedLabel = skipButton.querySelector('div');
+                    if (usedLabel) {
+                        usedLabel.remove();
+                    }
+                }
             }
 
             // Start the timer
@@ -1428,9 +1494,39 @@
                 resetGame();
             }
 
+            // Track which power-ups have been used
+            let usedPowerups = {
+                hint: 0, // For hint, we track the number of uses (0-3)
+                time: false,
+                skip: false
+            };
+
+            // Function to disable a power-up button
+            function disablePowerupButton(buttonId, type) {
+                const button = document.getElementById(buttonId);
+                if (button) {
+                    // Mark as used
+                    usedPowerups[type] = true;
+
+                    // Disable the button
+                    button.disabled = true;
+
+                    // Add visual styling to show it's used
+                    button.classList.remove('hover:bg-yellow-500/50', 'hover:bg-blue-500/50', 'hover:bg-purple-500/50');
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+
+                    // Add "Used" label
+                    const usedLabel = document.createElement('div');
+                    usedLabel.className = 'absolute top-0 right-0 bg-neutral-800 text-white text-xs px-1 rounded-tr-lg rounded-bl-lg';
+                    usedLabel.textContent = 'Used';
+                    button.style.position = 'relative';
+                    button.appendChild(usedLabel);
+                }
+            }
+
             // Show hint modal
             function showHint() {
-                if (!gameActive || powerupsAvailable <= 0) return;
+                if (!gameActive || powerupsAvailable <= 0 || hintsRemaining <= 0 || usedPowerups.hint >= 3) return;
 
                 // Get a random hint for the current era
                 const hints = historicalHints[currentEra];
@@ -1447,41 +1543,110 @@
                 hintModal.classList.add('hidden');
             }
 
+            // Update hint button appearance based on remaining hints
+            function updateHintButtonAppearance() {
+                const hintButton = document.getElementById('hint-btn');
+                if (!hintButton) return;
+
+                // Update the hint count indicator
+                let hintCountIndicator = hintButton.querySelector('.hint-count');
+                if (!hintCountIndicator) {
+                    hintCountIndicator = document.createElement('div');
+                    hintCountIndicator.className = 'hint-count absolute bottom-0 right-0 bg-yellow-800 text-white text-xs px-1 rounded-full';
+                    hintButton.style.position = 'relative';
+                    hintButton.appendChild(hintCountIndicator);
+                }
+
+                // Update the count
+                hintCountIndicator.textContent = hintsRemaining;
+
+                // If no hints left, fully disable the button
+                if (hintsRemaining <= 0) {
+                    hintButton.disabled = true;
+                    hintButton.classList.remove('hover:bg-yellow-500/50');
+                    hintButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+                    // Add "Used" label if not already present
+                    let usedLabel = hintButton.querySelector('.used-label');
+                    if (!usedLabel) {
+                        usedLabel = document.createElement('div');
+                        usedLabel.className = 'used-label absolute top-0 right-0 bg-neutral-800 text-white text-xs px-1 rounded-tr-lg rounded-bl-lg';
+                        usedLabel.textContent = 'Used';
+                        hintButton.appendChild(usedLabel);
+                    }
+                }
+            }
+
             // Apply hint to reveal correct answer
             function applyHint() {
-                if (hintsRemaining <= 0) return;
+                if (hintsRemaining <= 0 || usedPowerups.hint >= 3) return;
 
+                // Increment the hint usage counter
+                usedPowerups.hint++;
+
+                // Decrement available hints
                 hintsRemaining--;
                 powerupsAvailable--;
                 hintsRemainingDisplay.textContent = hintsRemaining;
                 powerupsAvailableDisplay.textContent = powerupsAvailable;
 
-                // Highlight the correct answer in the event choices
+                // Find and highlight the correct answer in the event choices
                 const buttons = eventChoices.querySelectorAll('button');
-                buttons.forEach(button => {
-                    if (button.textContent.includes('Great Pyramid')) {
-                        button.classList.add('bg-yellow-600');
-                        button.classList.remove('bg-neutral-700', 'hover:bg-neutral-600');
-                    }
-                });
+                const correctOption = window.sampleEvents.find(option => option.correct === true);
+
+                if (correctOption) {
+                    buttons.forEach(button => {
+                        if (button.textContent.includes(correctOption.title)) {
+                            button.classList.add('bg-yellow-600');
+                            button.classList.remove('bg-neutral-700', 'hover:bg-neutral-600');
+                        }
+                    });
+                }
+
+                // Update the hint button appearance
+                updateHintButtonAppearance();
 
                 // Close the hint modal
                 closeHint();
+
+                // Show a notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                notification.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    Hint used! Correct answer highlighted. (${hintsRemaining} hints remaining)
+                `;
+                document.body.appendChild(notification);
+
+                // Remove the notification after 2 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 2000);
             }
 
             // Add time power-up
             function addTime() {
-                if (!gameActive || powerupsAvailable <= 0) return;
+                if (!gameActive || powerupsAvailable <= 0 || usedPowerups.time) return;
 
                 // Add 30 seconds to the timer
                 startTime += 30000; // 30 seconds in milliseconds
                 powerupsAvailable--;
                 powerupsAvailableDisplay.textContent = powerupsAvailable;
 
+                // Disable the time button
+                disablePowerupButton('time-btn', 'time');
+
                 // Show a notification
                 const notification = document.createElement('div');
-                notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                notification.textContent = '+30 seconds added!';
+                notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                notification.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    +30 seconds added! Time power-up used.
+                `;
                 document.body.appendChild(notification);
 
                 // Remove the notification after 2 seconds
@@ -1492,10 +1657,13 @@
 
             // Skip question power-up
             function skipQuestion() {
-                if (!gameActive || powerupsAvailable <= 0) return;
+                if (!gameActive || powerupsAvailable <= 0 || usedPowerups.skip) return;
 
                 powerupsAvailable--;
                 powerupsAvailableDisplay.textContent = powerupsAvailable;
+
+                // Disable the skip button
+                disablePowerupButton('skip-btn', 'skip');
 
                 // Skip the current question
                 eventChoiceModal.classList.add('hidden');
@@ -1505,8 +1673,13 @@
 
                 // Show a notification
                 const notification = document.createElement('div');
-                notification.className = 'fixed top-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                notification.textContent = 'Question skipped!';
+                notification.className = 'fixed top-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                notification.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                    Question skipped! Skip power-up used.
+                `;
                 document.body.appendChild(notification);
 
                 // Remove the notification after 2 seconds
@@ -1897,6 +2070,16 @@
                     // Initialize the game UI without loading any questions yet
                     // This makes the initial page load much faster
                     initGame();
+
+                    // Add initial hint count indicator to the hint button
+                    const hintButton = document.getElementById('hint-btn');
+                    if (hintButton) {
+                        const hintCount = document.createElement('div');
+                        hintCount.className = 'hint-count absolute bottom-0 right-0 bg-yellow-800 text-white text-xs px-1 rounded-full';
+                        hintCount.textContent = '3';
+                        hintButton.style.position = 'relative';
+                        hintButton.appendChild(hintCount);
+                    }
 
                     // Initialize the timeline with empty data
                     updateTimeline();
