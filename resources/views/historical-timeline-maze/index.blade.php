@@ -439,9 +439,12 @@
                     'The Magna Carta was signed in 1215, limiting the power of the English monarchy.'
                 ],
                 'renaissance': [
-                    'The printing press was invented by Johannes Gutenberg around 1440.',
-                    'The Renaissance began in Italy in the 14th century and spread throughout Europe.',
-                    'The Age of Exploration began in the early 15th century with Portuguese expeditions.'
+                    'The printing press was invented by Johannes Gutenberg around 1440, revolutionizing the spread of knowledge.',
+                    'Vesalius published his groundbreaking work on human anatomy "De Humani Corporis Fabrica" in 1543.',
+                    'Galileo improved the telescope in 1609, allowing him to make astronomical observations that supported the Copernican theory.',
+                    'William Harvey discovered blood circulation in 1628, transforming our understanding of human physiology.',
+                    'Copernicus published his heliocentric model in 1543, challenging the Earth-centered view of the universe.',
+                    'Leonardo da Vinci made detailed anatomical drawings between 1490-1510 based on human dissections.'
                 ],
                 'modern': [
                     'The Industrial Revolution began in Britain in the late 18th century.',
@@ -519,7 +522,8 @@
                         // Transform the data to match our expected format
                         questionsDatabase[era][difficulty] = data.questions.map(q => ({
                             question: q.question,
-                            options: q.options
+                            options: q.options,
+                            hint: q.hint || null // Include the hint from the database
                         }));
                         console.log(`Successfully loaded ${data.questions.length} questions for ${era} - ${difficulty}`);
                     } else {
@@ -1138,6 +1142,9 @@
                 // Get the current question
                 const currentQuestion = questions[currentQuestionIndex];
 
+                // Store the current question in a global variable for easier access
+                window.currentQuestionData = currentQuestion;
+
                 // Update the question text
                 const questionTitle = document.querySelector('#event-choice-modal h3');
                 const questionDescription = document.querySelector('#event-choice-modal p');
@@ -1524,14 +1531,58 @@
                 }
             }
 
+            // Get the database hint for the current question
+            function getQuestionHint() {
+                // If we have the current question data in the global variable, use its hint
+                if (window.currentQuestionData && window.currentQuestionData.hint) {
+                    return window.currentQuestionData.hint;
+                }
+
+                // If there's no current question, return a generic hint
+                if (!window.sampleEvents || !window.sampleEvents.length) {
+                    const hints = historicalHints[currentEra];
+                    return hints[Math.floor(Math.random() * hints.length)];
+                }
+
+                // Try to get the current question from the database
+                const currentQuestion = getCurrentQuestion();
+
+                // If we have a database hint for this question, use it
+                if (currentQuestion && currentQuestion.hint) {
+                    return currentQuestion.hint;
+                }
+
+                // Fallback to a generic hint if no database hint is available
+                const hints = historicalHints[currentEra];
+                return hints[Math.floor(Math.random() * hints.length)];
+            }
+
+            // Get the current question from the database
+            function getCurrentQuestion() {
+                // If we don't have the current question index or era/difficulty, return null
+                if (currentQuestionIndex === undefined || !currentEra || !currentDifficulty) {
+                    return null;
+                }
+
+                // Try to get the question from the database
+                if (questionsDatabase[currentEra] &&
+                    questionsDatabase[currentEra][currentDifficulty] &&
+                    questionsDatabase[currentEra][currentDifficulty].length > 0 &&
+                    currentQuestionIndex < questionsDatabase[currentEra][currentDifficulty].length) {
+
+                    return questionsDatabase[currentEra][currentDifficulty][currentQuestionIndex];
+                }
+
+                return null;
+            }
+
             // Show hint modal
             function showHint() {
                 if (!gameActive || powerupsAvailable <= 0 || hintsRemaining <= 0 || usedPowerups.hint >= 3) return;
 
-                // Get a random hint for the current era
-                const hints = historicalHints[currentEra];
-                const randomHint = hints[Math.floor(Math.random() * hints.length)];
-                document.getElementById('hint-text').textContent = randomHint;
+                // Get the hint for the current question from the database
+                const questionHint = getQuestionHint();
+                document.getElementById('hint-text').textContent = questionHint;
 
                 // Show the hint modal
                 hintModal.classList.remove('hidden');
