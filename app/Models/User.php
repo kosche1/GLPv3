@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use LevelUp\Experience\Models\Achievement;
 use LevelUp\Experience\Concerns\GiveExperience;
 use LevelUp\Experience\Concerns\HasAchievements;
+use LevelUp\Experience\Concerns\HasStreaks;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -23,6 +24,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasRoles;
     use GiveExperience;
     use HasAchievements;
+    use HasStreaks;
     use LogsActivity;
 
     /**
