@@ -1918,12 +1918,47 @@
                     completed: true
                 };
 
+                // Get the save button
+                const saveButton = document.getElementById('save-score-btn');
+
+                // Set a timeout to prevent the UI from being stuck in "Saving..." state
+                let saveTimeout;
+
                 try {
                     // Show loading indicator
-                    const saveButton = document.getElementById('save-score-btn');
                     if (saveButton) {
                         saveButton.disabled = true;
                         saveButton.textContent = 'Saving...';
+
+                        // Set a timeout to reset the button if the save operation takes too long
+                        saveTimeout = setTimeout(() => {
+                            console.warn('Save operation timeout - resetting button');
+                            if (saveButton) {
+                                saveButton.disabled = false;
+                                saveButton.innerHTML = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                    </svg>
+                                    Retry Save
+                                `;
+                            }
+
+                            // Show a timeout notification
+                            const timeoutNotification = document.createElement('div');
+                            timeoutNotification.className = 'fixed top-4 right-4 bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                            timeoutNotification.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Save operation is taking longer than expected. Please try again.
+                            `;
+                            document.body.appendChild(timeoutNotification);
+
+                            // Remove the notification after 5 seconds
+                            setTimeout(() => {
+                                timeoutNotification.remove();
+                            }, 5000);
+                        }, 10000); // 10 second timeout
                     }
 
                     // Create a form data object for the request
@@ -1945,14 +1980,23 @@
                         formData.append('answers', JSON.stringify([]));
                     }
 
-                    // Send data to the server
+                    console.log('Sending save request to server...');
+
+                    // Send data to the server with a timeout
+                    const controller = new AbortController();
+                    const abortTimeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout for fetch
+
                     const response = await fetch('{{ route('subjects.specialized.humms.historical-timeline-maze.save-progress') }}', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        body: formData
+                        body: formData,
+                        signal: controller.signal
                     });
+
+                    // Clear the abort timeout since the request completed
+                    clearTimeout(abortTimeout);
 
                     // Check if the response is JSON
                     const contentType = response.headers.get('content-type');
@@ -1960,7 +2004,23 @@
                         throw new Error('Server returned non-JSON response. This might be due to a server error or CSRF token issue.');
                     }
 
-                    const data = await response.json();
+                    // Clear the save button timeout since we got a response
+                    if (saveTimeout) {
+                        clearTimeout(saveTimeout);
+                    }
+
+                    const responseText = await response.text();
+                    console.log('Raw server response:', responseText);
+
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (parseError) {
+                        console.error('Failed to parse JSON response:', parseError);
+                        throw new Error('Failed to parse server response. Please try again.');
+                    }
+
+                    console.log('Parsed server response:', data);
 
                     if (data.success) {
                         // Show success notification
@@ -1979,12 +2039,37 @@
                             notification.remove();
                         }, 3000);
 
-                        // Load and update the leaderboard
-                        loadLeaderboard();
+                        // Update the save button to show success
+                        if (saveButton) {
+                            saveButton.disabled = true;
+                            saveButton.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Saved Successfully
+                            `;
+                            saveButton.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+                            saveButton.classList.add('bg-green-600');
+                        }
+
+                        // Load and update the leaderboard with a slight delay to ensure the database has updated
+                        // Try multiple times with increasing delays to ensure we get the updated data
+                        const refreshIntervals = [1000, 2000, 4000];
+                        refreshIntervals.forEach((delay, index) => {
+                            setTimeout(() => {
+                                console.log(`Refreshing leaderboard after successful save (attempt ${index + 1})`);
+                                loadLeaderboard();
+                            }, delay);
+                        });
                     } else {
                         throw new Error(data.message || 'Failed to save progress');
                     }
                 } catch (error) {
+                    // Clear the save button timeout if it exists
+                    if (saveTimeout) {
+                        clearTimeout(saveTimeout);
+                    }
+
                     console.error('Error saving progress:', error);
 
                     // Show error notification
@@ -1993,7 +2078,9 @@
 
                     // Create a more detailed error message
                     let errorMessage = error.message;
-                    if (errorMessage.includes('Unexpected token')) {
+                    if (error.name === 'AbortError') {
+                        errorMessage = 'Save request timed out. The server might be busy. Please try again.';
+                    } else if (errorMessage.includes('Unexpected token') || errorMessage.includes('parse')) {
                         errorMessage = 'Server returned an invalid response. This might be due to a CSRF token issue. Please refresh the page and try again.';
                     }
 
@@ -2010,8 +2097,8 @@
                         notification.remove();
                     }, 5000);
                 } finally {
-                    // Re-enable the save button
-                    if (saveButton) {
+                    // Re-enable the save button if it's not already in a success state
+                    if (saveButton && saveButton.textContent !== 'Saved Successfully') {
                         saveButton.disabled = false;
                         saveButton.innerHTML = `
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2025,114 +2112,162 @@
 
             // Load leaderboard data from the server
             async function loadLeaderboard() {
-                try {
-                    // Remove any existing error notifications
-                    removeErrorNotifications();
+                // Track retry attempts
+                let retryCount = 0;
+                const maxRetries = 3;
 
-                    // Show loading state
-                    leaderboardBody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
-                                Loading leaderboard data...
-                            </td>
-                        </tr>
-                    `;
+                async function attemptLoadLeaderboard() {
+                    try {
+                        // Remove any existing error notifications
+                        removeErrorNotifications();
 
-                    // Make sure we have valid era and difficulty
-                    if (!currentEra || !currentDifficulty) {
-                        console.warn('Cannot load leaderboard: missing era or difficulty');
+                        // Show loading state
                         leaderboardBody.innerHTML = `
                             <tr>
                                 <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
-                                    Select an era and difficulty to view leaderboard.
+                                    Loading leaderboard data...
                                 </td>
                             </tr>
                         `;
-                        // Display default leaderboard data
-                        displayDefaultLeaderboard();
-                        return;
+
+                        // Make sure we have valid era and difficulty
+                        if (!currentEra || !currentDifficulty) {
+                            console.warn('Cannot load leaderboard: missing era or difficulty');
+                            leaderboardBody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
+                                        Select an era and difficulty to view leaderboard.
+                                    </td>
+                                </tr>
+                            `;
+                            // Display default leaderboard data
+                            displayDefaultLeaderboard();
+                            return;
+                        }
+
+                        console.log(`Attempting to load leaderboard for era: ${currentEra}, difficulty: ${currentDifficulty}, attempt: ${retryCount + 1}`);
+
+                        // Create a controller to allow aborting the fetch if it takes too long
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+                        // Add a cache-busting parameter to prevent caching
+                        const cacheBuster = new Date().getTime();
+
+                        // Fetch leaderboard data from the server
+                        const response = await fetch(`{{ route('subjects.specialized.humms.historical-timeline-maze.leaderboard') }}?era=${currentEra}&difficulty=${currentDifficulty}&_=${cacheBuster}`, {
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                                'Cache-Control': 'no-cache, no-store, must-revalidate', // Stronger cache prevention
+                                'Pragma': 'no-cache',
+                                'Expires': '0'
+                            },
+                            signal: controller.signal
+                        });
+
+                        // Clear the timeout since the request completed
+                        clearTimeout(timeoutId);
+
+                        if (!response.ok) {
+                            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                        }
+
+                        // Check if the response is JSON
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            throw new Error('Server returned non-JSON response');
+                        }
+
+                        const responseText = await response.text();
+                        console.log('Raw leaderboard response:', responseText);
+
+                        // Try to parse the JSON
+                        let data;
+                        try {
+                            data = JSON.parse(responseText);
+                        } catch (parseError) {
+                            console.error('JSON parse error:', parseError);
+                            throw new Error(`Failed to parse JSON response: ${parseError.message}`);
+                        }
+
+                        console.log('Parsed leaderboard data:', data);
+
+                        // Check if the data has the expected structure
+                        if (!data || !data.leaderboard) {
+                            console.warn('Leaderboard data is missing or has unexpected format:', data);
+                            throw new Error('Server returned invalid leaderboard data structure');
+                        }
+
+                        // Update the leaderboard display
+                        updateLeaderboardDisplay(data.leaderboard, data.user_rank);
+
+                        // Reset retry count on success
+                        retryCount = 0;
+
+                        return true; // Success
+                    } catch (error) {
+                        console.error(`Error loading leaderboard (attempt ${retryCount + 1}):`, error);
+
+                        // Remove any existing error notifications
+                        removeErrorNotifications();
+
+                        // Create a more detailed error message
+                        let errorMessage = 'Error loading leaderboard data. Please try again later.';
+
+                        if (error.name === 'AbortError') {
+                            errorMessage = 'Leaderboard request timed out. The server might be busy. Please try again later.';
+                        } else if (error.message.includes('Unexpected token') || error.message.includes('non-JSON response') || error.message.includes('parse')) {
+                            errorMessage = 'Server returned an invalid response. This might be due to a CSRF token issue. Please refresh the page and try again.';
+                        }
+
+                        // Increment retry count
+                        retryCount++;
+
+                        if (retryCount < maxRetries) {
+                            // Show retry message in the leaderboard table
+                            leaderboardBody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" class="px-4 py-4 text-center text-yellow-400">
+                                        Retrying to load leaderboard (attempt ${retryCount + 1})...
+                                    </td>
+                                </tr>
+                            `;
+
+                            // Wait a bit before retrying (exponential backoff)
+                            const retryDelay = Math.min(1000 * Math.pow(2, retryCount - 1), 5000);
+                            console.log(`Retrying in ${retryDelay}ms...`);
+
+                            await new Promise(resolve => setTimeout(resolve, retryDelay));
+                            return false; // Retry needed
+                        } else {
+                            // Show error state in the leaderboard table after max retries
+                            leaderboardBody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" class="px-4 py-4 text-center text-red-400">
+                                        ${errorMessage}
+                                    </td>
+                                </tr>
+                            `;
+
+                            // Log the error but don't show a notification - we'll just display default data
+                            console.log('Displaying default leaderboard data after max retries:', error.message);
+
+                            // Fall back to default leaderboard
+                            displayDefaultLeaderboard();
+
+                            // Reset retry count
+                            retryCount = 0;
+
+                            return true; // Stop retrying
+                        }
                     }
+                }
 
-                    console.log(`Attempting to load leaderboard for era: ${currentEra}, difficulty: ${currentDifficulty}`);
-
-                    // Create a controller to allow aborting the fetch if it takes too long
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-
-                    // Fetch leaderboard data from the server
-                    const response = await fetch(`{{ route('subjects.specialized.humms.historical-timeline-maze.leaderboard') }}?era=${currentEra}&difficulty=${currentDifficulty}`, {
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json',
-                            'Cache-Control': 'no-cache' // Prevent caching
-                        },
-                        signal: controller.signal
-                    });
-
-                    // Clear the timeout since the request completed
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) {
-                        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-                    }
-
-                    // Check if the response is JSON
-                    const contentType = response.headers.get('content-type');
-                    if (!contentType || !contentType.includes('application/json')) {
-                        throw new Error('Server returned non-JSON response');
-                    }
-
-                    const responseText = await response.text();
-                    console.log('Raw response:', responseText);
-
-                    // Try to parse the JSON
-                    let data;
-                    try {
-                        data = JSON.parse(responseText);
-                    } catch (parseError) {
-                        console.error('JSON parse error:', parseError);
-                        throw new Error(`Failed to parse JSON response: ${parseError.message}`);
-                    }
-
-                    console.log('Parsed leaderboard data:', data);
-
-                    // Check if the data has the expected structure
-                    if (!data || !data.leaderboard) {
-                        console.warn('Leaderboard data is missing or has unexpected format:', data);
-                        throw new Error('Server returned invalid leaderboard data structure');
-                    }
-
-                    // Update the leaderboard display
-                    updateLeaderboardDisplay(data.leaderboard, data.user_rank);
-                } catch (error) {
-                    console.error('Error loading leaderboard:', error);
-
-                    // Remove any existing error notifications
-                    removeErrorNotifications();
-
-                    // Create a more detailed error message
-                    let errorMessage = 'Error loading leaderboard data. Please try again later.';
-
-                    if (error.name === 'AbortError') {
-                        errorMessage = 'Leaderboard request timed out. The server might be busy. Please try again later.';
-                    } else if (error.message.includes('Unexpected token') || error.message.includes('non-JSON response') || error.message.includes('parse')) {
-                        errorMessage = 'Server returned an invalid response. This might be due to a CSRF token issue. Please refresh the page and try again.';
-                    }
-
-                    // Show error state in the leaderboard table
-                    leaderboardBody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="px-4 py-4 text-center text-red-400">
-                                ${errorMessage}
-                            </td>
-                        </tr>
-                    `;
-
-                    // Log the error but don't show a notification - we'll just display default data
-                    console.log('Displaying default leaderboard data due to error:', error.message);
-
-                    // Fall back to default leaderboard immediately
-                    displayDefaultLeaderboard();
+                // Start the retry loop
+                let success = false;
+                while (!success && retryCount < maxRetries) {
+                    success = await attemptLoadLeaderboard();
                 }
             }
 
@@ -2231,10 +2366,15 @@
                     return;
                 }
 
+                console.log('Updating leaderboard display with', leaderboardData.length, 'entries');
+
+                // Check if the current user is in the leaderboard data
+                const userInLeaderboard = leaderboardData.some(entry => entry.user_id == currentUserId);
+                console.log('Current user in leaderboard:', userInLeaderboard);
+
                 // Display leaderboard entries
                 leaderboardData.forEach(entry => {
                     const row = document.createElement('tr');
-                    row.className = 'border-b border-neutral-700';
 
                     // Format time from seconds to MM:SS
                     const minutes = Math.floor(entry.time_taken / 60);
@@ -2243,15 +2383,24 @@
 
                     // Highlight the current user's entry
                     const isCurrentUser = entry.user_id == currentUserId;
-                    const rowClass = isCurrentUser ? 'bg-emerald-900/20' : '';
 
-                    row.className = `border-b border-neutral-700 ${rowClass}`;
+                    // Apply special styling for the current user's row
+                    if (isCurrentUser) {
+                        row.className = 'border-b border-neutral-700 bg-emerald-900/30 animate-pulse';
+
+                        // Stop the animation after 3 seconds
+                        setTimeout(() => {
+                            row.classList.remove('animate-pulse');
+                        }, 3000);
+                    } else {
+                        row.className = 'border-b border-neutral-700';
+                    }
 
                     row.innerHTML = `
                         <td class="px-4 py-2 text-sm text-neutral-300">${entry.rank}</td>
-                        <td class="px-4 py-2 text-sm text-white">${entry.username || 'Anonymous'}</td>
+                        <td class="px-4 py-2 text-sm ${isCurrentUser ? 'font-bold text-emerald-300' : 'text-white'}">${isCurrentUser ? 'You' : (entry.username || 'Anonymous')}</td>
                         <td class="px-4 py-2 text-sm text-neutral-300">${entry.era.charAt(0).toUpperCase() + entry.era.slice(1)}</td>
-                        <td class="px-4 py-2 text-sm text-emerald-400">${entry.score}</td>
+                        <td class="px-4 py-2 text-sm ${isCurrentUser ? 'font-bold text-emerald-300' : 'text-emerald-400'}">${entry.score}</td>
                         <td class="px-4 py-2 text-sm text-neutral-300">${formattedTime}</td>
                         <td class="px-4 py-2 text-sm text-neutral-300">${Math.round(entry.accuracy)}%</td>
                     `;
@@ -2260,9 +2409,16 @@
                 });
 
                 // Display user's rank if available but not in top 10
-                if (userRank && !leaderboardData.some(entry => entry.user_id == currentUserId)) {
+                if (userRank && !userInLeaderboard) {
+                    console.log('Adding user rank row for user not in top leaderboard');
+
                     const userRow = document.createElement('tr');
-                    userRow.className = 'border-t-2 border-neutral-600 bg-emerald-900/20';
+                    userRow.className = 'border-t-2 border-neutral-600 bg-emerald-900/30 animate-pulse';
+
+                    // Stop the animation after 3 seconds
+                    setTimeout(() => {
+                        userRow.classList.remove('animate-pulse');
+                    }, 3000);
 
                     // Format time from seconds to MM:SS
                     const minutes = Math.floor(userRank.time_taken / 60);
@@ -2271,14 +2427,26 @@
 
                     userRow.innerHTML = `
                         <td class="px-4 py-2 text-sm text-neutral-300">${userRank.rank}</td>
-                        <td class="px-4 py-2 text-sm text-white">You</td>
+                        <td class="px-4 py-2 text-sm font-bold text-emerald-300">You</td>
                         <td class="px-4 py-2 text-sm text-neutral-300">${currentEra.charAt(0).toUpperCase() + currentEra.slice(1)}</td>
-                        <td class="px-4 py-2 text-sm text-emerald-400">${userRank.score}</td>
+                        <td class="px-4 py-2 text-sm font-bold text-emerald-300">${userRank.score}</td>
                         <td class="px-4 py-2 text-sm text-neutral-300">${formattedTime}</td>
                         <td class="px-4 py-2 text-sm text-neutral-300">${Math.round(userRank.accuracy)}%</td>
                     `;
 
                     leaderboardBody.appendChild(userRow);
+                }
+
+                // Add a visual indicator that the leaderboard has been updated
+                const leaderboardContainer = leaderboardBody.closest('.bg-neutral-800');
+                if (leaderboardContainer) {
+                    leaderboardContainer.classList.add('border-emerald-500');
+
+                    // Reset the border after a short delay
+                    setTimeout(() => {
+                        leaderboardContainer.classList.remove('border-emerald-500');
+                        leaderboardContainer.classList.add('border-neutral-700');
+                    }, 2000);
                 }
             }
 
