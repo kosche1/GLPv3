@@ -7,6 +7,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ForumController;
+use App\Http\Controllers\ParagonZController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ActivityGoalController;
 use App\Http\Controllers\MoleculeBuilderController;
@@ -143,6 +144,8 @@ Route::middleware(
     // Dynamic route for any subject type - must be after specific routes
     Route::get('subjects/{code}', [\App\Http\Controllers\SubjectsController::class, 'showSubjectType'])->name('subjects.type');
     // Notification routes
+    Route::get('paragonz', [ParagonZController::class, 'index'])->name('paragonz');
+
     Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');
     Route::get('api/notifications', [\App\Http\Controllers\NotificationController::class, 'getNotifications'])->name('notifications.get');
     Route::post('api/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');

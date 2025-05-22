@@ -19,18 +19,24 @@ class SubjectsController extends Controller
         // Get the Core subject type
         $subjectType = SubjectType::where('code', 'core')->first();
 
+        // Get all core subject challenges
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
-            ->where('is_active', true)
             ->where('subject_type_id', $subjectType?->id)
             ->orderBy('required_level', 'asc')
             ->get();
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -48,7 +54,8 @@ class SubjectsController extends Controller
         return view('subjects.core-subjects', [
             'challenges' => $challenges,
             'subjectType' => 'Core',
-            'completedChallenges' => $completedChallenges
+            'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges
         ]);
     }
 
@@ -61,17 +68,22 @@ class SubjectsController extends Controller
         $subjectType = SubjectType::where('code', 'applied')->first();
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
-            ->where('is_active', true)
             ->where('subject_type_id', $subjectType?->id)
             ->orderBy('required_level', 'asc')
             ->get();
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -89,7 +101,8 @@ class SubjectsController extends Controller
         return view('subjects.applied-subjects', [
             'challenges' => $challenges,
             'subjectType' => 'Applied',
-            'completedChallenges' => $completedChallenges
+            'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges
         ]);
     }
 
@@ -105,17 +118,22 @@ class SubjectsController extends Controller
         $strands = Strand::where('is_active', true)->orderBy('order')->get();
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
-            ->where('is_active', true)
             ->where('subject_type_id', $subjectType?->id)
             ->orderBy('required_level', 'asc')
             ->get();
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -134,6 +152,7 @@ class SubjectsController extends Controller
             'challenges' => $challenges,
             'subjectType' => 'Specialized',
             'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges,
             'strands' => $strands
         ]);
     }
@@ -150,7 +169,6 @@ class SubjectsController extends Controller
         $strand = Strand::where('code', 'abm')->first();
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
-            ->where('is_active', true)
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand?->id)
             ->orderBy('required_level', 'asc')
@@ -158,10 +176,16 @@ class SubjectsController extends Controller
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -180,7 +204,8 @@ class SubjectsController extends Controller
             'challenges' => $challenges,
             'trackName' => 'ABM',
             'trackFullName' => 'Accountancy, Business, and Management',
-            'completedChallenges' => $completedChallenges
+            'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges
         ]);
     }
 
@@ -196,7 +221,6 @@ class SubjectsController extends Controller
         $strand = Strand::where('code', 'he')->first();
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
-            ->where('is_active', true)
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand?->id)
             ->orderBy('required_level', 'asc')
@@ -204,10 +228,16 @@ class SubjectsController extends Controller
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -226,7 +256,8 @@ class SubjectsController extends Controller
             'challenges' => $challenges,
             'trackName' => 'HE',
             'trackFullName' => 'Home Economics',
-            'completedChallenges' => $completedChallenges
+            'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges
         ]);
     }
 
@@ -242,7 +273,6 @@ class SubjectsController extends Controller
         $strand = Strand::where('code', 'humms')->first();
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
-            ->where('is_active', true)
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand?->id)
             ->orderBy('required_level', 'asc')
@@ -250,10 +280,16 @@ class SubjectsController extends Controller
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -272,7 +308,8 @@ class SubjectsController extends Controller
             'challenges' => $challenges,
             'trackName' => 'HUMMS',
             'trackFullName' => 'Humanities and Social Sciences',
-            'completedChallenges' => $completedChallenges
+            'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges
         ]);
     }
 
@@ -296,10 +333,16 @@ class SubjectsController extends Controller
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -318,7 +361,8 @@ class SubjectsController extends Controller
             'challenges' => $challenges,
             'trackName' => 'STEM',
             'trackFullName' => 'Science, Technology, Engineering, and Mathematics',
-            'completedChallenges' => $completedChallenges
+            'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges
         ]);
     }
 
@@ -334,7 +378,6 @@ class SubjectsController extends Controller
         $strand = Strand::where('code', 'ict')->first();
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
-            ->where('is_active', true)
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand?->id)
             ->orderBy('required_level', 'asc')
@@ -342,10 +385,16 @@ class SubjectsController extends Controller
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -364,7 +413,8 @@ class SubjectsController extends Controller
             'challenges' => $challenges,
             'trackName' => 'ICT',
             'trackFullName' => 'Information and Communications Technology',
-            'completedChallenges' => $completedChallenges
+            'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges
         ]);
     }
 
@@ -377,17 +427,22 @@ class SubjectsController extends Controller
         $subjectType = SubjectType::where('code', $code)->firstOrFail();
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
-            ->where('is_active', true)
             ->where('subject_type_id', $subjectType->id)
             ->orderBy('required_level', 'asc')
             ->get();
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -415,7 +470,8 @@ class SubjectsController extends Controller
             'challenges' => $challenges,
             'subjectType' => $subjectType->name,
             'subjectTypeObject' => $subjectType,
-            'completedChallenges' => $completedChallenges
+            'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges
         ]);
     }
 
@@ -431,7 +487,6 @@ class SubjectsController extends Controller
         $strand = Strand::where('code', $code)->firstOrFail();
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
-            ->where('is_active', true)
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand->id)
             ->orderBy('required_level', 'asc')
@@ -439,10 +494,16 @@ class SubjectsController extends Controller
 
         // Get completed challenges for the current user
         $completedChallenges = [];
+        $expiredChallenges = [];
         if (Auth::check()) {
             $userId = Auth::id();
 
             foreach ($challenges as $challenge) {
+                // Check if challenge is expired using the model accessor
+                if ($challenge->isExpired()) {
+                    $expiredChallenges[] = $challenge->id;
+                }
+
                 $totalTasks = $challenge->tasks->count();
                 if ($totalTasks > 0) {
                     $completedTasks = \App\Models\StudentAnswer::where('user_id', $userId)
@@ -471,7 +532,8 @@ class SubjectsController extends Controller
             'trackName' => $strand->name,
             'trackFullName' => $strand->full_name,
             'strand' => $strand,
-            'completedChallenges' => $completedChallenges
+            'completedChallenges' => $completedChallenges,
+            'expiredChallenges' => $expiredChallenges
         ]);
     }
 }

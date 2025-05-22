@@ -33,6 +33,23 @@ class ChallengeCompletionTable extends BaseWidget
                 Tables\Columns\TextColumn::make('name')
                     ->label('Challenge')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->state(function (Challenge $record): string {
+                        $now = now();
+                        if ($record->end_date && $now->gt($record->end_date)) {
+                            return 'Expired';
+                        }
+                        return $record->is_active ? 'Active' : 'Inactive';
+                    })
+                    ->color(function (string $state): string {
+                        return match ($state) {
+                            'Active' => 'success',
+                            'Expired' => 'danger',
+                            default => 'gray',
+                        };
+                    }),
                 Tables\Columns\TextColumn::make('total_participants')
                     ->label('Participants')
                     ->sortable(),

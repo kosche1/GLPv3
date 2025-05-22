@@ -97,6 +97,9 @@ class LearningController extends Controller
 
     public function show(Challenge $challenge): View
     {
+        // Check if the challenge is expired using the model accessor
+        $isExpired = $challenge->isExpired();
+
         // Get all tasks for this challenge
         $tasks = $challenge->tasks()->orderBy('order')->get();
 
@@ -113,7 +116,8 @@ class LearningController extends Controller
         return view('challenge', [
             'challenge' => $challenge,
             'tasks' => $tasks,
-            'completedTaskIds' => $completedTaskIds
+            'completedTaskIds' => $completedTaskIds,
+            'isExpired' => $isExpired
         ]);
     }
 

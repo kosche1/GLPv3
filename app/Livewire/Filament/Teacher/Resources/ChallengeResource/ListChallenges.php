@@ -15,8 +15,17 @@ class ListChallenges extends Component
             ->latest()
             ->get();
 
+        // Identify expired challenges using the model accessor
+        $expiredChallengeIds = $challenges
+            ->filter(function ($challenge) {
+                return $challenge->isExpired();
+            })
+            ->pluck('id')
+            ->toArray();
+
         return view('livewire.filament.teacher.resources.challenge-resource.list-challenges', [
             'challenges' => $challenges,
+            'expiredChallengeIds' => $expiredChallengeIds,
         ]);
     }
 }

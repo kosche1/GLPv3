@@ -86,10 +86,24 @@
 
                                         <!-- Timeline dot -->
                                         <div class="absolute left-0 top-[6px] h-[18px] w-[18px] rounded-full border-2
-                                            {{ $activity['type'] === 'add' ? 'border-emerald-500 bg-emerald-500/20' :
-                                               ($activity['type'] === 'remove' ? 'border-red-500 bg-red-500/20' :
-                                               ($activity['type'] === 'level_up' ? 'border-yellow-500 bg-yellow-500/20' :
-                                               'border-blue-500 bg-blue-500/20')) }}
+                                            @if(isset($activity['activity_type']) && $activity['activity_type'] === 'notification')
+                                                @if($activity['notification_type'] === 'achievement')
+                                                    border-yellow-500 bg-yellow-500/20
+                                                @elseif($activity['notification_type'] === 'grade')
+                                                    border-emerald-500 bg-emerald-500/20
+                                                @elseif($activity['notification_type'] === 'challenge')
+                                                    border-blue-500 bg-blue-500/20
+                                                @elseif($activity['notification_type'] === 'reward')
+                                                    border-orange-500 bg-orange-500/20
+                                                @else
+                                                    border-purple-500 bg-purple-500/20
+                                                @endif
+                                            @else
+                                                {{ $activity['type'] === 'add' ? 'border-emerald-500 bg-emerald-500/20' :
+                                                   ($activity['type'] === 'remove' ? 'border-red-500 bg-red-500/20' :
+                                                   ($activity['type'] === 'level_up' ? 'border-yellow-500 bg-yellow-500/20' :
+                                                   'border-blue-500 bg-blue-500/20')) }}
+                                            @endif
                                             group-hover:scale-110 transition-transform duration-300">
                                         </div>
 
@@ -99,7 +113,31 @@
                                                 <div>
                                                     <div class="flex items-center">
                                                         <!-- Activity type icon -->
-                                                        @if($activity['type'] === 'add')
+                                                        @if(isset($activity['activity_type']) && $activity['activity_type'] === 'notification')
+                                                            @if($activity['notification_type'] === 'achievement')
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            @elseif($activity['notification_type'] === 'grade')
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            @elseif($activity['notification_type'] === 'challenge')
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
+                                                                </svg>
+                                                            @elseif($activity['notification_type'] === 'reward')
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-orange-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clip-rule="evenodd" />
+                                                                    <path d="M9 11H3v5a2 2 0 002 2h4v-7zm2 7h4a2 2 0 002-2v-5h-6v7z" />
+                                                                </svg>
+                                                            @else
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            @endif
+                                                        @elseif($activity['type'] === 'add')
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                                                             </svg>
@@ -119,30 +157,96 @@
 
                                                         <!-- Activity type label -->
                                                         <span class="text-sm font-medium
-                                                            {{ $activity['type'] === 'add' ? 'text-emerald-400' :
-                                                               ($activity['type'] === 'remove' ? 'text-red-400' :
-                                                               ($activity['type'] === 'level_up' ? 'text-yellow-400' :
-                                                               'text-blue-400')) }}">
-                                                            {{ $activity['type'] === 'add' ? 'Earned Points' :
-                                                               ($activity['type'] === 'remove' ? 'Lost Points' :
-                                                               ($activity['type'] === 'level_up' ? 'Level Up' :
-                                                               'Reset')) }}
+                                                            @if(isset($activity['activity_type']) && $activity['activity_type'] === 'notification')
+                                                                @if($activity['notification_type'] === 'achievement')
+                                                                    text-yellow-400
+                                                                @elseif($activity['notification_type'] === 'grade')
+                                                                    text-emerald-400
+                                                                @elseif($activity['notification_type'] === 'challenge')
+                                                                    text-blue-400
+                                                                @elseif($activity['notification_type'] === 'reward')
+                                                                    text-orange-400
+                                                                @else
+                                                                    text-purple-400
+                                                                @endif
+                                                            @else
+                                                                {{ $activity['type'] === 'add' ? 'text-emerald-400' :
+                                                                   ($activity['type'] === 'remove' ? 'text-red-400' :
+                                                                   ($activity['type'] === 'level_up' ? 'text-yellow-400' :
+                                                                   'text-blue-400')) }}
+                                                            @endif
+                                                            ">
+                                                            @if(isset($activity['activity_type']) && $activity['activity_type'] === 'notification')
+                                                                @if($activity['notification_type'] === 'achievement')
+                                                                    Achievement
+                                                                @elseif($activity['notification_type'] === 'grade')
+                                                                    Task Approved
+                                                                @elseif($activity['notification_type'] === 'challenge')
+                                                                    Challenge
+                                                                @elseif($activity['notification_type'] === 'reward')
+                                                                    Reward
+                                                                @else
+                                                                    Notification
+                                                                @endif
+                                                            @else
+                                                                {{ $activity['type'] === 'add' ? 'Earned Points' :
+                                                                   ($activity['type'] === 'remove' ? 'Lost Points' :
+                                                                   ($activity['type'] === 'level_up' ? 'Level Up' :
+                                                                   'Reset')) }}
+                                                            @endif
                                                         </span>
                                                     </div>
 
                                                     <!-- Activity reason -->
                                                     @if($activity['reason'])
-                                                        <p class="text-xs text-gray-300 mt-1">{{ $activity['reason'] }}</p>
+                                                        @if(isset($activity['activity_type']) && $activity['activity_type'] === 'notification' && isset($activity['link']) && $activity['link'])
+                                                            <p class="text-xs text-gray-300 mt-1">
+                                                                {{ $activity['reason'] }}
+                                                                <a href="{{ $activity['link'] }}" class="text-emerald-400 hover:text-emerald-300 ml-1 inline-flex items-center">
+                                                                    <span>View</span>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-0.5" viewBox="0 0 20 20" fill="currentColor">
+                                                                        <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                    </svg>
+                                                                </a>
+                                                            </p>
+                                                        @else
+                                                            <p class="text-xs text-gray-300 mt-1">{{ $activity['reason'] }}</p>
+                                                        @endif
                                                     @endif
                                                 </div>
 
                                                 <!-- Points -->
                                                 <div class="text-xs font-mono px-2 py-1 rounded-full
-                                                    {{ $activity['type'] === 'add' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                                                       ($activity['type'] === 'remove' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
-                                                       ($activity['type'] === 'level_up' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
-                                                       'bg-blue-500/20 text-blue-400 border border-blue-500/30')) }}">
-                                                    {{ $activity['type'] === 'add' ? '+' : ($activity['type'] === 'remove' ? '-' : '') }}{{ abs($activity['points']) }} XP
+                                                    @if(isset($activity['activity_type']) && $activity['activity_type'] === 'notification')
+                                                        @if($activity['notification_type'] === 'achievement')
+                                                            bg-yellow-500/20 text-yellow-400 border border-yellow-500/30
+                                                        @elseif($activity['notification_type'] === 'grade')
+                                                            bg-emerald-500/20 text-emerald-400 border border-emerald-500/30
+                                                        @elseif($activity['notification_type'] === 'challenge')
+                                                            bg-blue-500/20 text-blue-400 border border-blue-500/30
+                                                        @elseif($activity['notification_type'] === 'reward')
+                                                            bg-orange-500/20 text-orange-400 border border-orange-500/30
+                                                        @else
+                                                            bg-purple-500/20 text-purple-400 border border-purple-500/30
+                                                        @endif
+                                                    @else
+                                                        {{ $activity['type'] === 'add' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                                                           ($activity['type'] === 'remove' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                                                           ($activity['type'] === 'level_up' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' :
+                                                           'bg-blue-500/20 text-blue-400 border border-blue-500/30')) }}
+                                                    @endif
+                                                    ">
+                                                    @if(isset($activity['activity_type']) && $activity['activity_type'] === 'notification')
+                                                        @if($activity['points'] > 0)
+                                                            +{{ $activity['points'] }} XP
+                                                        @elseif($activity['notification_type'] === 'grade' || $activity['notification_type'] === 'achievement')
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" viewBox="0 0 20 20" fill="currentColor">
+                                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                            </svg>
+                                                        @endif
+                                                    @else
+                                                        {{ $activity['type'] === 'add' ? '+' : ($activity['type'] === 'remove' ? '-' : '') }}{{ abs($activity['points']) }} XP
+                                                    @endif
                                                 </div>
                                             </div>
 

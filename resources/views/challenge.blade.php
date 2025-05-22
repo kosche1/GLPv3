@@ -245,6 +245,17 @@
 
             <!-- Challenge Progress -->
             <div class="flex flex-col p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 shadow-lg">
+                @if(isset($isExpired) && $isExpired)
+                <div class="mb-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                    <h3 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Challenge Expired
+                    </h3>
+                    <p class="text-neutral-300">This challenge is no longer available as it has passed its end date ({{ $challenge->end_date->format('M d, Y') }}). Please check other available challenges.</p>
+                </div>
+                @endif
                 <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -331,7 +342,14 @@
                                                         ->exists();
                                                 @endphp
 
-                                                @if($hasSubmission)
+                                                @if(isset($isExpired) && $isExpired)
+                                                    <span class="px-6 py-1.5 text-sm font-medium rounded-lg bg-red-500/20 text-red-400 cursor-not-allowed flex items-center gap-1.5">
+                                                        Expired
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </span>
+                                                @elseif($hasSubmission)
                                                     <span class="px-6 py-1.5 text-sm font-medium rounded-lg bg-neutral-700 text-neutral-400 cursor-not-allowed flex items-center gap-1.5">
                                                         Submitted
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

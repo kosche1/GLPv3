@@ -21,6 +21,12 @@ class ChallengeController extends Controller
                 ->with('error', 'Task not found in this challenge');
         }
 
+        // Check if the challenge is expired using the model accessor
+        if ($challenge->isExpired()) {
+            return back()
+                ->with('error', 'This challenge has expired and is no longer available.');
+        }
+
         // Check if the user has submitted any answer for this task (not just correct ones)
         $hasSubmission = \App\Models\StudentAnswer::where('user_id', Auth::id())
             ->where('task_id', $task->id)
@@ -78,6 +84,12 @@ class ChallengeController extends Controller
                 ->with('error', 'Task not found in this challenge');
         }
 
+        // Check if the challenge is expired using the model accessor
+        if ($challenge->isExpired()) {
+            return back()
+                ->with('error', 'This challenge has expired and is no longer available.');
+        }
+
         $tasks = $challenge->tasks()->orderBy('order')->get();
         $currentTaskIndex = $tasks->search(function($item) use ($task) {
             return $item->id === $task->id;
@@ -109,6 +121,12 @@ class ChallengeController extends Controller
                 ->with('error', 'Task not found in this challenge');
         }
 
+        // Check if the challenge is expired using the model accessor
+        if ($challenge->isExpired()) {
+            return back()
+                ->with('error', 'This challenge has expired and is no longer available.');
+        }
+
         $tasks = $challenge->tasks()->orderBy('order')->get();
         $currentTaskIndex = $tasks->search(function($item) use ($task) {
             return $item->id === $task->id;
@@ -138,6 +156,13 @@ class ChallengeController extends Controller
         if ($task->challenge_id !== $challenge->id) {
             return back()
                 ->with('error', 'Task not found in this challenge');
+        }
+
+        // Check if the challenge is expired
+        $now = now();
+        if ($challenge->end_date && $now->gt($challenge->end_date)) {
+            return back()
+                ->with('error', 'This challenge has expired and is no longer available.');
         }
 
         $tasks = $challenge->tasks()->orderBy('order')->get();

@@ -108,16 +108,41 @@ class GroupChallenge extends Model
         }
 
         $now = now();
-        
+
         if ($this->start_date && $now->lt($this->start_date)) {
             return false;
         }
-        
-        if ($this->end_date && $now->gt($this->end_date)) {
+
+        if ($this->isExpired()) {
             return false;
         }
-        
+
         return true;
+    }
+
+    /**
+     * Determine if the challenge is expired based on end date.
+     *
+     * @return bool
+     */
+    public function isExpired(): bool
+    {
+        if ($this->end_date === null) {
+            return false; // Challenges with no end date never expire
+        }
+
+        $now = now();
+        return $now->gt($this->end_date);
+    }
+
+    /**
+     * Get the expired status attribute.
+     *
+     * @return bool
+     */
+    public function getIsExpiredAttribute(): bool
+    {
+        return $this->isExpired();
     }
 
     /**
@@ -128,15 +153,15 @@ class GroupChallenge extends Model
     public function getOverallCompletionPercentage(): int
     {
         $participants = $this->participants;
-        
+
         if ($participants->isEmpty()) {
             return 0;
         }
-        
+
         $totalProgress = $participants->sum(function ($participant) {
             return $participant->pivot->progress;
         });
-        
+
         return (int) ($totalProgress / ($participants->count() * 100));
     }
 }

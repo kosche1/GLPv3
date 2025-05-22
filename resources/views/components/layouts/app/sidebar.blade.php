@@ -16,6 +16,7 @@
             <flux:navlist.group heading="Overview" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate class="py-1">{{ __('Dashboard') }}</flux:navlist.item>
                 <flux:navlist.item icon="bell" :href="route('notifications')" :current="request()->routeIs('notifications')" wire:navigate class="py-1">{{ __('Notifications') }}</flux:navlist.item>
+                <flux:navlist.item icon="sparkles" :href="route('paragonz')" :current="request()->routeIs('paragonz')" wire:navigate class="py-1">{{ __('ParagonZ') }}</flux:navlist.item>
             </flux:navlist.group>
 
             <!-- Academic Resources -->
