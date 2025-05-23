@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\HistoricalTimelineMaze;
 use App\Models\HistoricalTimelineMazeQuestion;
 use App\Models\HistoricalTimelineMazeProgress;
 use App\Models\HistoricalTimelineMazeLeaderboard;
+use App\Models\HistoricalTimelineMazeResult;
+use App\Models\HistoricalTimelineMazeEvent;
 
 class HistoricalTimelineMazeController extends Controller
 {
@@ -252,6 +255,91 @@ class HistoricalTimelineMazeController extends Controller
             $entry->rank = $rank++;
             $entry->save();
         }
+    }
+
+    /**
+     * Save a detailed result of the game.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function saveResult(Request $request): JsonResponse
+    {
+        $request->validate([
+            'score' => 'required|integer',
+            'era' => 'required|string',
+            'difficulty' => 'required|string',
+            'questions_attempted' => 'required|integer',
+            'questions_correct' => 'required|integer',
+            'time_spent_seconds' => 'required|integer',
+            'completed' => 'required|boolean',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        // Get the active Historical Timeline Maze game
+        $historicalTimelineMaze = HistoricalTimelineMaze::where('is_active', true)->first();
+
+        if (!$historicalTimelineMaze) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No active historical timeline maze game found',
+            ], 404);
+        }
+
+        // Get the era ID
+        $era = HistoricalTimelineMazeEvent::where('era', $request->input('era'))
+            ->where('historical_timeline_maze_id', $historicalTimelineMaze->id)
+            ->where('is_active', true)
+            ->first();
+
+        $eraId = $era ? $era->id : null;
+
+        // Calculate accuracy percentage
+        $questionsAttempted = $request->input('questions_attempted');
+        $questionsCorrect = $request->input('questions_correct');
+        $accuracyPercentage = $questionsAttempted > 0
+            ? ($questionsCorrect / $questionsAttempted) * 100
+            : 0;
+
+        // Create the result record
+        $result = new HistoricalTimelineMazeResult([
+            'user_id' => Auth::id(),
+            'historical_timeline_maze_id' => $historicalTimelineMaze->id,
+            'era_id' => $eraId,
+            'score' => $request->input('score'),
+            'questions_attempted' => $questionsAttempted,
+            'questions_correct' => $questionsCorrect,
+            'accuracy_percentage' => $accuracyPercentage,
+            'time_spent_seconds' => $request->input('time_spent_seconds'),
+            'completed' => $request->input('completed'),
+            'notes' => $request->input('notes'),
+        ]);
+
+        $result->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Result saved successfully',
+            'result' => $result,
+        ]);
+    }
+
+    /**
+     * Get the user's historical timeline maze results history.
+     *
+     * @return JsonResponse
+     */
+    public function getResults(): JsonResponse
+    {
+        $user = Auth::user();
+
+        // Get results ordered by date (newest first)
+        $results = HistoricalTimelineMazeResult::where('user_id', $user->id)
+            ->with(['historicalTimelineMaze:id,title', 'era:id,era,title'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($results);
     }
 
     /**
