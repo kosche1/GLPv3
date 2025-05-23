@@ -23,9 +23,9 @@ class UserRecipeResource extends Resource
 
     protected static ?string $navigationGroup = 'SHS Specialized Subjects';
 
-    protected static ?string $navigationLabel = 'Recipe Builder';
+    protected static ?string $navigationLabel = 'Recipe Submissions';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
@@ -43,6 +43,7 @@ class UserRecipeResource extends Resource
                             ->disabled(),
                         Forms\Components\Select::make('recipe_template_id')
                             ->relationship('recipeTemplate', 'name')
+                            ->label('Challenge')
                             ->disabled(),
                         Forms\Components\TextInput::make('score')
                             ->numeric()
@@ -99,7 +100,7 @@ class UserRecipeResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('recipeTemplate.name')
-                    ->label('Template')
+                    ->label('Challenge')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('score')
                     ->numeric()
