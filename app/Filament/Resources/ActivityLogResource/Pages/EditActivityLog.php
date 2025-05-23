@@ -3,21 +3,23 @@
 namespace App\Filament\Resources\ActivityLogResource\Pages;
 
 use App\Filament\Resources\ActivityLogResource;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
 
-class ListActivityLogs extends ListRecords
+class EditActivityLog extends EditRecord
 {
     protected static string $resource = ActivityLogResource::class;
 
     public function getTitle(): string
     {
-        return 'Audit Trail';
+        return 'Edit Audit Trail Record';
     }
 
     protected function getHeaderActions(): array
     {
         return [
-            // No create action for audit trail
+            Actions\DeleteAction::make(),
+            Actions\ViewAction::make(),
         ];
     }
 }

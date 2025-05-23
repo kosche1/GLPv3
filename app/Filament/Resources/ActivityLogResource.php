@@ -23,12 +23,12 @@ class ActivityLogResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Activity Log';
+        return 'Audit Trail';
     }
 
     public static function getPluralLabel(): string
     {
-        return 'Activity Logs';
+        return 'Audit Trail';
     }
 
     public static function form(Form $form): Form
@@ -37,7 +37,7 @@ class ActivityLogResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('log_name')
                     ->label('Subject')
-                    ->disabled(),
+                    ->required(),
                 Forms\Components\TextInput::make('causer_name')
                     ->label('User')
                     ->getStateUsing(function ($record) {
@@ -46,10 +46,20 @@ class ActivityLogResource extends Resource
                     ->disabled(),
                 Forms\Components\TextInput::make('description')
                     ->label('Description')
-                    ->disabled(),
+                    ->required(),
+                Forms\Components\Select::make('event')
+                    ->label('Action')
+                    ->options([
+                        'created' => 'Created',
+                        'updated' => 'Updated',
+                        'deleted' => 'Deleted',
+                        'viewed' => 'Viewed',
+                        'login' => 'Login',
+                        'logout' => 'Logout',
+                    ])
+                    ->required(),
                 Forms\Components\KeyValue::make('properties')
-                    ->label('Properties')
-                    ->disabled(),
+                    ->label('Properties'),
                 Forms\Components\DateTimePicker::make('created_at')
                     ->label('Created At')
                     ->disabled(),
@@ -77,6 +87,23 @@ class ActivityLogResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->limit(50),
+                TextColumn::make('event')
+                    ->label('Action')
+                    ->sortable()
+                    ->searchable()
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'created' => 'success',
+                        'updated' => 'warning',
+                        'deleted' => 'danger',
+                        default => 'gray',
+                    }),
+                TextColumn::make('subject_type')
+                    ->label('Resource Type')
+                    ->formatStateUsing(fn (?string $state): string => $state ? class_basename($state) : '-')
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Created At')
                     ->dateTime()
@@ -91,7 +118,14 @@ class ActivityLogResource extends Resource
 
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->label('View')
+                        ->icon('heroicon-o-eye'),
+                    Tables\Actions\EditAction::make()
+                        ->label('Edit')
+                        ->icon('heroicon-o-pencil'),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -113,6 +147,7 @@ class ActivityLogResource extends Resource
         return [
             'index' => Pages\ListActivityLogs::route('/'),
             'view' => Pages\ViewActivityLog::route('/{record}'),
+            'edit' => Pages\EditActivityLog::route('/{record}/edit'),
         ];
     }
 }
