@@ -29,8 +29,10 @@ use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('home');
 
-// Terms & Conditions page - accessible without authentication
+// Terms & Conditions pages - accessible without authentication
 Route::view('terms', 'terms')->name('terms');
+Route::view('disclaimer', 'disclaimer')->name('disclaimer');
+Route::view('system-policy', 'system-policy')->name('system-policy');
 
 
 
