@@ -184,6 +184,22 @@ class Challenge extends Model
     }
 
     /**
+     * Get the formatted end date attribute.
+     *
+     * @return string
+     */
+    public function getDurationAttribute(): string
+    {
+        // If there's no end date, return "Ongoing"
+        if ($this->end_date === null) {
+            return 'Ongoing';
+        }
+
+        // Format the end date as "Month Day, Year"
+        return $this->end_date->format('M d, Y');
+    }
+
+    /**
      * Get the users participating in this challenge.
      */
     public function users()
