@@ -153,22 +153,79 @@ class ActivityLogResource extends Resource
                             return $state;
                         }
 
-                        // If subject is a StudentAnswer, try to get the task name
+                        // If subject is a StudentAnswer, try to get the challenge name (subject name)
                         if ($record->subject_type === 'App\\Models\\StudentAnswer') {
+                            // First try to get task_id from properties
                             $properties = $record->properties;
+                            if (isset($properties['task_id'])) {
+                                // Load the task with its challenge
+                                $task = \App\Models\Task::with('challenge')->find($properties['task_id']);
+                                if ($task && $task->challenge) {
+                                    // Return the challenge name (subject name)
+                                    return $task->challenge->name;
+                                }
+                            }
+
+                            // If not found in properties, try to load the StudentAnswer and get the task
+                            if ($record->subject_id) {
+                                $studentAnswer = \App\Models\StudentAnswer::with('task.challenge')->find($record->subject_id);
+                                if ($studentAnswer && $studentAnswer->task && $studentAnswer->task->challenge) {
+                                    return $studentAnswer->task->challenge->name;
+                                }
+                                if ($studentAnswer && $studentAnswer->task) {
+                                    return $studentAnswer->task->name;
+                                }
+                                if ($studentAnswer && $studentAnswer->task_id) {
+                                    return 'Task #' . $studentAnswer->task_id;
+                                }
+                            }
+
+                            // If we have a task_id in properties but couldn't load the task
                             if (isset($properties['task_id'])) {
                                 return 'Task #' . $properties['task_id'];
                             }
+
+                            return 'Student Answer';
+                        }
+
+                        // For submitted_answer events, try to get the challenge name
+                        if ($record->event === 'submitted_answer') {
+                            // First try to get task_id from properties
+                            $properties = $record->properties;
+                            if (isset($properties['task_id'])) {
+                                // Load the task with its challenge
+                                $task = \App\Models\Task::with('challenge')->find($properties['task_id']);
+                                if ($task && $task->challenge) {
+                                    // Return the challenge name (subject name)
+                                    return $task->challenge->name;
+                                }
+                                if ($task) {
+                                    return $task->name;
+                                }
+                            }
+
+                            // If subject is a StudentAnswer, try to get the task directly
+                            if ($record->subject_type === 'App\\Models\\StudentAnswer' && $record->subject_id) {
+                                $studentAnswer = \App\Models\StudentAnswer::with('task.challenge')->find($record->subject_id);
+                                if ($studentAnswer && $studentAnswer->task && $studentAnswer->task->challenge) {
+                                    return $studentAnswer->task->challenge->name;
+                                }
+                                if ($studentAnswer && $studentAnswer->task) {
+                                    return $studentAnswer->task->name;
+                                }
+                            }
+
+                            // If we have a task_id in properties but couldn't load the task
+                            if (isset($properties['task_id'])) {
+                                return 'Task #' . $properties['task_id'];
+                            }
+
+                            return 'Student Answer';
                         }
 
                         // Check if log_name is a model name (like "Challenge", "Task", etc.)
                         if (in_array($record->log_name, ['Challenge', 'Task', 'StudentAnswer', 'User', 'Learning Material'])) {
                             return $record->log_name;
-                        }
-
-                        // For submitted_answer events, show "Student Answer"
-                        if ($record->event === 'submitted_answer') {
-                            return 'Student Answer';
                         }
 
                         // Fallback to a generic description
@@ -189,6 +246,100 @@ class ActivityLogResource extends Resource
                             }
                         }
 
+                        // If the subject is a StudentAnswer, try to get the student who submitted the answer
+                        if ($record->subject_type === 'App\\Models\\StudentAnswer') {
+                            // First try to get user_id from properties
+                            $properties = $record->properties;
+                            if (isset($properties['user_id'])) {
+                                // Try to load the user
+                                $user = \App\Models\User::find($properties['user_id']);
+                                if ($user) {
+                                    return $user->name;
+                                }
+                            }
+
+                            // If not found in properties, try to load the StudentAnswer and get the user
+                            if ($record->subject_id) {
+                                $studentAnswer = \App\Models\StudentAnswer::with('user')->find($record->subject_id);
+                                if ($studentAnswer && $studentAnswer->user) {
+                                    return $studentAnswer->user->name;
+                                }
+                            }
+
+                            // If still not found, try causer
+                            if ($record->causer_type === 'App\\Models\\User') {
+                                if (!$record->relationLoaded('causer')) {
+                                    $record->load('causer');
+                                }
+
+                                if ($record->causer && $record->causer->name) {
+                                    return $record->causer->name;
+                                }
+                            }
+
+                            // If we have a user_id in properties, try to get the user name directly from the database
+                            if (isset($properties['user_id'])) {
+                                $user = \App\Models\User::find($properties['user_id']);
+                                if ($user) {
+                                    return $user->name;
+                                }
+                                return 'Student #' . $properties['user_id'];
+                            }
+
+                            // If we have a causer_id, try to get the user name
+                            if ($record->causer_id) {
+                                $user = \App\Models\User::find($record->causer_id);
+                                if ($user) {
+                                    return $user->name;
+                                }
+                                return 'Student #' . $record->causer_id;
+                            }
+
+                            return 'Unknown Student';
+                        }
+
+                        // For submitted_answer events, try to find the student who submitted
+                        if ($record->event === 'submitted_answer') {
+                            // First check properties
+                            $properties = $record->properties;
+                            if (isset($properties['user_id'])) {
+                                $user = \App\Models\User::find($properties['user_id']);
+                                if ($user) {
+                                    return $user->name;
+                                }
+                                return 'Student #' . $properties['user_id'];
+                            }
+
+                            // If subject is a StudentAnswer, try to get the user directly
+                            if ($record->subject_type === 'App\\Models\\StudentAnswer' && $record->subject_id) {
+                                $studentAnswer = \App\Models\StudentAnswer::find($record->subject_id);
+                                if ($studentAnswer && $studentAnswer->user_id) {
+                                    $user = \App\Models\User::find($studentAnswer->user_id);
+                                    if ($user) {
+                                        return $user->name;
+                                    }
+                                    return 'Student #' . $studentAnswer->user_id;
+                                }
+                            }
+
+                            // Then check causer
+                            if ($record->causer_type === 'App\\Models\\User') {
+                                if (!$record->relationLoaded('causer')) {
+                                    $record->load('causer');
+                                }
+
+                                if ($record->causer && $record->causer->name) {
+                                    return $record->causer->name;
+                                }
+
+                                if ($record->causer_id) {
+                                    return 'Student #' . $record->causer_id;
+                                }
+                            }
+
+                            return 'Unknown Student';
+                        }
+
                         // If we have a causer that is a User, show their name
                         if ($record->causer_type === 'App\\Models\\User') {
                             // Try to load the causer relationship if it's not already loaded
@@ -201,27 +352,6 @@ class ActivityLogResource extends Resource
                             }
 
                             return 'User #' . $record->causer_id;
-                        }
-
-                        // If the subject is a StudentAnswer, try to get the user from properties
-                        if ($record->subject_type === 'App\\Models\\StudentAnswer') {
-                            $properties = $record->properties;
-                            if (isset($properties['user_id'])) {
-                                // Try to load the user
-                                $user = \App\Models\User::find($properties['user_id']);
-                                if ($user) {
-                                    return $user->name;
-                                }
-                                return 'Student #' . $properties['user_id'];
-                            }
-                        }
-
-                        // For submitted_answer events, try to find the user from auth
-                        if ($record->event === 'submitted_answer' && $record->causer_id) {
-                            $user = \App\Models\User::find($record->causer_id);
-                            if ($user) {
-                                return $user->name;
-                            }
                         }
 
                         return 'System';
