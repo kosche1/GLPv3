@@ -2,7 +2,6 @@
 
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
@@ -27,11 +26,15 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
 
         $validated['password'] = Hash::make($validated['password']);
 
-        event(new Registered(($user = User::create($validated))));
+        // Create the user
+        $user = User::create($validated);
+
+        // Dispatch the Registered event - we'll let the listener handle the audit trail
+        event(new Registered($user));
 
         // Remove automatic login and redirect to login page instead
         // Auth::login($user);
-        
+
         session()->flash('status', 'Account created successfully. Please login with your credentials.');
         $this->redirect(route('login', absolute: false));
     }

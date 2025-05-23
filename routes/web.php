@@ -11,7 +11,6 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ActivityGoalController;
 use App\Http\Controllers\EquationDropController;
 use App\Http\Controllers\HistoricalTimelineMazeController;
-use App\Http\Controllers\ActivityLogPrintController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -386,10 +385,7 @@ Route::post('/verify-password', [\App\Http\Controllers\PasswordVerificationContr
     ->middleware('auth')
     ->name('verify-password');
 
-// Activity Log Print Route
-Route::get('/activity-logs/{record}/print', [ActivityLogPrintController::class, 'print'])
-    ->middleware('auth')
-    ->name('activity-log.print');
+
 
 // Debug route for investment challenges
 Route::get('/debug-investment-challenges', function() {

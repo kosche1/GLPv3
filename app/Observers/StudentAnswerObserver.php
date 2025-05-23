@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Events\TaskSubmitted;
 use App\Models\StudentAnswer;
 use App\Services\AnswerEvaluationService;
 use App\Services\NotificationService;
@@ -34,6 +35,22 @@ class StudentAnswerObserver
         if ($studentAnswer->status === 'submitted') {
             Log::info("StudentAnswer ID: {$studentAnswer->id} created with status 'submitted'. Triggering evaluation.");
             $this->evaluationService->evaluate($studentAnswer);
+
+            // Dispatch TaskSubmitted event for audit trail
+            try {
+                $user = $studentAnswer->user;
+                $task = $studentAnswer->task;
+
+                if ($user && $task) {
+                    event(new TaskSubmitted($user, $task, $studentAnswer));
+                    Log::info("TaskSubmitted event dispatched for StudentAnswer ID: {$studentAnswer->id}");
+                }
+            } catch (\Exception $e) {
+                Log::error("Error dispatching TaskSubmitted event: {$e->getMessage()}", [
+                    'student_answer_id' => $studentAnswer->id,
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
         }
     }
 

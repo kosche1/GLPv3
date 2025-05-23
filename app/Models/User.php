@@ -17,6 +17,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Contracts\Activity;
+use App\Events\UserCompletedChallenge;
+use App\Events\ChallengeCompleted;
 
 class User extends Authenticatable
 {
@@ -269,8 +271,9 @@ class User extends Authenticatable
             }
         }
 
-        // Fire event if needed
-        // event(new UserCompletedChallenge($this, $challenge));
+        // Fire events
+        event(new UserCompletedChallenge($this, $challenge));
+        event(new ChallengeCompleted($this, $challenge));
     }
 
     /**
