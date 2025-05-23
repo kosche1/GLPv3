@@ -10,6 +10,9 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use League\Csv\Writer;
 
 class AuditTrailResource extends Resource
 {
@@ -77,6 +80,8 @@ class AuditTrailResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultPaginationPageOption(25)
+            ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Student Name')
@@ -180,7 +185,64 @@ class AuditTrailResource extends Resource
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
-                // No bulk actions needed
+                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\BulkAction::make('print')
+                    ->label('Print Selected')
+                    ->icon('heroicon-o-printer')
+                    ->action(function (Collection $records) {
+                        // Generate a unique ID for this batch
+                        $batchId = uniqid('batch-');
+
+                        // Store the records in the session
+                        session()->put("audit-trail-print-{$batchId}", $records->pluck('id')->toArray());
+
+                        // Redirect to the bulk print page
+                        return redirect()->route('filament.admin.resources.audit-trails.bulk-print', ['batchId' => $batchId]);
+                    }),
+                Tables\Actions\BulkAction::make('export')
+                    ->label('Export Selected')
+                    ->icon('heroicon-o-document-arrow-down')
+                        ->action(function (Collection $records): StreamedResponse {
+                            $csv = Writer::createFromString();
+
+                            // Add the headers
+                            $csv->insertOne([
+                                'ID',
+                                'Student Name',
+                                'Action Type',
+                                'Subject Type',
+                                'Subject Name',
+                                'Challenge Name',
+                                'Task Name',
+                                'Score',
+                                'Description',
+                                'Date & Time',
+                            ]);
+
+                            // Add the records
+                            $records->each(function (AuditTrail $record) use ($csv) {
+                                $csv->insertOne([
+                                    $record->id,
+                                    $record->user->name,
+                                    $record->action_type,
+                                    $record->subject_type,
+                                    $record->subject_name,
+                                    $record->challenge_name,
+                                    $record->task_name,
+                                    $record->score,
+                                    $record->description,
+                                    $record->created_at->format('Y-m-d H:i:s'),
+                                ]);
+                            });
+
+                            return response()->streamDownload(
+                                fn () => print($csv->toString()),
+                                'audit-trail-export-' . now()->format('Y-m-d') . '.csv',
+                                [
+                                    'Content-Type' => 'text/csv',
+                                ]
+                            );
+                        })
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -199,6 +261,7 @@ class AuditTrailResource extends Resource
             'view' => Pages\ViewAuditTrail::route('/{record}'),
             'edit' => Pages\EditAuditTrail::route('/{record}/edit'),
             'print' => Pages\PrintAuditTrail::route('/{record}/print'),
+            'bulk-print' => Pages\BulkPrintAuditTrail::route('/bulk-print/{batchId}'),
         ];
     }
 }
