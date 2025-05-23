@@ -18,7 +18,7 @@ class EditAuditTrail extends EditRecord
             Actions\Action::make('print')
                 ->label('Print')
                 ->icon('heroicon-o-printer')
-                ->url(fn () => route('filament.admin.resources.audit-trails.print', $this->record))
+                ->url(fn () => route('audit-trails.print-view', $this->record))
                 ->openUrlInNewTab(),
         ];
     }

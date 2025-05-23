@@ -135,7 +135,8 @@ class AuditTrailResource extends Resource
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Date & Time')
-                    ->dateTime()
+                    ->dateTime('F j, Y g:i:s A')
+                    ->timezone(config('app.timezone'))
                     ->sortable(),
             ])
             ->filters([
@@ -181,7 +182,7 @@ class AuditTrailResource extends Resource
                 Tables\Actions\Action::make('print')
                     ->label('Print')
                     ->icon('heroicon-o-printer')
-                    ->url(fn (AuditTrail $record) => route('filament.admin.resources.audit-trails.print', $record))
+                    ->url(fn (AuditTrail $record) => route('audit-trails.print-view', $record))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
@@ -197,7 +198,7 @@ class AuditTrailResource extends Resource
                         session()->put("audit-trail-print-{$batchId}", $records->pluck('id')->toArray());
 
                         // Redirect to the bulk print page
-                        return redirect()->route('filament.admin.resources.audit-trails.bulk-print', ['batchId' => $batchId]);
+                        return redirect()->route('audit-trails.bulk-print-view', ['batchId' => $batchId]);
                     }),
                 Tables\Actions\BulkAction::make('export')
                     ->label('Export Selected')
@@ -231,13 +232,13 @@ class AuditTrailResource extends Resource
                                     $record->task_name,
                                     $record->score,
                                     $record->description,
-                                    $record->created_at->format('Y-m-d H:i:s'),
+                                    $record->created_at->setTimezone(config('app.timezone'))->format('Y-m-d H:i:s'),
                                 ]);
                             });
 
                             return response()->streamDownload(
                                 fn () => print($csv->toString()),
-                                'audit-trail-export-' . now()->format('Y-m-d') . '.csv',
+                                'audit-trail-export-' . now()->setTimezone(config('app.timezone'))->format('Y-m-d_H-i-s') . '.csv',
                                 [
                                     'Content-Type' => 'text/csv',
                                 ]

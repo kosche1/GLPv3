@@ -2,8 +2,8 @@
     <div class="flex flex-col gap-y-8 print:p-8">
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold">Audit Trail Records</h1>
-            
-            <button 
+
+            <button
                 type="button"
                 class="filament-button filament-button-size-md inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors focus:outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset dark:focus:ring-offset-0 min-h-[2.25rem] px-4 text-sm text-white shadow focus:ring-white border-transparent bg-primary-600 hover:bg-primary-500 focus:bg-primary-700 focus:ring-offset-primary-700 print:hidden"
                 onclick="window.print()"
@@ -14,28 +14,28 @@
                 Print All
             </button>
         </div>
-        
+
         <div class="print:text-right text-sm text-gray-500 print:mb-4">
             <span>Generated on: {{ now()->format('F j, Y g:i A') }}</span>
         </div>
-        
+
         @foreach($records as $index => $record)
         <div class="border rounded-xl overflow-hidden page-break-inside-avoid mb-8">
             <div class="bg-gray-100 dark:bg-gray-800 px-6 py-4 border-b">
                 <h2 class="text-xl font-semibold">Record #{{ $record['id'] }}</h2>
             </div>
-            
+
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Student Name</h3>
                     <p class="mt-1 text-lg">{{ $record['user']['name'] ?? 'N/A' }}</p>
                 </div>
-                
+
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Student Email</h3>
                     <p class="mt-1 text-lg">{{ $record['user']['email'] ?? 'N/A' }}</p>
                 </div>
-                
+
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Action Type</h3>
                     <p class="mt-1 text-lg">
@@ -46,7 +46,7 @@
                                 'task_submission' => 'Task Submission',
                                 default => $record['action_type'],
                             };
-                            
+
                             $actionColor = match($record['action_type']) {
                                 'registration' => 'bg-green-100 text-green-800',
                                 'challenge_completion' => 'bg-blue-100 text-blue-800',
@@ -59,53 +59,53 @@
                         </span>
                     </p>
                 </div>
-                
+
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Date & Time</h3>
                     <p class="mt-1 text-lg">{{ \Carbon\Carbon::parse($record['created_at'])->format('F j, Y g:i A') }}</p>
                 </div>
-                
+
                 @if($record['subject_type'])
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Subject Type</h3>
                     <p class="mt-1 text-lg">{{ $record['subject_type'] }}</p>
                 </div>
                 @endif
-                
+
                 @if($record['subject_name'])
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Subject Name</h3>
                     <p class="mt-1 text-lg">{{ $record['subject_name'] }}</p>
                 </div>
                 @endif
-                
+
                 @if($record['challenge_name'])
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Challenge</h3>
                     <p class="mt-1 text-lg">{{ $record['challenge_name'] }}</p>
                 </div>
                 @endif
-                
+
                 @if($record['task_name'])
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Task</h3>
                     <p class="mt-1 text-lg">{{ $record['task_name'] }}</p>
                 </div>
                 @endif
-                
+
                 @if($record['score'] !== null)
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Score</h3>
                     <p class="mt-1 text-lg">{{ $record['score'] }}</p>
                 </div>
                 @endif
-                
+
                 <div class="md:col-span-2">
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Description</h3>
                     <p class="mt-1 text-lg">{{ $record['description'] }}</p>
                 </div>
             </div>
-            
+
             @if($record['additional_data'])
             <div class="border-t p-6">
                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Additional Data</h3>
@@ -140,12 +140,12 @@
         <div class="page-break"></div>
         @endif
         @endforeach
-        
+
         <div class="print:fixed print:bottom-0 print:left-0 print:w-full print:text-center print:py-4 print:text-sm print:text-gray-500 print:border-t">
             <p>GameLearnPro Audit Trail - Generated on {{ now()->format('F j, Y g:i A') }}</p>
         </div>
     </div>
-    
+
     <style>
         @media print {
             /* Hide unnecessary elements when printing */
@@ -157,43 +157,50 @@
             .print\:hidden {
                 display: none !important;
             }
-            
+
             /* Ensure the content takes up the full page */
             .fi-main {
                 padding: 0 !important;
                 margin: 0 !important;
                 width: 100% !important;
             }
-            
+
             /* Make text darker for better printing */
             body {
                 color: #000 !important;
                 background: #fff !important;
             }
-            
+
             /* Ensure all content is visible */
             .fi-section {
                 page-break-inside: avoid;
                 margin-bottom: 20px !important;
             }
-            
+
             /* Add page breaks */
             .page-break {
                 page-break-after: always;
             }
-            
+
             .page-break-inside-avoid {
                 page-break-inside: avoid;
             }
+
+            /* Fix for content not showing in print preview */
+            .fi-page {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
         }
     </style>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Auto-print when the page loads
+        // Auto-print when the page loads
+        window.onload = function() {
             setTimeout(function() {
                 window.print();
-            }, 500);
-        });
+            }, 1000);
+        };
     </script>
 </x-filament-panels::page>

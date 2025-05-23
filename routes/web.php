@@ -385,6 +385,14 @@ Route::post('/verify-password', [\App\Http\Controllers\PasswordVerificationContr
     ->middleware('auth')
     ->name('verify-password');
 
+// Audit Trail Print Routes
+Route::get('/admin/audit-trails/{record}/print-view', [\App\Http\Controllers\AuditTrailPrintController::class, 'printRecord'])
+    ->middleware('auth')
+    ->name('audit-trails.print-view');
+Route::get('/admin/audit-trails/bulk-print/{batchId}', [\App\Http\Controllers\AuditTrailPrintController::class, 'printBulk'])
+    ->middleware('auth')
+    ->name('audit-trails.bulk-print-view');
+
 
 
 // Debug route for investment challenges
