@@ -239,6 +239,7 @@ Route::middleware(
         Route::get('/equation-drop', [EquationDropController::class, 'index'])->name('equation-drop.index');
         Route::get('/equation-drop/questions', [EquationDropController::class, 'getQuestions'])->name('equation-drop.questions');
         Route::post('/equation-drop/save-score', [EquationDropController::class, 'saveScore'])->name('equation-drop.save-score');
+        Route::get('/equation-drop/results', [EquationDropController::class, 'getResults'])->name('equation-drop.results');
     });
 
     // HUMMS Specialized Subject Routes
