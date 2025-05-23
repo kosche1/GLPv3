@@ -306,4 +306,114 @@ class AuditTrail extends Model
             ], $additionalData),
         ]);
     }
+
+    /**
+     * Record a user login event.
+     *
+     * @param mixed $user The user who logged in
+     * @param array $additionalData Additional data to store
+     * @return AuditTrail
+     */
+    public static function recordLogin($user, array $additionalData = []): AuditTrail
+    {
+        // Determine user role for better description
+        $userType = 'User';
+        if (method_exists($user, 'hasRole')) {
+            if ($user->hasRole('admin')) {
+                $userType = 'Admin';
+            } elseif ($user->hasRole('faculty')) {
+                $userType = 'Teacher';
+            } elseif ($user->hasRole('student')) {
+                $userType = 'Student';
+            }
+        }
+
+        \Illuminate\Support\Facades\Log::info('Creating audit trail entry for login', [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'user_type' => $userType
+        ]);
+
+        try {
+            $entry = self::create([
+                'user_id' => $user->id,
+                'action_type' => 'login',
+                'description' => "{$userType} login: {$user->name}",
+                'additional_data' => array_merge([
+                    'login_at' => now()->toDateTimeString(),
+                    'email' => $user->email,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'user_type' => $userType,
+                ], $additionalData),
+            ]);
+
+            \Illuminate\Support\Facades\Log::info('Successfully created audit trail entry for login', [
+                'audit_trail_id' => $entry->id
+            ]);
+
+            return $entry;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error creating audit trail entry for login', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Record a user logout event.
+     *
+     * @param mixed $user The user who logged out
+     * @param array $additionalData Additional data to store
+     * @return AuditTrail
+     */
+    public static function recordLogout($user, array $additionalData = []): AuditTrail
+    {
+        // Determine user role for better description
+        $userType = 'User';
+        if (method_exists($user, 'hasRole')) {
+            if ($user->hasRole('admin')) {
+                $userType = 'Admin';
+            } elseif ($user->hasRole('faculty')) {
+                $userType = 'Teacher';
+            } elseif ($user->hasRole('student')) {
+                $userType = 'Student';
+            }
+        }
+
+        \Illuminate\Support\Facades\Log::info('Creating audit trail entry for logout', [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'user_type' => $userType
+        ]);
+
+        try {
+            $entry = self::create([
+                'user_id' => $user->id,
+                'action_type' => 'logout',
+                'description' => "{$userType} logout: {$user->name}",
+                'additional_data' => array_merge([
+                    'logout_at' => now()->toDateTimeString(),
+                    'email' => $user->email,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'user_type' => $userType,
+                ], $additionalData),
+            ]);
+
+            \Illuminate\Support\Facades\Log::info('Successfully created audit trail entry for logout', [
+                'audit_trail_id' => $entry->id
+            ]);
+
+            return $entry;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error creating audit trail entry for logout', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+    }
 }

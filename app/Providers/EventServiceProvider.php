@@ -12,6 +12,7 @@ use App\Events\UserEnrolledInChallenge;
 use App\Events\ChallengeCompleted;
 use App\Events\TaskSubmitted;
 use App\Listeners\RecordUserAttendance;
+use App\Listeners\RecordUserLogin;
 use App\Listeners\RecordUserRegistration;
 use App\Listeners\RecordChallengeCompletion;
 use App\Listeners\RecordTaskSubmission;
@@ -42,6 +43,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         Login::class => [
             RecordUserAttendance::class,
+            RecordUserLogin::class,
         ],
         UserLevelledUp::class => [
             SendLevelUpNotification::class,

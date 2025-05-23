@@ -109,6 +109,15 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
             // Set a session flag to indicate a fresh login
             session()->put('justLoggedIn', true);
 
+            // We don't need to manually fire the Login event anymore
+            // The Auth::attempt() call above already fires the Login event
+
+            // Log successful login
+            \Illuminate\Support\Facades\Log::info('User logged in successfully', [
+                'user_id' => Auth::id(),
+                'user_name' => Auth::user()->name
+            ]);
+
             // Process daily login reward
             $this->processDailyLoginReward();
 

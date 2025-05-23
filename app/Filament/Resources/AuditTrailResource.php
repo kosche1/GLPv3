@@ -44,6 +44,8 @@ class AuditTrailResource extends Resource
                         Forms\Components\Select::make('action_type')
                             ->options([
                                 'registration' => 'Registration',
+                                'login' => 'Login',
+                                'logout' => 'Logout',
                                 'challenge_completion' => 'Challenge Completion',
                                 'task_submission' => 'Task Submission',
                                 'task_evaluation' => 'Task Evaluation',
@@ -96,15 +98,19 @@ class AuditTrailResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'registration' => 'success',
-                        'challenge_completion' => 'primary',
+                        'login' => 'primary',
+                        'logout' => 'purple',
+                        'challenge_completion' => 'info',
                         'task_submission' => 'warning',
-                        'task_evaluation' => 'info',
-                        'challenge_creation' => 'danger',
-                        'task_creation' => 'danger',
+                        'task_evaluation' => 'danger',
+                        'challenge_creation' => 'gray',
+                        'task_creation' => 'gray',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'registration' => 'Registration',
+                        'login' => 'Login',
+                        'logout' => 'Logout',
                         'challenge_completion' => 'Challenge Completion',
                         'task_submission' => 'Task Submission',
                         'task_evaluation' => 'Task Evaluation',
@@ -155,8 +161,13 @@ class AuditTrailResource extends Resource
                     ->label('Action Type')
                     ->options([
                         'registration' => 'Registration',
+                        'login' => 'Login',
+                        'logout' => 'Logout',
                         'challenge_completion' => 'Challenge Completion',
                         'task_submission' => 'Task Submission',
+                        'task_evaluation' => 'Task Evaluation',
+                        'challenge_creation' => 'Challenge Creation',
+                        'task_creation' => 'Task Creation',
                     ]),
 
                 Tables\Filters\SelectFilter::make('subject_type')
