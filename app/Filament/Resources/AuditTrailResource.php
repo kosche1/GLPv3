@@ -133,11 +133,13 @@ class AuditTrailResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('effective_timestamp')
                     ->label('Date & Time')
                     ->dateTime('F j, Y g:i:s A')
                     ->timezone(config('app.timezone'))
-                    ->sortable(),
+                    ->sortable(query: function ($query, $direction) {
+                        return $query->orderBy('created_at', $direction);
+                    }),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('action_type')

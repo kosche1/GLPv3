@@ -45,6 +45,30 @@ class AuditTrail extends Model
     }
 
     /**
+     * Get the effective timestamp for display.
+     * This will use timestamps from additional_data if available.
+     *
+     * @return \Illuminate\Support\Carbon
+     */
+    public function getEffectiveTimestampAttribute()
+    {
+        // Check for specific timestamp fields in additional_data
+        if (is_array($this->additional_data)) {
+            $timestampFields = ['registered_at', 'completed_at', 'submitted_at'];
+
+            foreach ($timestampFields as $field) {
+                if (isset($this->additional_data[$field])) {
+                    return \Illuminate\Support\Carbon::parse($this->additional_data[$field])
+                        ->setTimezone(config('app.timezone'));
+                }
+            }
+        }
+
+        // Fall back to created_at if no timestamp found in additional_data
+        return $this->created_at;
+    }
+
+    /**
      * Record a student registration event.
      *
      * @param User $user The user who registered

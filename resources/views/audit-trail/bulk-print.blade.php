@@ -187,7 +187,7 @@
 
                     <div>
                         <div class="field-label">Date & Time</div>
-                        <div class="field-value">{{ $record->created_at->setTimezone(config('app.timezone'))->format('F j, Y g:i:s A') }}</div>
+                        <div class="field-value">{{ $record->effective_timestamp->format('F j, Y g:i:s A') }}</div>
                     </div>
 
                     @if($record->subject_type)

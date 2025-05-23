@@ -69,7 +69,7 @@
 
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Date & Time</h3>
-                    <p class="mt-1 text-lg">{{ $record->created_at->format('F j, Y g:i A') }}</p>
+                    <p class="mt-1 text-lg">{{ $record->effective_timestamp->format('F j, Y g:i A') }}</p>
                 </div>
 
                 @if($record->subject_type)

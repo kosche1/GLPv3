@@ -62,7 +62,27 @@
 
                 <div>
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Date & Time</h3>
-                    <p class="mt-1 text-lg">{{ \Carbon\Carbon::parse($record['created_at'])->format('F j, Y g:i A') }}</p>
+                    <p class="mt-1 text-lg">
+                        @php
+                            // Check for timestamp fields in additional_data
+                            $timestamp = null;
+                            $additionalData = json_decode($record['additional_data'], true) ?? [];
+                            $timestampFields = ['registered_at', 'completed_at', 'submitted_at'];
+
+                            foreach ($timestampFields as $field) {
+                                if (isset($additionalData[$field])) {
+                                    $timestamp = \Carbon\Carbon::parse($additionalData[$field]);
+                                    break;
+                                }
+                            }
+
+                            // Fall back to created_at if no timestamp found
+                            if (!$timestamp) {
+                                $timestamp = \Carbon\Carbon::parse($record['created_at']);
+                            }
+                        @endphp
+                        {{ $timestamp->setTimezone(config('app.timezone'))->format('F j, Y g:i A') }}
+                    </p>
                 </div>
 
                 @if($record['subject_type'])
