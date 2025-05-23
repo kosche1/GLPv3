@@ -9,6 +9,7 @@
         <button @click="activeView = 'portfolio'" :class="{ active: activeView === 'portfolio' }">Portfolio</button>
         <button @click="activeView = 'market'" :class="{ active: activeView === 'market' }">Market</button>
         <button @click="activeView = 'transactions'" :class="{ active: activeView === 'transactions' }">Transactions</button>
+        <button @click="activeView = 'results'" :class="{ active: activeView === 'results' }">Results</button>
         <button @click="activeView = 'learn'" :class="{ active: activeView === 'learn' }">Learn</button>
         <button @click="activeView = 'challenges'" :class="{ active: activeView === 'challenges' }">Challenges</button>
       </nav>
@@ -41,6 +42,7 @@ import axios from 'axios';
 import PortfolioView from './views/PortfolioView.vue';
 import MarketView from './views/MarketViewNew.vue';
 import TransactionsView from './views/TransactionsView.vue';
+import ResultsView from './views/ResultsView.vue';
 import LearnView from './views/LearnView.vue';
 import ChallengesView from './views/ChallengesView.vue';
 
@@ -63,6 +65,7 @@ const currentView = computed(() => {
     case 'portfolio': return PortfolioView;
     case 'market': return MarketView;
     case 'transactions': return TransactionsView;
+    case 'results': return ResultsView;
     case 'learn': return LearnView;
     case 'challenges': return ChallengesView;
     default: return PortfolioView;

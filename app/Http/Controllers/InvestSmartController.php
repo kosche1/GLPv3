@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\InvestSmartMarketData;
 use App\Models\InvestSmartPortfolio;
+use App\Models\InvestSmartResult;
 use App\Models\InvestSmartStock;
 use App\Models\InvestSmartTransaction;
 use App\Models\UserInvestmentChallenge;
@@ -358,6 +359,86 @@ class InvestSmartController extends Controller
         }
 
         // Also update temporary challenges in localStorage (handled by frontend)
+    }
+
+    /**
+     * Save the current portfolio state as a result.
+     */
+    public function saveResult(Request $request): JsonResponse
+    {
+        $request->validate([
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $user = Auth::user();
+
+        // Get the portfolio
+        $portfolio = InvestSmartPortfolio::where('user_id', $user->id)->firstOrFail();
+
+        // Load portfolio stocks
+        $stocks = $portfolio->stocks;
+
+        // Calculate portfolio value
+        $portfolioValue = 0;
+        foreach ($stocks as $stock) {
+            $portfolioValue += ($stock->quantity * $stock->current_price);
+        }
+
+        // Calculate total value (portfolio + cash)
+        $totalValue = $portfolioValue + $portfolio->balance;
+
+        // Calculate return (assuming starting capital was 100,000)
+        $startingCapital = 100000.00;
+        $totalReturn = $totalValue - $startingCapital;
+        $totalReturnPercent = ($totalReturn / $startingCapital) * 100;
+
+        // Get transaction count
+        $transactionCount = $portfolio->transactions()->count();
+
+        // Create snapshot data
+        $snapshotData = [
+            'stocks' => $stocks->toArray(),
+            'balance' => $portfolio->balance,
+            'total_value' => $totalValue,
+        ];
+
+        // Create the result
+        $result = new InvestSmartResult([
+            'user_id' => $user->id,
+            'portfolio_id' => $portfolio->id,
+            'total_value' => $totalValue,
+            'cash_balance' => $portfolio->balance,
+            'portfolio_value' => $portfolioValue,
+            'total_return' => $totalReturn,
+            'total_return_percent' => $totalReturnPercent,
+            'stock_count' => $stocks->count(),
+            'transaction_count' => $transactionCount,
+            'snapshot_data' => $snapshotData,
+            'notes' => $request->input('notes'),
+        ]);
+
+        $result->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Portfolio result saved successfully.',
+            'result' => $result,
+        ]);
+    }
+
+    /**
+     * Get the user's investment results history.
+     */
+    public function getResults(): JsonResponse
+    {
+        $user = Auth::user();
+
+        // Get results ordered by date (newest first)
+        $results = InvestSmartResult::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($results);
     }
 
     /**

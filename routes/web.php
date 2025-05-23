@@ -127,6 +127,8 @@ Route::middleware(
         Route::post('/sell', [\App\Http\Controllers\InvestSmartController::class, 'sellStock']);
         Route::get('/transactions', [\App\Http\Controllers\InvestSmartController::class, 'getTransactions']);
         Route::post('/update-prices', [\App\Http\Controllers\InvestSmartController::class, 'updatePrices']);
+        Route::post('/save-result', [\App\Http\Controllers\InvestSmartController::class, 'saveResult']);
+        Route::get('/results', [\App\Http\Controllers\InvestSmartController::class, 'getResults']);
     });
 
 
