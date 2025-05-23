@@ -11,6 +11,18 @@ use App\Models\SubjectType;
 
 class LearningController extends Controller
 {
+    /**
+     * Get the user's level or default to 1 if the method doesn't exist
+     */
+    private function getUserLevel(): int
+    {
+        if (!Auth::check()) {
+            return 1;
+        }
+
+        $user = Auth::user();
+        return method_exists($user, 'getLevel') ? $user->getLevel() : 1;
+    }
     public function index(): View
     {
         $challenges = Challenge::with(['tasks', 'category'])->where('is_active', true)
@@ -31,11 +43,18 @@ class LearningController extends Controller
 
         $completedTasks = 0;
         $completedChallenges = [];
+        $lockedChallenges = [];
         $challengeFeedback = [];
 
         // Check which challenges are completed by the current user
         if (Auth::check()) {
+            $userLevel = $this->getUserLevel();
+
             foreach ($challenges as $challenge) {
+                // Check if challenge is locked due to level requirement
+                if ($challenge->required_level > $userLevel) {
+                    $lockedChallenges[] = $challenge->id;
+                }
                 $challengeTasks = $challenge->tasks;
                 $totalChallengeTasks = $challengeTasks->count();
 
@@ -90,13 +109,26 @@ class LearningController extends Controller
             'completedLevels' => $completedLevels,
             'techCategories' => $techCategories,
             'completedChallenges' => $completedChallenges,
+            'lockedChallenges' => $lockedChallenges,
             'challengeFeedback' => $challengeFeedback,
             'subjectTypes' => $subjectTypes
         ]);
     }
 
-    public function show(Challenge $challenge): View
+    public function show(Challenge $challenge)
     {
+        // Check if the challenge is expired using the model accessor
+        $isExpired = $challenge->isExpired();
+
+        // Check if the user has the required level to access this challenge
+        $userLevel = $this->getUserLevel();
+        $isLocked = false;
+
+        // Check if the challenge requires a higher level than the user has
+        if ($challenge->required_level > $userLevel) {
+            $isLocked = true;
+        }
+
         // Get all tasks for this challenge
         $tasks = $challenge->tasks()->orderBy('order')->get();
 
@@ -113,12 +145,24 @@ class LearningController extends Controller
         return view('challenge', [
             'challenge' => $challenge,
             'tasks' => $tasks,
-            'completedTaskIds' => $completedTaskIds
+            'completedTaskIds' => $completedTaskIds,
+            'isExpired' => $isExpired,
+            'isLocked' => $isLocked,
+            'userLevel' => $userLevel
         ]);
     }
 
-    public function showTask(Challenge $challenge, string $task): View
+    public function showTask(Challenge $challenge, string $task)
     {
+        // Check if the user has the required level to access this challenge
+        $userLevel = $this->getUserLevel();
+
+        // If the challenge requires a higher level than the user has, redirect to the challenge page
+        if ($challenge->required_level > $userLevel) {
+            return redirect()->route('challenge', ['challenge' => $challenge])
+                ->with('error', 'You need to reach level ' . $challenge->required_level . ' to access the tasks in this challenge.');
+        }
+
         $currentTask = $challenge->tasks()->findOrFail($task);
         $nextTask = $challenge->tasks()
             ->where('id', '>', $task)

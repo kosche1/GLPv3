@@ -111,7 +111,6 @@ class ChallengeResource extends Resource
             Forms\Components\Section::make("Challenge Configuration")->schema([
                 Forms\Components\Select::make("challenge_type")
                 ->label("Challenge Type")
-                ->required()
                 ->options([
                     "debugging" => "Debugging Exercise",
                     "algorithm" => "Algorithm Challenge",
@@ -161,6 +160,16 @@ class ChallengeResource extends Resource
         Forms\Components\Section::make("Challenge Content")
             ->schema(function (Forms\Get $get) {
                 $challengeType = $get("challenge_type");
+
+                // If no challenge type is selected, return empty schema
+                if (empty($challengeType)) {
+                    return [
+                        Forms\Components\Placeholder::make("no_type_selected")
+                            ->content('Select a challenge type to configure specific content.')
+                            ->columnSpanFull(),
+                    ];
+                }
+
                 return match ($challengeType) {
                     "debugging" => [
                         Forms\Components\Textarea::make("challenge_content.scenario")

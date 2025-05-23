@@ -5,11 +5,10 @@ use App\Models\Challenge;
 
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ChallengeController;
-use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ForumController;
+use App\Http\Controllers\ParagonZController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ActivityGoalController;
-use App\Http\Controllers\MoleculeBuilderController;
 use App\Http\Controllers\EquationDropController;
 use App\Http\Controllers\HistoricalTimelineMazeController;
 
@@ -28,8 +27,10 @@ use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
 Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name('home');
 
-// Terms & Conditions page - accessible without authentication
+// Terms & Conditions pages - accessible without authentication
 Route::view('terms', 'terms')->name('terms');
+Route::view('disclaimer', 'disclaimer')->name('disclaimer');
+Route::view('system-policy', 'system-policy')->name('system-policy');
 
 
 
@@ -125,6 +126,8 @@ Route::middleware(
         Route::post('/sell', [\App\Http\Controllers\InvestSmartController::class, 'sellStock']);
         Route::get('/transactions', [\App\Http\Controllers\InvestSmartController::class, 'getTransactions']);
         Route::post('/update-prices', [\App\Http\Controllers\InvestSmartController::class, 'updatePrices']);
+        Route::post('/save-result', [\App\Http\Controllers\InvestSmartController::class, 'saveResult']);
+        Route::get('/results', [\App\Http\Controllers\InvestSmartController::class, 'getResults']);
     });
 
 
@@ -143,6 +146,8 @@ Route::middleware(
     // Dynamic route for any subject type - must be after specific routes
     Route::get('subjects/{code}', [\App\Http\Controllers\SubjectsController::class, 'showSubjectType'])->name('subjects.type');
     // Notification routes
+    Route::get('paragonz', [ParagonZController::class, 'index'])->name('paragonz');
+
     Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');
     Route::get('api/notifications', [\App\Http\Controllers\NotificationController::class, 'getNotifications'])->name('notifications.get');
     Route::post('api/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
@@ -233,6 +238,7 @@ Route::middleware(
         Route::get('/equation-drop', [EquationDropController::class, 'index'])->name('equation-drop.index');
         Route::get('/equation-drop/questions', [EquationDropController::class, 'getQuestions'])->name('equation-drop.questions');
         Route::post('/equation-drop/save-score', [EquationDropController::class, 'saveScore'])->name('equation-drop.save-score');
+        Route::get('/equation-drop/results', [EquationDropController::class, 'getResults'])->name('equation-drop.results');
     });
 
     // HUMMS Specialized Subject Routes
@@ -241,6 +247,41 @@ Route::middleware(
         Route::get('/historical-timeline-maze/questions', [HistoricalTimelineMazeController::class, 'getQuestions'])->name('historical-timeline-maze.questions');
         Route::get('/historical-timeline-maze/events', [HistoricalTimelineMazeController::class, 'getEvents'])->name('historical-timeline-maze.events');
         Route::post('/historical-timeline-maze/save-progress', [HistoricalTimelineMazeController::class, 'saveProgress'])->name('historical-timeline-maze.save-progress');
+        Route::get('/historical-timeline-maze/leaderboard', [HistoricalTimelineMazeController::class, 'getLeaderboard'])->name('historical-timeline-maze.leaderboard');
+        Route::post('/historical-timeline-maze/save-result', [HistoricalTimelineMazeController::class, 'saveResult'])->name('historical-timeline-maze.save-result');
+        Route::get('/historical-timeline-maze/results', [HistoricalTimelineMazeController::class, 'getResults'])->name('historical-timeline-maze.results');
+    });
+
+    // Collaborative Learning Routes
+    Route::prefix('study-groups')->name('study-groups.')->group(function () {
+        // Study Group Routes
+        Route::get('/', [\App\Http\Controllers\StudyGroupController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\StudyGroupController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\StudyGroupController::class, 'store'])->name('store');
+        Route::get('/{studyGroup}', [\App\Http\Controllers\StudyGroupController::class, 'show'])->name('show');
+        Route::get('/{studyGroup}/edit', [\App\Http\Controllers\StudyGroupController::class, 'edit'])->name('edit');
+        Route::put('/{studyGroup}', [\App\Http\Controllers\StudyGroupController::class, 'update'])->name('update');
+        Route::post('/join', [\App\Http\Controllers\StudyGroupController::class, 'join'])->name('join');
+        Route::post('/{studyGroup}/leave', [\App\Http\Controllers\StudyGroupController::class, 'leave'])->name('leave');
+
+        // Group Challenge Routes
+        Route::get('/{studyGroup}/challenges/create', [\App\Http\Controllers\GroupChallengeController::class, 'create'])->name('challenges.create');
+        Route::post('/{studyGroup}/challenges', [\App\Http\Controllers\GroupChallengeController::class, 'store'])->name('challenges.store');
+        Route::get('/{studyGroup}/challenges/{groupChallenge}', [\App\Http\Controllers\GroupChallengeController::class, 'show'])->name('challenges.show');
+        Route::get('/{studyGroup}/challenges/{groupChallenge}/edit', [\App\Http\Controllers\GroupChallengeController::class, 'edit'])->name('challenges.edit');
+        Route::put('/{studyGroup}/challenges/{groupChallenge}', [\App\Http\Controllers\GroupChallengeController::class, 'update'])->name('challenges.update');
+        Route::post('/{studyGroup}/challenges/{groupChallenge}/join', [\App\Http\Controllers\GroupChallengeController::class, 'join'])->name('challenges.join');
+        Route::post('/{studyGroup}/challenges/{groupChallenge}/progress', [\App\Http\Controllers\GroupChallengeController::class, 'updateProgress'])->name('challenges.progress');
+
+        // Group Discussion Routes
+        Route::get('/{studyGroup}/discussions', [\App\Http\Controllers\GroupDiscussionController::class, 'index'])->name('discussions.index');
+        Route::get('/{studyGroup}/discussions/create', [\App\Http\Controllers\GroupDiscussionController::class, 'create'])->name('discussions.create');
+        Route::post('/{studyGroup}/discussions', [\App\Http\Controllers\GroupDiscussionController::class, 'store'])->name('discussions.store');
+        Route::get('/{studyGroup}/discussions/{discussion}', [\App\Http\Controllers\GroupDiscussionController::class, 'show'])->name('discussions.show');
+        Route::get('/{studyGroup}/discussions/{discussion}/edit', [\App\Http\Controllers\GroupDiscussionController::class, 'edit'])->name('discussions.edit');
+        Route::put('/{studyGroup}/discussions/{discussion}', [\App\Http\Controllers\GroupDiscussionController::class, 'update'])->name('discussions.update');
+        Route::post('/{studyGroup}/discussions/{discussion}/pin', [\App\Http\Controllers\GroupDiscussionController::class, 'togglePin'])->name('discussions.pin');
+        Route::post('/{studyGroup}/discussions/{discussion}/comment', [\App\Http\Controllers\GroupDiscussionController::class, 'addComment'])->name('discussions.comment');
     });
 });
 
@@ -343,6 +384,16 @@ Route::get('/fix-ict-tasks', [\App\Http\Controllers\FixIctTasksController::class
 Route::post('/verify-password', [\App\Http\Controllers\PasswordVerificationController::class, 'verify'])
     ->middleware('auth')
     ->name('verify-password');
+
+// Audit Trail Print Routes
+Route::get('/admin/audit-trails/{record}/print-view', [\App\Http\Controllers\AuditTrailPrintController::class, 'printRecord'])
+    ->middleware('auth')
+    ->name('audit-trails.print-view');
+Route::get('/admin/audit-trails/bulk-print/{batchId}', [\App\Http\Controllers\AuditTrailPrintController::class, 'printBulk'])
+    ->middleware('auth')
+    ->name('audit-trails.bulk-print-view');
+
+
 
 // Debug route for investment challenges
 Route::get('/debug-investment-challenges', function() {

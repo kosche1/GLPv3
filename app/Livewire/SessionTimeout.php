@@ -145,6 +145,26 @@ class SessionTimeout extends Component
         // Clear session lock state
         $this->dispatch('clear-session-lock');
 
+        // Get the current user before logging out
+        $user = Auth::user();
+
+        if ($user) {
+            try {
+                // Record the logout event in the audit trail
+                \Illuminate\Support\Facades\Log::info('Recording logout from session timeout', [
+                    'user_id' => $user->id,
+                    'user_name' => $user->name
+                ]);
+
+                \App\Models\AuditTrail::recordLogout($user);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error recording logout in session timeout', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+        }
+
         Auth::logout();
         return redirect()->route('login');
     }

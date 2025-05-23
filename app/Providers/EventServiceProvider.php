@@ -9,7 +9,13 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use App\Events\UserCompletedChallenge;
 use App\Events\UserEnrolledInChallenge;
+use App\Events\ChallengeCompleted;
+use App\Events\TaskSubmitted;
 use App\Listeners\RecordUserAttendance;
+use App\Listeners\RecordUserLogin;
+use App\Listeners\RecordUserRegistration;
+use App\Listeners\RecordChallengeCompletion;
+use App\Listeners\RecordTaskSubmission;
 use App\Listeners\SendAchievementNotification;
 use App\Listeners\SendChallengeCompletionNotification;
 use App\Listeners\SendLevelUpNotification;
@@ -31,9 +37,13 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
             AssignStudentRole::class,
+            // RecordUserRegistration is now handled directly in the registration process
+            // but we'll keep it here as a backup
+            RecordUserRegistration::class,
         ],
         Login::class => [
             RecordUserAttendance::class,
+            RecordUserLogin::class,
         ],
         UserLevelledUp::class => [
             SendLevelUpNotification::class,
@@ -46,6 +56,12 @@ class EventServiceProvider extends ServiceProvider
         ],
         UserCompletedChallenge::class => [
             SendChallengeCompletionNotification::class,
+        ],
+        ChallengeCompleted::class => [
+            RecordChallengeCompletion::class,
+        ],
+        TaskSubmitted::class => [
+            RecordTaskSubmission::class,
         ],
     ];
 

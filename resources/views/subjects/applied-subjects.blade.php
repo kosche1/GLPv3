@@ -93,8 +93,17 @@
                             </span>
                         </div>
 
-                        <!-- Completed Badge -->
-                        @if(isset($completedChallenges) && in_array($challenge->id, $completedChallenges ?? []))
+                        <!-- Status Badges -->
+                        @if(isset($expiredChallenges) && in_array($challenge->id, $expiredChallenges ?? []))
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-red-500 text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Expired
+                            </span>
+                        </div>
+                        @elseif(isset($completedChallenges) && in_array($challenge->id, $completedChallenges ?? []))
                         <div class="absolute top-3 left-3">
                             <span class="bg-emerald-500 text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -121,9 +130,9 @@
                             <div class="grid grid-cols-2 gap-2 mt-3">
                                 <div class="flex items-center gap-1.5 text-xs text-neutral-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span>{{ $challenge->duration ?? '4 weeks' }}</span>
+                                    <span>{{ $challenge->duration ?? 'No end date' }}</span>
                                 </div>
                                 <div class="flex items-center gap-1.5 text-xs text-neutral-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -135,16 +144,37 @@
                         </div>
 
                         <div class="mt-4 pt-4 border-t border-neutral-700">
-                            <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white {{ isset($completedChallenges) && in_array($challenge->id, $completedChallenges ?? []) ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-500' }} rounded-lg transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
-                                @if(isset($completedChallenges) && in_array($challenge->id, $completedChallenges ?? []))
-                                    View Course
-                                @else
-                                    Start Challenge
-                                @endif
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                </svg>
-                            </a>
+                            @if(isset($expiredChallenges) && in_array($challenge->id, $expiredChallenges ?? []))
+                                <div class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-neutral-400 bg-neutral-700 rounded-lg cursor-not-allowed">
+                                    Challenge Expired
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                            @elseif(isset($lockedChallenges) && in_array($challenge->id, $lockedChallenges ?? []))
+                                <div class="inline-flex flex-col items-center justify-center w-full px-4 py-2.5 text-sm font-medium bg-neutral-700 rounded-lg cursor-not-allowed">
+                                    <div class="flex items-center justify-center text-amber-400 mb-1">
+                                        <span>Level {{ $challenge->required_level }} Required</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-xs text-neutral-400">
+                                        Reach level {{ $challenge->required_level }} to unlock this challenge
+                                    </div>
+                                </div>
+                            @else
+                                <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white {{ isset($completedChallenges) && in_array($challenge->id, $completedChallenges ?? []) ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-500' }} rounded-lg transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">
+                                    @if(isset($completedChallenges) && in_array($challenge->id, $completedChallenges ?? []))
+                                        View Course
+                                    @else
+                                        Start Challenge
+                                    @endif
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                    </svg>
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>

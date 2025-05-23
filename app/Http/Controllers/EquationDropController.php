@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\EquationDrop;
+use App\Models\EquationDropResult;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class EquationDropController extends Controller
@@ -73,19 +76,71 @@ class EquationDropController extends Controller
     /**
      * Save a user's game score.
      */
-    public function saveScore(Request $request)
+    public function saveScore(Request $request): JsonResponse
     {
         $request->validate([
             'score' => 'required|integer',
             'difficulty' => 'required|string',
             'completed' => 'required|boolean',
+            'questions_attempted' => 'required|integer',
+            'questions_correct' => 'required|integer',
+            'time_spent_seconds' => 'required|integer',
+            'notes' => 'nullable|string|max:1000',
         ]);
 
-        // In a production environment, you would save this to a database
-        // For now, we'll just return a success response
+        // Get the active Equation Drop game
+        $equationDrop = EquationDrop::where('is_active', true)->first();
+
+        if (!$equationDrop) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No active equation drop game found',
+            ], 404);
+        }
+
+        // Calculate accuracy percentage
+        $questionsAttempted = $request->input('questions_attempted');
+        $questionsCorrect = $request->input('questions_correct');
+        $accuracyPercentage = $questionsAttempted > 0
+            ? ($questionsCorrect / $questionsAttempted) * 100
+            : 0;
+
+        // Create the result record
+        $result = new EquationDropResult([
+            'user_id' => Auth::id(),
+            'equation_drop_id' => $equationDrop->id,
+            'difficulty' => $request->input('difficulty'),
+            'score' => $request->input('score'),
+            'questions_attempted' => $questionsAttempted,
+            'questions_correct' => $questionsCorrect,
+            'accuracy_percentage' => $accuracyPercentage,
+            'time_spent_seconds' => $request->input('time_spent_seconds'),
+            'completed' => $request->input('completed'),
+            'notes' => $request->input('notes'),
+        ]);
+
+        $result->save();
+
         return response()->json([
             'success' => true,
             'message' => 'Score saved successfully',
+            'result' => $result,
         ]);
+    }
+
+    /**
+     * Get the user's equation drop results history.
+     */
+    public function getResults(): JsonResponse
+    {
+        $user = Auth::user();
+
+        // Get results ordered by date (newest first)
+        $results = EquationDropResult::where('user_id', $user->id)
+            ->with('equationDrop:id,title')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($results);
     }
 }

@@ -40,7 +40,26 @@
                             <p class="text-sm text-neutral-400 mb-4">{{ $challenge->description }}</p>
 
                             <div class="mt-auto pt-4 border-t border-neutral-700">
-                                @if(in_array($challenge->id, $completedChallenges))
+                                @if(isset($expiredChallenges) && in_array($challenge->id, $expiredChallenges ?? []))
+                                    <div class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-neutral-400 bg-neutral-700 rounded-lg cursor-not-allowed">
+                                        Challenge Expired
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                @elseif(isset($lockedChallenges) && in_array($challenge->id, $lockedChallenges ?? []))
+                                    <div class="inline-flex flex-col items-center justify-center w-full px-4 py-2.5 text-sm font-medium bg-neutral-700 rounded-lg cursor-not-allowed">
+                                        <div class="flex items-center justify-center text-amber-400 mb-1">
+                                            <span>Level {{ $challenge->required_level }} Required</span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        </div>
+                                        <div class="text-xs text-neutral-400">
+                                            Reach level {{ $challenge->required_level }} to unlock this challenge
+                                        </div>
+                                    </div>
+                                @elseif(in_array($challenge->id, $completedChallenges))
                                     <div class="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-emerald-400 bg-emerald-500/10 rounded-lg">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />

@@ -476,15 +476,6 @@
                                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Your Activity</span>
                             </h3>
                             <div class="flex items-center gap-2">
-                                <!-- Current Streak Display -->
-                                <div class="flex items-center gap-2 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner mr-2">
-                                    <div class="text-xs text-emerald-400">Current Streak:</div>
-                                    <div class="text-sm font-bold text-white">{{ $currentLoginStreak }} days</div>
-                                </div>
-
-                                <!-- Activity Trend Indicator -->
-                                {!! $trendIndicatorHtml !!}
-
                                 <!-- Refresh Activity Button -->
                                 <a href="{{ route('refresh-activity') }}" class="flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner hover:bg-neutral-700/80 transition-colors duration-200">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
@@ -548,16 +539,128 @@
                             </div>
                         @endif
 
-                        <div class="overflow-x-auto h-[300px] bg-neutral-800/30 rounded-xl border border-neutral-700/30 p-3">
-                            <div class="contribution-calendar min-w-[700px] h-full">
-                                <!-- Server-side rendered activity graph -->
-                                {!! $activityGraphHtml !!}
+                        <!-- Modern Activity Graph with Weekly Breakdown -->
+                        <div x-data="{
+                            months: {},
+                            activityData: {},
+                            init() {
+                                // Initialize months as collapsed except for the first one
+                                @if(isset($activityData) && isset($activityData['monthly_data']))
+                                    @foreach($activityData['monthly_data'] as $month => $data)
+                                        this.months['{{ $month }}'] = {{ $loop->first ? 'true' : 'false' }};
+                                    @endforeach
+                                @else
+                                    // Default months if no data available
+                                    const currentDate = new Date();
+                                    for (let i = 0; i < 6; i++) {
+                                        const date = new Date(currentDate);
+                                        date.setMonth(currentDate.getMonth() - i);
+                                        const monthKey = date.toLocaleString('default', { month: 'long' }) + ' ' + date.getFullYear();
+                                        this.months[monthKey] = i === 0;
+                                    }
+                                @endif
+                            },
+                            toggleMonth(month) {
+                                this.months[month] = !this.months[month];
+                            }
+                        }" class="space-y-4">
+                            <!-- Stats Summary -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-neutral-800/30 rounded-xl border border-neutral-700/30 p-4">
+                                <div class="text-center">
+                                    <p class="text-gray-400 text-sm">Total Activity</p>
+                                    <p class="text-2xl font-bold text-white">{{ isset($activityData['total_activity']) ? number_format($activityData['total_activity']) : '0' }}</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-gray-400 text-sm">Weekly Average</p>
+                                    <p class="text-2xl font-bold text-white">{{ isset($activityData['weekly_average']) ? number_format($activityData['weekly_average']) : '0' }}</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-gray-400 text-sm">Current Streak</p>
+                                    <p class="text-2xl font-bold text-white">{{ $currentLoginStreak }} days</p>
+                                </div>
+                                <div class="text-center">
+                                    <p class="text-gray-400 text-sm">Completion Rate</p>
+                                    <p class="text-2xl font-bold text-white">{{ isset($activityData['completion_rate']) ? $activityData['completion_rate'] : '0' }}%</p>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Weekly Activity Summary with integrated Activity Goals -->
-                        <div class="mt-6">
-                            {!! $weeklySummaryHtml !!}
+                            <!-- Monthly Activity Breakdown -->
+                            @if(isset($activityData) && isset($activityData['monthly_data']))
+                                @foreach($activityData['monthly_data'] as $month => $monthData)
+                                    <div class="bg-neutral-800/30 rounded-xl border border-neutral-700/30 overflow-hidden">
+                                        <!-- Month Header -->
+                                        <div class="p-4 border-b border-neutral-700/50 bg-neutral-800/50">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium text-gray-300">{{ $month }}</span>
+                                                <div class="flex items-center">
+                                                    <div class="w-32 h-2 bg-neutral-700/50 rounded-full overflow-hidden mr-3">
+                                                        <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" style="width: {{ $monthData['completion_percentage'] }}%"></div>
+                                                    </div>
+                                                    <span class="text-sm font-medium text-gray-300">{{ $monthData['completion_percentage'] }}%</span>
+                                                    <button @click="toggleMonth('{{ $month }}')" class="ml-3 text-emerald-400 hover:text-emerald-300 transition-colors">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{ 'transform rotate-180': months['{{ $month }}'] }" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Weekly Breakdown -->
+                                        <div x-show="months['{{ $month }}']" x-transition class="p-4">
+                                            <div class="space-y-3">
+                                                @foreach($monthData['weeks'] as $weekNum => $weekData)
+                                                    <div>
+                                                        <div class="flex items-center justify-between mb-1">
+                                                            <span class="text-xs text-gray-500">Week {{ $weekNum }}</span>
+                                                            <span class="text-xs text-gray-500">{{ $weekData['date_range'] }}</span>
+                                                        </div>
+                                                        <div class="flex items-center">
+                                                            <div class="flex-1 h-1.5 bg-neutral-700/50 rounded-full overflow-hidden">
+                                                                <div class="h-full bg-emerald-500 rounded-full" style="width: {{ $weekData['completion_percentage'] }}%"></div>
+                                                            </div>
+                                                            <span class="ml-3 text-xs font-medium text-gray-400">{{ $weekData['completion_percentage'] }}%</span>
+                                                        </div>
+                                                        <!-- Daily dots -->
+                                                        <div class="flex space-x-1 mt-1.5">
+                                                            @foreach($weekData['days'] as $day)
+                                                                @php
+                                                                    $bgColor = 'bg-neutral-700';
+                                                                    if ($day['activity_level'] === 1) $bgColor = 'bg-emerald-900';
+                                                                    if ($day['activity_level'] === 2) $bgColor = 'bg-emerald-700';
+                                                                    if ($day['activity_level'] === 3) $bgColor = 'bg-emerald-500';
+                                                                    if ($day['activity_level'] >= 4) $bgColor = 'bg-emerald-300';
+                                                                @endphp
+                                                                <div class="w-1.5 h-1.5 rounded-full {{ $bgColor }}" title="{{ $day['date'] }}: {{ $day['activity_count'] }} activities"></div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <!-- Collapsed State -->
+                                        <div x-show="!months['{{ $month }}']" class="p-4 text-center">
+                                            <button @click="toggleMonth('{{ $month }}')" class="text-xs text-emerald-500 font-medium hover:text-emerald-400 transition-colors">
+                                                Click to expand weekly breakdown
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <!-- Fallback for when no activity data is available -->
+                                <div class="bg-neutral-800/30 rounded-xl border border-neutral-700/30 p-6 text-center">
+                                    <p class="text-gray-400 mb-2">No activity data available yet.</p>
+                                    <a href="{{ route('refresh-activity') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
+                                        Refresh Activity Data
+                                    </a>
+                                </div>
+                            @endif
+
+                            <!-- Activity Goals Section -->
+                            <div class="mt-4">
+                                {!! $weeklySummaryHtml !!}
+                            </div>
                         </div>
                     </div>
                 </div>

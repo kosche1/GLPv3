@@ -28,6 +28,13 @@
                         <span class="text-xs text-emerald-400 font-medium">TIME</span>
                         <span id="timer-display" class="text-lg font-bold text-white">60s</span>
                     </div>
+                    <div class="h-8 w-px bg-neutral-700"></div>
+                    <button id="results-btn" class="flex items-center gap-1 px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Results
+                    </button>
                 </div>
 
                 <a href="{{ route('subjects.specialized.stem') }}" class="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/20 group">
@@ -153,7 +160,33 @@
                     </button>
                 </div>
 
-                <p class="text-sm text-gray-400 text-center">Select a difficulty to begin the challenge!</p>
+                <div class="flex justify-between items-center">
+                    <p class="text-sm text-gray-400">Select a difficulty to begin the challenge!</p>
+                    <button id="view-results-btn" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg">
+                        View Results
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Modal -->
+        <div id="results-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+            <div class="bg-neutral-800 rounded-xl border border-emerald-500 p-6 shadow-lg max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-white">Your Results</h2>
+                    <button id="close-results-btn" class="p-1 rounded-full bg-neutral-700 hover:bg-neutral-600 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="results-content" class="text-white">
+                    <!-- Results content will be loaded here -->
+                    <div class="flex justify-center items-center py-12">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -325,6 +358,10 @@
             const levelDisplay = document.getElementById('level-display');
             const scoreDisplay = document.getElementById('score-display');
             const timerDisplay = document.getElementById('timer-display');
+            const resultsModal = document.getElementById('results-modal');
+            const resultsContent = document.getElementById('results-content');
+            const viewResultsBtn = document.getElementById('view-results-btn');
+            const closeResultsBtn = document.getElementById('close-results-btn');
 
             // Update timer displays in difficulty buttons
             function updateTimerDisplaysInButtons() {
@@ -335,6 +372,163 @@
 
             // Update timer displays when the page loads
             updateTimerDisplaysInButtons();
+
+            // Initialize results modal
+            viewResultsBtn.addEventListener('click', function() {
+                loadResults();
+                difficultyModal.style.display = 'none';
+                resultsModal.style.display = 'flex';
+            });
+
+            closeResultsBtn.addEventListener('click', function() {
+                resultsModal.style.display = 'none';
+                difficultyModal.style.display = 'flex';
+            });
+
+            // Results button in the header
+            document.getElementById('results-btn').addEventListener('click', function() {
+                loadResults();
+                resultsModal.style.display = 'flex';
+            });
+
+            // Function to load results from the server
+            function loadResults() {
+                resultsContent.innerHTML = `
+                    <div class="flex justify-center items-center py-12">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+                    </div>
+                `;
+
+                fetch('{{ route('subjects.specialized.stem.equation-drop.results') }}')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch results');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.length === 0) {
+                            resultsContent.innerHTML = `
+                                <div class="bg-neutral-900 p-6 rounded-lg text-center">
+                                    <p class="text-lg mb-4">You haven't played any Equation Drop games yet.</p>
+                                    <p>Complete a game to see your results here.</p>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        // Calculate summary statistics
+                        const totalGames = data.length;
+                        const totalScore = data.reduce((sum, result) => sum + result.score, 0);
+                        const averageScore = Math.round(totalScore / totalGames);
+                        const totalAccuracy = data.reduce((sum, result) => sum + parseFloat(result.accuracy_percentage), 0);
+                        const averageAccuracy = (totalAccuracy / totalGames).toFixed(1);
+
+                        // Build the HTML for the results
+                        let html = `
+                            <div class="bg-neutral-900 rounded-lg p-4 mb-6">
+                                <h3 class="text-xl font-semibold mb-4">Performance Summary</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="bg-neutral-800 p-4 rounded-lg">
+                                        <p class="text-sm text-emerald-400">Total Games</p>
+                                        <p class="text-2xl font-bold">${totalGames}</p>
+                                    </div>
+                                    <div class="bg-neutral-800 p-4 rounded-lg">
+                                        <p class="text-sm text-emerald-400">Average Score</p>
+                                        <p class="text-2xl font-bold">${averageScore}</p>
+                                    </div>
+                                    <div class="bg-neutral-800 p-4 rounded-lg">
+                                        <p class="text-sm text-emerald-400">Average Accuracy</p>
+                                        <p class="text-2xl font-bold">${averageAccuracy}%</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3 class="text-xl font-semibold mb-4">Game History</h3>
+                            <div class="space-y-4">
+                        `;
+
+                        // Add each result
+                        data.forEach((result, index) => {
+                            const date = new Date(result.created_at);
+                            const formattedDate = date.toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+
+                            const difficultyColor = result.difficulty === 'easy'
+                                ? 'bg-green-100 text-green-800'
+                                : (result.difficulty === 'medium'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-red-100 text-red-800');
+
+                            html += `
+                                <div class="bg-neutral-900 rounded-lg overflow-hidden">
+                                    <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+                                        <div>
+                                            <span class="font-semibold text-lg">Game #${totalGames - index}</span>
+                                            <span class="ml-2 text-sm text-gray-400">${formattedDate}</span>
+                                        </div>
+                                        <div>
+                                            <span class="px-3 py-1 rounded-full text-sm font-medium ${difficultyColor}">
+                                                ${result.difficulty.charAt(0).toUpperCase() + result.difficulty.slice(1)}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-4">
+                                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                            <div>
+                                                <p class="text-sm text-gray-400">Score</p>
+                                                <p class="font-bold text-xl">${result.score}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-gray-400">Accuracy</p>
+                                                <p class="font-bold text-xl">${parseFloat(result.accuracy_percentage).toFixed(1)}%</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-gray-400">Questions</p>
+                                                <p class="font-bold text-xl">${result.questions_correct} / ${result.questions_attempted}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-gray-400">Time Spent</p>
+                                                <p class="font-bold text-xl">${formatTime(result.time_spent_seconds)}</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3 flex justify-between items-center">
+                                            <span class="text-sm ${result.completed ? 'text-emerald-400' : 'text-yellow-400'}">
+                                                ${result.completed ? 'Completed' : 'Not Completed'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        html += `</div>`;
+                        resultsContent.innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error('Error loading results:', error);
+                        resultsContent.innerHTML = `
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                                <p>There was an error loading your results. Please try again.</p>
+                                <button onclick="loadResults()" class="underline mt-2">Try again</button>
+                            </div>
+                        `;
+                    });
+            }
+
+            // Format time in seconds to minutes and seconds
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes}m ${remainingSeconds}s`;
+            }
 
             // Initialize difficulty selection
             difficultyButtons.forEach(button => {
@@ -677,6 +871,11 @@
 
             // Function to save score to the server
             function saveScoreToServer(finalScore, difficulty, completed) {
+                // Calculate additional metrics
+                const questionsAttempted = level; // Current level represents questions attempted
+                const questionsCorrect = Math.floor(finalScore / 100); // Estimate based on score
+                const timeSpentSeconds = calculateTotalTimeSpent(difficulty);
+
                 fetch('{{ route('subjects.specialized.stem.equation-drop.save-score') }}', {
                     method: 'POST',
                     headers: {
@@ -686,7 +885,11 @@
                     body: JSON.stringify({
                         score: finalScore,
                         difficulty: difficulty,
-                        completed: completed
+                        completed: completed,
+                        questions_attempted: questionsAttempted,
+                        questions_correct: questionsCorrect,
+                        time_spent_seconds: timeSpentSeconds,
+                        notes: ''
                     })
                 })
                 .then(response => response.json())
@@ -696,6 +899,23 @@
                 .catch(error => {
                     console.error('Error saving score:', error);
                 });
+            }
+
+            // Calculate total time spent based on difficulty and questions attempted
+            function calculateTotalTimeSpent(difficulty) {
+                const questionsAttempted = level;
+                let secondsPerQuestion;
+
+                if (difficulty === 'easy') {
+                    secondsPerQuestion = timerSettings.easy_timer_seconds;
+                } else if (difficulty === 'medium') {
+                    secondsPerQuestion = timerSettings.medium_timer_seconds;
+                } else {
+                    secondsPerQuestion = timerSettings.hard_timer_seconds;
+                }
+
+                // Estimate time spent as 70% of the maximum time per question
+                return Math.round(questionsAttempted * secondsPerQuestion * 0.7);
             }
 
             // Reset equation function

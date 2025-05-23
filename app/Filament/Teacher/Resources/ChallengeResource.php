@@ -123,7 +123,6 @@ class ChallengeResource extends Resource
             Forms\Components\Section::make("Challenge Configuration")->schema([
                 Forms\Components\Select::make("challenge_type")
                 ->label("Challenge Type")
-                ->required()
                 ->options([
                     "debugging" => "Debugging Exercise",
                     "algorithm" => "Algorithm Challenge",
@@ -173,6 +172,16 @@ class ChallengeResource extends Resource
         Forms\Components\Section::make("Challenge Content")
             ->schema(function (Forms\Get $get) {
                 $challengeType = $get("challenge_type");
+
+                // If no challenge type is selected, return empty schema
+                if (empty($challengeType)) {
+                    return [
+                        Forms\Components\Placeholder::make("no_type_selected")
+                            ->content('Select a challenge type to configure specific content.')
+                            ->columnSpanFull(),
+                    ];
+                }
+
                 return match ($challengeType) {
                     "debugging" => [
                         Forms\Components\Textarea::make("challenge_content.scenario")
@@ -365,8 +374,23 @@ class ChallengeResource extends Resource
                     ->label("Participants")
                     ->counts("users")
                     ->sortable(),
-                Tables\Columns\IconColumn::make("is_active")
-                    ->boolean()
+                Tables\Columns\TextColumn::make("status")
+                    ->label("Status")
+                    ->badge()
+                    ->state(function (Challenge $record): string {
+                        $now = now();
+                        if ($record->end_date && $now->gt($record->end_date)) {
+                            return 'Expired';
+                        }
+                        return $record->is_active ? 'Active' : 'Inactive';
+                    })
+                    ->color(function (string $state): string {
+                        return match ($state) {
+                            'Active' => 'success',
+                            'Expired' => 'danger',
+                            default => 'gray',
+                        };
+                    })
                     ->sortable(),
             ])
             ->filters([
@@ -408,6 +432,12 @@ class ChallengeResource extends Resource
                 Tables\Filters\TernaryFilter::make("is_active")->label(
                     "Active Status"
                 ),
+                Tables\Filters\Filter::make('expired')
+                    ->label('Expired Challenges')
+                    ->query(function (Builder $query): Builder {
+                        return $query->whereNotNull('end_date')
+                            ->where('end_date', '<', now());
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

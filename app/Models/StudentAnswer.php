@@ -107,6 +107,7 @@ class StudentAnswer extends Model
                 ->causedBy(auth()->user())
                 ->performedOn($studentAnswer)
                 ->withProperties([
+                    'user_id' => $studentAnswer->user_id,
                     'task_id' => $studentAnswer->task_id,
                     'is_correct' => $studentAnswer->is_correct,
                     'status' => $studentAnswer->status,
@@ -124,6 +125,7 @@ class StudentAnswer extends Model
                     ->causedBy(auth()->user())
                     ->performedOn($studentAnswer)
                     ->withProperties([
+                        'user_id' => $studentAnswer->user_id,
                         'task_id' => $studentAnswer->task_id,
                         'is_correct' => $studentAnswer->is_correct,
                         'status' => 'evaluated',

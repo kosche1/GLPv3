@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use App\Models\Notification;
 use Livewire\Component;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -82,6 +83,7 @@ class UserActivityHistoryModal extends Component
                             'reason' => $entry->reason,
                             'date' => Carbon::parse($entry->created_at)->format('M d, Y h:i A'),
                             'time_ago' => Carbon::parse($entry->created_at)->diffForHumans(),
+                            'activity_type' => 'experience', // Add activity type to distinguish from notifications
                         ];
                     })
                     ->toArray();
@@ -109,6 +111,47 @@ class UserActivityHistoryModal extends Component
                         'reason' => "Daily login reward - Day {$reward->current_streak}",
                         'date' => Carbon::parse($reward->claimed_at)->format('M d, Y h:i A'),
                         'time_ago' => Carbon::parse($reward->claimed_at)->diffForHumans(),
+                        'activity_type' => 'reward', // Add activity type to distinguish from notifications
+                    ];
+                }
+
+                // Get notifications for challenge completions and approvals
+                $notifications = Notification::where('user_id', $user->id)
+                    ->whereIn('type', ['achievement', 'grade', 'challenge'])
+                    ->orderBy('created_at', 'desc')
+                    ->take(20)
+                    ->get();
+
+                foreach ($notifications as $notification) {
+                    // Extract points from notification message if available
+                    $points = 0;
+                    $pointsPattern = '/(\d+) points/i';
+
+                    if (preg_match($pointsPattern, $notification->message, $matches)) {
+                        $points = (int) $matches[1];
+                    }
+
+                    // Determine notification type for display
+                    $displayType = 'add'; // Default to 'add' for most notifications
+
+                    if (strpos($notification->message, 'approved') !== false ||
+                        strpos($notification->message, 'completed') !== false ||
+                        $notification->type === 'achievement' ||
+                        $notification->type === 'grade') {
+                        $displayType = 'add';
+                    }
+
+                    // Add to activity history
+                    $this->activityHistory[] = [
+                        'id' => 'notif_' . $notification->id, // Prefix to distinguish from other entries
+                        'points' => $points,
+                        'type' => $displayType,
+                        'reason' => $notification->message,
+                        'date' => Carbon::parse($notification->created_at)->format('M d, Y h:i A'),
+                        'time_ago' => Carbon::parse($notification->created_at)->diffForHumans(),
+                        'activity_type' => 'notification', // Add activity type to distinguish from other activities
+                        'notification_type' => $notification->type, // Store the original notification type
+                        'link' => $notification->link, // Store the link if available
                     ];
                 }
 
@@ -117,13 +160,14 @@ class UserActivityHistoryModal extends Component
                     return strtotime($b['date']) - strtotime($a['date']);
                 });
 
-                // Limit to 20 entries after combining
-                $this->activityHistory = array_slice($this->activityHistory, 0, 20);
+                // Limit to 30 entries after combining (increased from 20 to show more history)
+                $this->activityHistory = array_slice($this->activityHistory, 0, 30);
             } catch (\Exception $e) {
                 Log::error('Error fetching activity history: ' . $e->getMessage());
             }
         } catch (\Exception $e) {
             // Handle error
+            Log::error('Error in user activity history: ' . $e->getMessage());
             $this->activityHistory = [];
         }
 

@@ -37,8 +37,9 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'User Management',
                 'Content',
-                'System',
+                'Gamification',
                 'SHS Specialized Subjects',
+                'System',
             ])
             ->discoverResources(
                 in: app_path("Filament/Resources"),
@@ -83,6 +84,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\LogFilamentLogout::class,
             ])
             ->authMiddleware([Authenticate::class]);
     }

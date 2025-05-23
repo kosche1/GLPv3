@@ -251,6 +251,21 @@ class ActivityService
             // Get user activity goals
             $activityGoals = $this->getUserActivityGoals($userId);
 
+            // Generate monthly data for the new activity graph
+            $monthlyData = $this->generateMonthlyActivityData($startDate, $endDate, $filteredActivityLevels, $filteredActivityCounts);
+
+            // Calculate total activity and weekly average
+            $totalActivity = array_sum($filteredActivityCounts);
+            $weekCount = count($weeklyTotals);
+            $weeklyAverage = $weekCount > 0 ? round($totalActivity / $weekCount) : 0;
+
+            // Calculate completion rate (percentage of days with activity)
+            $totalDays = $startDate->diffInDays($endDate) + 1;
+            $daysWithActivity = count(array_filter($filteredActivityLevels, function($level) {
+                return $level > 0;
+            }));
+            $completionRate = $totalDays > 0 ? round(($daysWithActivity / $totalDays) * 100) : 0;
+
             return [
                 'activity_data' => $filteredActivityLevels,
                 'activity_by_type' => $activityByType,
@@ -262,6 +277,10 @@ class ActivityService
                 'activity_type' => $activityType ?: 'all',
                 'months_range' => $months,
                 'activity_goals' => $activityGoals,
+                'monthly_data' => $monthlyData,
+                'total_activity' => $totalActivity,
+                'weekly_average' => $weeklyAverage,
+                'completion_rate' => $completionRate,
             ];
         });
     }
@@ -510,6 +529,154 @@ class ActivityService
             'has_custom_goals' => $hasCustomGoals,
             'total_goals_count' => $totalGoalsCount,
         ];
+    }
+
+    /**
+     * Generate monthly activity data for the new activity graph
+     *
+     * @param Carbon $startDate
+     * @param Carbon $endDate
+     * @param array $activityLevels
+     * @param array $activityCounts
+     * @return array
+     */
+    public function generateMonthlyActivityData($startDate, $endDate, $activityLevels, $activityCounts)
+    {
+        $months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        $monthlyData = [];
+
+        // Clone the dates to avoid modifying the originals
+        $currentDate = clone $startDate;
+        $endDateClone = clone $endDate;
+
+        // Process each month in the range
+        while ($currentDate->format('Y-m') <= $endDateClone->format('Y-m')) {
+            $monthYear = $months[$currentDate->month - 1] . ' ' . $currentDate->year;
+            $monthStart = (clone $currentDate)->startOfMonth();
+            $monthEnd = (clone $currentDate)->endOfMonth();
+
+            if ($monthEnd > $endDateClone) {
+                $monthEnd = clone $endDateClone;
+            }
+
+            // Initialize month data
+            $monthlyData[$monthYear] = [
+                'start_date' => $monthStart->format('Y-m-d'),
+                'end_date' => $monthEnd->format('Y-m-d'),
+                'weeks' => [],
+                'total_activity' => 0,
+                'days_with_activity' => 0,
+                'total_days' => $monthStart->diffInDays($monthEnd) + 1,
+                'completion_percentage' => 0,
+                'sort_key' => $currentDate->format('Y-m'), // Add a sort key for ordering
+                'is_current' => $currentDate->format('Y-m') === Carbon::now()->format('Y-m') // Flag current month
+            ];
+
+            // Process each week in the month
+            $weekStart = clone $monthStart;
+            $weekNum = 1;
+
+            while ($weekStart <= $monthEnd) {
+                $weekEnd = (clone $weekStart)->addDays(6);
+
+                if ($weekEnd > $monthEnd) {
+                    $weekEnd = clone $monthEnd;
+                }
+
+                // Format date range for display
+                $dateRange = $weekStart->format('M j') . ' - ' . $weekEnd->format('M j');
+
+                // Initialize week data
+                $weekData = [
+                    'date_range' => $dateRange,
+                    'start_date' => $weekStart->format('Y-m-d'),
+                    'end_date' => $weekEnd->format('Y-m-d'),
+                    'days' => [],
+                    'total_activity' => 0,
+                    'days_with_activity' => 0,
+                    'total_days' => $weekStart->diffInDays($weekEnd) + 1,
+                    'completion_percentage' => 0
+                ];
+
+                // Process each day in the week
+                $dayDate = clone $weekStart;
+
+                while ($dayDate <= $weekEnd) {
+                    $dateStr = $dayDate->format('Y-m-d');
+                    $activityLevel = $activityLevels[$dateStr] ?? 0;
+                    $activityCount = $activityCounts[$dateStr] ?? 0;
+
+                    // Add day data
+                    $weekData['days'][] = [
+                        'date' => $dayDate->format('M j, Y'),
+                        'activity_level' => $activityLevel,
+                        'activity_count' => $activityCount
+                    ];
+
+                    // Update week totals
+                    $weekData['total_activity'] += $activityCount;
+                    if ($activityLevel > 0) {
+                        $weekData['days_with_activity']++;
+                    }
+
+                    // Update month totals
+                    $monthlyData[$monthYear]['total_activity'] += $activityCount;
+                    if ($activityLevel > 0) {
+                        $monthlyData[$monthYear]['days_with_activity']++;
+                    }
+
+                    // Move to next day
+                    $dayDate->addDay();
+                }
+
+                // Calculate week completion percentage
+                if ($weekData['total_days'] > 0) {
+                    $weekData['completion_percentage'] = round(($weekData['days_with_activity'] / $weekData['total_days']) * 100);
+                }
+
+                // Add week data to month
+                $monthlyData[$monthYear]['weeks'][$weekNum] = $weekData;
+
+                // Move to next week
+                $weekStart->addDays(7);
+                $weekNum++;
+            }
+
+            // Calculate month completion percentage
+            if ($monthlyData[$monthYear]['total_days'] > 0) {
+                $monthlyData[$monthYear]['completion_percentage'] = round(($monthlyData[$monthYear]['days_with_activity'] / $monthlyData[$monthYear]['total_days']) * 100);
+            }
+
+            // Move to next month
+            $currentDate->addMonth()->startOfMonth();
+        }
+
+        // Sort the monthly data with the current month first, then in reverse chronological order
+        $sortedMonthlyData = [];
+        $currentMonthData = null;
+        $otherMonthsData = [];
+
+        foreach ($monthlyData as $monthYear => $data) {
+            if ($data['is_current']) {
+                $currentMonthData = [$monthYear => $data];
+            } else {
+                $otherMonthsData[$monthYear] = $data;
+            }
+        }
+
+        // Sort other months in reverse chronological order
+        uasort($otherMonthsData, function($a, $b) {
+            return strcmp($b['sort_key'], $a['sort_key']);
+        });
+
+        // Combine current month (if exists) with other months
+        if ($currentMonthData) {
+            $sortedMonthlyData = array_merge($currentMonthData, $otherMonthsData);
+        } else {
+            $sortedMonthlyData = $otherMonthsData;
+        }
+
+        return $sortedMonthlyData;
     }
 
     /**

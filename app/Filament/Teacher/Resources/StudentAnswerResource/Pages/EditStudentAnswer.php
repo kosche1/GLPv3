@@ -60,6 +60,20 @@ class EditStudentAnswer extends EditRecord
                     ->title('Points awarded')
                     ->body("Points have been awarded to {$user->name} for completing task {$task->name}")
                     ->send();
+
+                // Record this action in the audit trail
+                try {
+                    \App\Models\AuditTrail::recordTaskEvaluation(
+                        Auth::user(),
+                        $record,
+                        [
+                            'points_awarded' => $task->points_reward,
+                            'task_id' => $task->id,
+                        ]
+                    );
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Error recording task evaluation in audit trail: ' . $e->getMessage());
+                }
             }
         }
     }

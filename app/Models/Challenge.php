@@ -116,6 +116,21 @@ class Challenge extends Model
     }
 
     /**
+     * Scope a query to only include active and non-expired challenges.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActiveAndNotExpired($query)
+    {
+        return $query->where('is_active', true)
+            ->where(function ($query) {
+                $query->whereNull('end_date')
+                    ->orWhere('end_date', '>=', Carbon::now());
+            });
+    }
+
+    /**
      * Calculate and update the total points reward based on associated tasks.
      *
      * @return void
@@ -135,12 +150,53 @@ class Challenge extends Model
      *
      * @return bool
      */
-    public function isCurrentlyActive()
+    public function isCurrentlyActive(): bool
     {
         $now = Carbon::now();
         return $this->is_active &&
                $now->greaterThanOrEqualTo($this->start_date) &&
                ($this->end_date === null || $now->lessThanOrEqualTo($this->end_date));
+    }
+
+    /**
+     * Determine if the challenge is expired based on end date.
+     *
+     * @return bool
+     */
+    public function isExpired(): bool
+    {
+        if ($this->end_date === null) {
+            return false; // Challenges with no end date never expire
+        }
+
+        $now = Carbon::now();
+        return $now->gte($this->end_date); // Use greater than or equal to
+    }
+
+    /**
+     * Get the expired status attribute.
+     *
+     * @return bool
+     */
+    public function getIsExpiredAttribute(): bool
+    {
+        return $this->isExpired();
+    }
+
+    /**
+     * Get the formatted end date attribute.
+     *
+     * @return string
+     */
+    public function getDurationAttribute(): string
+    {
+        // If there's no end date, return "Ongoing"
+        if ($this->end_date === null) {
+            return 'Ongoing';
+        }
+
+        // Format the end date as "Month Day, Year"
+        return $this->end_date->format('M d, Y');
     }
 
     /**

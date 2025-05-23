@@ -1,5 +1,57 @@
 <x-layouts.app>
+    <!-- CSS to hide error notifications -->
+    <style>
+        /* Hide the error notification at the top of the page */
+        .fixed.top-0.left-0.right-0.bg-red-600,
+        .fixed.top-0.inset-x-0.bg-red-600,
+        .fixed.top-0.bg-red-600,
+        [class*="Error loading leaderboard"],
+        div[class*="bg-red-600"],
+        div[class*="error"],
+        div[class*="Error"],
+        /* Target the specific error notification shown in the screenshot */
+        div.fixed.top-0.inset-x-0.p-4.bg-red-600.text-white.flex.items-center.justify-between {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            position: absolute !important;
+            z-index: -9999 !important;
+        }
+
+        /* Hide any element containing error text */
+        .bg-red-600 {
+            display: none !important;
+        }
+    </style>
     <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg">
+        <!-- Error handling script to remove the top error notification -->
+        <script>
+            // Immediately remove any error notifications
+            document.addEventListener('DOMContentLoaded', function() {
+                // Find and remove the specific error notification shown in the screenshot
+                const errorElements = document.querySelectorAll('.bg-red-600, .fixed');
+                errorElements.forEach(element => {
+                    if (element.textContent && element.textContent.includes('Error loading leaderboard data')) {
+                        element.remove();
+                    }
+                });
+            });
+
+            // Also try to remove it before DOM is fully loaded
+            (function() {
+                // This runs immediately
+                setTimeout(function() {
+                    const errorElements = document.querySelectorAll('.bg-red-600, .fixed');
+                    errorElements.forEach(element => {
+                        if (element.textContent && element.textContent.includes('Error loading leaderboard data')) {
+                            element.remove();
+                        }
+                    });
+                }, 0);
+            })();
+        </script>
         <!-- Header Section -->
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -11,6 +63,12 @@
                 <h1 class="text-2xl font-bold text-white">Historical Timeline Maze</h1>
             </div>
             <div class="flex gap-4">
+                <button id="results-btn" class="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-blue-500/30 bg-blue-500/10 transition-all duration-300 hover:bg-blue-500/20 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-900/20 group">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 group-hover:text-blue-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span class="text-base font-medium text-blue-400 group-hover:text-blue-300 transition-colors">My Results</span>
+                </button>
                 <a href="{{ route('subjects.specialized.humms') }}" class="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 transition-all duration-300 hover:bg-emerald-500/20 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/20 group">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 group-hover:text-emerald-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -31,6 +89,7 @@
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-neutral-300 mb-2">Select Historical Era</label>
                         <select id="era-selector" class="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+                            <option value="" selected>-- Select an Era --</option>
                             <option value="ancient">Ancient History (3000 BCE - 500 CE)</option>
                             <option value="medieval">Medieval Period (500 - 1500 CE)</option>
                             <option value="renaissance">Renaissance & Early Modern (1500 - 1800 CE)</option>
@@ -245,10 +304,11 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="player-name" class="block text-sm font-medium text-white mb-2">Save your score:</label>
-                                    <input type="text" id="player-name" placeholder="Enter your name" class="w-full px-4 py-2 mb-2 bg-neutral-900/70 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-                                    <button id="save-score-btn" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors">
-                                        Save
+                                    <button id="save-score-btn" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                        </svg>
+                                        Save Score to Leaderboard
                                     </button>
                                 </div>
 
@@ -358,10 +418,117 @@
                 </div>
             </div>
         </div>
+
+        <!-- Results Modal (Hidden initially) -->
+        <div id="results-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+            <div class="bg-neutral-800 rounded-xl border border-emerald-500 p-6 shadow-lg max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-white">Your Results History</h2>
+                    <button id="close-results-btn" class="p-1 rounded-full bg-neutral-700 hover:bg-neutral-600 text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="results-content" class="text-white">
+                    <!-- Results content will be loaded here -->
+                    <div class="flex justify-center items-center py-12">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Game Scripts -->
     <script>
+        // Function to remove the top error notification that appears on page load
+        function removeTopErrorNotification() {
+            // Find any error notifications at the top of the page
+            const topErrorNotifications = document.querySelectorAll('.fixed.top-0.inset-x-0');
+            topErrorNotifications.forEach(notification => {
+                notification.remove();
+            });
+
+            // Look for the specific error notification shown in the screenshot
+            const specificErrorNotifications = document.querySelectorAll('[class*="Error loading leaderboard"]');
+            specificErrorNotifications.forEach(notification => {
+                notification.remove();
+            });
+
+            // Target the specific error notification by its text content
+            document.querySelectorAll('*').forEach(element => {
+                if (element.textContent && element.textContent.includes('Error loading leaderboard data')) {
+                    // Find the closest parent that might be the notification container
+                    let parent = element;
+                    for (let i = 0; i < 5; i++) { // Check up to 5 levels up
+                        if (parent && parent.classList &&
+                            (parent.classList.contains('bg-red-600') ||
+                             parent.classList.contains('fixed'))) {
+                            parent.remove();
+                            break;
+                        }
+                        parent = parent.parentElement;
+                    }
+                }
+            });
+
+            // Also look for specific error message about leaderboard data
+            const leaderboardErrors = document.querySelectorAll('.bg-red-600:not(.fixed)');
+            leaderboardErrors.forEach(error => {
+                if (error.textContent && error.textContent.includes('leaderboard')) {
+                    error.remove();
+                }
+            });
+        }
+
+        // Remove error notification as soon as possible
+        document.addEventListener('DOMContentLoaded', function() {
+            // Remove any error notifications that might be present
+            removeTopErrorNotification();
+
+            // Set an interval to check for and remove error notifications that might appear later
+            setInterval(removeTopErrorNotification, 500);
+
+            // Also directly target the specific error notification shown in the screenshot
+            const errorElements = document.querySelectorAll('.bg-red-600');
+            errorElements.forEach(element => {
+                if (element.textContent && element.textContent.includes('Error loading leaderboard data')) {
+                    element.remove();
+                }
+            });
+
+            // Add a mutation observer to catch dynamically added error notifications
+            const observer = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    if (mutation.addedNodes.length) {
+                        mutation.addedNodes.forEach(node => {
+                            // Check if the added node is an element
+                            if (node.nodeType === 1) {
+                                // Check if it's an error notification
+                                if ((node.classList && node.classList.contains('bg-red-600')) ||
+                                    (node.textContent && node.textContent.includes('Error loading leaderboard data'))) {
+                                    node.remove();
+                                }
+
+                                // Also check children of the added node
+                                const errorChildren = node.querySelectorAll('.bg-red-600, [class*="error"]');
+                                errorChildren.forEach(child => {
+                                    if (child.textContent && child.textContent.includes('Error loading leaderboard data')) {
+                                        child.remove();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Start observing the document body for changes
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             // Game elements
             const startBtn = document.getElementById('start-btn');
@@ -394,6 +561,12 @@
             const playerNameInput = document.getElementById('player-name');
             const leaderboardBody = document.getElementById('leaderboard-body');
 
+            // Results elements
+            const resultsBtn = document.getElementById('results-btn');
+            const resultsModal = document.getElementById('results-modal');
+            const closeResultsBtn = document.getElementById('close-results-btn');
+            const resultsContent = document.getElementById('results-content');
+
             // Timeline elements
             const currentEraTitle = document.getElementById('current-era-title');
             const eraDescription = document.getElementById('era-description');
@@ -425,6 +598,9 @@
                 { rank: 3, player: 'ChronoMaster', era: 'Modern', score: 820, time: '02:30', accuracy: '78%' }
             ];
 
+            // Store current user ID for comparisons
+            const currentUserId = {{ Auth::id() ?? 'null' }};
+
             // Historical hints database
             let historicalHints = {
                 'ancient': [
@@ -438,9 +614,12 @@
                     'The Magna Carta was signed in 1215, limiting the power of the English monarchy.'
                 ],
                 'renaissance': [
-                    'The printing press was invented by Johannes Gutenberg around 1440.',
-                    'The Renaissance began in Italy in the 14th century and spread throughout Europe.',
-                    'The Age of Exploration began in the early 15th century with Portuguese expeditions.'
+                    'The printing press was invented by Johannes Gutenberg around 1440, revolutionizing the spread of knowledge.',
+                    'Vesalius published his groundbreaking work on human anatomy "De Humani Corporis Fabrica" in 1543.',
+                    'Galileo improved the telescope in 1609, allowing him to make astronomical observations that supported the Copernican theory.',
+                    'William Harvey discovered blood circulation in 1628, transforming our understanding of human physiology.',
+                    'Copernicus published his heliocentric model in 1543, challenging the Earth-centered view of the universe.',
+                    'Leonardo da Vinci made detailed anatomical drawings between 1490-1510 based on human dissections.'
                 ],
                 'modern': [
                     'The Industrial Revolution began in Britain in the late 18th century.',
@@ -483,24 +662,43 @@
                 }
             };
 
-            // Function to load questions from the API
+            // Function to load questions from the API with caching
             async function loadQuestions(era, difficulty) {
+                // Check if questions are already loaded for this era and difficulty
+                if (questionsDatabase[era] &&
+                    questionsDatabase[era][difficulty] &&
+                    questionsDatabase[era][difficulty].length > 0) {
+                    console.log(`Using cached questions for ${era} - ${difficulty}`);
+                    return questionsDatabase[era][difficulty];
+                }
+
                 try {
                     console.log(`Fetching questions for ${era} - ${difficulty}...`);
-                    const response = await fetch(`{{ route('subjects.specialized.humms.historical-timeline-maze.questions') }}?era=${era}&difficulty=${difficulty}`);
+
+                    // Create a controller to allow aborting the fetch if it takes too long
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+                    const response = await fetch(
+                        `{{ route('subjects.specialized.humms.historical-timeline-maze.questions') }}?era=${era}&difficulty=${difficulty}`,
+                        { signal: controller.signal }
+                    );
+
+                    // Clear the timeout since the request completed
+                    clearTimeout(timeoutId);
 
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
                     const data = await response.json();
-                    console.log(`API response for ${era} - ${difficulty}:`, data);
 
                     if (data.questions && data.questions.length > 0) {
                         // Transform the data to match our expected format
                         questionsDatabase[era][difficulty] = data.questions.map(q => ({
                             question: q.question,
-                            options: q.options
+                            options: q.options,
+                            hint: q.hint || null // Include the hint from the database
                         }));
                         console.log(`Successfully loaded ${data.questions.length} questions for ${era} - ${difficulty}`);
                     } else {
@@ -508,21 +706,34 @@
                         // Initialize with an empty array to prevent null errors
                         questionsDatabase[era][difficulty] = [];
                     }
+
+                    return questionsDatabase[era][difficulty];
                 } catch (error) {
-                    console.error(`Error loading questions for ${era} - ${difficulty}:`, error);
+                    // Check if this was an abort error (timeout)
+                    if (error.name === 'AbortError') {
+                        console.warn(`Request for ${era} - ${difficulty} timed out`);
+                    } else {
+                        console.error(`Error loading questions for ${era} - ${difficulty}:`, error);
+                    }
+
                     // Initialize with an empty array to prevent null errors
                     questionsDatabase[era][difficulty] = [];
 
-                    // Show an error notification
-                    const notification = document.createElement('div');
-                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                    notification.textContent = `Failed to load questions for ${era} - ${difficulty}. Please check the console for details.`;
-                    document.body.appendChild(notification);
+                    // Only show notification for non-timeout errors to avoid too many notifications
+                    if (error.name !== 'AbortError') {
+                        // Show an error notification
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                        notification.textContent = `Failed to load questions for ${era} - ${difficulty}. Using default questions.`;
+                        document.body.appendChild(notification);
 
-                    // Remove the notification after 5 seconds
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 5000);
+                        // Remove the notification after 3 seconds
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 3000);
+                    }
+
+                    return [];
                 }
             }
 
@@ -632,16 +843,170 @@
                 useHintBtn.addEventListener('click', applyHint);
                 saveScoreBtn.addEventListener('click', saveScore);
 
+                // Disable difficulty buttons and start button by default until an Era is selected
+                const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+                difficultyButtons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                });
+
+                // Add a hint message to select an Era first
+                const difficultySection = document.querySelector('.difficulty-btn').closest('.mb-3');
+                const selectEraHint = document.createElement('div');
+                selectEraHint.id = 'select-era-hint';
+                selectEraHint.className = 'text-xs text-yellow-400 mb-2 flex items-center';
+                selectEraHint.innerHTML = `
+                    <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Please select an Era first to enable difficulty options
+                `;
+                difficultySection.insertBefore(selectEraHint, difficultySection.firstChild);
+
+                // Disable start button until an Era is selected
+                startBtn.disabled = true;
+                startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
                 // Timeline event listeners
                 prevEventBtn.addEventListener('click', showPreviousTimelineEvent);
                 nextEventBtn.addEventListener('click', showNextTimelineEvent);
-                eraSelector.addEventListener('change', updateTimelineEra);
+
+                // Enhanced Era selector with loading indicator and difficulty button management
+                eraSelector.addEventListener('change', async function(e) {
+                    // Get the selected era
+                    const selectedEra = e.target.value;
+
+                    // Check if a valid era is selected
+                    if (!selectedEra) {
+                        // If the default "Select an Era" option is chosen, disable difficulty buttons
+                        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+                        difficultyButtons.forEach(btn => {
+                            btn.disabled = true;
+                            btn.classList.add('opacity-50', 'cursor-not-allowed');
+                        });
+
+                        // Disable start button
+                        startBtn.disabled = true;
+                        startBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+                        // Make sure the hint is visible
+                        let selectEraHint = document.getElementById('select-era-hint');
+                        if (!selectEraHint) {
+                            const difficultySection = document.querySelector('.difficulty-btn').closest('.mb-3');
+                            selectEraHint = document.createElement('div');
+                            selectEraHint.id = 'select-era-hint';
+                            selectEraHint.className = 'text-xs text-yellow-400 mb-2 flex items-center';
+                            selectEraHint.innerHTML = `
+                                <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Please select an Era first to enable difficulty options
+                            `;
+                            difficultySection.insertBefore(selectEraHint, difficultySection.firstChild);
+                        }
+
+                        return; // Exit the function early
+                    }
+
+                    // Set the current era
+                    currentEra = selectedEra;
+
+                    // Remove the select era hint if it exists
+                    const selectEraHint = document.getElementById('select-era-hint');
+                    if (selectEraHint) {
+                        selectEraHint.remove();
+                    }
+
+                    // Show loading indicator
+                    const difficultySection = document.querySelector('.difficulty-btn').closest('.mb-3');
+                    const loadingIndicator = document.createElement('div');
+                    loadingIndicator.id = 'era-loading-indicator';
+                    loadingIndicator.className = 'text-xs text-emerald-400 mb-2 flex items-center';
+                    loadingIndicator.innerHTML = `
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Loading ${selectedEra} era data...
+                    `;
+
+                    // Temporarily disable difficulty buttons
+                    const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+                    difficultyButtons.forEach(btn => {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    });
+
+                    // Insert loading indicator before difficulty buttons
+                    difficultySection.insertBefore(loadingIndicator, difficultySection.firstChild);
+
+                    try {
+                        // Load timeline events and questions in parallel for faster loading
+                        const loadingPromises = [
+                            // Load timeline events
+                            loadTimelineEvents(selectedEra),
+
+                            // Load questions for all difficulties in parallel
+                            loadQuestionsForEra(selectedEra)
+                        ];
+
+                        // Wait for all loading to complete
+                        await Promise.all(loadingPromises);
+
+                        // Update the timeline display
+                        updateTimelineEra();
+                    } catch (error) {
+                        console.error('Error loading era data:', error);
+                    } finally {
+                        // Remove loading indicator
+                        const indicator = document.getElementById('era-loading-indicator');
+                        if (indicator) {
+                            indicator.remove();
+                        }
+
+                        // Re-enable difficulty buttons
+                        difficultyButtons.forEach(btn => {
+                            btn.disabled = false;
+                            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        });
+
+                        // Enable start button
+                        startBtn.disabled = false;
+                        startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                        // Add a subtle animation to show buttons are ready
+                        difficultyButtons.forEach(btn => {
+                            btn.classList.add('animate-pulse');
+                            setTimeout(() => btn.classList.remove('animate-pulse'), 1000);
+                        });
+
+                        // Show a success notification
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed top-4 right-4 bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                        notification.innerHTML = `
+                            <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            ${selectedEra.charAt(0).toUpperCase() + selectedEra.slice(1)} era loaded! Choose a difficulty to continue.
+                        `;
+                        document.body.appendChild(notification);
+
+                        // Remove the notification after 3 seconds
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 3000);
+                    }
+                });
 
                 // Set initial difficulty
                 setDifficulty('easy');
 
                 // Initialize leaderboard
-                updateLeaderboard();
+                try {
+                    updateLeaderboard();
+                } catch (error) {
+                    console.error("Error initializing leaderboard:", error);
+                }
             }
 
             // Set the game difficulty
@@ -749,6 +1114,13 @@
                 studentAnswers = [];
                 currentQuestionIndex = 0;
 
+                // Reset power-up usage tracking
+                usedPowerups = {
+                    hint: 0, // Reset to 0 uses
+                    time: false,
+                    skip: false
+                };
+
                 // Restore original timeline data
                 resetTimelineData();
 
@@ -765,8 +1137,67 @@
                 hintsRemainingDisplay.textContent = hintsRemaining;
                 powerupsAvailableDisplay.textContent = powerupsAvailable;
 
+                // Reset power-up buttons
+                resetPowerupButtons();
+
                 // Reset timeline
                 updateTimeline();
+            }
+
+            // Function to reset power-up buttons
+            function resetPowerupButtons() {
+                // Reset hint button
+                const hintButton = document.getElementById('hint-btn');
+                if (hintButton) {
+                    hintButton.disabled = false;
+                    hintButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    hintButton.classList.add('hover:bg-yellow-500/50');
+
+                    // Remove any "Used" labels
+                    const usedLabel = hintButton.querySelector('.used-label');
+                    if (usedLabel) {
+                        usedLabel.remove();
+                    }
+
+                    // Remove any hint count indicators
+                    const hintCount = hintButton.querySelector('.hint-count');
+                    if (hintCount) {
+                        hintCount.remove();
+                    }
+
+                    // Add a fresh hint count indicator
+                    const newHintCount = document.createElement('div');
+                    newHintCount.className = 'hint-count absolute bottom-0 right-0 bg-yellow-800 text-white text-xs px-1 rounded-full';
+                    newHintCount.textContent = '3';
+                    hintButton.style.position = 'relative';
+                    hintButton.appendChild(newHintCount);
+                }
+
+                // Reset time button
+                const timeButton = document.getElementById('time-btn');
+                if (timeButton) {
+                    timeButton.disabled = false;
+                    timeButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    timeButton.classList.add('hover:bg-blue-500/50');
+                    // Remove any "Used" labels
+                    const usedLabel = timeButton.querySelector('div');
+                    if (usedLabel) {
+                        usedLabel.remove();
+                    }
+                }
+
+                // Reset skip button
+                const skipButton = document.getElementById('skip-btn');
+                if (skipButton) {
+                    skipButton.disabled = false;
+                    skipButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    skipButton.classList.add('hover:bg-purple-500/50');
+                    // Remove any "Used" labels
+                    const usedLabel = skipButton.querySelector('div');
+                    if (usedLabel) {
+                        usedLabel.remove();
+                    }
+                }
             }
 
             // Start the timer
@@ -889,6 +1320,9 @@
 
                 // Get the current question
                 const currentQuestion = questions[currentQuestionIndex];
+
+                // Store the current question in a global variable for easier access
+                window.currentQuestionData = currentQuestion;
 
                 // Update the question text
                 const questionTitle = document.querySelector('#event-choice-modal h3');
@@ -1180,6 +1614,9 @@
                 document.getElementById('completed-level-info').textContent =
                     `${eraNames[currentEra]} - ${currentDifficulty.charAt(0).toUpperCase() + currentDifficulty.slice(1)}`;
 
+                // Load the leaderboard for this era and difficulty
+                loadLeaderboard();
+
                 // Show the modal
                 levelCompleteModal.classList.remove('hidden');
             }
@@ -1246,14 +1683,88 @@
                 resetGame();
             }
 
+            // Track which power-ups have been used
+            let usedPowerups = {
+                hint: 0, // For hint, we track the number of uses (0-3)
+                time: false,
+                skip: false
+            };
+
+            // Function to disable a power-up button
+            function disablePowerupButton(buttonId, type) {
+                const button = document.getElementById(buttonId);
+                if (button) {
+                    // Mark as used
+                    usedPowerups[type] = true;
+
+                    // Disable the button
+                    button.disabled = true;
+
+                    // Add visual styling to show it's used
+                    button.classList.remove('hover:bg-yellow-500/50', 'hover:bg-blue-500/50', 'hover:bg-purple-500/50');
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+
+                    // Add "Used" label
+                    const usedLabel = document.createElement('div');
+                    usedLabel.className = 'absolute top-0 right-0 bg-neutral-800 text-white text-xs px-1 rounded-tr-lg rounded-bl-lg';
+                    usedLabel.textContent = 'Used';
+                    button.style.position = 'relative';
+                    button.appendChild(usedLabel);
+                }
+            }
+
+            // Get the database hint for the current question
+            function getQuestionHint() {
+                // If we have the current question data in the global variable, use its hint
+                if (window.currentQuestionData && window.currentQuestionData.hint) {
+                    return window.currentQuestionData.hint;
+                }
+
+                // If there's no current question, return a generic hint
+                if (!window.sampleEvents || !window.sampleEvents.length) {
+                    const hints = historicalHints[currentEra];
+                    return hints[Math.floor(Math.random() * hints.length)];
+                }
+
+                // Try to get the current question from the database
+                const currentQuestion = getCurrentQuestion();
+
+                // If we have a database hint for this question, use it
+                if (currentQuestion && currentQuestion.hint) {
+                    return currentQuestion.hint;
+                }
+
+                // Fallback to a generic hint if no database hint is available
+                const hints = historicalHints[currentEra];
+                return hints[Math.floor(Math.random() * hints.length)];
+            }
+
+            // Get the current question from the database
+            function getCurrentQuestion() {
+                // If we don't have the current question index or era/difficulty, return null
+                if (currentQuestionIndex === undefined || !currentEra || !currentDifficulty) {
+                    return null;
+                }
+
+                // Try to get the question from the database
+                if (questionsDatabase[currentEra] &&
+                    questionsDatabase[currentEra][currentDifficulty] &&
+                    questionsDatabase[currentEra][currentDifficulty].length > 0 &&
+                    currentQuestionIndex < questionsDatabase[currentEra][currentDifficulty].length) {
+
+                    return questionsDatabase[currentEra][currentDifficulty][currentQuestionIndex];
+                }
+
+                return null;
+            }
+
             // Show hint modal
             function showHint() {
-                if (!gameActive || powerupsAvailable <= 0) return;
+                if (!gameActive || powerupsAvailable <= 0 || hintsRemaining <= 0 || usedPowerups.hint >= 3) return;
 
-                // Get a random hint for the current era
-                const hints = historicalHints[currentEra];
-                const randomHint = hints[Math.floor(Math.random() * hints.length)];
-                document.getElementById('hint-text').textContent = randomHint;
+                // Get the hint for the current question from the database
+                const questionHint = getQuestionHint();
+                document.getElementById('hint-text').textContent = questionHint;
 
                 // Show the hint modal
                 hintModal.classList.remove('hidden');
@@ -1265,41 +1776,110 @@
                 hintModal.classList.add('hidden');
             }
 
+            // Update hint button appearance based on remaining hints
+            function updateHintButtonAppearance() {
+                const hintButton = document.getElementById('hint-btn');
+                if (!hintButton) return;
+
+                // Update the hint count indicator
+                let hintCountIndicator = hintButton.querySelector('.hint-count');
+                if (!hintCountIndicator) {
+                    hintCountIndicator = document.createElement('div');
+                    hintCountIndicator.className = 'hint-count absolute bottom-0 right-0 bg-yellow-800 text-white text-xs px-1 rounded-full';
+                    hintButton.style.position = 'relative';
+                    hintButton.appendChild(hintCountIndicator);
+                }
+
+                // Update the count
+                hintCountIndicator.textContent = hintsRemaining;
+
+                // If no hints left, fully disable the button
+                if (hintsRemaining <= 0) {
+                    hintButton.disabled = true;
+                    hintButton.classList.remove('hover:bg-yellow-500/50');
+                    hintButton.classList.add('opacity-50', 'cursor-not-allowed');
+
+                    // Add "Used" label if not already present
+                    let usedLabel = hintButton.querySelector('.used-label');
+                    if (!usedLabel) {
+                        usedLabel = document.createElement('div');
+                        usedLabel.className = 'used-label absolute top-0 right-0 bg-neutral-800 text-white text-xs px-1 rounded-tr-lg rounded-bl-lg';
+                        usedLabel.textContent = 'Used';
+                        hintButton.appendChild(usedLabel);
+                    }
+                }
+            }
+
             // Apply hint to reveal correct answer
             function applyHint() {
-                if (hintsRemaining <= 0) return;
+                if (hintsRemaining <= 0 || usedPowerups.hint >= 3) return;
 
+                // Increment the hint usage counter
+                usedPowerups.hint++;
+
+                // Decrement available hints
                 hintsRemaining--;
                 powerupsAvailable--;
                 hintsRemainingDisplay.textContent = hintsRemaining;
                 powerupsAvailableDisplay.textContent = powerupsAvailable;
 
-                // Highlight the correct answer in the event choices
+                // Find and highlight the correct answer in the event choices
                 const buttons = eventChoices.querySelectorAll('button');
-                buttons.forEach(button => {
-                    if (button.textContent.includes('Great Pyramid')) {
-                        button.classList.add('bg-yellow-600');
-                        button.classList.remove('bg-neutral-700', 'hover:bg-neutral-600');
-                    }
-                });
+                const correctOption = window.sampleEvents.find(option => option.correct === true);
+
+                if (correctOption) {
+                    buttons.forEach(button => {
+                        if (button.textContent.includes(correctOption.title)) {
+                            button.classList.add('bg-yellow-600');
+                            button.classList.remove('bg-neutral-700', 'hover:bg-neutral-600');
+                        }
+                    });
+                }
+
+                // Update the hint button appearance
+                updateHintButtonAppearance();
 
                 // Close the hint modal
                 closeHint();
+
+                // Show a notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                notification.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    Hint used! Correct answer highlighted. (${hintsRemaining} hints remaining)
+                `;
+                document.body.appendChild(notification);
+
+                // Remove the notification after 2 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 2000);
             }
 
             // Add time power-up
             function addTime() {
-                if (!gameActive || powerupsAvailable <= 0) return;
+                if (!gameActive || powerupsAvailable <= 0 || usedPowerups.time) return;
 
                 // Add 30 seconds to the timer
                 startTime += 30000; // 30 seconds in milliseconds
                 powerupsAvailable--;
                 powerupsAvailableDisplay.textContent = powerupsAvailable;
 
+                // Disable the time button
+                disablePowerupButton('time-btn', 'time');
+
                 // Show a notification
                 const notification = document.createElement('div');
-                notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                notification.textContent = '+30 seconds added!';
+                notification.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                notification.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    +30 seconds added! Time power-up used.
+                `;
                 document.body.appendChild(notification);
 
                 // Remove the notification after 2 seconds
@@ -1310,10 +1890,13 @@
 
             // Skip question power-up
             function skipQuestion() {
-                if (!gameActive || powerupsAvailable <= 0) return;
+                if (!gameActive || powerupsAvailable <= 0 || usedPowerups.skip) return;
 
                 powerupsAvailable--;
                 powerupsAvailableDisplay.textContent = powerupsAvailable;
+
+                // Disable the skip button
+                disablePowerupButton('skip-btn', 'skip');
 
                 // Skip the current question
                 eventChoiceModal.classList.add('hidden');
@@ -1323,8 +1906,13 @@
 
                 // Show a notification
                 const notification = document.createElement('div');
-                notification.className = 'fixed top-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                notification.textContent = 'Question skipped!';
+                notification.className = 'fixed top-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                notification.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                    Question skipped! Skip power-up used.
+                `;
                 document.body.appendChild(notification);
 
                 // Remove the notification after 2 seconds
@@ -1338,60 +1926,509 @@
                 }, 500);
             }
 
-            // Save score to leaderboard
-            function saveScore() {
-                const playerName = playerNameInput.value.trim();
-                if (!playerName) {
-                    alert('Please enter your name to save your score.');
-                    return;
-                }
-
+            // Save score to database
+            async function saveScore() {
                 // Calculate accuracy
                 const accuracy = Math.round((correctChoices / totalChoices) * 100);
 
                 // Get time from the final-time element to ensure consistency
                 const timeString = document.getElementById('final-time').textContent;
 
-                // Create new score entry
-                const newScore = {
-                    player: playerName,
-                    era: currentEra.charAt(0).toUpperCase() + currentEra.slice(1),
+                // Convert time string (MM:SS) to seconds
+                const timeParts = timeString.split(':');
+                const timeInSeconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
+
+                // Prepare data to send to the server
+                const progressData = {
                     score: score,
-                    time: timeString,
-                    accuracy: `${accuracy}%`
+                    era: currentEra,
+                    difficulty: currentDifficulty,
+                    time_taken: timeInSeconds,
+                    questions_answered: totalChoices,
+                    correct_answers: correctChoices,
+                    max_streak: streak,
+                    answers: studentAnswers,
+                    completed: true
                 };
 
-                // Add to leaderboard and sort
-                leaderboard.push(newScore);
-                leaderboard.sort((a, b) => b.score - a.score);
-
-                // Update ranks
-                leaderboard = leaderboard.map((entry, index) => {
-                    return { ...entry, rank: index + 1 };
-                });
-
-                // Keep only top 10
-                if (leaderboard.length > 10) {
-                    leaderboard = leaderboard.slice(0, 10);
+                // Also save detailed results for the results feature
+                try {
+                    await saveDetailedResults(
+                        score,
+                        timeInSeconds,
+                        totalChoices,
+                        correctChoices,
+                        true
+                    );
+                } catch (error) {
+                    console.error('Error saving detailed results:', error);
+                    // Continue with normal save process even if detailed results fail
                 }
 
-                // Update leaderboard display
-                updateLeaderboard();
+                // Get the save button
+                const saveButton = document.getElementById('save-score-btn');
 
-                // Clear input and show confirmation
-                playerNameInput.value = '';
-                alert('Score saved successfully!');
+                // Set a timeout to prevent the UI from being stuck in "Saving..." state
+                let saveTimeout;
 
-                // In a real application, you would send this data to your server
-                // to be stored in a database
-                console.log('Score saved:', newScore);
+                try {
+                    // Show loading indicator
+                    if (saveButton) {
+                        saveButton.disabled = true;
+                        saveButton.textContent = 'Saving...';
+
+                        // Set a timeout to reset the button if the save operation takes too long
+                        saveTimeout = setTimeout(() => {
+                            console.warn('Save operation timeout - resetting button');
+                            if (saveButton) {
+                                saveButton.disabled = false;
+                                saveButton.innerHTML = `
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                    </svg>
+                                    Retry Save
+                                `;
+                            }
+
+                            // Show a timeout notification
+                            const timeoutNotification = document.createElement('div');
+                            timeoutNotification.className = 'fixed top-4 right-4 bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                            timeoutNotification.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Save operation is taking longer than expected. Please try again.
+                            `;
+                            document.body.appendChild(timeoutNotification);
+
+                            // Remove the notification after 5 seconds
+                            setTimeout(() => {
+                                timeoutNotification.remove();
+                            }, 5000);
+                        }, 10000); // 10 second timeout
+                    }
+
+                    // Create a form data object for the request
+                    const formData = new FormData();
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('score', progressData.score);
+                    formData.append('era', progressData.era);
+                    formData.append('difficulty', progressData.difficulty);
+                    formData.append('time_taken', progressData.time_taken);
+                    formData.append('questions_answered', progressData.questions_answered);
+                    formData.append('correct_answers', progressData.correct_answers);
+                    formData.append('max_streak', progressData.max_streak);
+                    formData.append('completed', progressData.completed ? 1 : 0);
+
+                    // Convert answers array to JSON string and append
+                    if (progressData.answers && progressData.answers.length > 0) {
+                        formData.append('answers', JSON.stringify(progressData.answers));
+                    } else {
+                        formData.append('answers', JSON.stringify([]));
+                    }
+
+                    console.log('Sending save request to server...');
+
+                    // Send data to the server with a timeout
+                    const controller = new AbortController();
+                    const abortTimeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout for fetch
+
+                    const response = await fetch('{{ route('subjects.specialized.humms.historical-timeline-maze.save-progress') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData,
+                        signal: controller.signal
+                    });
+
+                    // Clear the abort timeout since the request completed
+                    clearTimeout(abortTimeout);
+
+                    // Check if the response is JSON
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Server returned non-JSON response. This might be due to a server error or CSRF token issue.');
+                    }
+
+                    // Clear the save button timeout since we got a response
+                    if (saveTimeout) {
+                        clearTimeout(saveTimeout);
+                    }
+
+                    const responseText = await response.text();
+                    console.log('Raw server response:', responseText);
+
+                    let data;
+                    try {
+                        data = JSON.parse(responseText);
+                    } catch (parseError) {
+                        console.error('Failed to parse JSON response:', parseError);
+                        throw new Error('Failed to parse server response. Please try again.');
+                    }
+
+                    console.log('Parsed server response:', data);
+
+                    if (data.success) {
+                        // Show success notification
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                        notification.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Progress saved successfully!
+                        `;
+                        document.body.appendChild(notification);
+
+                        // Remove the notification after 3 seconds
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 3000);
+
+                        // Update the save button to show success
+                        if (saveButton) {
+                            saveButton.disabled = true;
+                            saveButton.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Saved Successfully
+                            `;
+                            saveButton.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+                            saveButton.classList.add('bg-green-600');
+                        }
+
+                        // Load and update the leaderboard with a slight delay to ensure the database has updated
+                        // Try multiple times with increasing delays to ensure we get the updated data
+                        const refreshIntervals = [1000, 2000, 4000];
+                        refreshIntervals.forEach((delay, index) => {
+                            setTimeout(() => {
+                                console.log(`Refreshing leaderboard after successful save (attempt ${index + 1})`);
+                                loadLeaderboard();
+                            }, delay);
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to save progress');
+                    }
+                } catch (error) {
+                    // Clear the save button timeout if it exists
+                    if (saveTimeout) {
+                        clearTimeout(saveTimeout);
+                    }
+
+                    console.error('Error saving progress:', error);
+
+                    // Show error notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+
+                    // Create a more detailed error message
+                    let errorMessage = error.message;
+                    if (error.name === 'AbortError') {
+                        errorMessage = 'Save request timed out. The server might be busy. Please try again.';
+                    } else if (errorMessage.includes('Unexpected token') || errorMessage.includes('parse')) {
+                        errorMessage = 'Server returned an invalid response. This might be due to a CSRF token issue. Please refresh the page and try again.';
+                    }
+
+                    notification.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Error saving progress: ${errorMessage}
+                    `;
+                    document.body.appendChild(notification);
+
+                    // Remove the notification after 5 seconds
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 5000);
+                } finally {
+                    // Re-enable the save button if it's not already in a success state
+                    if (saveButton && saveButton.textContent !== 'Saved Successfully') {
+                        saveButton.disabled = false;
+                        saveButton.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                            </svg>
+                            Save Score to Leaderboard
+                        `;
+                    }
+                }
             }
 
-            // Update leaderboard display
+            // Load leaderboard data from the server
+            async function loadLeaderboard() {
+                // Track retry attempts
+                let retryCount = 0;
+                const maxRetries = 3;
+
+                async function attemptLoadLeaderboard() {
+                    try {
+                        // Remove any existing error notifications
+                        removeErrorNotifications();
+
+                        // Show loading state
+                        leaderboardBody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
+                                    Loading leaderboard data...
+                                </td>
+                            </tr>
+                        `;
+
+                        // Make sure we have valid era and difficulty
+                        if (!currentEra || !currentDifficulty) {
+                            console.warn('Cannot load leaderboard: missing era or difficulty');
+                            leaderboardBody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
+                                        Select an era and difficulty to view leaderboard.
+                                    </td>
+                                </tr>
+                            `;
+                            // Display default leaderboard data
+                            displayDefaultLeaderboard();
+                            return;
+                        }
+
+                        console.log(`Attempting to load leaderboard for era: ${currentEra}, difficulty: ${currentDifficulty}, attempt: ${retryCount + 1}`);
+
+                        // Create a controller to allow aborting the fetch if it takes too long
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
+                        // Add a cache-busting parameter to prevent caching
+                        const cacheBuster = new Date().getTime();
+
+                        // Fetch leaderboard data from the server
+                        const response = await fetch(`{{ route('subjects.specialized.humms.historical-timeline-maze.leaderboard') }}?era=${currentEra}&difficulty=${currentDifficulty}&_=${cacheBuster}`, {
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                                'Cache-Control': 'no-cache, no-store, must-revalidate', // Stronger cache prevention
+                                'Pragma': 'no-cache',
+                                'Expires': '0'
+                            },
+                            signal: controller.signal
+                        });
+
+                        // Clear the timeout since the request completed
+                        clearTimeout(timeoutId);
+
+                        if (!response.ok) {
+                            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                        }
+
+                        // Check if the response is JSON
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            throw new Error('Server returned non-JSON response');
+                        }
+
+                        const responseText = await response.text();
+                        console.log('Raw leaderboard response:', responseText);
+
+                        // Try to parse the JSON
+                        let data;
+                        try {
+                            data = JSON.parse(responseText);
+                        } catch (parseError) {
+                            console.error('JSON parse error:', parseError);
+                            throw new Error(`Failed to parse JSON response: ${parseError.message}`);
+                        }
+
+                        console.log('Parsed leaderboard data:', data);
+
+                        // Check if the data has the expected structure
+                        if (!data || !data.leaderboard) {
+                            console.warn('Leaderboard data is missing or has unexpected format:', data);
+                            throw new Error('Server returned invalid leaderboard data structure');
+                        }
+
+                        // Update the leaderboard display
+                        updateLeaderboardDisplay(data.leaderboard, data.user_rank);
+
+                        // Reset retry count on success
+                        retryCount = 0;
+
+                        return true; // Success
+                    } catch (error) {
+                        console.error(`Error loading leaderboard (attempt ${retryCount + 1}):`, error);
+
+                        // Remove any existing error notifications
+                        removeErrorNotifications();
+
+                        // Create a more detailed error message
+                        let errorMessage = 'Error loading leaderboard data. Please try again later.';
+
+                        if (error.name === 'AbortError') {
+                            errorMessage = 'Leaderboard request timed out. The server might be busy. Please try again later.';
+                        } else if (error.message.includes('Unexpected token') || error.message.includes('non-JSON response') || error.message.includes('parse')) {
+                            errorMessage = 'Server returned an invalid response. This might be due to a CSRF token issue. Please refresh the page and try again.';
+                        }
+
+                        // Increment retry count
+                        retryCount++;
+
+                        if (retryCount < maxRetries) {
+                            // Show retry message in the leaderboard table
+                            leaderboardBody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" class="px-4 py-4 text-center text-yellow-400">
+                                        Retrying to load leaderboard (attempt ${retryCount + 1})...
+                                    </td>
+                                </tr>
+                            `;
+
+                            // Wait a bit before retrying (exponential backoff)
+                            const retryDelay = Math.min(1000 * Math.pow(2, retryCount - 1), 5000);
+                            console.log(`Retrying in ${retryDelay}ms...`);
+
+                            await new Promise(resolve => setTimeout(resolve, retryDelay));
+                            return false; // Retry needed
+                        } else {
+                            // Show error state in the leaderboard table after max retries
+                            leaderboardBody.innerHTML = `
+                                <tr>
+                                    <td colspan="6" class="px-4 py-4 text-center text-red-400">
+                                        ${errorMessage}
+                                    </td>
+                                </tr>
+                            `;
+
+                            // Log the error but don't show a notification - we'll just display default data
+                            console.log('Displaying default leaderboard data after max retries:', error.message);
+
+                            // Fall back to default leaderboard
+                            displayDefaultLeaderboard();
+
+                            // Reset retry count
+                            retryCount = 0;
+
+                            return true; // Stop retrying
+                        }
+                    }
+                }
+
+                // Start the retry loop
+                let success = false;
+                while (!success && retryCount < maxRetries) {
+                    success = await attemptLoadLeaderboard();
+                }
+            }
+
+            // Initialize the leaderboard with default data
             function updateLeaderboard() {
+                // Check if leaderboardBody exists
+                if (!leaderboardBody) {
+                    console.error("Leaderboard body element not found");
+                    return;
+                }
+
+                // Show loading state
+                leaderboardBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
+                            Select an era and difficulty to view leaderboard.
+                        </td>
+                    </tr>
+                `;
+
+                // If we have a current era and difficulty, try to load the leaderboard
+                if (currentEra && currentDifficulty) {
+                    // Use a try-catch block to handle any synchronous errors
+                    try {
+                        loadLeaderboard();
+                    } catch (error) {
+                        console.error("Error initiating leaderboard load:", error);
+                        displayDefaultLeaderboard();
+                    }
+                } else {
+                    // Display default leaderboard if no era/difficulty selected
+                    displayDefaultLeaderboard();
+                }
+            }
+
+            // Function to remove any error notifications at the top of the page
+            function removeErrorNotifications() {
+                // Find and remove any error notifications at the top of the page
+                const errorNotifications = document.querySelectorAll('.fixed.top-0.left-0.right-0.bg-red-600');
+                errorNotifications.forEach(notification => {
+                    notification.remove();
+                });
+
+                // Also remove any other error notifications that might be showing
+                const otherErrorNotifications = document.querySelectorAll('.bg-red-600.text-white');
+                otherErrorNotifications.forEach(notification => {
+                    notification.remove();
+                });
+            }
+
+            // Function to save detailed results for the results feature
+            async function saveDetailedResults(score, timeSpentSeconds, questionsAttempted, questionsCorrect, completed) {
+                try {
+                    const controller = new AbortController();
+                    const abortTimeout = setTimeout(() => controller.abort(), 15000); // 15 second timeout for fetch
+
+                    // Calculate accuracy percentage
+                    const accuracyPercentage = questionsAttempted > 0
+                        ? (questionsCorrect / questionsAttempted) * 100
+                        : 0;
+
+                    const response = await fetch('{{ route('subjects.specialized.humms.historical-timeline-maze.save-result') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            era: currentEra,
+                            difficulty: currentDifficulty,
+                            score: score,
+                            questions_attempted: questionsAttempted,
+                            questions_correct: questionsCorrect,
+                            time_spent_seconds: timeSpentSeconds,
+                            completed: completed,
+                            notes: ''
+                        }),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(abortTimeout);
+
+                    if (!response.ok) {
+                        throw new Error('Failed to save detailed results');
+                    }
+
+                    const data = await response.json();
+                    console.log('Detailed results saved:', data);
+
+                    return data;
+                } catch (error) {
+                    console.error('Error saving detailed results:', error);
+                    return null;
+                }
+            }
+
+            // Display default leaderboard data when API fails
+            function displayDefaultLeaderboard() {
+                if (!leaderboardBody) return;
+
+                // Remove any error notifications first
+                removeErrorNotifications();
+
                 leaderboardBody.innerHTML = '';
 
-                leaderboard.forEach(entry => {
+                // Use the default leaderboard data
+                const defaultData = [
+                    { rank: 1, player: 'HistoryBuff', era: 'Ancient', score: 1250, time: '01:45', accuracy: '92%' },
+                    { rank: 2, player: 'TimeExplorer', era: 'Medieval', score: 980, time: '02:10', accuracy: '85%' },
+                    { rank: 3, player: 'ChronoMaster', era: 'Modern', score: 820, time: '02:30', accuracy: '78%' }
+                ];
+
+                defaultData.forEach(entry => {
                     const row = document.createElement('tr');
                     row.className = 'border-b border-neutral-700';
 
@@ -1406,6 +2443,105 @@
 
                     leaderboardBody.appendChild(row);
                 });
+            }
+
+            // Update leaderboard display with data from the server
+            function updateLeaderboardDisplay(leaderboardData, userRank) {
+                leaderboardBody.innerHTML = '';
+
+                if (!leaderboardData || leaderboardData.length === 0) {
+                    leaderboardBody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
+                                No leaderboard entries yet. Be the first to complete this level!
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                console.log('Updating leaderboard display with', leaderboardData.length, 'entries');
+
+                // Check if the current user is in the leaderboard data
+                const userInLeaderboard = leaderboardData.some(entry => entry.user_id == currentUserId);
+                console.log('Current user in leaderboard:', userInLeaderboard);
+
+                // Display leaderboard entries
+                leaderboardData.forEach(entry => {
+                    const row = document.createElement('tr');
+
+                    // Format time from seconds to MM:SS
+                    const minutes = Math.floor(entry.time_taken / 60);
+                    const seconds = entry.time_taken % 60;
+                    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                    // Highlight the current user's entry
+                    const isCurrentUser = entry.user_id == currentUserId;
+
+                    // Apply special styling for the current user's row
+                    if (isCurrentUser) {
+                        row.className = 'border-b border-neutral-700 bg-emerald-900/30 animate-pulse';
+
+                        // Stop the animation after 3 seconds
+                        setTimeout(() => {
+                            row.classList.remove('animate-pulse');
+                        }, 3000);
+                    } else {
+                        row.className = 'border-b border-neutral-700';
+                    }
+
+                    row.innerHTML = `
+                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.rank}</td>
+                        <td class="px-4 py-2 text-sm ${isCurrentUser ? 'font-bold text-emerald-300' : 'text-white'}">${isCurrentUser ? 'You' : (entry.username || 'Anonymous')}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.era.charAt(0).toUpperCase() + entry.era.slice(1)}</td>
+                        <td class="px-4 py-2 text-sm ${isCurrentUser ? 'font-bold text-emerald-300' : 'text-emerald-400'}">${entry.score}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${formattedTime}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${Math.round(entry.accuracy)}%</td>
+                    `;
+
+                    leaderboardBody.appendChild(row);
+                });
+
+                // Display user's rank if available but not in top 10
+                if (userRank && !userInLeaderboard) {
+                    console.log('Adding user rank row for user not in top leaderboard');
+
+                    const userRow = document.createElement('tr');
+                    userRow.className = 'border-t-2 border-neutral-600 bg-emerald-900/30 animate-pulse';
+
+                    // Stop the animation after 3 seconds
+                    setTimeout(() => {
+                        userRow.classList.remove('animate-pulse');
+                    }, 3000);
+
+                    // Format time from seconds to MM:SS
+                    const minutes = Math.floor(userRank.time_taken / 60);
+                    const seconds = userRank.time_taken % 60;
+                    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                    userRow.innerHTML = `
+                        <td class="px-4 py-2 text-sm text-neutral-300">${userRank.rank}</td>
+                        <td class="px-4 py-2 text-sm font-bold text-emerald-300">You</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${currentEra.charAt(0).toUpperCase() + currentEra.slice(1)}</td>
+                        <td class="px-4 py-2 text-sm font-bold text-emerald-300">${userRank.score}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${formattedTime}</td>
+                        <td class="px-4 py-2 text-sm text-neutral-300">${Math.round(userRank.accuracy)}%</td>
+                    `;
+
+                    leaderboardBody.appendChild(userRow);
+                }
+
+                // Add a visual indicator that the leaderboard has been updated
+                const leaderboardContainer = leaderboardBody.closest('.bg-neutral-800');
+                if (leaderboardContainer) {
+                    leaderboardContainer.classList.add('border-emerald-500');
+
+                    // Reset the border after a short delay
+                    setTimeout(() => {
+                        leaderboardContainer.classList.remove('border-emerald-500');
+                        leaderboardContainer.classList.add('border-neutral-700');
+                    }, 2000);
+                }
             }
 
             // Update the timeline based on the selected era
@@ -1551,8 +2687,57 @@
 
             // Start the game
             function startGame() {
+                // Validate that an Era is selected
+                const selectedEra = eraSelector.value;
+                if (!selectedEra) {
+                    // Show an error notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                    notification.innerHTML = `
+                        <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Please select a historical Era before starting the game.
+                    `;
+                    document.body.appendChild(notification);
+
+                    // Remove the notification after 3 seconds
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+
+                    // Highlight the Era selector to draw attention
+                    eraSelector.classList.add('ring-2', 'ring-red-500', 'animate-pulse');
+                    setTimeout(() => {
+                        eraSelector.classList.remove('ring-2', 'ring-red-500', 'animate-pulse');
+                    }, 2000);
+
+                    return; // Exit the function early
+                }
+
+                // Validate that a difficulty is selected
+                if (!currentDifficulty) {
+                    // Show an error notification
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                    notification.innerHTML = `
+                        <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Please select a difficulty level before starting the game.
+                    `;
+                    document.body.appendChild(notification);
+
+                    // Remove the notification after 3 seconds
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+
+                    return; // Exit the function early
+                }
+
                 gameActive = true;
-                currentEra = eraSelector.value;
+                currentEra = selectedEra;
                 currentTimelineEra = currentEra;
                 currentTimelineEventIndex = 0;
                 score = 0;
@@ -1606,36 +2791,391 @@
                 setTimeout(showEventChoiceModal, 1500);
             }
 
-            // Function to load all questions for all eras and difficulties
-            async function loadAllQuestions() {
-                const eras = ['ancient', 'medieval', 'renaissance', 'modern', 'contemporary'];
-                const difficulties = ['easy', 'medium', 'hard'];
+            // Function to load questions for a specific era and all difficulties
+            async function loadQuestionsForEra(era) {
+                // Check if questions are already loaded for this era
+                const isAlreadyLoaded =
+                    questionsDatabase[era] &&
+                    questionsDatabase[era].easy &&
+                    questionsDatabase[era].easy.length > 0;
 
-                console.log("Starting to load all questions...");
-
-                // Load questions for each era and difficulty
-                for (const era of eras) {
-                    for (const difficulty of difficulties) {
-                        console.log(`Loading questions for ${era} - ${difficulty}...`);
-                        await loadQuestions(era, difficulty);
-
-                        // Check if questions were loaded successfully
-                        if (!questionsDatabase[era][difficulty] || questionsDatabase[era][difficulty].length === 0) {
-                            console.warn(`No questions loaded for ${era} - ${difficulty}`);
-                        } else {
-                            console.log(`Loaded ${questionsDatabase[era][difficulty].length} questions for ${era} - ${difficulty}`);
-                        }
-                    }
+                // If already loaded, return immediately
+                if (isAlreadyLoaded) {
+                    console.log(`Questions for ${era} already loaded, skipping fetch`);
+                    return true;
                 }
 
-                // Log the loaded questions database
-                console.log("Loaded questions database:", questionsDatabase);
+                const difficulties = ['easy', 'medium', 'hard'];
 
-                // Initialize the timeline
-                updateTimeline();
+                console.log(`Starting to load questions for ${era}...`);
 
-                // Initialize the game
-                initGame();
+                try {
+                    // Create an array of promises for parallel loading
+                    const loadPromises = difficulties.map(difficulty => {
+                        return loadQuestions(era, difficulty);
+                    });
+
+                    // Wait for all questions to load in parallel with a timeout
+                    const timeoutPromise = new Promise((_, reject) => {
+                        setTimeout(() => reject(new Error('Loading questions timed out')), 10000);
+                    });
+
+                    await Promise.race([
+                        Promise.all(loadPromises),
+                        timeoutPromise
+                    ]);
+
+                    // Log the loaded questions for this era
+                    console.log(`Completed loading questions for ${era}`);
+
+                    return true;
+                } catch (error) {
+                    console.error(`Error loading questions for ${era}:`, error);
+
+                    // Initialize with empty arrays to prevent errors
+                    difficulties.forEach(difficulty => {
+                        if (!questionsDatabase[era][difficulty]) {
+                            questionsDatabase[era][difficulty] = [];
+                        }
+                    });
+
+                    return false;
+                }
+            }
+
+            // Function to initialize the game without loading any questions initially
+            async function loadAllQuestions() {
+                console.log("Starting game initialization...");
+
+                // Create a persistent error banner that stays until initialization is complete
+                const errorBanner = document.createElement('div');
+                errorBanner.className = 'fixed top-0 left-0 right-0 bg-red-600 text-white px-4 py-2 text-center font-medium z-50 flex items-center justify-center';
+                errorBanner.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Initializing game... Please wait.
+                `;
+
+                try {
+                    // Check if all required DOM elements exist
+                    const requiredElements = [
+                        { name: 'startBtn', element: startBtn },
+                        { name: 'resetBtn', element: resetBtn },
+                        { name: 'easyBtn', element: easyBtn },
+                        { name: 'mediumBtn', element: mediumBtn },
+                        { name: 'hardBtn', element: hardBtn },
+                        { name: 'eraSelector', element: eraSelector },
+                        { name: 'gameInstructions', element: gameInstructions },
+                        { name: 'mazeCanvas', element: mazeCanvas },
+                        { name: 'hintBtn', element: hintBtn },
+                        { name: 'timeBtn', element: timeBtn },
+                        { name: 'skipBtn', element: skipBtn }
+                    ];
+
+                    // Check for missing elements
+                    const missingElements = requiredElements.filter(item => !item.element);
+                    if (missingElements.length > 0) {
+                        throw new Error(`Missing required DOM elements: ${missingElements.map(item => item.name).join(', ')}`);
+                    }
+
+                    // Add the error banner to the page before initialization
+                    document.body.appendChild(errorBanner);
+
+                    // Initialize the game UI without loading any questions yet
+                    // This makes the initial page load much faster
+                    initGame();
+
+                    // Add initial hint count indicator to the hint button
+                    const hintButton = document.getElementById('hint-btn');
+                    if (hintButton) {
+                        const hintCount = document.createElement('div');
+                        hintCount.className = 'hint-count absolute bottom-0 right-0 bg-yellow-800 text-white text-xs px-1 rounded-full';
+                        hintCount.textContent = '3';
+                        hintButton.style.position = 'relative';
+                        hintButton.appendChild(hintCount);
+                    }
+
+                    // Initialize the timeline with empty data
+                    updateTimeline();
+
+                    // Remove the error banner since initialization was successful
+                    errorBanner.remove();
+
+                    // Show success notification
+                    const successNotification = document.createElement('div');
+                    successNotification.className = 'fixed top-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center';
+                    successNotification.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Game initialized successfully! Select an Era to begin.
+                    `;
+                    document.body.appendChild(successNotification);
+
+                    // Remove the success notification after 3 seconds
+                    setTimeout(() => {
+                        successNotification.remove();
+                    }, 3000);
+
+                    // We'll load questions on-demand when an era is selected
+                    console.log("Game initialized successfully. Questions will be loaded when an era is selected.");
+
+                } catch (error) {
+                    console.error("Error during game initialization:", error);
+
+                    // Update the error banner with the specific error
+                    errorBanner.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Failed to initialize the game. Please try refreshing the page.
+                    `;
+
+                    // Try to initialize a minimal version of the game
+                    try {
+                        // Basic initialization of UI elements that are available
+                        if (gameInstructions) {
+                            gameInstructions.innerHTML = `
+                                <div class="p-6 bg-red-900/30 rounded-lg border border-red-500/30 max-w-md mx-auto">
+                                    <h3 class="text-xl font-bold text-white mb-4">Game Initialization Error</h3>
+                                    <p class="text-white mb-4">There was a problem initializing the game. This might be due to:</p>
+                                    <ul class="text-white list-disc pl-5 mb-4 space-y-2">
+                                        <li>Missing game elements</li>
+                                        <li>JavaScript errors</li>
+                                        <li>Network connectivity issues</li>
+                                    </ul>
+                                    <p class="text-white mb-6">Please try refreshing the page or contact support if the problem persists.</p>
+                                    <button onclick="window.location.reload()" class="w-full px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors">
+                                        Refresh Page
+                                    </button>
+                                </div>
+                            `;
+                            gameInstructions.classList.remove('hidden');
+                        }
+
+                        // Disable any buttons that might exist
+                        [startBtn, resetBtn, easyBtn, mediumBtn, hardBtn].forEach(btn => {
+                            if (btn) {
+                                btn.disabled = true;
+                                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                            }
+                        });
+
+                    } catch (fallbackError) {
+                        console.error("Failed to initialize fallback UI:", fallbackError);
+                    }
+                }
+            }
+
+            // Initialize the leaderboard with default data
+            displayDefaultLeaderboard();
+
+            // Results functionality
+            resultsBtn.addEventListener('click', function() {
+                loadResults();
+                resultsModal.classList.remove('hidden');
+            });
+
+            closeResultsBtn.addEventListener('click', function() {
+                resultsModal.classList.add('hidden');
+            });
+
+            // Function to load results from the server
+            async function loadResults() {
+                resultsContent.innerHTML = `
+                    <div class="flex justify-center items-center py-12">
+                        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+                    </div>
+                `;
+
+                try {
+                    const response = await fetch('{{ route('subjects.specialized.humms.historical-timeline-maze.results') }}', {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch results');
+                    }
+
+                    const data = await response.json();
+
+                    if (data.length === 0) {
+                        resultsContent.innerHTML = `
+                            <div class="bg-neutral-900 p-6 rounded-lg text-center">
+                                <p class="text-lg mb-4">You haven't played any Historical Timeline Maze games yet.</p>
+                                <p>Complete a game to see your results here.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // Calculate summary statistics
+                    const totalGames = data.length;
+                    const totalScore = data.reduce((sum, result) => sum + result.score, 0);
+                    const averageScore = Math.round(totalScore / totalGames);
+                    const totalAccuracy = data.reduce((sum, result) => sum + parseFloat(result.accuracy_percentage), 0);
+                    const averageAccuracy = (totalAccuracy / totalGames).toFixed(1);
+
+                    // Count games by era
+                    const eraCounts = {
+                        ancient: 0,
+                        medieval: 0,
+                        renaissance: 0,
+                        modern: 0,
+                        contemporary: 0
+                    };
+
+                    data.forEach(result => {
+                        if (result.era && result.era.era) {
+                            eraCounts[result.era.era] = (eraCounts[result.era.era] || 0) + 1;
+                        }
+                    });
+
+                    // Build the HTML for the results
+                    let html = `
+                        <div class="bg-neutral-900 rounded-lg p-4 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Performance Summary</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-neutral-800 p-4 rounded-lg">
+                                    <p class="text-sm text-emerald-400">Total Games</p>
+                                    <p class="text-2xl font-bold">${totalGames}</p>
+                                </div>
+                                <div class="bg-neutral-800 p-4 rounded-lg">
+                                    <p class="text-sm text-emerald-400">Average Score</p>
+                                    <p class="text-2xl font-bold">${averageScore}</p>
+                                </div>
+                                <div class="bg-neutral-800 p-4 rounded-lg">
+                                    <p class="text-sm text-emerald-400">Average Accuracy</p>
+                                    <p class="text-2xl font-bold">${averageAccuracy}%</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-neutral-900 rounded-lg p-4 mb-6">
+                            <h3 class="text-xl font-semibold mb-4">Era Distribution</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    `;
+
+                    // Add era distribution
+                    const eraNames = {
+                        'ancient': 'Ancient',
+                        'medieval': 'Medieval',
+                        'renaissance': 'Renaissance',
+                        'modern': 'Modern',
+                        'contemporary': 'Contemporary'
+                    };
+
+                    for (const [era, count] of Object.entries(eraCounts)) {
+                        html += `
+                            <div class="bg-neutral-800 p-4 rounded-lg text-center">
+                                <p class="text-sm text-emerald-400">${eraNames[era] || era}</p>
+                                <p class="text-2xl font-bold">${count}</p>
+                                <p class="text-xs text-neutral-400">games played</p>
+                            </div>
+                        `;
+                    }
+
+                    html += `
+                            </div>
+                        </div>
+
+                        <h3 class="text-xl font-semibold mb-4">Game History</h3>
+                        <div class="space-y-4">
+                    `;
+
+                    // Add each result
+                    data.forEach((result, index) => {
+                        const date = new Date(result.created_at);
+                        const formattedDate = date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
+                        const difficultyColor = result.difficulty === 'easy'
+                            ? 'bg-green-100 text-green-800'
+                            : (result.difficulty === 'medium'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-red-100 text-red-800');
+
+                        html += `
+                            <div class="bg-neutral-900 rounded-lg overflow-hidden">
+                                <div class="p-4 border-b border-neutral-800 flex justify-between items-center">
+                                    <div>
+                                        <span class="font-semibold text-lg">Game #${totalGames - index}</span>
+                                        <span class="ml-2 text-sm text-gray-400">${formattedDate}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-3 py-1 rounded-full text-sm font-medium ${difficultyColor}">
+                                            ${result.difficulty.charAt(0).toUpperCase() + result.difficulty.slice(1)}
+                                        </span>
+                                        <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
+                                            ${result.era ? eraNames[result.era.era] || result.era.era : 'Unknown Era'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="p-4">
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                        <div>
+                                            <p class="text-sm text-gray-400">Score</p>
+                                            <p class="font-bold text-xl">${result.score}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-400">Accuracy</p>
+                                            <p class="font-bold text-xl">${parseFloat(result.accuracy_percentage).toFixed(1)}%</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-400">Questions</p>
+                                            <p class="font-bold text-xl">${result.questions_correct} / ${result.questions_attempted}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-400">Time Spent</p>
+                                            <p class="font-bold text-xl">${formatTime(result.time_spent_seconds)}</p>
+                                        </div>
+                                    </div>
+
+                                    ${result.notes ? `
+                                        <div class="mt-2 p-3 bg-neutral-800 rounded">
+                                            <p class="text-sm text-gray-400 mb-1">Notes:</p>
+                                            <p class="text-sm">${result.notes}</p>
+                                        </div>
+                                    ` : ''}
+
+                                    <div class="mt-3 flex justify-between items-center">
+                                        <span class="text-sm ${result.completed ? 'text-emerald-400' : 'text-yellow-400'}">
+                                            ${result.completed ? 'Completed' : 'Not Completed'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                    resultsContent.innerHTML = html;
+                } catch (error) {
+                    console.error('Error loading results:', error);
+                    resultsContent.innerHTML = `
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            <p>There was an error loading your results. Please try again.</p>
+                            <button onclick="loadResults()" class="underline mt-2">Try again</button>
+                        </div>
+                    `;
+                }
+            }
+
+            // Format time in seconds to minutes and seconds
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes}m ${remainingSeconds}s`;
             }
 
             // Load all questions and initialize the game

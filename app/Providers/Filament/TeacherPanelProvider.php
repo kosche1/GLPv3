@@ -66,6 +66,7 @@ class TeacherPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\LogFilamentLogout::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

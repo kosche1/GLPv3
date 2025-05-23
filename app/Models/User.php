@@ -10,12 +10,15 @@ use Illuminate\Notifications\Notifiable;
 use LevelUp\Experience\Models\Achievement;
 use LevelUp\Experience\Concerns\GiveExperience;
 use LevelUp\Experience\Concerns\HasAchievements;
+use LevelUp\Experience\Concerns\HasStreaks;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Contracts\Activity;
+use App\Events\UserCompletedChallenge;
+use App\Events\ChallengeCompleted;
 
 class User extends Authenticatable
 {
@@ -23,6 +26,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasRoles;
     use GiveExperience;
     use HasAchievements;
+    use HasStreaks;
     use LogsActivity;
 
     /**
@@ -267,8 +271,9 @@ class User extends Authenticatable
             }
         }
 
-        // Fire event if needed
-        // event(new UserCompletedChallenge($this, $challenge));
+        // Fire events
+        event(new UserCompletedChallenge($this, $challenge));
+        event(new ChallengeCompleted($this, $challenge));
     }
 
     /**
@@ -417,5 +422,72 @@ class User extends Authenticatable
     public function notifications()
     {
         return $this->customNotifications();
+    }
+
+    /**
+     * Get the study groups the user is a member of.
+     */
+    public function studyGroups()
+    {
+        return $this->belongsToMany(StudyGroup::class, 'study_group_user')
+            ->withPivot('role', 'joined_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the study groups created by the user.
+     */
+    public function createdStudyGroups()
+    {
+        return $this->hasMany(StudyGroup::class, 'created_by');
+    }
+
+    /**
+     * Get the historical timeline maze progress records for the user.
+     */
+    public function historicalTimelineMazeProgress()
+    {
+        return $this->hasMany(HistoricalTimelineMazeProgress::class);
+    }
+
+    /**
+     * Get the historical timeline maze leaderboard entries for the user.
+     */
+    public function historicalTimelineMazeLeaderboard()
+    {
+        return $this->hasMany(HistoricalTimelineMazeLeaderboard::class);
+    }
+
+    /**
+     * Get the group challenges the user is participating in.
+     */
+    public function groupChallenges()
+    {
+        return $this->belongsToMany(GroupChallenge::class, 'user_group_challenges')
+            ->withPivot(
+                'status',
+                'progress',
+                'completed_at',
+                'reward_claimed',
+                'reward_claimed_at',
+                'attempts'
+            )
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the group discussions created by the user.
+     */
+    public function groupDiscussions()
+    {
+        return $this->hasMany(GroupDiscussion::class);
+    }
+
+    /**
+     * Get the group discussion comments created by the user.
+     */
+    public function groupDiscussionComments()
+    {
+        return $this->hasMany(GroupDiscussionComment::class);
     }
 }
