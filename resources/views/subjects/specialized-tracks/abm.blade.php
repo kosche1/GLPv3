@@ -149,11 +149,16 @@
                                     </svg>
                                 </div>
                             @elseif(isset($lockedChallenges) && in_array($challenge->id, $lockedChallenges ?? []))
-                                <div class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-amber-400 bg-neutral-700 rounded-lg cursor-not-allowed">
-                                    Level {{ $challenge->required_level }} Required
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
+                                <div class="inline-flex flex-col items-center justify-center w-full px-4 py-2.5 text-sm font-medium bg-neutral-700 rounded-lg cursor-not-allowed">
+                                    <div class="flex items-center justify-center text-amber-400 mb-1">
+                                        <span>Level {{ $challenge->required_level }} Required</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-xs text-neutral-400">
+                                        Reach level {{ $challenge->required_level }} to unlock this challenge
+                                    </div>
                                 </div>
                             @else
                                 <a href="{{ route('challenge', ['challenge' => $challenge]) }}" class="inline-flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-white {{ isset($completedChallenges) && in_array($challenge->id, $completedChallenges ?? []) ? 'bg-blue-600 hover:bg-blue-500' : 'bg-emerald-600 hover:bg-emerald-500' }} rounded-lg transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-neutral-800">

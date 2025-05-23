@@ -122,10 +122,11 @@ class LearningController extends Controller
 
         // Check if the user has the required level to access this challenge
         $userLevel = $this->getUserLevel();
+        $isLocked = false;
 
-        // If the challenge requires a higher level than the user has, redirect back with an error
+        // Check if the challenge requires a higher level than the user has
         if ($challenge->required_level > $userLevel) {
-            return redirect()->back()->with('error', 'You need to reach level ' . $challenge->required_level . ' to access this challenge.');
+            $isLocked = true;
         }
 
         // Get all tasks for this challenge
@@ -145,7 +146,9 @@ class LearningController extends Controller
             'challenge' => $challenge,
             'tasks' => $tasks,
             'completedTaskIds' => $completedTaskIds,
-            'isExpired' => $isExpired
+            'isExpired' => $isExpired,
+            'isLocked' => $isLocked,
+            'userLevel' => $userLevel
         ]);
     }
 
@@ -154,9 +157,10 @@ class LearningController extends Controller
         // Check if the user has the required level to access this challenge
         $userLevel = $this->getUserLevel();
 
-        // If the challenge requires a higher level than the user has, redirect back with an error
+        // If the challenge requires a higher level than the user has, redirect to the challenge page
         if ($challenge->required_level > $userLevel) {
-            return redirect()->route('learning')->with('error', 'You need to reach level ' . $challenge->required_level . ' to access this challenge.');
+            return redirect()->route('challenge', ['challenge' => $challenge])
+                ->with('error', 'You need to reach level ' . $challenge->required_level . ' to access the tasks in this challenge.');
         }
 
         $currentTask = $challenge->tasks()->findOrFail($task);
