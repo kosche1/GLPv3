@@ -38,26 +38,24 @@ class ActivityLogResource extends Resource
                 Forms\Components\TextInput::make('log_name')
                     ->label('Subject')
                     ->required(),
-                Forms\Components\TextInput::make('causer_name')
-                    ->label('User')
-                    ->getStateUsing(function ($record) {
-                        return $record->causer?->name ?? 'System';
-                    })
+                Forms\Components\TextInput::make('causer_type')
+                    ->label('User Type')
+                    ->disabled(),
+                Forms\Components\TextInput::make('causer_id')
+                    ->label('User ID')
                     ->disabled(),
                 Forms\Components\TextInput::make('description')
                     ->label('Description')
                     ->required(),
-                Forms\Components\Select::make('event')
+                Forms\Components\TextInput::make('event')
                     ->label('Action')
-                    ->options([
-                        'created' => 'Created',
-                        'updated' => 'Updated',
-                        'deleted' => 'Deleted',
-                        'viewed' => 'Viewed',
-                        'login' => 'Login',
-                        'logout' => 'Logout',
-                    ])
                     ->required(),
+                Forms\Components\TextInput::make('subject_type')
+                    ->label('Resource Type')
+                    ->disabled(),
+                Forms\Components\TextInput::make('subject_id')
+                    ->label('Resource ID')
+                    ->disabled(),
                 Forms\Components\KeyValue::make('properties')
                     ->label('Properties'),
                 Forms\Components\DateTimePicker::make('created_at')
@@ -81,7 +79,7 @@ class ActivityLogResource extends Resource
                     ->label('User')
                     ->sortable()
                     ->searchable()
-                    ->default('System'),
+                    ->formatStateUsing(fn ($state, $record) => $state ?? ($record->causer_type ? class_basename($record->causer_type) . ' #' . $record->causer_id : 'System')),
                 TextColumn::make('description')
                     ->label('Description')
                     ->sortable()
@@ -91,12 +89,13 @@ class ActivityLogResource extends Resource
                     ->label('Action')
                     ->sortable()
                     ->searchable()
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                    ->formatStateUsing(fn ($state): string => $state ? ucfirst($state) : 'Unknown')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn ($state): string => match ($state) {
                         'created' => 'success',
                         'updated' => 'warning',
                         'deleted' => 'danger',
+                        null => 'gray',
                         default => 'gray',
                     }),
                 TextColumn::make('subject_type')
