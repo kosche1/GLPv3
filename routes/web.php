@@ -5,14 +5,13 @@ use App\Models\Challenge;
 
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ChallengeController;
-use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\ParagonZController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ActivityGoalController;
-use App\Http\Controllers\MoleculeBuilderController;
 use App\Http\Controllers\EquationDropController;
 use App\Http\Controllers\HistoricalTimelineMazeController;
+use App\Http\Controllers\ActivityLogPrintController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -381,6 +380,11 @@ Route::get('/fix-ict-tasks', [\App\Http\Controllers\FixIctTasksController::class
 Route::post('/verify-password', [\App\Http\Controllers\PasswordVerificationController::class, 'verify'])
     ->middleware('auth')
     ->name('verify-password');
+
+// Activity Log Print Route
+Route::get('/activity-logs/{record}/print', [ActivityLogPrintController::class, 'print'])
+    ->middleware('auth')
+    ->name('activity-log.print');
 
 // Debug route for investment challenges
 Route::get('/debug-investment-challenges', function() {
