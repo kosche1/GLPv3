@@ -189,4 +189,121 @@ class AuditTrail extends Model
             ], $additionalData),
         ]);
     }
+
+    /**
+     * Record a task evaluation event by an admin or faculty.
+     *
+     * @param mixed $admin The admin/faculty who evaluated the task
+     * @param StudentAnswer $answer The student's answer that was evaluated
+     * @param array $additionalData Additional data to store
+     * @return AuditTrail
+     */
+    public static function recordTaskEvaluation($admin, StudentAnswer $answer, array $additionalData = []): AuditTrail
+    {
+        $task = $answer->task;
+        $student = $answer->user;
+        $challenge = $task ? $task->challenge : null;
+
+        // Get subject type and name if available
+        $subjectType = $challenge && $challenge->subjectType ? $challenge->subjectType->name : null;
+        $subjectName = null;
+
+        if ($challenge && $challenge->strand) {
+            $subjectName = $challenge->strand->name;
+        } elseif (isset($additionalData['subject_name'])) {
+            $subjectName = $additionalData['subject_name'];
+        }
+
+        return self::create([
+            'user_id' => $admin->id,
+            'action_type' => 'task_evaluation',
+            'subject_type' => $subjectType,
+            'subject_name' => $subjectName,
+            'challenge_name' => $challenge ? $challenge->name : null,
+            'task_name' => $task ? $task->name : null,
+            'score' => $answer->score,
+            'description' => "Evaluated task submission by {$student->name}",
+            'additional_data' => array_merge([
+                'evaluated_at' => now()->toDateTimeString(),
+                'student_id' => $student->id,
+                'student_name' => $student->name,
+                'is_correct' => $answer->is_correct,
+                'feedback' => $answer->feedback,
+            ], $additionalData),
+        ]);
+    }
+
+    /**
+     * Record a challenge creation event by an admin or faculty.
+     *
+     * @param mixed $admin The admin/faculty who created the challenge
+     * @param Challenge $challenge The challenge that was created
+     * @param array $additionalData Additional data to store
+     * @return AuditTrail
+     */
+    public static function recordChallengeCreation($admin, Challenge $challenge, array $additionalData = []): AuditTrail
+    {
+        // Get subject type and name if available
+        $subjectType = $challenge->subjectType ? $challenge->subjectType->name : null;
+        $subjectName = null;
+
+        if ($challenge->strand) {
+            $subjectName = $challenge->strand->name;
+        } elseif (isset($additionalData['subject_name'])) {
+            $subjectName = $additionalData['subject_name'];
+        }
+
+        return self::create([
+            'user_id' => $admin->id,
+            'action_type' => 'challenge_creation',
+            'subject_type' => $subjectType,
+            'subject_name' => $subjectName,
+            'challenge_name' => $challenge->name,
+            'description' => "Created challenge: {$challenge->name}",
+            'additional_data' => array_merge([
+                'created_at' => now()->toDateTimeString(),
+                'difficulty_level' => $challenge->difficulty_level,
+                'points_reward' => $challenge->points_reward,
+                'is_active' => $challenge->is_active,
+            ], $additionalData),
+        ]);
+    }
+
+    /**
+     * Record a task creation event by an admin or faculty.
+     *
+     * @param mixed $admin The admin/faculty who created the task
+     * @param Task $task The task that was created
+     * @param array $additionalData Additional data to store
+     * @return AuditTrail
+     */
+    public static function recordTaskCreation($admin, Task $task, array $additionalData = []): AuditTrail
+    {
+        $challenge = $task->challenge;
+
+        // Get subject type and name if available
+        $subjectType = $challenge && $challenge->subjectType ? $challenge->subjectType->name : null;
+        $subjectName = null;
+
+        if ($challenge && $challenge->strand) {
+            $subjectName = $challenge->strand->name;
+        } elseif (isset($additionalData['subject_name'])) {
+            $subjectName = $additionalData['subject_name'];
+        }
+
+        return self::create([
+            'user_id' => $admin->id,
+            'action_type' => 'task_creation',
+            'subject_type' => $subjectType,
+            'subject_name' => $subjectName,
+            'challenge_name' => $challenge ? $challenge->name : null,
+            'task_name' => $task->name,
+            'description' => "Created task: {$task->name}",
+            'additional_data' => array_merge([
+                'created_at' => now()->toDateTimeString(),
+                'points_reward' => $task->points_reward,
+                'is_active' => $task->is_active,
+            ], $additionalData),
+        ]);
+    }
 }

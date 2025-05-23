@@ -46,6 +46,9 @@ class AuditTrailResource extends Resource
                                 'registration' => 'Registration',
                                 'challenge_completion' => 'Challenge Completion',
                                 'task_submission' => 'Task Submission',
+                                'task_evaluation' => 'Task Evaluation',
+                                'challenge_creation' => 'Challenge Creation',
+                                'task_creation' => 'Task Creation',
                             ])
                             ->required(),
 
@@ -95,12 +98,18 @@ class AuditTrailResource extends Resource
                         'registration' => 'success',
                         'challenge_completion' => 'primary',
                         'task_submission' => 'warning',
+                        'task_evaluation' => 'info',
+                        'challenge_creation' => 'danger',
+                        'task_creation' => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'registration' => 'Registration',
                         'challenge_completion' => 'Challenge Completion',
                         'task_submission' => 'Task Submission',
+                        'task_evaluation' => 'Task Evaluation',
+                        'challenge_creation' => 'Challenge Creation',
+                        'task_creation' => 'Task Creation',
                         default => $state,
                     })
                     ->searchable()

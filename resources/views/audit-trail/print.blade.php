@@ -89,6 +89,16 @@
             color: #92400e;
         }
 
+        .badge-evaluation {
+            background-color: #cffafe;
+            color: #155e75;
+        }
+
+        .badge-creation {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -162,6 +172,9 @@
                                 'registration' => 'Registration',
                                 'challenge_completion' => 'Challenge Completion',
                                 'task_submission' => 'Task Submission',
+                                'task_evaluation' => 'Task Evaluation',
+                                'challenge_creation' => 'Challenge Creation',
+                                'task_creation' => 'Task Creation',
                                 default => $record->action_type,
                             };
 
@@ -169,6 +182,9 @@
                                 'registration' => 'badge-registration',
                                 'challenge_completion' => 'badge-challenge',
                                 'task_submission' => 'badge-task',
+                                'task_evaluation' => 'badge-evaluation',
+                                'challenge_creation' => 'badge-creation',
+                                'task_creation' => 'badge-creation',
                                 default => '',
                             };
                         @endphp
