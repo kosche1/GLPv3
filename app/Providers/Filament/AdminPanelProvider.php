@@ -37,8 +37,9 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'User Management',
                 'Content',
-                'System',
+                'Gamification',
                 'SHS Specialized Subjects',
+                'System',
             ])
             ->discoverResources(
                 in: app_path("Filament/Resources"),

@@ -22,6 +22,7 @@ class SubjectsController extends Controller
         // Get all core subject challenges
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
             ->where('subject_type_id', $subjectType?->id)
+            ->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
 
@@ -69,6 +70,7 @@ class SubjectsController extends Controller
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
             ->where('subject_type_id', $subjectType?->id)
+            ->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
 
@@ -119,6 +121,7 @@ class SubjectsController extends Controller
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
             ->where('subject_type_id', $subjectType?->id)
+            ->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
 
@@ -171,6 +174,7 @@ class SubjectsController extends Controller
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand?->id)
+            ->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
 
@@ -223,6 +227,7 @@ class SubjectsController extends Controller
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand?->id)
+            ->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
 
@@ -275,6 +280,7 @@ class SubjectsController extends Controller
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand?->id)
+            ->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
 
@@ -380,6 +386,7 @@ class SubjectsController extends Controller
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand?->id)
+            ->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
 
@@ -428,6 +435,7 @@ class SubjectsController extends Controller
 
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
             ->where('subject_type_id', $subjectType->id)
+            ->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
 
@@ -489,6 +497,7 @@ class SubjectsController extends Controller
         $challenges = Challenge::with(['tasks', 'category', 'strand', 'subjectType'])
             ->where('subject_type_id', $subjectType?->id)
             ->where('strand_id', $strand->id)
+            ->where('is_active', true)
             ->orderBy('required_level', 'asc')
             ->get();
 
