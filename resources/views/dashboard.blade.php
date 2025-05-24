@@ -260,14 +260,54 @@
             $completionPercentage = round(($completedCredits / $creditsRequired) * 100, 2);
 
             // --- Leaderboard Data ---
-            $leaderboardData = collect([
-                (object)['user' => (object)['id' => 1, 'name' => 'John Doe'], 'experience' => (object)['level_id' => 5, 'experience_points' => 1500]],
-                (object)['user' => (object)['id' => 2, 'name' => 'Jane Smith'], 'experience' => (object)['level_id' => 4, 'experience_points' => 1300]],
-                (object)['user' => (object)['id' => $user->id, 'name' => $user->name], 'experience' => (object)['level_id' => $currentLevel, 'experience_points' => $currentPoints]],
-                (object)['user' => (object)['id' => 3, 'name' => 'Alex Johnson'], 'experience' => (object)['level_id' => 3, 'experience_points' => 1100]],
-                (object)['user' => (object)['id' => 4, 'name' => 'Sam Wilson'], 'experience' => (object)['level_id' => 3, 'experience_points' => 1050]],
-                (object)['user' => (object)['id' => 5, 'name' => 'Chris Evans'], 'experience' => (object)['level_id' => 2, 'experience_points' => 900]],
-            ])->sortByDesc('experience.experience_points')->values();
+            $leaderboardData = \App\Models\User::query()
+                ->role('student')
+                ->join('experiences', 'users.id', '=', 'experiences.user_id')
+                ->leftJoin('levels', 'experiences.level_id', '=', 'levels.id')
+                ->select([
+                    'users.id',
+                    'users.name',
+                    'experiences.experience_points',
+                    'experiences.level_id',
+                    'levels.level'
+                ])
+                ->selectSub(function ($query) {
+                    $query->select('created_at')
+                        ->from('experience_audits')
+                        ->whereColumn('experience_audits.user_id', 'users.id')
+                        ->where('experience_audits.type', 'add')
+                        ->where('experience_audits.points', '>', 0)
+                        ->orderBy('created_at', 'desc')
+                        ->limit(1);
+                }, 'last_points_earned_at')
+                ->selectSub(function ($query) {
+                    $query->select('points')
+                        ->from('experience_audits')
+                        ->whereColumn('experience_audits.user_id', 'users.id')
+                        ->where('experience_audits.type', 'add')
+                        ->where('experience_audits.points', '>', 0)
+                        ->orderBy('created_at', 'desc')
+                        ->limit(1);
+                }, 'last_points_earned')
+                ->orderBy('experiences.experience_points', 'desc')
+                ->get()
+                ->map(function ($user) {
+                    // Convert to the expected object structure
+                    return (object)[
+                        'user' => (object)[
+                            'id' => $user->id,
+                            'name' => $user->name
+                        ],
+                        'experience' => (object)[
+                            'level_id' => $user->level_id,
+                            'experience_points' => $user->experience_points
+                        ],
+                        'last_points_earned_at' => $user->last_points_earned_at
+                            ? \Carbon\Carbon::parse($user->last_points_earned_at)->setTimezone('Asia/Manila')
+                            : null,
+                        'last_points_earned' => $user->last_points_earned ?? 0
+                    ];
+                });
             $userRank = $leaderboardData->search(fn($item) => $item->user->id === $user->id);
             $userRank = ($userRank !== false) ? $userRank + 1 : null;
 
@@ -1054,13 +1094,23 @@
                                             <span class="font-medium text-gray-100 truncate group-hover:text-white transition-colors duration-300">{{ $entry->user->name }}</span>
                                             <span class="text-xs font-mono bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300 border border-neutral-700/50 group-hover:border-neutral-600/50 transition-colors duration-300">{{ number_format($entry->experience->experience_points ?? 0) }}</span>
                                         </div>
-                                        <div class="flex items-center mt-1">
-                                            <div class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">Level {{ $entry->experience->level_id ?? 1 }}</div>
-                                            <div class="ml-2 w-full bg-neutral-800/80 rounded-full h-1.5 overflow-hidden backdrop-blur-sm border border-neutral-700/50 shadow-inner">
-                                                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full relative" style="width: 70%">
-                                                    <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0)_75%)] bg-[length:200%_100%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+                                        <div class="flex items-center justify-between mt-1">
+                                            <div class="flex items-center">
+                                                <div class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">Level {{ $entry->experience->level_id ?? 1 }}</div>
+                                                <div class="ml-2 w-20 bg-neutral-800/80 rounded-full h-1.5 overflow-hidden backdrop-blur-sm border border-neutral-700/50 shadow-inner">
+                                                    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full relative" style="width: 70%">
+                                                        <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0)_75%)] bg-[length:200%_100%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            @if($entry->last_points_earned_at)
+                                                <div class="text-xs text-gray-500 group-hover:text-gray-400 transition-colors duration-300">
+                                                    {{ $entry->last_points_earned_at->format('M j, Y') }}
+                                                    @if($entry->last_points_earned > 0)
+                                                        <span class="text-emerald-400 font-medium">+{{ $entry->last_points_earned }} XP</span>
+                                                    @endif
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -1086,42 +1136,69 @@
                                                 <span class="font-medium text-gray-100 truncate group-hover:text-white transition-colors duration-300">{{ $user->name }}</span>
                                                 <span class="text-xs font-mono bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300 border border-emerald-500/30 group-hover:border-emerald-500/50 transition-colors duration-300">{{ number_format($currentPoints) }}</span>
                                             </div>
-                                            <div class="flex items-center mt-1">
-                                                <div class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">Level {{ $currentLevel }}</div>
-                                                <div class="ml-2 w-full bg-neutral-800/80 rounded-full h-1.5 overflow-hidden border border-neutral-700/50">
-                                                    <div
-                                                        x-data="{
-                                                            width: 0,
-                                                            targetWidth: {{ $progressPercentage }},
-                                                            init() {
-                                                                const duration = 1500;
-                                                                const startTime = performance.now();
-                                                                const animate = (currentTime) => {
-                                                                    const elapsedTime = currentTime - startTime;
-                                                                    const progress = Math.min(elapsedTime / duration, 1);
-                                                                    // Use cubic-bezier easing for smooth animation
-                                                                    const t = progress;
-                                                                    const easedProgress = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                                            <div class="flex items-center justify-between mt-1">
+                                                <div class="flex items-center">
+                                                    <div class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">Level {{ $currentLevel }}</div>
+                                                    <div class="ml-2 w-20 bg-neutral-800/80 rounded-full h-1.5 overflow-hidden border border-neutral-700/50">
+                                                        <div
+                                                            x-data="{
+                                                                width: 0,
+                                                                targetWidth: {{ $progressPercentage }},
+                                                                init() {
+                                                                    const duration = 1500;
+                                                                    const startTime = performance.now();
+                                                                    const animate = (currentTime) => {
+                                                                        const elapsedTime = currentTime - startTime;
+                                                                        const progress = Math.min(elapsedTime / duration, 1);
+                                                                        // Use cubic-bezier easing for smooth animation
+                                                                        const t = progress;
+                                                                        const easedProgress = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-                                                                    this.width = easedProgress * this.targetWidth;
+                                                                        this.width = easedProgress * this.targetWidth;
 
-                                                                    if (progress < 1) {
-                                                                        requestAnimationFrame(animate);
-                                                                    } else {
-                                                                        // Ensure we end exactly at the target width
-                                                                        this.width = this.targetWidth;
-                                                                    }
-                                                                };
-                                                                requestAnimationFrame(animate);
-                                                            }
-                                                        }"
-                                                        class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full hw-accelerate relative overflow-hidden"
-                                                        :style="`width: ${width}%;`"
-                                                        style="width: 0%;"
-                                                    >
-                                                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer" style="background-size: 200% 100%;"></div>
+                                                                        if (progress < 1) {
+                                                                            requestAnimationFrame(animate);
+                                                                        } else {
+                                                                            // Ensure we end exactly at the target width
+                                                                            this.width = this.targetWidth;
+                                                                        }
+                                                                    };
+                                                                    requestAnimationFrame(animate);
+                                                                }
+                                                            }"
+                                                            class="bg-gradient-to-r from-emerald-500 to-teal-500 h-1.5 rounded-full hw-accelerate relative overflow-hidden"
+                                                            :style="`width: ${width}%;`"
+                                                            style="width: 0%;"
+                                                        >
+                                                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer" style="background-size: 200% 100%;"></div>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                @php
+                                                    // Get the current user's last points earned date and amount directly from the database
+                                                    $userLastAudit = \Illuminate\Support\Facades\DB::table('experience_audits')
+                                                        ->where('user_id', $user->id)
+                                                        ->where('type', 'add')
+                                                        ->where('points', '>', 0)
+                                                        ->orderBy('created_at', 'desc')
+                                                        ->first();
+
+                                                    $userLastPointsDate = null;
+                                                    $userLastPointsEarned = 0;
+
+                                                    if ($userLastAudit) {
+                                                        $userLastPointsDate = \Carbon\Carbon::parse($userLastAudit->created_at)->setTimezone('Asia/Manila');
+                                                        $userLastPointsEarned = $userLastAudit->points;
+                                                    }
+                                                @endphp
+                                                @if($userLastPointsDate)
+                                                    <div class="text-xs text-gray-500 group-hover:text-gray-400 transition-colors duration-300">
+                                                        {{ $userLastPointsDate->format('M j, Y') }}
+                                                        @if($userLastPointsEarned > 0)
+                                                            <span class="text-emerald-400 font-medium">+{{ $userLastPointsEarned }} XP</span>
+                                                        @endif
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
