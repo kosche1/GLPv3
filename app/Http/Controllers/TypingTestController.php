@@ -124,9 +124,10 @@ class TypingTestController extends Controller
                 'challenge_id' => 'nullable|exists:typing_test_challenges,id',
             ]);
 
+            // Save all results to database, but mark free typing differently
             $result = new TypingTestResult();
             $result->user_id = Auth::id();
-            $result->challenge_id = $request->challenge_id;
+            $result->challenge_id = $request->challenge_id; // Will be null for free typing
             $result->wpm = $request->wpm;
             $result->cpm = $request->cpm;
             $result->accuracy = $request->accuracy;
@@ -139,14 +140,27 @@ class TypingTestController extends Controller
             $result->errors = $request->errors ?? 0;
             $result->save();
 
-            Log::info('Typing test result saved successfully', [
-                'user_id' => Auth::id(),
-                'result_id' => $result->id,
-                'wpm' => $result->wpm,
-                'accuracy' => $result->accuracy
-            ]);
+            if ($request->challenge_id) {
+                Log::info('Typing test challenge result saved successfully', [
+                    'user_id' => Auth::id(),
+                    'result_id' => $result->id,
+                    'challenge_id' => $result->challenge_id,
+                    'wpm' => $result->wpm,
+                    'accuracy' => $result->accuracy
+                ]);
 
-            return response()->json(['success' => true, 'result_id' => $result->id]);
+                return response()->json(['success' => true, 'result_id' => $result->id, 'type' => 'challenge']);
+            } else {
+                Log::info('Free typing result saved to database (not visible in admin panel)', [
+                    'user_id' => Auth::id(),
+                    'result_id' => $result->id,
+                    'wpm' => $result->wpm,
+                    'accuracy' => $result->accuracy,
+                    'test_mode' => $result->test_mode
+                ]);
+
+                return response()->json(['success' => true, 'result_id' => $result->id, 'type' => 'free_typing']);
+            }
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::error('Validation error saving typing test result', [
                 'errors' => $e->errors(),
@@ -189,17 +203,21 @@ class TypingTestController extends Controller
 
     /**
      * Get typing test history for the current user.
+     * Includes both challenge results and free typing results from database
      *
      * @return \Illuminate\Http\Response
      */
     public function getHistory()
     {
-        $history = TypingTestResult::where('user_id', Auth::id())
+        // Get all results from database (both challenges and free typing)
+        $allResults = TypingTestResult::where('user_id', Auth::id())
             ->with('challenge:id,title,difficulty')
             ->orderBy('created_at', 'desc')
-            ->limit(10)
+            ->limit(20) // Increased limit since we're showing both types
             ->get();
 
-        return response()->json($history);
+        return response()->json($allResults);
     }
+
+
 }

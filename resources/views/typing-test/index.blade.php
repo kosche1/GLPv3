@@ -186,11 +186,46 @@
                         </div>
                     </div>
 
-                    <div id="history-container" class="mt-10 p-8 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
-                        <h3 class="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">Your History</h3>
+                    <!-- Challenge History -->
+                    <div id="challenge-history-container" class="mt-10 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
+                        <h3 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Challenge History
+                            <span class="ml-3 text-sm font-normal text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 px-2 py-1 rounded-full">Visible to teachers</span>
+                        </h3>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden shadow-md">
-                                <thead class="bg-gray-100 dark:bg-gray-700">
+                            <table class="min-w-full border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden shadow-md">
+                                <thead class="bg-green-50 dark:bg-green-900">
+                                    <tr>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Date</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Challenge</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">WPM</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">CPM</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Accuracy</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Words</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="challenge-history-table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <!-- Challenge history will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Free Typing History -->
+                    <div id="free-typing-history-container" class="mt-8 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600">
+                        <h3 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            Free Typing History
+                            <span class="ml-3 text-sm font-normal text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded-full">Personal practice only</span>
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden shadow-md">
+                                <thead class="bg-blue-50 dark:bg-blue-900">
                                     <tr>
                                         <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Date</th>
                                         <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">WPM</th>
@@ -200,8 +235,8 @@
                                         <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Mode</th>
                                     </tr>
                                 </thead>
-                                <tbody id="history-table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <!-- History will be loaded here -->
+                                <tbody id="free-typing-history-table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <!-- Free typing history will be loaded here -->
                                 </tbody>
                             </table>
                         </div>
@@ -862,7 +897,10 @@
                     challenge_id: challengeId
                 });
 
-                fetch('{{ route("typing-test.save-result") }}', {
+                // Determine the correct endpoint based on whether it's a challenge or free typing
+                const endpoint = challengeId ? '{{ route("typing-test.save-result") }}' : '{{ route("typing-test.save-result") }}';
+
+                fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -895,11 +933,22 @@
                             Saved!
                         `;
 
-                        // Refresh history from database only (no manual addition)
+                        // Show different messages based on result type
+                        if (data.type === 'challenge') {
+                            console.log('✅ Challenge result saved to database and admin panel');
+                            // Show a brief notification for challenge completion
+                            showNotification('Challenge result saved! Visible to teachers.', 'success');
+                        } else if (data.type === 'free_typing') {
+                            console.log('✅ Free typing result saved to personal history only');
+                            // Show a brief notification for free typing
+                            showNotification('Free typing result saved to your personal history.', 'info');
+                        }
+
+                        // Refresh history (includes both database and session results)
                         loadHistoryFromDatabase();
 
                         // Show challenge completion message if targets were met
-                        if (selectedChallenge) {
+                        if (selectedChallenge && data.type === 'challenge') {
                             checkChallengeCompletion();
                         }
                     } else {
@@ -956,40 +1005,64 @@
                 fetch('{{ route("typing-test.history") }}')
                     .then(response => response.json())
                     .then(data => {
-                        const historyTableBody = document.getElementById('history-table-body');
+                        const challengeTableBody = document.getElementById('challenge-history-table-body');
+                        const freeTypingTableBody = document.getElementById('free-typing-history-table-body');
 
                         // Clear all existing rows
-                        historyTableBody.innerHTML = '';
+                        challengeTableBody.innerHTML = '';
+                        freeTypingTableBody.innerHTML = '';
 
-                        // Add history rows
-                        if (data.length === 0) {
-                            // If no history, show a message
+                        // Separate challenge and free typing results
+                        const challengeResults = data.filter(item => item.challenge_id !== null);
+                        const freeTypingResults = data.filter(item => item.challenge_id === null);
+
+                        // Populate Challenge History
+                        if (challengeResults.length === 0) {
                             const emptyRow = document.createElement('tr');
                             emptyRow.innerHTML = `
-                                <td colspan="6" class="py-6 px-6 text-center text-gray-500 dark:text-gray-400 italic text-lg">No typing test history yet. Complete a test to see your results here.</td>
+                                <td colspan="6" class="py-6 px-6 text-center text-gray-500 dark:text-gray-400 italic text-lg">No challenge completions yet. Complete a challenge to see your results here.</td>
                             `;
-                            historyTableBody.appendChild(emptyRow);
+                            challengeTableBody.appendChild(emptyRow);
                         } else {
-                            // Add each history item
-                            data.forEach(item => {
+                            challengeResults.forEach(item => {
                                 const date = new Date(item.created_at);
                                 const dateString = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
 
                                 const row = document.createElement('tr');
-                                row.className = 'hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150';
+                                row.className = 'hover:bg-green-50 dark:hover:bg-green-900 transition-colors duration-150';
 
-                                // Determine the mode display
-                                let modeDisplay;
-                                if (item.test_mode === 'time') {
-                                    modeDisplay = `${item.time_limit ? formatTime(item.time_limit) : '1:00'} Timer`;
-                                } else {
-                                    modeDisplay = `${item.word_count} Words in ${item.time_limit ? formatTime(item.time_limit) : '1:00'}`;
-                                }
+                                const challengeName = item.challenge && item.challenge.title ? item.challenge.title : 'Unknown Challenge';
+                                const difficulty = item.challenge && item.challenge.difficulty ? ` (${item.challenge.difficulty})` : '';
 
-                                // Add challenge title if available
-                                if (item.challenge && item.challenge.title) {
-                                    modeDisplay = `${item.challenge.title} (${modeDisplay})`;
-                                }
+                                row.innerHTML = `
+                                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${dateString}</td>
+                                    <td class="py-4 px-6 font-medium text-green-600 dark:text-green-400">${challengeName}${difficulty}</td>
+                                    <td class="py-4 px-6 font-medium text-blue-600 dark:text-blue-400">${item.wpm}</td>
+                                    <td class="py-4 px-6 font-medium text-green-600 dark:text-green-400">${item.cpm}</td>
+                                    <td class="py-4 px-6 font-medium text-purple-600 dark:text-purple-400">${item.accuracy}%</td>
+                                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${item.word_count}</td>
+                                `;
+                                challengeTableBody.appendChild(row);
+                            });
+                        }
+
+                        // Populate Free Typing History
+                        if (freeTypingResults.length === 0) {
+                            const emptyRow = document.createElement('tr');
+                            emptyRow.innerHTML = `
+                                <td colspan="6" class="py-6 px-6 text-center text-gray-500 dark:text-gray-400 italic text-lg">No free typing sessions yet. Try the free typing mode to practice!</td>
+                            `;
+                            freeTypingTableBody.appendChild(emptyRow);
+                        } else {
+                            freeTypingResults.forEach(item => {
+                                const date = new Date(item.created_at);
+                                const dateString = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+
+                                const row = document.createElement('tr');
+                                row.className = 'hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors duration-150';
+
+                                // Determine the mode display for free typing
+                                let modeDisplay = `Free Typing (${item.time_limit ? formatTime(item.time_limit) : '60'}s)`;
 
                                 row.innerHTML = `
                                     <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${dateString}</td>
@@ -999,7 +1072,7 @@
                                     <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${item.word_count}</td>
                                     <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${modeDisplay}</td>
                                 `;
-                                historyTableBody.appendChild(row);
+                                freeTypingTableBody.appendChild(row);
                             });
                         }
                     })
@@ -1045,6 +1118,40 @@
             // Load history when page loads
             loadHistoryFromDatabase();
         });
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium transition-all duration-300 transform translate-x-full`;
+
+            // Set color based on type
+            if (type === 'success') {
+                notification.classList.add('bg-green-600');
+            } else if (type === 'info') {
+                notification.classList.add('bg-blue-600');
+            } else if (type === 'warning') {
+                notification.classList.add('bg-yellow-600');
+            } else {
+                notification.classList.add('bg-red-600');
+            }
+
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            // Animate out and remove
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
     </script>
 
     @push('styles')

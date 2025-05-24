@@ -129,7 +129,7 @@ class TypingTestResultResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'challenge']));
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'challenge'])->whereNotNull('challenge_id'));
     }
 
     public static function getRelations(): array
