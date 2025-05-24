@@ -158,10 +158,121 @@ class StudentAttendancePage extends Page implements HasTable
             ])
             ->actions([
                 \Filament\Tables\Actions\ViewAction::make()
-                    ->url(fn (AuditTrail $record): string => route('audit-trails.print-view', $record))
+                    ->form([
+                        \Filament\Forms\Components\Section::make('Student Information')
+                            ->schema([
+                                \Filament\Forms\Components\Select::make('user_id')
+                                    ->relationship('user', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->disabled(),
+                            ]),
+                        \Filament\Forms\Components\Section::make('Activity Details')
+                            ->schema([
+                                \Filament\Forms\Components\Select::make('action_type')
+                                    ->options([
+                                        'registration' => 'Registration',
+                                        'login' => 'Login',
+                                        'logout' => 'Logout',
+                                        'challenge_completion' => 'Challenge Completion',
+                                        'task_submission' => 'Task Submission',
+                                        'task_evaluation' => 'Task Evaluation',
+                                        'challenge_creation' => 'Challenge Creation',
+                                        'task_creation' => 'Task Creation',
+                                    ])
+                                    ->disabled(),
+                                \Filament\Forms\Components\TextInput::make('subject_type')
+                                    ->label('Subject Type')
+                                    ->placeholder('Core, Applied, or Specialized')
+                                    ->disabled(),
+                                \Filament\Forms\Components\TextInput::make('subject_name')
+                                    ->label('Subject Name')
+                                    ->placeholder('e.g., Python, Math')
+                                    ->disabled(),
+                                \Filament\Forms\Components\TextInput::make('challenge_name')
+                                    ->label('Challenge Name')
+                                    ->disabled(),
+                                \Filament\Forms\Components\TextInput::make('task_name')
+                                    ->label('Task Name')
+                                    ->disabled(),
+                                \Filament\Forms\Components\TextInput::make('score')
+                                    ->label('Score')
+                                    ->numeric()
+                                    ->disabled(),
+                                \Filament\Forms\Components\Textarea::make('description')
+                                    ->label('Description')
+                                    ->disabled(),
+                                \Filament\Forms\Components\KeyValue::make('additional_data')
+                                    ->label('Additional Data')
+                                    ->disabled(),
+                            ]),
+                    ]),
+                \Filament\Tables\Actions\EditAction::make()
+                    ->form([
+                        \Filament\Forms\Components\Section::make('Student Information')
+                            ->schema([
+                                \Filament\Forms\Components\Select::make('user_id')
+                                    ->relationship('user', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
+                            ]),
+                        \Filament\Forms\Components\Section::make('Activity Details')
+                            ->schema([
+                                \Filament\Forms\Components\Select::make('action_type')
+                                    ->options([
+                                        'registration' => 'Registration',
+                                        'login' => 'Login',
+                                        'logout' => 'Logout',
+                                        'challenge_completion' => 'Challenge Completion',
+                                        'task_submission' => 'Task Submission',
+                                        'task_evaluation' => 'Task Evaluation',
+                                        'challenge_creation' => 'Challenge Creation',
+                                        'task_creation' => 'Task Creation',
+                                    ])
+                                    ->required(),
+                                \Filament\Forms\Components\TextInput::make('subject_type')
+                                    ->label('Subject Type')
+                                    ->placeholder('Core, Applied, or Specialized'),
+                                \Filament\Forms\Components\TextInput::make('subject_name')
+                                    ->label('Subject Name')
+                                    ->placeholder('e.g., Python, Math'),
+                                \Filament\Forms\Components\TextInput::make('challenge_name')
+                                    ->label('Challenge Name'),
+                                \Filament\Forms\Components\TextInput::make('task_name')
+                                    ->label('Task Name'),
+                                \Filament\Forms\Components\TextInput::make('score')
+                                    ->label('Score')
+                                    ->numeric(),
+                                \Filament\Forms\Components\Textarea::make('description')
+                                    ->label('Description')
+                                    ->required(),
+                                \Filament\Forms\Components\KeyValue::make('additional_data')
+                                    ->label('Additional Data'),
+                            ]),
+                    ]),
+                \Filament\Tables\Actions\DeleteAction::make(),
+                \Filament\Tables\Actions\Action::make('print')
+                    ->label('Print')
+                    ->icon('heroicon-o-printer')
+                    ->url(fn (AuditTrail $record): string => route('teacher.audit-trails.print-view', $record))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
+                \Filament\Tables\Actions\DeleteBulkAction::make(),
+                \Filament\Tables\Actions\BulkAction::make('print')
+                    ->label('Print Selected')
+                    ->icon('heroicon-o-printer')
+                    ->action(function (Collection $records) {
+                        // Generate a unique ID for this batch
+                        $batchId = uniqid('batch-');
+
+                        // Store the records in the session
+                        session()->put("audit-trail-print-{$batchId}", $records->pluck('id')->toArray());
+
+                        // Redirect to the bulk print page
+                        return redirect()->route('teacher.audit-trails.bulk-print-view', ['batchId' => $batchId]);
+                    }),
                 \Filament\Tables\Actions\BulkAction::make('export')
                     ->label('Export Selected')
                     ->icon('heroicon-o-document-arrow-down')
