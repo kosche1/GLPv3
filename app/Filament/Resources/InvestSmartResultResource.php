@@ -21,7 +21,7 @@ class InvestSmartResultResource extends Resource
 
     protected static ?string $navigationLabel = 'InvestSmart Results';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
@@ -74,7 +74,7 @@ class InvestSmartResultResource extends Resource
                             ->label('Portfolio Snapshot')
                             ->content(function (InvestSmartResult $record) {
                                 $html = '<div class="space-y-4">';
-                                
+
                                 if (isset($record->snapshot_data['stocks']) && is_array($record->snapshot_data['stocks'])) {
                                     $html .= '<table class="w-full border-collapse border border-gray-300">';
                                     $html .= '<thead class="bg-gray-100"><tr>';
@@ -86,7 +86,7 @@ class InvestSmartResultResource extends Resource
                                     $html .= '<th class="border border-gray-300 p-2 text-right">Value</th>';
                                     $html .= '</tr></thead>';
                                     $html .= '<tbody>';
-                                    
+
                                     foreach ($record->snapshot_data['stocks'] as $stock) {
                                         $value = $stock['quantity'] * $stock['current_price'];
                                         $html .= '<tr>';
@@ -98,10 +98,10 @@ class InvestSmartResultResource extends Resource
                                         $html .= '<td class="border border-gray-300 p-2 text-right">₱' . number_format($value, 2) . '</td>';
                                         $html .= '</tr>';
                                     }
-                                    
+
                                     $html .= '</tbody></table>';
                                 }
-                                
+
                                 $html .= '</div>';
                                 return new \Illuminate\Support\HtmlString($html);
                             }),

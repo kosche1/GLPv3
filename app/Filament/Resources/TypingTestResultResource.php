@@ -19,9 +19,9 @@ class TypingTestResultResource extends Resource
 
     protected static ?string $navigationGroup = 'SHS Specialized Subjects';
 
-    protected static ?string $navigationLabel = 'Typing Speed Test';
+    protected static ?string $navigationLabel = 'Typing Speed Results';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -109,14 +109,14 @@ class TypingTestResultResource extends Resource
             ])
             ->defaultSort('created_at', 'desc');
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [

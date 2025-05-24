@@ -67,7 +67,7 @@ class InvestSmartChallengeResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-                
+
                 Forms\Components\Section::make('Challenge Requirements')
                     ->schema([
                         Forms\Components\Repeater::make('required_stocks')
@@ -83,7 +83,7 @@ class InvestSmartChallengeResource extends Resource
                             ])
                             ->columns(2)
                             ->collapsible(),
-                        
+
                         Forms\Components\Repeater::make('forbidden_stocks')
                             ->label('Forbidden Stocks')
                             ->schema([
@@ -178,14 +178,14 @@ class InvestSmartChallengeResource extends Resource
                 ]),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
