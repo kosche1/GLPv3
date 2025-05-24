@@ -84,7 +84,7 @@ return [
     |
     */
     'audit' => [
-        'enabled' => env(key: 'AUDIT_POINTS', default: false),
+        'enabled' => env(key: 'AUDIT_POINTS', default: true),
     ],
 
     /*

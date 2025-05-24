@@ -73,17 +73,18 @@ class UserActivityHistoryModal extends Component
                 $this->activityHistory = DB::table('experience_audits')
                     ->where('user_id', $user->id)
                     ->orderBy('created_at', 'desc')
-                    ->take(20)
                     ->get()
                     ->map(function ($entry) {
+                        $createdAt = Carbon::parse($entry->created_at)->setTimezone('Asia/Manila');
                         return [
                             'id' => $entry->id,
                             'points' => $entry->points,
                             'type' => $entry->type,
                             'reason' => $entry->reason,
-                            'date' => Carbon::parse($entry->created_at)->format('M d, Y h:i A'),
-                            'time_ago' => Carbon::parse($entry->created_at)->diffForHumans(),
+                            'date' => $createdAt->format('M d, Y h:i A'),
+                            'time_ago' => $createdAt->diffForHumans(),
                             'activity_type' => 'experience', // Add activity type to distinguish from notifications
+                            'sort_timestamp' => $createdAt->timestamp, // Add for proper sorting
                         ];
                     })
                     ->toArray();
@@ -92,7 +93,6 @@ class UserActivityHistoryModal extends Component
                 $dailyRewards = DB::table('user_daily_rewards')
                     ->where('user_id', $user->id)
                     ->orderBy('claimed_at', 'desc')
-                    ->take(10)
                     ->get();
 
                 foreach ($dailyRewards as $reward) {
@@ -104,25 +104,123 @@ class UserActivityHistoryModal extends Component
                     $points = $rewardTier ? $rewardTier->points_reward : 10;
 
                     // Add to activity history
+                    $claimedAt = Carbon::parse($reward->claimed_at)->setTimezone('Asia/Manila');
                     $this->activityHistory[] = [
                         'id' => 'dr_' . $reward->id, // Prefix to distinguish from experience audits
                         'points' => $points,
                         'type' => 'add',
                         'reason' => "Daily login reward - Day {$reward->current_streak}",
-                        'date' => Carbon::parse($reward->claimed_at)->format('M d, Y h:i A'),
-                        'time_ago' => Carbon::parse($reward->claimed_at)->diffForHumans(),
+                        'date' => $claimedAt->format('M d, Y h:i A'),
+                        'time_ago' => $claimedAt->diffForHumans(),
                         'activity_type' => 'reward', // Add activity type to distinguish from notifications
+                        'sort_timestamp' => $claimedAt->timestamp, // Add for proper sorting
                     ];
                 }
 
-                // Get notifications for challenge completions and approvals
+                // Get badges earned by the user
+                $userBadges = DB::table('user_badges')
+                    ->join('badges', 'user_badges.badge_id', '=', 'badges.id')
+                    ->where('user_badges.user_id', $user->id)
+                    ->orderBy('user_badges.earned_at', 'desc')
+                    ->get();
+
+                foreach ($userBadges as $badge) {
+                    $earnedAt = Carbon::parse($badge->earned_at)->setTimezone('Asia/Manila');
+                    $this->activityHistory[] = [
+                        'id' => 'badge_' . $badge->badge_id,
+                        'points' => 0, // Badges don't give points directly
+                        'type' => 'badge',
+                        'reason' => "Earned badge: {$badge->name}",
+                        'date' => $earnedAt->format('M d, Y h:i A'),
+                        'time_ago' => $earnedAt->diffForHumans(),
+                        'activity_type' => 'badge',
+                        'badge_name' => $badge->name,
+                        'badge_description' => $badge->description,
+                        'badge_image' => $badge->image,
+                        'rarity_level' => $badge->rarity_level,
+                        'sort_timestamp' => $earnedAt->timestamp, // Add for proper sorting
+                    ];
+                }
+
+                // Get achievements earned by the user
+                $userAchievements = DB::table('achievement_user')
+                    ->join('achievements', 'achievement_user.achievement_id', '=', 'achievements.id')
+                    ->where('achievement_user.user_id', $user->id)
+                    ->orderBy('achievement_user.created_at', 'desc')
+                    ->get();
+
+                foreach ($userAchievements as $achievement) {
+                    // Use unlocked_at if available, otherwise fall back to created_at
+                    $timestamp = $achievement->unlocked_at ?? $achievement->created_at;
+                    $unlockedAt = Carbon::parse($timestamp)->setTimezone('Asia/Manila');
+
+                    $this->activityHistory[] = [
+                        'id' => 'achievement_' . $achievement->achievement_id,
+                        'points' => 0, // Achievements don't directly give points in this system
+                        'type' => 'achievement',
+                        'reason' => "Unlocked achievement: {$achievement->name}",
+                        'date' => $unlockedAt->format('M d, Y h:i A'),
+                        'time_ago' => $unlockedAt->diffForHumans(),
+                        'activity_type' => 'achievement',
+                        'achievement_name' => $achievement->name,
+                        'achievement_description' => $achievement->description,
+                        'achievement_image' => $achievement->image,
+                        'sort_timestamp' => $unlockedAt->timestamp, // Add for proper sorting
+                    ];
+                }
+
+                // Get notifications for challenge completions and approvals (including achievements as fallback)
                 $notifications = Notification::where('user_id', $user->id)
                     ->whereIn('type', ['achievement', 'grade', 'challenge'])
                     ->orderBy('created_at', 'desc')
-                    ->take(20)
                     ->get();
 
+                // Keep track of achievement names and reasons we've already added to avoid duplicates
+                $addedAchievements = collect($this->activityHistory)
+                    ->where('activity_type', 'achievement')
+                    ->map(function($item) {
+                        return [
+                            'name' => $item['achievement_name'] ?? '',
+                            'reason' => $item['reason'] ?? '',
+                            'normalized_reason' => strtolower(preg_replace('/[^a-z0-9\s]/i', '', $item['reason'] ?? ''))
+                        ];
+                    })
+                    ->toArray();
+
                 foreach ($notifications as $notification) {
+                    // Skip achievement notifications if we already have them from the direct query
+                    if ($notification->type === 'achievement') {
+                        // Normalize the notification message for comparison
+                        $normalizedNotification = strtolower(preg_replace('/[^a-z0-9\s]/i', '', $notification->message));
+
+                        // Check if this achievement is already in our list
+                        $isDuplicate = false;
+                        foreach ($addedAchievements as $existing) {
+                            // Compare normalized reasons to catch similar messages
+                            if (similar_text($normalizedNotification, $existing['normalized_reason']) > 80) {
+                                $isDuplicate = true;
+                                break;
+                            }
+
+                            // Also check for exact achievement name matches
+                            if (!empty($existing['name'])) {
+                                $achievementNamePattern = '/achievement[:\s]+(.+?)(?:\s*!|$)/i';
+                                if (preg_match($achievementNamePattern, $notification->message, $matches)) {
+                                    $achievementName = trim($matches[1]);
+                                    if (stripos($existing['name'], $achievementName) !== false ||
+                                        stripos($achievementName, $existing['name']) !== false) {
+                                        $isDuplicate = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if ($isDuplicate) {
+                            continue; // Skip this duplicate achievement
+                        }
+                    }
+
                     // Extract points from notification message if available
                     $points = 0;
                     $pointsPattern = '/(\d+) points/i';
@@ -142,26 +240,47 @@ class UserActivityHistoryModal extends Component
                     }
 
                     // Add to activity history
+                    $createdAt = Carbon::parse($notification->created_at)->setTimezone('Asia/Manila');
+                    $activityType = $notification->type === 'achievement' ? 'achievement' : 'notification';
+
                     $this->activityHistory[] = [
                         'id' => 'notif_' . $notification->id, // Prefix to distinguish from other entries
                         'points' => $points,
                         'type' => $displayType,
                         'reason' => $notification->message,
-                        'date' => Carbon::parse($notification->created_at)->format('M d, Y h:i A'),
-                        'time_ago' => Carbon::parse($notification->created_at)->diffForHumans(),
-                        'activity_type' => 'notification', // Add activity type to distinguish from other activities
+                        'date' => $createdAt->format('M d, Y h:i A'),
+                        'time_ago' => $createdAt->diffForHumans(),
+                        'activity_type' => $activityType, // Use 'achievement' for achievement notifications
                         'notification_type' => $notification->type, // Store the original notification type
                         'link' => $notification->link, // Store the link if available
+                        'sort_timestamp' => $createdAt->timestamp, // Add for proper sorting
                     ];
                 }
 
-                // Sort combined history by date (newest first)
+                // Sort combined history by timestamp (newest first) with priority for badges and achievements
                 usort($this->activityHistory, function($a, $b) {
-                    return strtotime($b['date']) - strtotime($a['date']);
+                    $timestampA = $a['sort_timestamp'] ?? strtotime($a['date']);
+                    $timestampB = $b['sort_timestamp'] ?? strtotime($b['date']);
+
+                    // Give slight priority to badges and achievements if they're within 1 hour of other activities
+                    $timeDiff = abs($timestampA - $timestampB);
+                    $oneHour = 3600; // 1 hour in seconds
+
+                    if ($timeDiff <= $oneHour) {
+                        // If activities are within 1 hour of each other, prioritize badges and achievements
+                        $aPriority = (isset($a['activity_type']) && in_array($a['activity_type'], ['badge', 'achievement'])) ? 1 : 0;
+                        $bPriority = (isset($b['activity_type']) && in_array($b['activity_type'], ['badge', 'achievement'])) ? 1 : 0;
+
+                        if ($aPriority !== $bPriority) {
+                            return $bPriority - $aPriority; // Higher priority first
+                        }
+                    }
+
+                    return $timestampB - $timestampA; // Newest first
                 });
 
-                // Limit to 30 entries after combining (increased from 20 to show more history)
-                $this->activityHistory = array_slice($this->activityHistory, 0, 30);
+                // Limit to 50 entries after combining to show more comprehensive history
+                $this->activityHistory = array_slice($this->activityHistory, 0, 50);
             } catch (\Exception $e) {
                 Log::error('Error fetching activity history: ' . $e->getMessage());
             }

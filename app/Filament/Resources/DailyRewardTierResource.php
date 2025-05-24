@@ -146,6 +146,14 @@ class DailyRewardTierResource extends Resource
                     ->label("Times Claimed")
                     ->counts("userRewards")
                     ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->label('Created At'),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->label('Updated At'),
             ])
             ->defaultSort("day_number")
             ->filters([
