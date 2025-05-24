@@ -495,6 +495,36 @@
                                 <span class="text-xs text-gray-500 group-hover:text-emerald-500 transition-colors duration-300">Level {{ $currentLevel }}</span>
                                 <span class="text-xs text-gray-400 group-hover:text-teal-400 transition-colors duration-300">{{ number_format($xpToNextLevel) }} XP to Level {{ $currentLevel + 1 }}</span>
                             </div>
+
+                            @php
+                                // Get the current user's last points earned date and amount for the progress section
+                                $progressLastAudit = \Illuminate\Support\Facades\DB::table('experience_audits')
+                                    ->where('user_id', $user->id)
+                                    ->where('type', 'add')
+                                    ->where('points', '>', 0)
+                                    ->orderBy('created_at', 'desc')
+                                    ->first();
+
+                                $progressLastPointsDate = null;
+                                $progressLastPointsEarned = 0;
+
+                                if ($progressLastAudit) {
+                                    $progressLastPointsDate = \Carbon\Carbon::parse($progressLastAudit->created_at)->setTimezone('Asia/Manila');
+                                    $progressLastPointsEarned = $progressLastAudit->points;
+                                }
+                            @endphp
+
+                            @if($progressLastPointsDate)
+                                <div class="flex justify-center mt-2 pt-2 border-t border-neutral-700/50">
+                                    <div class="text-xs bg-neutral-800/60 px-3 py-1.5 rounded-full border border-neutral-700/50 flex items-center gap-2">
+                                        <div class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                                        <span class="text-white">Last earned: {{ $progressLastPointsDate->format('M j, Y') }}</span>
+                                        @if($progressLastPointsEarned > 0)
+                                            <span class="text-emerald-400 font-medium">+{{ $progressLastPointsEarned }} XP</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
