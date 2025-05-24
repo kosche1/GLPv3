@@ -62,6 +62,14 @@ class LeaderboardCategoryResource extends Resource
                 Tables\Columns\BooleanColumn::make("is_active")->label(
                     "Active"
                 ),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->label('Created At'),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->label('Updated At'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make("metric")->options([
