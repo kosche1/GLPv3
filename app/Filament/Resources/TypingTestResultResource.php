@@ -32,6 +32,10 @@ class TypingTestResultResource extends Resource
                         Forms\Components\TextInput::make('user.name')
                             ->label('Student')
                             ->disabled(),
+                        Forms\Components\TextInput::make('challenge.title')
+                            ->label('Challenge')
+                            ->disabled()
+                            ->default('Free Typing'),
                         Forms\Components\TextInput::make('wpm')
                             ->label('Words Per Minute')
                             ->disabled(),
@@ -63,6 +67,16 @@ class TypingTestResultResource extends Resource
                     ->label('Student')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('challenge.title')
+                    ->label('Challenge')
+                    ->searchable()
+                    ->sortable()
+                    ->default('Free Typing')
+                    ->description(fn (TypingTestResult $record): string =>
+                        $record->challenge
+                            ? "Difficulty: " . ucfirst($record->challenge->difficulty)
+                            : "No specific challenge"
+                    ),
                 Tables\Columns\TextColumn::make('wpm')
                     ->label('WPM')
                     ->numeric()
@@ -95,6 +109,13 @@ class TypingTestResultResource extends Resource
                         'words' => 'Words',
                         'time' => 'Timed',
                     ]),
+                Tables\Filters\SelectFilter::make('challenge')
+                    ->relationship('challenge', 'title')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\Filter::make('free_typing')
+                    ->label('Free Typing Only')
+                    ->query(fn (Builder $query): Builder => $query->whereNull('challenge_id')),
                 Tables\Filters\Filter::make('high_performers')
                     ->label('High Performers')
                     ->query(fn (Builder $query): Builder => $query->where('wpm', '>=', 60)),
@@ -107,7 +128,8 @@ class TypingTestResultResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('created_at', 'desc')
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['user', 'challenge']));
     }
 
     public static function getRelations(): array
