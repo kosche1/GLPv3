@@ -21,7 +21,7 @@ class RecipeTemplateResource extends Resource
 
     protected static ?string $navigationLabel = 'Recipe Challenges';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 7;
 
     public static function form(Form $form): Form
     {

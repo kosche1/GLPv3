@@ -16,12 +16,17 @@ class TypingTestResult extends Model
      */
     protected $fillable = [
         'user_id',
+        'challenge_id',
         'wpm',
         'cpm',
         'accuracy',
         'word_count',
         'test_mode',
         'time_limit',
+        'test_duration',
+        'words_typed',
+        'characters_typed',
+        'errors',
     ];
 
     /**
@@ -30,5 +35,13 @@ class TypingTestResult extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the challenge that this result belongs to.
+     */
+    public function challenge()
+    {
+        return $this->belongsTo(TypingTestChallenge::class, 'challenge_id');
     }
 }

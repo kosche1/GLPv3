@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TypingTestResult;
+use App\Models\TypingTestChallenge;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -16,7 +17,43 @@ class TypingTestController extends Controller
      */
     public function index()
     {
-        return view('typing-test.index');
+        // Get active challenges for the challenge selection
+        $challenges = TypingTestChallenge::where('is_active', true)
+            ->orderBy('difficulty')
+            ->orderBy('test_mode')
+            ->get();
+
+        // Check which challenges the current user has completed successfully
+        $userId = Auth::id();
+        $completedChallengeIds = [];
+
+        if ($userId) {
+            // Get challenges where user met both WPM and accuracy targets
+            $completedChallengeIds = TypingTestResult::where('user_id', $userId)
+                ->whereNotNull('challenge_id')
+                ->get()
+                ->filter(function ($result) {
+                    $challenge = $result->challenge;
+                    if (!$challenge) return false;
+
+                    // Check if user met both targets
+                    $metWpmTarget = $result->wpm >= $challenge->target_wpm;
+                    $metAccuracyTarget = $result->accuracy >= $challenge->target_accuracy;
+
+                    return $metWpmTarget && $metAccuracyTarget;
+                })
+                ->pluck('challenge_id')
+                ->unique()
+                ->toArray();
+        }
+
+        // Add completion status to challenges
+        $challenges = $challenges->map(function ($challenge) use ($completedChallengeIds) {
+            $challenge->is_completed = in_array($challenge->id, $completedChallengeIds);
+            return $challenge;
+        });
+
+        return view('typing-test.index', compact('challenges'));
     }
 
     /**
@@ -28,9 +65,28 @@ class TypingTestController extends Controller
     public function getWords(Request $request)
     {
         $count = $request->input('count', 25);
+        $challengeId = $request->input('challenge_id');
 
         try {
-            // Get words from the word bank file
+            // If a challenge is specified, use its word list
+            if ($challengeId) {
+                $challenge = TypingTestChallenge::find($challengeId);
+                if ($challenge && $challenge->word_list) {
+                    // Use the challenge's custom word list
+                    $words = $challenge->word_list;
+
+                    // Get random words from the challenge's word list
+                    $randomWords = [];
+                    for ($i = 0; $i < $count; $i++) {
+                        $randomIndex = array_rand($words);
+                        $randomWords[] = $words[$randomIndex];
+                    }
+
+                    return response()->json($randomWords);
+                }
+            }
+
+            // Default behavior: Get words from the word bank file
             if (file_exists(resource_path('word-banks/english.txt'))) {
                 $wordBank = file_get_contents(resource_path('word-banks/english.txt'));
                 $words = explode("\n", $wordBank);
@@ -84,40 +140,163 @@ class TypingTestController extends Controller
      */
     public function saveResult(Request $request)
     {
-        $request->validate([
-            'wpm' => 'required|numeric',
-            'cpm' => 'required|numeric',
-            'accuracy' => 'required|numeric',
-            'word_count' => 'required|numeric',
-            'test_mode' => 'required|string|in:words,time',
-            'time_limit' => 'nullable|numeric',
-        ]);
+        try {
+            $request->validate([
+                'wpm' => 'required|numeric|min:0',
+                'cpm' => 'required|numeric|min:0',
+                'accuracy' => 'required|numeric|min:0|max:100',
+                'word_count' => 'required|numeric|min:0',
+                'test_mode' => 'required|string|in:words,time',
+                'time_limit' => 'nullable|numeric|min:1',
+                'test_duration' => 'nullable|numeric|min:1',
+                'characters_typed' => 'nullable|numeric|min:0',
+                'errors' => 'nullable|numeric|min:0',
+                'challenge_id' => 'nullable|exists:typing_test_challenges,id',
+            ]);
 
-        $result = new TypingTestResult();
-        $result->user_id = Auth::id();
-        $result->wpm = $request->wpm;
-        $result->cpm = $request->cpm;
-        $result->accuracy = $request->accuracy;
-        $result->word_count = $request->word_count;
-        $result->test_mode = $request->test_mode;
-        $result->time_limit = $request->time_limit;
-        $result->save();
+            // Save all results to database, but mark free typing differently
+            $result = new TypingTestResult();
+            $result->user_id = Auth::id();
+            $result->challenge_id = $request->challenge_id; // Will be null for free typing
+            $result->wpm = $request->wpm;
+            $result->cpm = $request->cpm;
+            $result->accuracy = $request->accuracy;
+            $result->word_count = $request->word_count;
+            $result->test_mode = $request->test_mode;
+            $result->time_limit = $request->time_limit;
+            $result->test_duration = $request->test_duration ?? $request->time_limit;
+            $result->words_typed = $request->word_count;
+            $result->characters_typed = $request->characters_typed ?? 0;
+            $result->errors = $request->errors ?? 0;
+            $result->save();
 
-        return response()->json(['success' => true, 'result_id' => $result->id]);
+            if ($request->challenge_id) {
+                Log::info('Typing test challenge result saved successfully', [
+                    'user_id' => Auth::id(),
+                    'result_id' => $result->id,
+                    'challenge_id' => $result->challenge_id,
+                    'wpm' => $result->wpm,
+                    'accuracy' => $result->accuracy
+                ]);
+
+                return response()->json(['success' => true, 'result_id' => $result->id, 'type' => 'challenge']);
+            } else {
+                Log::info('Free typing result saved to database (not visible in admin panel)', [
+                    'user_id' => Auth::id(),
+                    'result_id' => $result->id,
+                    'wpm' => $result->wpm,
+                    'accuracy' => $result->accuracy,
+                    'test_mode' => $result->test_mode
+                ]);
+
+                return response()->json(['success' => true, 'result_id' => $result->id, 'type' => 'free_typing']);
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error saving typing test result', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('Error saving typing test result', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Failed to save result: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Get challenge details by ID.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getChallenge(Request $request)
+    {
+        $challengeId = $request->input('challenge_id');
+
+        if (!$challengeId) {
+            return response()->json(['error' => 'Challenge ID is required'], 400);
+        }
+
+        $challenge = TypingTestChallenge::where('id', $challengeId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$challenge) {
+            return response()->json(['error' => 'Challenge not found'], 404);
+        }
+
+        return response()->json($challenge);
     }
 
     /**
      * Get typing test history for the current user.
+     * Includes both challenge results and free typing results from database
      *
      * @return \Illuminate\Http\Response
      */
     public function getHistory()
     {
-        $history = TypingTestResult::where('user_id', Auth::id())
+        // Get all results from database (both challenges and free typing)
+        $allResults = TypingTestResult::where('user_id', Auth::id())
+            ->with('challenge:id,title,difficulty')
             ->orderBy('created_at', 'desc')
-            ->limit(10)
+            ->limit(20) // Increased limit since we're showing both types
             ->get();
 
-        return response()->json($history);
+        return response()->json($allResults);
     }
+
+    /**
+     * Delete a free typing result for the current user
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteFreeTypingResult($id)
+    {
+        try {
+            // Find the result and ensure it belongs to the current user and is free typing
+            $result = TypingTestResult::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->whereNull('challenge_id') // Only allow deletion of free typing results
+                ->first();
+
+            if (!$result) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Free typing result not found or you do not have permission to delete it.'
+                ], 404);
+            }
+
+            $result->delete();
+
+            Log::info('Free typing result deleted by user', [
+                'user_id' => Auth::id(),
+                'result_id' => $id,
+                'wpm' => $result->wpm,
+                'accuracy' => $result->accuracy
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Free typing result deleted successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error deleting free typing result', [
+                'user_id' => Auth::id(),
+                'result_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while deleting the result.'
+            ], 500);
+        }
+    }
+
 }

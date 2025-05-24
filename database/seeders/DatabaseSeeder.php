@@ -64,6 +64,9 @@ class DatabaseSeeder extends Seeder
             // ICT Computer Programming
             IctComputerProgrammingSeeder::class,
 
+            // Typing Speed Challenges
+            TypingSpeedChallengeSeeder::class,
+
             // Recipe Builder Game
             RecipeIngredientsSeeder::class,
             RecipeTemplatesSeeder::class,

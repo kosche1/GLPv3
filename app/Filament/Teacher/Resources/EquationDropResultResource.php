@@ -21,7 +21,7 @@ class EquationDropResultResource extends Resource
 
     protected static ?string $navigationLabel = 'Equation Drop Results';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 6;
 
     public static function form(Form $form): Form
     {
@@ -114,8 +114,8 @@ class EquationDropResultResource extends Resource
                     ->numeric(2)
                     ->suffix('%')
                     ->sortable()
-                    ->color(fn (string $state): string => 
-                        floatval($state) >= 80 ? 'success' : 
+                    ->color(fn (string $state): string =>
+                        floatval($state) >= 80 ? 'success' :
                         (floatval($state) >= 50 ? 'warning' : 'danger')
                     ),
                 Tables\Columns\IconColumn::make('completed')

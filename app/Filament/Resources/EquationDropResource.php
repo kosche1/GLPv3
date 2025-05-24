@@ -22,7 +22,7 @@ class EquationDropResource extends Resource
 
     protected static ?string $navigationLabel = 'Equation Drop';
 
-    protected static ?int $navigationSort = 4; // After InvestSmart
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {

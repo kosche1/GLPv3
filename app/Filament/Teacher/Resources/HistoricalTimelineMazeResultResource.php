@@ -21,7 +21,7 @@ class HistoricalTimelineMazeResultResource extends Resource
 
     protected static ?string $navigationLabel = 'Historical Timeline Maze Results';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 10;
 
     public static function form(Form $form): Form
     {
