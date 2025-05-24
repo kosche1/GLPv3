@@ -387,10 +387,10 @@ Route::post('/verify-password', [\App\Http\Controllers\PasswordVerificationContr
 
 // Audit Trail Print Routes
 Route::get('/admin/audit-trails/{record}/print-view', [\App\Http\Controllers\AuditTrailPrintController::class, 'printRecord'])
-    ->middleware('auth')
+    ->middleware(['auth:admin'])
     ->name('audit-trails.print-view');
 Route::get('/admin/audit-trails/bulk-print/{batchId}', [\App\Http\Controllers\AuditTrailPrintController::class, 'printBulk'])
-    ->middleware('auth')
+    ->middleware(['auth:admin'])
     ->name('audit-trails.bulk-print-view');
 
 
