@@ -38,32 +38,58 @@
                             <div class="flex flex-wrap justify-center gap-3 mb-4">
                                 @if($challenges->count() > 0)
                                     @foreach($challenges as $challenge)
-                                        <button
-                                            class="challenge-btn px-5 py-3 rounded-md {{ $loop->first ? 'bg-blue-600' : 'bg-gray-600' }} text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base border-2 border-transparent hover:border-blue-300"
-                                            data-challenge-id="{{ $challenge->id }}"
-                                            data-test-mode="{{ $challenge->test_mode }}"
-                                            data-word-count="{{ $challenge->word_count }}"
-                                            data-time-limit="{{ $challenge->time_limit }}"
-                                            data-target-wpm="{{ $challenge->target_wpm }}"
-                                            data-target-accuracy="{{ $challenge->target_accuracy }}"
-                                            data-points="{{ $challenge->points_reward }}"
-
-                                        >
-                                            <div class="text-center">
-                                                <div class="font-bold">{{ $challenge->title }}</div>
-                                                <div class="text-xs opacity-90">
-                                                    {{ ucfirst($challenge->difficulty) }} •
-                                                    @if($challenge->test_mode === 'words')
-                                                        {{ $challenge->word_count }} words • {{ $challenge->time_limit }}s timer
-                                                    @else
-                                                        {{ $challenge->time_limit }}s timer
-                                                    @endif
+                                        @if($challenge->is_completed)
+                                            <!-- Completed Challenge (Locked) -->
+                                            <div class="challenge-btn px-5 py-3 rounded-md bg-gray-600 text-white font-medium shadow-md text-base border-2 border-gray-400 cursor-not-allowed relative">
+                                                <div class="text-center">
+                                                    <div class="font-bold">{{ $challenge->title }}</div>
+                                                    <div class="text-xs opacity-90">
+                                                        {{ ucfirst($challenge->difficulty) }} •
+                                                        @if($challenge->test_mode === 'words')
+                                                            {{ $challenge->word_count }} words • {{ $challenge->time_limit }}s timer
+                                                        @else
+                                                            {{ $challenge->time_limit }}s timer
+                                                        @endif
+                                                    </div>
+                                                    <div class="text-xs opacity-75">
+                                                        Target: {{ $challenge->target_wpm }} WPM, {{ $challenge->target_accuracy }}% ACC
+                                                    </div>
                                                 </div>
-                                                <div class="text-xs opacity-75">
-                                                    Target: {{ $challenge->target_wpm }} WPM, {{ $challenge->target_accuracy }}% ACC
+                                                <!-- Lock Icon -->
+                                                <div class="absolute top-2 right-2">
+                                                    <svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                                                    </svg>
                                                 </div>
                                             </div>
-                                        </button>
+                                        @else
+                                            <!-- Available Challenge -->
+                                            <button
+                                                class="challenge-btn px-5 py-3 rounded-md {{ $loop->first && !$challenges->where('is_completed', false)->first() ? 'bg-blue-600' : 'bg-gray-600' }} text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base border-2 border-transparent hover:border-blue-300"
+                                                data-challenge-id="{{ $challenge->id }}"
+                                                data-test-mode="{{ $challenge->test_mode }}"
+                                                data-word-count="{{ $challenge->word_count }}"
+                                                data-time-limit="{{ $challenge->time_limit }}"
+                                                data-target-wpm="{{ $challenge->target_wpm }}"
+                                                data-target-accuracy="{{ $challenge->target_accuracy }}"
+                                                data-points="{{ $challenge->points_reward }}"
+                                            >
+                                                <div class="text-center">
+                                                    <div class="font-bold">{{ $challenge->title }}</div>
+                                                    <div class="text-xs opacity-90">
+                                                        {{ ucfirst($challenge->difficulty) }} •
+                                                        @if($challenge->test_mode === 'words')
+                                                            {{ $challenge->word_count }} words • {{ $challenge->time_limit }}s timer
+                                                        @else
+                                                            {{ $challenge->time_limit }}s timer
+                                                        @endif
+                                                    </div>
+                                                    <div class="text-xs opacity-75">
+                                                        Target: {{ $challenge->target_wpm }} WPM, {{ $challenge->target_accuracy }}% ACC
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        @endif
                                     @endforeach
                                 @else
                                     <div class="text-center text-gray-500 dark:text-gray-400">
@@ -375,9 +401,10 @@
             const challengesSection = document.getElementById('challenges-section');
             const freeTypingSection = document.getElementById('free-typing-section');
 
-            // Initialize with first challenge if available
-            if (challengeButtons.length > 0) {
-                selectChallenge(challengeButtons[0]);
+            // Initialize with first available challenge if available
+            const availableChallengeButtons = Array.from(challengeButtons).filter(btn => btn.tagName === 'BUTTON');
+            if (availableChallengeButtons.length > 0) {
+                selectChallenge(availableChallengeButtons[0]);
             }
 
             // Load history
@@ -401,12 +428,15 @@
                 switchToTab('free-typing');
             });
 
-            // Challenge selection
+            // Challenge selection (only for available challenges)
             challengeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    selectChallenge(this);
-                    restart();
-                });
+                // Only add click listeners to actual buttons (not completed challenge divs)
+                if (button.tagName === 'BUTTON') {
+                    button.addEventListener('click', function() {
+                        selectChallenge(this);
+                        restart();
+                    });
+                }
             });
 
             // Free typing time selection
@@ -431,9 +461,10 @@
                     challengesSection.classList.remove('hidden');
                     freeTypingSection.classList.add('hidden');
 
-                    // Initialize with first challenge if available
-                    if (challengeButtons.length > 0) {
-                        selectChallenge(challengeButtons[0]);
+                    // Initialize with first available challenge if available
+                    const availableButtons = Array.from(challengeButtons).filter(btn => btn.tagName === 'BUTTON');
+                    if (availableButtons.length > 0) {
+                        selectChallenge(availableButtons[0]);
                     }
                 } else {
                     // Update tab styles
@@ -457,13 +488,17 @@
             function selectChallenge(button) {
                 currentMode = 'challenges';
 
-                // Update button styles
+                // Update button styles (only for actual buttons, not completed challenge divs)
                 challengeButtons.forEach(btn => {
-                    btn.classList.remove('bg-blue-600');
-                    btn.classList.add('bg-gray-600');
+                    if (btn.tagName === 'BUTTON') {
+                        btn.classList.remove('bg-blue-600');
+                        btn.classList.add('bg-gray-600');
+                    }
                 });
-                button.classList.remove('bg-gray-600');
-                button.classList.add('bg-blue-600');
+                if (button.tagName === 'BUTTON') {
+                    button.classList.remove('bg-gray-600');
+                    button.classList.add('bg-blue-600');
+                }
 
                 // Get challenge data
                 challengeId = button.dataset.challengeId;

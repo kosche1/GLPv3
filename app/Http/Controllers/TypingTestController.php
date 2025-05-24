@@ -23,6 +23,36 @@ class TypingTestController extends Controller
             ->orderBy('test_mode')
             ->get();
 
+        // Check which challenges the current user has completed successfully
+        $userId = Auth::id();
+        $completedChallengeIds = [];
+
+        if ($userId) {
+            // Get challenges where user met both WPM and accuracy targets
+            $completedChallengeIds = TypingTestResult::where('user_id', $userId)
+                ->whereNotNull('challenge_id')
+                ->get()
+                ->filter(function ($result) {
+                    $challenge = $result->challenge;
+                    if (!$challenge) return false;
+
+                    // Check if user met both targets
+                    $metWpmTarget = $result->wpm >= $challenge->target_wpm;
+                    $metAccuracyTarget = $result->accuracy >= $challenge->target_accuracy;
+
+                    return $metWpmTarget && $metAccuracyTarget;
+                })
+                ->pluck('challenge_id')
+                ->unique()
+                ->toArray();
+        }
+
+        // Add completion status to challenges
+        $challenges = $challenges->map(function ($challenge) use ($completedChallengeIds) {
+            $challenge->is_completed = in_array($challenge->id, $completedChallengeIds);
+            return $challenge;
+        });
+
         return view('typing-test.index', compact('challenges'));
     }
 
