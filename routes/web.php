@@ -211,6 +211,7 @@ Route::middleware(
     Route::get('typing-test/challenge', [\App\Http\Controllers\TypingTestController::class, 'getChallenge'])->name('typing-test.challenge');
     Route::post('typing-test/save-result', [\App\Http\Controllers\TypingTestController::class, 'saveResult'])->name('typing-test.save-result');
     Route::get('typing-test/history', [\App\Http\Controllers\TypingTestController::class, 'getHistory'])->name('typing-test.history');
+    Route::delete('typing-test/free-typing/{id}', [\App\Http\Controllers\TypingTestController::class, 'deleteFreeTypingResult'])->name('typing-test.delete-free-typing');
 
     // Recipe Builder routes
     Route::get('recipe-builder', [\App\Http\Controllers\RecipeBuilderController::class, 'index'])->name('recipe-builder');

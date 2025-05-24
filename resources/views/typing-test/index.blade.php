@@ -233,6 +233,7 @@
                                         <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Accuracy</th>
                                         <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Words</th>
                                         <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Mode</th>
+                                        <th class="py-4 px-6 border-b border-gray-300 dark:border-gray-600 text-left font-bold text-gray-700 dark:text-gray-200">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="free-typing-history-table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -241,6 +242,82 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alpine.js Delete Confirmation Modal -->
+    <div x-data="{
+        showDeleteModal: false,
+        resultToDelete: null,
+        deleteResult() {
+            if (this.resultToDelete) {
+                performDeleteFreeTypingResult(this.resultToDelete);
+                this.showDeleteModal = false;
+                this.resultToDelete = null;
+            }
+        },
+        cancelDelete() {
+            this.showDeleteModal = false;
+            this.resultToDelete = null;
+        }
+    }"
+    x-show="showDeleteModal"
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    class="fixed inset-0 z-50 overflow-y-auto"
+    style="display: none;">
+
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" @click="cancelDelete()"></div>
+
+        <!-- Modal content -->
+        <div class="flex items-center justify-center min-h-screen px-4 py-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg px-6 py-6 text-left overflow-hidden shadow-xl transform transition-all max-w-lg w-full mx-auto"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 scale-95">
+
+                <!-- Icon -->
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900">
+                    <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                </div>
+
+                <!-- Content -->
+                <div class="mt-3 text-center sm:mt-5">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                        Delete Free Typing Result
+                    </h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            Are you sure you want to delete this free typing result? This action cannot be undone and will permanently remove this practice session from your history.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-6 flex flex-col-reverse sm:flex-row justify-center gap-3">
+                    <button @click="cancelDelete()"
+                            class="w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-2.5 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                        Cancel
+                    </button>
+                    <button @click="deleteResult()"
+                            class="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-6 py-2.5 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Delete
+                    </button>
                 </div>
             </div>
         </div>
@@ -1050,7 +1127,7 @@
                         if (freeTypingResults.length === 0) {
                             const emptyRow = document.createElement('tr');
                             emptyRow.innerHTML = `
-                                <td colspan="6" class="py-6 px-6 text-center text-gray-500 dark:text-gray-400 italic text-lg">No free typing sessions yet. Try the free typing mode to practice!</td>
+                                <td colspan="7" class="py-6 px-6 text-center text-gray-500 dark:text-gray-400 italic text-lg">No free typing sessions yet. Try the free typing mode to practice!</td>
                             `;
                             freeTypingTableBody.appendChild(emptyRow);
                         } else {
@@ -1071,6 +1148,15 @@
                                     <td class="py-4 px-6 font-medium text-purple-600 dark:text-purple-400">${item.accuracy}%</td>
                                     <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${item.word_count}</td>
                                     <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${modeDisplay}</td>
+                                    <td class="py-4 px-6">
+                                        <button onclick="showDeleteConfirmation(${item.id})"
+                                                class="inline-flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                            Delete
+                                        </button>
+                                    </td>
                                 `;
                                 freeTypingTableBody.appendChild(row);
                             });
@@ -1151,6 +1237,43 @@
                     document.body.removeChild(notification);
                 }, 300);
             }, 3000);
+        }
+
+        // Function to show delete confirmation modal
+        function showDeleteConfirmation(resultId) {
+            // Get the Alpine.js component
+            const modalComponent = document.querySelector('[x-data*="showDeleteModal"]');
+            if (modalComponent) {
+                // Access Alpine.js data
+                const alpineData = Alpine.$data(modalComponent);
+                alpineData.resultToDelete = resultId;
+                alpineData.showDeleteModal = true;
+            }
+        }
+
+        // Function to actually perform the deletion (called from Alpine.js)
+        function performDeleteFreeTypingResult(resultId) {
+            fetch(`{{ url('typing-test/free-typing') }}/${resultId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Free typing result deleted successfully.', 'success');
+                    // Refresh the history to remove the deleted item
+                    loadHistoryFromDatabase();
+                } else {
+                    showNotification(data.message || 'Failed to delete result.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting result:', error);
+                showNotification('An error occurred while deleting the result.', 'error');
+            });
         }
     </script>
 

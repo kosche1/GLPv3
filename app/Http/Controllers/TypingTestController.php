@@ -219,5 +219,54 @@ class TypingTestController extends Controller
         return response()->json($allResults);
     }
 
+    /**
+     * Delete a free typing result for the current user
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteFreeTypingResult($id)
+    {
+        try {
+            // Find the result and ensure it belongs to the current user and is free typing
+            $result = TypingTestResult::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->whereNull('challenge_id') // Only allow deletion of free typing results
+                ->first();
+
+            if (!$result) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Free typing result not found or you do not have permission to delete it.'
+                ], 404);
+            }
+
+            $result->delete();
+
+            Log::info('Free typing result deleted by user', [
+                'user_id' => Auth::id(),
+                'result_id' => $id,
+                'wpm' => $result->wpm,
+                'accuracy' => $result->accuracy
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Free typing result deleted successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error deleting free typing result', [
+                'user_id' => Auth::id(),
+                'result_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while deleting the result.'
+            ], 500);
+        }
+    }
 
 }
