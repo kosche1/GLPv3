@@ -7,8 +7,22 @@
                     <p class="text-center mb-8 text-gray-700 dark:text-gray-300 text-lg max-w-3xl mx-auto">Improve your typing speed and accuracy with this typing test. Type the words as they appear and see your results.</p>
 
                     <div class="mb-8">
-                        <!-- Challenge Selection -->
-                        <div class="mb-8">
+                        <!-- Mode Selection Tabs -->
+                        <div class="mb-6">
+                            <div class="flex justify-center mb-4">
+                                <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-1 flex">
+                                    <button id="challenges-tab" class="tab-btn px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 bg-blue-600 text-white">
+                                        Challenges
+                                    </button>
+                                    <button id="free-typing-tab" class="tab-btn px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                                        Free Typing
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Challenges Section -->
+                        <div id="challenges-section" class="mb-8">
                             <h3 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">Select a Challenge</h3>
                             <div class="flex flex-wrap justify-center gap-3 mb-4">
                                 @if($challenges->count() > 0)
@@ -46,6 +60,45 @@
                                         <p class="text-sm">Please check back later or contact your teacher.</p>
                                     </div>
                                 @endif
+                            </div>
+                        </div>
+
+                        <!-- Free Typing Section -->
+                        <div id="free-typing-section" class="mb-8 hidden">
+                            <h3 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">Free Typing Mode</h3>
+                            <p class="text-center text-gray-600 dark:text-gray-400 mb-4">Practice typing without targets - just focus on speed and accuracy!</p>
+
+                            <div class="flex flex-wrap justify-center gap-3 mb-4">
+                                <button class="free-time-btn px-5 py-3 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base border-2 border-transparent hover:border-blue-300" data-time="10">
+                                    <div class="text-center">
+                                        <div class="font-bold">10 Seconds</div>
+                                        <div class="text-xs opacity-90">Quick Sprint</div>
+                                    </div>
+                                </button>
+                                <button class="free-time-btn px-5 py-3 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base border-2 border-transparent hover:border-blue-300" data-time="15">
+                                    <div class="text-center">
+                                        <div class="font-bold">15 Seconds</div>
+                                        <div class="text-xs opacity-90">Speed Burst</div>
+                                    </div>
+                                </button>
+                                <button class="free-time-btn px-5 py-3 rounded-md bg-blue-600 text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base border-2 border-transparent hover:border-blue-300" data-time="30">
+                                    <div class="text-center">
+                                        <div class="font-bold">30 Seconds</div>
+                                        <div class="text-xs opacity-90">Standard Test</div>
+                                    </div>
+                                </button>
+                                <button class="free-time-btn px-5 py-3 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base border-2 border-transparent hover:border-blue-300" data-time="60">
+                                    <div class="text-center">
+                                        <div class="font-bold">60 Seconds</div>
+                                        <div class="text-xs opacity-90">One Minute</div>
+                                    </div>
+                                </button>
+                                <button class="free-time-btn px-5 py-3 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base border-2 border-transparent hover:border-blue-300" data-time="120">
+                                    <div class="text-center">
+                                        <div class="font-bold">120 Seconds</div>
+                                        <div class="text-xs opacity-90">Endurance</div>
+                                    </div>
+                                </button>
                             </div>
                         </div>
 
@@ -180,6 +233,7 @@
             let statsUpdateInterval;
             let selectedChallenge = null;
             let challengeId = null;
+            let currentMode = 'challenges'; // 'challenges' or 'free-typing'
 
             const wordContainer = document.getElementById("word-container");
             const inputField = document.getElementById('input-field');
@@ -187,9 +241,16 @@
             const restartButton = document.getElementById("restart-button");
             const saveResultButton = document.getElementById("save-result-button");
             const challengeButtons = document.querySelectorAll('.challenge-btn');
+            const freeTimeButtons = document.querySelectorAll('.free-time-btn');
             const challengeInfo = document.getElementById('challenge-info');
             const timerContainer = document.getElementById('timer-container');
             const timerDisplay = document.getElementById('timer-display');
+
+            // Tab elements
+            const challengesTab = document.getElementById('challenges-tab');
+            const freeTypingTab = document.getElementById('free-typing-tab');
+            const challengesSection = document.getElementById('challenges-section');
+            const freeTypingSection = document.getElementById('free-typing-section');
 
             // Initialize with first challenge if available
             if (challengeButtons.length > 0) {
@@ -208,6 +269,15 @@
                 saveResult();
             });
 
+            // Tab switching
+            challengesTab.addEventListener('click', function() {
+                switchToTab('challenges');
+            });
+
+            freeTypingTab.addEventListener('click', function() {
+                switchToTab('free-typing');
+            });
+
             // Challenge selection
             challengeButtons.forEach(button => {
                 button.addEventListener('click', function() {
@@ -216,7 +286,54 @@
                 });
             });
 
+            // Free typing time selection
+            freeTimeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    selectFreeTypingTime(this);
+                    restart();
+                });
+            });
+
+            function switchToTab(mode) {
+                currentMode = mode;
+
+                if (mode === 'challenges') {
+                    // Update tab styles
+                    challengesTab.classList.add('bg-blue-600', 'text-white');
+                    challengesTab.classList.remove('text-gray-600', 'dark:text-gray-400');
+                    freeTypingTab.classList.remove('bg-blue-600', 'text-white');
+                    freeTypingTab.classList.add('text-gray-600', 'dark:text-gray-400');
+
+                    // Show/hide sections
+                    challengesSection.classList.remove('hidden');
+                    freeTypingSection.classList.add('hidden');
+
+                    // Initialize with first challenge if available
+                    if (challengeButtons.length > 0) {
+                        selectChallenge(challengeButtons[0]);
+                    }
+                } else {
+                    // Update tab styles
+                    freeTypingTab.classList.add('bg-blue-600', 'text-white');
+                    freeTypingTab.classList.remove('text-gray-600', 'dark:text-gray-400');
+                    challengesTab.classList.remove('bg-blue-600', 'text-white');
+                    challengesTab.classList.add('text-gray-600', 'dark:text-gray-400');
+
+                    // Show/hide sections
+                    freeTypingSection.classList.remove('hidden');
+                    challengesSection.classList.add('hidden');
+
+                    // Initialize with 30 seconds (default)
+                    const defaultButton = document.querySelector('.free-time-btn[data-time="30"]');
+                    if (defaultButton) {
+                        selectFreeTypingTime(defaultButton);
+                    }
+                }
+            }
+
             function selectChallenge(button) {
+                currentMode = 'challenges';
+
                 // Update button styles
                 challengeButtons.forEach(btn => {
                     btn.classList.remove('bg-blue-600');
@@ -246,22 +363,63 @@
                 updateChallengeInfo();
             }
 
+            function selectFreeTypingTime(button) {
+                currentMode = 'free-typing';
+
+                // Update button styles
+                freeTimeButtons.forEach(btn => {
+                    btn.classList.remove('bg-blue-600');
+                    btn.classList.add('bg-gray-600');
+                });
+                button.classList.remove('bg-gray-600');
+                button.classList.add('bg-blue-600');
+
+                // Set free typing data
+                challengeId = null; // No challenge ID for free typing
+                testMode = 'time'; // Always time-based for free typing
+                WordCount = 0; // No word count limit
+                timeLimit = parseInt(button.dataset.time);
+
+                selectedChallenge = {
+                    id: null,
+                    name: `Free Typing - ${timeLimit}s`,
+                    mode: 'time',
+                    wordCount: 0,
+                    timeLimit: timeLimit,
+                    targetWpm: null,
+                    targetAccuracy: null,
+                    points: null
+                };
+
+                // Update challenge info display
+                updateChallengeInfo();
+            }
+
             function updateChallengeInfo() {
                 if (!selectedChallenge) return;
 
                 document.getElementById('challenge-name').textContent = selectedChallenge.name;
-                document.getElementById('challenge-mode').textContent = selectedChallenge.mode === 'words' ? 'Word Count' : 'Timed Test';
 
-                // Update duration display - show both word count and timer for word-based challenges
-                if (selectedChallenge.mode === 'words') {
-                    document.getElementById('challenge-duration').textContent = `${selectedChallenge.wordCount} words in ${formatTime(selectedChallenge.timeLimit)}`;
-                } else {
+                if (currentMode === 'free-typing') {
+                    document.getElementById('challenge-mode').textContent = 'Free Typing';
                     document.getElementById('challenge-duration').textContent = formatTime(selectedChallenge.timeLimit);
-                }
+                    document.getElementById('challenge-wpm').textContent = 'No Target';
+                    document.getElementById('challenge-accuracy').textContent = 'No Target';
+                    document.getElementById('challenge-points').textContent = 'No Points';
+                } else {
+                    document.getElementById('challenge-mode').textContent = selectedChallenge.mode === 'words' ? 'Word Count' : 'Timed Test';
 
-                document.getElementById('challenge-wpm').textContent = selectedChallenge.targetWpm + ' WPM';
-                document.getElementById('challenge-accuracy').textContent = selectedChallenge.targetAccuracy + '%';
-                document.getElementById('challenge-points').textContent = selectedChallenge.points + ' pts';
+                    // Update duration display - show both word count and timer for word-based challenges
+                    if (selectedChallenge.mode === 'words') {
+                        document.getElementById('challenge-duration').textContent = `${selectedChallenge.wordCount} words in ${formatTime(selectedChallenge.timeLimit)}`;
+                    } else {
+                        document.getElementById('challenge-duration').textContent = formatTime(selectedChallenge.timeLimit);
+                    }
+
+                    document.getElementById('challenge-wpm').textContent = selectedChallenge.targetWpm + ' WPM';
+                    document.getElementById('challenge-accuracy').textContent = selectedChallenge.targetAccuracy + '%';
+                    document.getElementById('challenge-points').textContent = selectedChallenge.points + ' pts';
+                }
 
                 challengeInfo.classList.remove('hidden');
             }
@@ -749,9 +907,14 @@
                 newRow.className = 'hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150';
 
                 // Determine mode display
-                let modeDisplay = testMode === 'time' ? `${formatTime(timeLimit)} Timer` : `${enteredWords} Words in ${formatTime(timeLimit)}`;
-                if (selectedChallenge) {
-                    modeDisplay = `${selectedChallenge.name} (${modeDisplay})`;
+                let modeDisplay;
+                if (currentMode === 'free-typing') {
+                    modeDisplay = `Free Typing (${formatTime(timeLimit)})`;
+                } else {
+                    modeDisplay = testMode === 'time' ? `${formatTime(timeLimit)} Timer` : `${enteredWords} Words in ${formatTime(timeLimit)}`;
+                    if (selectedChallenge && selectedChallenge.name) {
+                        modeDisplay = `${selectedChallenge.name} (${modeDisplay})`;
+                    }
                 }
 
                 newRow.innerHTML = `
@@ -1036,6 +1199,37 @@
         }
 
         .challenge-btn.bg-gray-600 {
+            background: linear-gradient(135deg, #6B7280, #4B5563);
+        }
+
+        /* Tab button styling */
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Free typing button styling */
+        .free-time-btn {
+            min-width: 120px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .free-time-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .free-time-btn.bg-blue-600 {
+            background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+            border-color: #1D4ED8;
+        }
+
+        .free-time-btn.bg-gray-600 {
             background: linear-gradient(135deg, #6B7280, #4B5563);
         }
     </style>
