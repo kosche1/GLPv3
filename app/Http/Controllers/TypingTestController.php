@@ -110,28 +110,56 @@ class TypingTestController extends Controller
      */
     public function saveResult(Request $request)
     {
-        $request->validate([
-            'wpm' => 'required|numeric',
-            'cpm' => 'required|numeric',
-            'accuracy' => 'required|numeric',
-            'word_count' => 'required|numeric',
-            'test_mode' => 'required|string|in:words,time',
-            'time_limit' => 'nullable|numeric',
-            'challenge_id' => 'nullable|exists:typing_test_challenges,id',
-        ]);
+        try {
+            $request->validate([
+                'wpm' => 'required|numeric|min:0',
+                'cpm' => 'required|numeric|min:0',
+                'accuracy' => 'required|numeric|min:0|max:100',
+                'word_count' => 'required|numeric|min:0',
+                'test_mode' => 'required|string|in:words,time',
+                'time_limit' => 'nullable|numeric|min:1',
+                'test_duration' => 'nullable|numeric|min:1',
+                'characters_typed' => 'nullable|numeric|min:0',
+                'errors' => 'nullable|numeric|min:0',
+                'challenge_id' => 'nullable|exists:typing_test_challenges,id',
+            ]);
 
-        $result = new TypingTestResult();
-        $result->user_id = Auth::id();
-        $result->challenge_id = $request->challenge_id;
-        $result->wpm = $request->wpm;
-        $result->cpm = $request->cpm;
-        $result->accuracy = $request->accuracy;
-        $result->word_count = $request->word_count;
-        $result->test_mode = $request->test_mode;
-        $result->time_limit = $request->time_limit;
-        $result->save();
+            $result = new TypingTestResult();
+            $result->user_id = Auth::id();
+            $result->challenge_id = $request->challenge_id;
+            $result->wpm = $request->wpm;
+            $result->cpm = $request->cpm;
+            $result->accuracy = $request->accuracy;
+            $result->word_count = $request->word_count;
+            $result->test_mode = $request->test_mode;
+            $result->time_limit = $request->time_limit;
+            $result->test_duration = $request->test_duration ?? $request->time_limit;
+            $result->words_typed = $request->word_count;
+            $result->characters_typed = $request->characters_typed ?? 0;
+            $result->errors = $request->errors ?? 0;
+            $result->save();
 
-        return response()->json(['success' => true, 'result_id' => $result->id]);
+            Log::info('Typing test result saved successfully', [
+                'user_id' => Auth::id(),
+                'result_id' => $result->id,
+                'wpm' => $result->wpm,
+                'accuracy' => $result->accuracy
+            ]);
+
+            return response()->json(['success' => true, 'result_id' => $result->id]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error saving typing test result', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            Log::error('Error saving typing test result', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Failed to save result: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -167,7 +195,7 @@ class TypingTestController extends Controller
     public function getHistory()
     {
         $history = TypingTestResult::where('user_id', Auth::id())
-            ->with('challenge:id,name,difficulty')
+            ->with('challenge:id,title,difficulty')
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();

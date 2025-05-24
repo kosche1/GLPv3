@@ -350,13 +350,13 @@
 
                 selectedChallenge = {
                     id: challengeId,
-                    name: button.querySelector('.font-bold').textContent,
+                    title: button.querySelector('.font-bold').textContent,
                     mode: testMode,
                     wordCount: WordCount,
                     timeLimit: timeLimit,
                     targetWpm: parseInt(button.dataset.targetWpm),
                     targetAccuracy: parseInt(button.dataset.targetAccuracy),
-                    points: parseInt(button.dataset.points)
+                    points_reward: parseInt(button.dataset.points)
                 };
 
                 // Update challenge info display
@@ -382,13 +382,13 @@
 
                 selectedChallenge = {
                     id: null,
-                    name: `Free Typing - ${timeLimit}s`,
+                    title: `Free Typing - ${timeLimit}s`,
                     mode: 'time',
                     wordCount: 0,
                     timeLimit: timeLimit,
                     targetWpm: null,
                     targetAccuracy: null,
-                    points: null
+                    points_reward: null
                 };
 
                 // Update challenge info display
@@ -398,7 +398,7 @@
             function updateChallengeInfo() {
                 if (!selectedChallenge) return;
 
-                document.getElementById('challenge-name').textContent = selectedChallenge.name;
+                document.getElementById('challenge-name').textContent = selectedChallenge.title;
 
                 if (currentMode === 'free-typing') {
                     document.getElementById('challenge-mode').textContent = 'Free Typing';
@@ -418,7 +418,7 @@
 
                     document.getElementById('challenge-wpm').textContent = selectedChallenge.targetWpm + ' WPM';
                     document.getElementById('challenge-accuracy').textContent = selectedChallenge.targetAccuracy + '%';
-                    document.getElementById('challenge-points').textContent = selectedChallenge.points + ' pts';
+                    document.getElementById('challenge-points').textContent = selectedChallenge.points_reward + ' pts';
                 }
 
                 challengeInfo.classList.remove('hidden');
@@ -829,6 +829,39 @@
             }
 
             function saveResult() {
+                // Check if we have valid results to save
+                if (!WPM || !CPM || Accuracy === undefined || !enteredWords) {
+                    alert('Please complete a typing test before saving results!');
+                    return;
+                }
+
+                // Show loading state
+                const originalText = saveResultButton.textContent;
+                saveResultButton.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                `;
+                saveResultButton.disabled = true;
+
+                // Calculate actual test duration
+                const actualTestDuration = endTime && startTime ? Math.round((endTime - startTime) / 1000) : timeLimit;
+
+                console.log('Saving result:', {
+                    wpm: WPM,
+                    cpm: CPM,
+                    accuracy: Accuracy,
+                    word_count: enteredWords,
+                    test_mode: testMode,
+                    time_limit: timeLimit,
+                    test_duration: actualTestDuration,
+                    characters_typed: correctCharactersTyped,
+                    errors: incorrectWords,
+                    challenge_id: challengeId
+                });
+
                 fetch('{{ route("typing-test.save-result") }}', {
                     method: 'POST',
                     headers: {
@@ -841,25 +874,45 @@
                         accuracy: Accuracy,
                         word_count: enteredWords,
                         test_mode: testMode,
-                        time_limit: testMode === 'time' ? timeLimit : null,
+                        time_limit: timeLimit,
+                        test_duration: actualTestDuration,
+                        characters_typed: correctCharactersTyped,
+                        errors: incorrectWords,
                         challenge_id: challengeId
                     })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Response data:', data);
                     if (data.success) {
-                        saveResultButton.textContent = 'Saved!';
-                        saveResultButton.disabled = true;
-                        loadHistory();
+                        saveResultButton.innerHTML = `
+                            <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Saved!
+                        `;
+
+                        // Refresh history from database only (no manual addition)
+                        loadHistoryFromDatabase();
 
                         // Show challenge completion message if targets were met
                         if (selectedChallenge) {
                             checkChallengeCompletion();
                         }
+                    } else {
+                        saveResultButton.textContent = originalText;
+                        saveResultButton.disabled = false;
+                        alert('Failed to save result: ' + (data.message || 'Unknown error'));
                     }
                 })
                 .catch(error => {
                     console.error('Error saving result:', error);
+                    saveResultButton.textContent = originalText;
+                    saveResultButton.disabled = false;
+                    alert('Error saving result. Please check the console for details.');
                 });
             }
 
@@ -876,7 +929,7 @@
                     successMessage.innerHTML = `
                         <div class="text-green-800 dark:text-green-200">
                             <div class="text-lg font-bold mb-2">🎉 Challenge Completed!</div>
-                            <div class="text-sm">You've successfully completed "${selectedChallenge.name}" and earned ${selectedChallenge.points} points!</div>
+                            <div class="text-sm">You've successfully completed "${selectedChallenge.title}" and earned ${selectedChallenge.points_reward} points!</div>
                         </div>
                     `;
                     resultContainer.appendChild(successMessage);
@@ -897,40 +950,7 @@
                 }
             }
 
-            function loadHistory() {
-                // Add the current result to the history table
-                const historyTableBody = document.getElementById('history-table-body');
-                const now = new Date();
-                const dateString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
 
-                const newRow = document.createElement('tr');
-                newRow.className = 'hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150';
-
-                // Determine mode display
-                let modeDisplay;
-                if (currentMode === 'free-typing') {
-                    modeDisplay = `Free Typing (${formatTime(timeLimit)})`;
-                } else {
-                    modeDisplay = testMode === 'time' ? `${formatTime(timeLimit)} Timer` : `${enteredWords} Words in ${formatTime(timeLimit)}`;
-                    if (selectedChallenge && selectedChallenge.name) {
-                        modeDisplay = `${selectedChallenge.name} (${modeDisplay})`;
-                    }
-                }
-
-                newRow.innerHTML = `
-                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${dateString}</td>
-                    <td class="py-4 px-6 font-medium text-blue-600 dark:text-blue-400">${WPM}</td>
-                    <td class="py-4 px-6 font-medium text-green-600 dark:text-green-400">${CPM}</td>
-                    <td class="py-4 px-6 font-medium text-purple-600 dark:text-purple-400">${Accuracy}%</td>
-                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${enteredWords}</td>
-                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${modeDisplay}</td>
-                `;
-
-                historyTableBody.prepend(newRow);
-
-                // After adding the new result, refresh the history from the database
-                loadHistoryFromDatabase();
-            }
 
             function loadHistoryFromDatabase() {
                 fetch('{{ route("typing-test.history") }}')
@@ -938,14 +958,8 @@
                     .then(data => {
                         const historyTableBody = document.getElementById('history-table-body');
 
-                        // Clear existing rows except the first one (which is the current result)
-                        if (historyTableBody.children.length > 1) {
-                            while (historyTableBody.children.length > 1) {
-                                historyTableBody.removeChild(historyTableBody.lastChild);
-                            }
-                        } else {
-                            historyTableBody.innerHTML = '';
-                        }
+                        // Clear all existing rows
+                        historyTableBody.innerHTML = '';
 
                         // Add history rows
                         if (data.length === 0) {
@@ -972,9 +986,9 @@
                                     modeDisplay = `${item.word_count} Words in ${item.time_limit ? formatTime(item.time_limit) : '1:00'}`;
                                 }
 
-                                // Add challenge name if available
-                                if (item.challenge && item.challenge.name) {
-                                    modeDisplay = `${item.challenge.name} (${modeDisplay})`;
+                                // Add challenge title if available
+                                if (item.challenge && item.challenge.title) {
+                                    modeDisplay = `${item.challenge.title} (${modeDisplay})`;
                                 }
 
                                 row.innerHTML = `
@@ -1015,7 +1029,7 @@
                 inputField.focus();
 
                 resultContainer.classList.add('hidden');
-                saveResultButton.textContent = 'Save Result';
+                saveResultButton.innerHTML = 'Save Result';
                 saveResultButton.disabled = false;
 
                 // Reset timer display color
@@ -1027,6 +1041,9 @@
                 document.getElementById('live-cpm').textContent = '0';
                 document.getElementById('live-accuracy').textContent = '100%';
             }
+
+            // Load history when page loads
+            loadHistoryFromDatabase();
         });
     </script>
 

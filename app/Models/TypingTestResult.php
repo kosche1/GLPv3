@@ -23,6 +23,10 @@ class TypingTestResult extends Model
         'word_count',
         'test_mode',
         'time_limit',
+        'test_duration',
+        'words_typed',
+        'characters_typed',
+        'errors',
     ];
 
     /**
