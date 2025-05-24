@@ -7,36 +7,74 @@
                     <p class="text-center mb-8 text-gray-700 dark:text-gray-300 text-lg max-w-3xl mx-auto">Improve your typing speed and accuracy with this typing test. Type the words as they appear and see your results.</p>
 
                     <div class="mb-8">
-                        <div class="flex justify-center mb-8">
-                            <div class="inline-flex rounded-md shadow-md" role="group">
-                                <button id="mode-words" class="test-mode-btn px-6 py-3 text-base font-medium bg-blue-600 text-white rounded-l-lg border border-blue-600 hover:bg-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
-                                    Word Count
-                                </button>
-                                <button id="mode-time" class="test-mode-btn px-6 py-3 text-base font-medium bg-gray-600 text-white rounded-r-lg border border-gray-600 hover:bg-gray-700 focus:z-10 focus:ring-2 focus:ring-gray-500 transition-colors duration-200">
-                                    Timed Test
-                                </button>
+                        <!-- Challenge Selection -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">Select a Challenge</h3>
+                            <div class="flex flex-wrap justify-center gap-3 mb-4">
+                                @if($challenges->count() > 0)
+                                    @foreach($challenges as $challenge)
+                                        <button
+                                            class="challenge-btn px-5 py-3 rounded-md {{ $loop->first ? 'bg-blue-600' : 'bg-gray-600' }} text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base border-2 border-transparent hover:border-blue-300"
+                                            data-challenge-id="{{ $challenge->id }}"
+                                            data-test-mode="{{ $challenge->test_mode }}"
+                                            data-word-count="{{ $challenge->word_count }}"
+                                            data-time-limit="{{ $challenge->time_limit }}"
+                                            data-target-wpm="{{ $challenge->target_wpm }}"
+                                            data-target-accuracy="{{ $challenge->target_accuracy }}"
+                                            data-points="{{ $challenge->points_reward }}"
+
+                                        >
+                                            <div class="text-center">
+                                                <div class="font-bold">{{ $challenge->title }}</div>
+                                                <div class="text-xs opacity-90">
+                                                    {{ ucfirst($challenge->difficulty) }} •
+                                                    @if($challenge->test_mode === 'words')
+                                                        {{ $challenge->word_count }} words • {{ $challenge->time_limit }}s timer
+                                                    @else
+                                                        {{ $challenge->time_limit }}s timer
+                                                    @endif
+                                                </div>
+                                                <div class="text-xs opacity-75">
+                                                    Target: {{ $challenge->target_wpm }} WPM, {{ $challenge->target_accuracy }}% ACC
+                                                </div>
+                                            </div>
+                                        </button>
+                                    @endforeach
+                                @else
+                                    <div class="text-center text-gray-500 dark:text-gray-400">
+                                        <p class="text-lg">No challenges available at the moment.</p>
+                                        <p class="text-sm">Please check back later or contact your teacher.</p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
-                        <div id="word-count-options" class="mb-8">
-                            <h3 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">Select Word Count</h3>
-                            <div class="flex flex-wrap justify-center gap-3 mb-4">
-                                <button id="wordCount-25" class="word-count-btn px-5 py-2.5 rounded-md bg-blue-600 text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base" data-count="25">25 words</button>
-                                <button id="wordCount-50" class="word-count-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-count="50">50 words</button>
-                                <button id="wordCount-100" class="word-count-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-count="100">100 words</button>
-                            </div>
-                        </div>
-
-                        <div id="time-options" class="mb-8 hidden">
-                            <h3 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">Select Time Limit</h3>
-                            <div class="flex flex-wrap justify-center gap-3 mb-4">
-                                <button id="timeLimit-15" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="15">15 seconds</button>
-                                <button id="timeLimit-30" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="30">30 seconds</button>
-                                <button id="timeLimit-60" class="time-limit-btn px-5 py-2.5 rounded-md bg-blue-600 text-white font-medium shadow-md hover:bg-blue-700 transition-colors duration-200 text-base" data-seconds="60">1 minute</button>
-                                <button id="timeLimit-120" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="120">2 minutes</button>
-                                <button id="timeLimit-180" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="180">3 minutes</button>
-                                <button id="timeLimit-240" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="240">4 minutes</button>
-                                <button id="timeLimit-300" class="time-limit-btn px-5 py-2.5 rounded-md bg-gray-600 text-white font-medium shadow-md hover:bg-gray-700 transition-colors duration-200 text-base" data-seconds="300">5 minutes</button>
+                        <!-- Challenge Info Display -->
+                        <div id="challenge-info" class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 hidden">
+                            <div class="text-center">
+                                <h4 id="challenge-name" class="text-lg font-bold text-blue-800 dark:text-blue-200 mb-2"></h4>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+                                    <div class="text-center">
+                                        <div class="font-medium text-gray-600 dark:text-gray-400">Mode</div>
+                                        <div id="challenge-mode" class="font-bold text-blue-600 dark:text-blue-400"></div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-medium text-gray-600 dark:text-gray-400">Duration</div>
+                                        <div id="challenge-duration" class="font-bold text-indigo-600 dark:text-indigo-400"></div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-medium text-gray-600 dark:text-gray-400">Target WPM</div>
+                                        <div id="challenge-wpm" class="font-bold text-green-600 dark:text-green-400"></div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-medium text-gray-600 dark:text-gray-400">Target Accuracy</div>
+                                        <div id="challenge-accuracy" class="font-bold text-purple-600 dark:text-purple-400"></div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-medium text-gray-600 dark:text-gray-400">Points</div>
+                                        <div id="challenge-points" class="font-bold text-orange-600 dark:text-orange-400"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -140,22 +178,23 @@
             let timerInterval;
             let remainingTime;
             let statsUpdateInterval;
+            let selectedChallenge = null;
+            let challengeId = null;
 
             const wordContainer = document.getElementById("word-container");
             const inputField = document.getElementById('input-field');
             const resultContainer = document.getElementById("result-container");
             const restartButton = document.getElementById("restart-button");
             const saveResultButton = document.getElementById("save-result-button");
-            const wordCountButtons = document.querySelectorAll('.word-count-btn');
-            const timeLimitButtons = document.querySelectorAll('.time-limit-btn');
-            const testModeButtons = document.querySelectorAll('.test-mode-btn');
-            const wordCountOptions = document.getElementById('word-count-options');
-            const timeOptions = document.getElementById('time-options');
+            const challengeButtons = document.querySelectorAll('.challenge-btn');
+            const challengeInfo = document.getElementById('challenge-info');
             const timerContainer = document.getElementById('timer-container');
             const timerDisplay = document.getElementById('timer-display');
 
-            // Initialize
-            restart();
+            // Initialize with first challenge if available
+            if (challengeButtons.length > 0) {
+                selectChallenge(challengeButtons[0]);
+            }
 
             // Load history
             loadHistoryFromDatabase();
@@ -169,34 +208,63 @@
                 saveResult();
             });
 
-            // Test mode selection
-            testModeButtons.forEach(button => {
+            // Challenge selection
+            challengeButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const mode = this.id.split('-')[1]; // Extract mode from button id
-                    setTestMode(mode);
+                    selectChallenge(this);
                     restart();
                 });
             });
 
-            // Word count selection
-            wordCountButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const count = parseInt(this.dataset.count);
-                    WordCount = count;
-                    updateWordCountStyle(count);
-                    restart();
+            function selectChallenge(button) {
+                // Update button styles
+                challengeButtons.forEach(btn => {
+                    btn.classList.remove('bg-blue-600');
+                    btn.classList.add('bg-gray-600');
                 });
-            });
+                button.classList.remove('bg-gray-600');
+                button.classList.add('bg-blue-600');
 
-            // Time limit selection
-            timeLimitButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const seconds = parseInt(this.dataset.seconds);
-                    timeLimit = seconds;
-                    updateTimeLimitStyle(seconds);
-                    restart();
-                });
-            });
+                // Get challenge data
+                challengeId = button.dataset.challengeId;
+                testMode = button.dataset.testMode;
+                WordCount = parseInt(button.dataset.wordCount) || 25;
+                timeLimit = parseInt(button.dataset.timeLimit) || 60;
+
+                selectedChallenge = {
+                    id: challengeId,
+                    name: button.querySelector('.font-bold').textContent,
+                    mode: testMode,
+                    wordCount: WordCount,
+                    timeLimit: timeLimit,
+                    targetWpm: parseInt(button.dataset.targetWpm),
+                    targetAccuracy: parseInt(button.dataset.targetAccuracy),
+                    points: parseInt(button.dataset.points)
+                };
+
+                // Update challenge info display
+                updateChallengeInfo();
+            }
+
+            function updateChallengeInfo() {
+                if (!selectedChallenge) return;
+
+                document.getElementById('challenge-name').textContent = selectedChallenge.name;
+                document.getElementById('challenge-mode').textContent = selectedChallenge.mode === 'words' ? 'Word Count' : 'Timed Test';
+
+                // Update duration display - show both word count and timer for word-based challenges
+                if (selectedChallenge.mode === 'words') {
+                    document.getElementById('challenge-duration').textContent = `${selectedChallenge.wordCount} words in ${formatTime(selectedChallenge.timeLimit)}`;
+                } else {
+                    document.getElementById('challenge-duration').textContent = formatTime(selectedChallenge.timeLimit);
+                }
+
+                document.getElementById('challenge-wpm').textContent = selectedChallenge.targetWpm + ' WPM';
+                document.getElementById('challenge-accuracy').textContent = selectedChallenge.targetAccuracy + '%';
+                document.getElementById('challenge-points').textContent = selectedChallenge.points + ' pts';
+
+                challengeInfo.classList.remove('hidden');
+            }
 
             function restart() {
                 // Clear any existing timer
@@ -214,26 +282,22 @@
                 resetVariables();
                 resetStyles();
 
-                // Get a lot of words for timed tests
+                // Get a lot of words for timed tests, or the word count for word-based tests
                 const wordRequestCount = testMode === 'time' ? 300 : WordCount;
                 getRandomWords(wordRequestCount);
 
-                // Setup timer for timed tests
-                if (testMode === 'time') {
-                    timerContainer.classList.remove('hidden');
-                    remainingTime = timeLimit;
-                    timerDisplay.textContent = formatTime(remainingTime);
+                // Setup timer for ALL challenges (both word-based and time-based)
+                timerContainer.classList.remove('hidden');
+                remainingTime = timeLimit;
+                timerDisplay.textContent = formatTime(remainingTime);
 
-                    // Start the timer when user starts typing
-                    const startTimerOnFirstInput = function() {
-                        startTimer();
-                        inputField.removeEventListener('input', startTimerOnFirstInput);
-                    };
+                // Start the timer when user starts typing
+                const startTimerOnFirstInput = function() {
+                    startTimer();
+                    inputField.removeEventListener('input', startTimerOnFirstInput);
+                };
 
-                    inputField.addEventListener('input', startTimerOnFirstInput);
-                } else {
-                    timerContainer.classList.add('hidden');
-                }
+                inputField.addEventListener('input', startTimerOnFirstInput);
 
                 // Start stats update interval when user starts typing
                 const startStatsUpdateOnFirstInput = function() {
@@ -243,33 +307,6 @@
                 };
 
                 inputField.addEventListener('input', startStatsUpdateOnFirstInput);
-            }
-
-            function setTestMode(mode) {
-                testMode = mode;
-
-                // Update UI
-                testModeButtons.forEach(button => {
-                    button.classList.remove('bg-blue-600', 'border-blue-600');
-                    button.classList.add('bg-gray-600', 'border-gray-600');
-                });
-
-                const activeButton = document.getElementById(`mode-${mode}`);
-                if (activeButton) {
-                    activeButton.classList.remove('bg-gray-600', 'border-gray-600');
-                    activeButton.classList.add('bg-blue-600', 'border-blue-600');
-                }
-
-                // Show/hide appropriate options
-                if (mode === 'words') {
-                    wordCountOptions.classList.remove('hidden');
-                    timeOptions.classList.add('hidden');
-                    document.body.classList.remove('timed-mode');
-                } else {
-                    wordCountOptions.classList.add('hidden');
-                    timeOptions.classList.remove('hidden');
-                    document.body.classList.add('timed-mode');
-                }
             }
 
             function startTimer() {
@@ -302,8 +339,18 @@
                 }
 
                 endTime = Date.now();
-                const totalTime = timeLimit; // Use the full time limit for calculations
-                const minutes = totalTime / 60;
+
+                // For time-based challenges, use the full time limit
+                // For word-based challenges that ran out of time, use actual elapsed time
+                let calculationTime;
+                if (testMode === 'time') {
+                    calculationTime = timeLimit; // Use the full time limit for time-based challenges
+                } else {
+                    // Word-based challenge that ran out of time - use actual elapsed time
+                    calculationTime = (endTime - startTime) / 1000;
+                }
+
+                const minutes = calculationTime / 60;
 
                 CPM = Math.round(correctCharactersTyped / minutes);
                 WPM = Math.round((correctCharactersTyped / 5) / minutes);
@@ -325,31 +372,7 @@
                 }
             }
 
-            function updateWordCountStyle(wordCount) {
-                wordCountButtons.forEach(button => {
-                    button.classList.remove('bg-blue-600');
-                    button.classList.add('bg-gray-600');
-                });
 
-                const selectedButton = document.getElementById(`wordCount-${wordCount}`);
-                if (selectedButton) {
-                    selectedButton.classList.remove('bg-gray-600');
-                    selectedButton.classList.add('bg-blue-600');
-                }
-            }
-
-            function updateTimeLimitStyle(seconds) {
-                timeLimitButtons.forEach(button => {
-                    button.classList.remove('bg-blue-600');
-                    button.classList.add('bg-gray-600');
-                });
-
-                const selectedButton = document.getElementById(`timeLimit-${seconds}`);
-                if (selectedButton) {
-                    selectedButton.classList.remove('bg-gray-600');
-                    selectedButton.classList.add('bg-blue-600');
-                }
-            }
 
             // Store all words for timed test
             let allWords = [];
@@ -357,7 +380,12 @@
             let wordsPerRow = 6; // Reduced number of words per row for better visibility and spacing
 
             function getRandomWords(numberOfWords) {
-                fetch('{{ route("typing-test.words") }}?count=' + numberOfWords)
+                let url = '{{ route("typing-test.words") }}?count=' + numberOfWords;
+                if (challengeId) {
+                    url += '&challenge_id=' + challengeId;
+                }
+
+                fetch(url)
                     .then(response => response.json())
                     .then(randomWords => {
                         allWords = randomWords;
@@ -587,29 +615,40 @@
 
             function checkIfTestEnded() {
                 // For word count mode, check if we've reached the word count
+                // But the timer will still be running and can end the test early
                 if (testMode === 'words' && enteredWords >= WordCount) {
-                    // Clear stats update interval
-                    if (statsUpdateInterval) {
-                        clearInterval(statsUpdateInterval);
-                        statsUpdateInterval = null;
-                    }
-
-                    endTime = Date.now();
-                    const totalTime = (endTime - startTime) / 1000;
-                    const minutes = totalTime / 60;
-
-                    CPM = Math.round(correctCharactersTyped / minutes);
-                    WPM = Math.round((correctCharactersTyped / 5) / minutes);
-                    Accuracy = enteredWords > 0 ? Math.round(((enteredWords - incorrectWords) / enteredWords) * 100) : 100;
-
-                    inputField.disabled = true;
-                    inputField.removeEventListener('input', handleInput);
-
-                    showResults();
+                    endWordBasedTest();
                 }
 
                 // For timed mode, the test ends when the timer reaches 0
                 // This is handled in the endTimedTest function
+            }
+
+            function endWordBasedTest() {
+                // Clear any existing timer
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+
+                // Clear stats update interval
+                if (statsUpdateInterval) {
+                    clearInterval(statsUpdateInterval);
+                    statsUpdateInterval = null;
+                }
+
+                endTime = Date.now();
+                const totalTime = (endTime - startTime) / 1000;
+                const minutes = totalTime / 60;
+
+                CPM = Math.round(correctCharactersTyped / minutes);
+                WPM = Math.round((correctCharactersTyped / 5) / minutes);
+                Accuracy = enteredWords > 0 ? Math.round(((enteredWords - incorrectWords) / enteredWords) * 100) : 100;
+
+                inputField.disabled = true;
+                inputField.removeEventListener('input', handleInput);
+
+                showResults();
             }
 
             function isInputCorrect() {
@@ -644,7 +683,8 @@
                         accuracy: Accuracy,
                         word_count: enteredWords,
                         test_mode: testMode,
-                        time_limit: testMode === 'time' ? timeLimit : null
+                        time_limit: testMode === 'time' ? timeLimit : null,
+                        challenge_id: challengeId
                     })
                 })
                 .then(response => response.json())
@@ -653,11 +693,50 @@
                         saveResultButton.textContent = 'Saved!';
                         saveResultButton.disabled = true;
                         loadHistory();
+
+                        // Show challenge completion message if targets were met
+                        if (selectedChallenge) {
+                            checkChallengeCompletion();
+                        }
                     }
                 })
                 .catch(error => {
                     console.error('Error saving result:', error);
                 });
+            }
+
+            function checkChallengeCompletion() {
+                if (!selectedChallenge) return;
+
+                const metWpmTarget = WPM >= selectedChallenge.targetWpm;
+                const metAccuracyTarget = Accuracy >= selectedChallenge.targetAccuracy;
+
+                if (metWpmTarget && metAccuracyTarget) {
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'mt-4 p-4 bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-lg text-center';
+                    successMessage.innerHTML = `
+                        <div class="text-green-800 dark:text-green-200">
+                            <div class="text-lg font-bold mb-2">🎉 Challenge Completed!</div>
+                            <div class="text-sm">You've successfully completed "${selectedChallenge.name}" and earned ${selectedChallenge.points} points!</div>
+                        </div>
+                    `;
+                    resultContainer.appendChild(successMessage);
+                } else {
+                    // Show encouragement message
+                    const encouragementMessage = document.createElement('div');
+                    encouragementMessage.className = 'mt-4 p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700 rounded-lg text-center';
+                    encouragementMessage.innerHTML = `
+                        <div class="text-yellow-800 dark:text-yellow-200">
+                            <div class="text-lg font-bold mb-2">Keep Practicing!</div>
+                            <div class="text-sm">
+                                Target: ${selectedChallenge.targetWpm} WPM, ${selectedChallenge.targetAccuracy}% accuracy<br>
+                                Your result: ${WPM} WPM, ${Accuracy}% accuracy
+                            </div>
+                        </div>
+                    `;
+                    resultContainer.appendChild(encouragementMessage);
+                }
             }
 
             function loadHistory() {
@@ -668,13 +747,20 @@
 
                 const newRow = document.createElement('tr');
                 newRow.className = 'hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150';
+
+                // Determine mode display
+                let modeDisplay = testMode === 'time' ? `${formatTime(timeLimit)} Timer` : `${enteredWords} Words in ${formatTime(timeLimit)}`;
+                if (selectedChallenge) {
+                    modeDisplay = `${selectedChallenge.name} (${modeDisplay})`;
+                }
+
                 newRow.innerHTML = `
                     <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${dateString}</td>
                     <td class="py-4 px-6 font-medium text-blue-600 dark:text-blue-400">${WPM}</td>
                     <td class="py-4 px-6 font-medium text-green-600 dark:text-green-400">${CPM}</td>
                     <td class="py-4 px-6 font-medium text-purple-600 dark:text-purple-400">${Accuracy}%</td>
                     <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${enteredWords}</td>
-                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${testMode === 'time' ? `${formatTime(timeLimit)}` : 'Words'}</td>
+                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${modeDisplay}</td>
                 `;
 
                 historyTableBody.prepend(newRow);
@@ -714,13 +800,27 @@
 
                                 const row = document.createElement('tr');
                                 row.className = 'hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors duration-150';
+
+                                // Determine the mode display
+                                let modeDisplay;
+                                if (item.test_mode === 'time') {
+                                    modeDisplay = `${item.time_limit ? formatTime(item.time_limit) : '1:00'} Timer`;
+                                } else {
+                                    modeDisplay = `${item.word_count} Words in ${item.time_limit ? formatTime(item.time_limit) : '1:00'}`;
+                                }
+
+                                // Add challenge name if available
+                                if (item.challenge && item.challenge.name) {
+                                    modeDisplay = `${item.challenge.name} (${modeDisplay})`;
+                                }
+
                                 row.innerHTML = `
                                     <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${dateString}</td>
                                     <td class="py-4 px-6 font-medium text-blue-600 dark:text-blue-400">${item.wpm}</td>
                                     <td class="py-4 px-6 font-medium text-green-600 dark:text-green-400">${item.cpm}</td>
                                     <td class="py-4 px-6 font-medium text-purple-600 dark:text-purple-400">${item.accuracy}%</td>
                                     <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${item.word_count}</td>
-                                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${item.test_mode === 'time' ? (item.time_limit ? formatTime(item.time_limit) : '1:00') : 'Words'}</td>
+                                    <td class="py-4 px-6 text-gray-700 dark:text-gray-300">${modeDisplay}</td>
                                 `;
                                 historyTableBody.appendChild(row);
                             });
@@ -916,6 +1016,28 @@
             justify-content: center; /* Center words horizontally */
             gap: 0 4px; /* Add some gap between words */
         }
+
+        /* Challenge button styling */
+        .challenge-btn {
+            min-width: 200px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .challenge-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .challenge-btn.bg-blue-600 {
+            background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+            border-color: #1D4ED8;
+        }
+
+        .challenge-btn.bg-gray-600 {
+            background: linear-gradient(135deg, #6B7280, #4B5563);
+        }
     </style>
     @endpush
-</x-layouts.app.sidebar>
+</x-layouts.app>

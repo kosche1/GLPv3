@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TypingTestResult;
+use App\Models\TypingTestChallenge;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -16,7 +17,13 @@ class TypingTestController extends Controller
      */
     public function index()
     {
-        return view('typing-test.index');
+        // Get active challenges for the challenge selection
+        $challenges = TypingTestChallenge::where('is_active', true)
+            ->orderBy('difficulty')
+            ->orderBy('test_mode')
+            ->get();
+
+        return view('typing-test.index', compact('challenges'));
     }
 
     /**
@@ -28,9 +35,28 @@ class TypingTestController extends Controller
     public function getWords(Request $request)
     {
         $count = $request->input('count', 25);
+        $challengeId = $request->input('challenge_id');
 
         try {
-            // Get words from the word bank file
+            // If a challenge is specified, use its word list
+            if ($challengeId) {
+                $challenge = TypingTestChallenge::find($challengeId);
+                if ($challenge && $challenge->word_list) {
+                    // Use the challenge's custom word list
+                    $words = $challenge->word_list;
+
+                    // Get random words from the challenge's word list
+                    $randomWords = [];
+                    for ($i = 0; $i < $count; $i++) {
+                        $randomIndex = array_rand($words);
+                        $randomWords[] = $words[$randomIndex];
+                    }
+
+                    return response()->json($randomWords);
+                }
+            }
+
+            // Default behavior: Get words from the word bank file
             if (file_exists(resource_path('word-banks/english.txt'))) {
                 $wordBank = file_get_contents(resource_path('word-banks/english.txt'));
                 $words = explode("\n", $wordBank);
@@ -91,10 +117,12 @@ class TypingTestController extends Controller
             'word_count' => 'required|numeric',
             'test_mode' => 'required|string|in:words,time',
             'time_limit' => 'nullable|numeric',
+            'challenge_id' => 'nullable|exists:typing_test_challenges,id',
         ]);
 
         $result = new TypingTestResult();
         $result->user_id = Auth::id();
+        $result->challenge_id = $request->challenge_id;
         $result->wpm = $request->wpm;
         $result->cpm = $request->cpm;
         $result->accuracy = $request->accuracy;
@@ -107,6 +135,31 @@ class TypingTestController extends Controller
     }
 
     /**
+     * Get challenge details by ID.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getChallenge(Request $request)
+    {
+        $challengeId = $request->input('challenge_id');
+
+        if (!$challengeId) {
+            return response()->json(['error' => 'Challenge ID is required'], 400);
+        }
+
+        $challenge = TypingTestChallenge::where('id', $challengeId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$challenge) {
+            return response()->json(['error' => 'Challenge not found'], 404);
+        }
+
+        return response()->json($challenge);
+    }
+
+    /**
      * Get typing test history for the current user.
      *
      * @return \Illuminate\Http\Response
@@ -114,6 +167,7 @@ class TypingTestController extends Controller
     public function getHistory()
     {
         $history = TypingTestResult::where('user_id', Auth::id())
+            ->with('challenge:id,name,difficulty')
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
