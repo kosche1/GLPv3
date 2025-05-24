@@ -3,6 +3,17 @@
         <div class="max-w-8xl">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <!-- Back Button -->
+                    <div class="mb-6">
+                        <a href="{{ url('subjects/specialized/ict') }}"
+                           class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Back to ICT Subjects
+                        </a>
+                    </div>
+
                     <h2 class="text-3xl font-bold mb-4 text-center text-gray-800 dark:text-white">Typing Speed Test</h2>
                     <p class="text-center mb-8 text-gray-700 dark:text-gray-300 text-lg max-w-3xl mx-auto">Improve your typing speed and accuracy with this typing test. Type the words as they appear and see your results.</p>
 
@@ -1203,6 +1214,9 @@
 
             // Load history when page loads
             loadHistoryFromDatabase();
+
+            // Make loadHistoryFromDatabase globally accessible
+            window.loadHistoryFromDatabase = loadHistoryFromDatabase;
         });
 
         // Notification function
@@ -1253,21 +1267,43 @@
 
         // Function to actually perform the deletion (called from Alpine.js)
         function performDeleteFreeTypingResult(resultId) {
+            console.log('Attempting to delete result ID:', resultId); // Debug log
+
+            // Get CSRF token with fallback
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+            console.log('Using CSRF token:', csrfToken ? 'Present' : 'Missing'); // Debug log
+
             fetch(`{{ url('typing-test/free-typing') }}/${resultId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status); // Debug log
+                console.log('Response ok:', response.ok); // Debug log
+
+                // Check if response is ok first
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        console.error('Error response text:', text);
+                        throw new Error(`HTTP error! status: ${response.status}, response: ${text}`);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
-                if (data.success) {
+                console.log('Delete response:', data); // Debug log
+                if (data && data.success) {
                     showNotification('Free typing result deleted successfully.', 'success');
                     // Refresh the history to remove the deleted item
-                    loadHistoryFromDatabase();
+                    if (window.loadHistoryFromDatabase) {
+                        window.loadHistoryFromDatabase();
+                    }
                 } else {
-                    showNotification(data.message || 'Failed to delete result.', 'error');
+                    showNotification(data?.message || 'Failed to delete result.', 'error');
                 }
             })
             .catch(error => {
