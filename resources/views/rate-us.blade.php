@@ -27,9 +27,25 @@
                         </div>
                     @endif
 
+                    @if($existingRating)
+                        <div class="mb-6 p-4 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300">
+                            <div class="flex items-center mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <strong>Your Previous Rating</strong>
+                            </div>
+                            <p>You rated us {{ $existingRating->rating }}/5 stars on {{ $existingRating->created_at->format('M j, Y') }}.</p>
+                            @if($existingRating->feedback)
+                                <p class="mt-2 text-sm">Your feedback: "{{ $existingRating->feedback }}"</p>
+                            @endif
+                            <p class="mt-2 text-sm">You can update your rating below.</p>
+                        </div>
+                    @endif
+
                     <form action="{{ route('rate-us.store') }}" method="POST" class="space-y-6">
                         @csrf
-                        
+
                         <!-- Star Rating -->
                         <div>
                             <label class="block text-white font-medium mb-4">How would you rate your experience?</label>
@@ -37,7 +53,8 @@
                                 <div class="flex space-x-1">
                                     @for ($i = 1; $i <= 5; $i++)
                                         <label for="star-{{ $i }}" class="cursor-pointer">
-                                            <input type="radio" id="star-{{ $i }}" name="rating" value="{{ $i }}" class="sr-only peer" required>
+                                            <input type="radio" id="star-{{ $i }}" name="rating" value="{{ $i }}" class="sr-only peer" required
+                                                @if($existingRating && $existingRating->rating == $i) checked @endif>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-neutral-500 peer-checked:text-yellow-400 hover:text-yellow-300 transition-colors" fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                                             </svg>
@@ -53,7 +70,7 @@
                         <!-- Feedback Text Area -->
                         <div>
                             <label for="feedback" class="block text-white font-medium mb-2">Tell us more about your experience (optional)</label>
-                            <textarea id="feedback" name="feedback" rows="5" class="w-full px-4 py-3 rounded-lg border border-neutral-700 bg-neutral-800/80 text-white placeholder-neutral-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 hover:border-neutral-600 transition-all duration-300" placeholder="Share your thoughts, suggestions, or any issues you encountered..."></textarea>
+                            <textarea id="feedback" name="feedback" rows="5" class="w-full px-4 py-3 rounded-lg border border-neutral-700 bg-neutral-800/80 text-white placeholder-neutral-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 hover:border-neutral-600 transition-all duration-300" placeholder="Share your thoughts, suggestions, or any issues you encountered...">{{ $existingRating ? $existingRating->feedback : old('feedback') }}</textarea>
                             @error('feedback')
                                 <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
                             @enderror
@@ -62,7 +79,7 @@
                         <!-- Submit Button -->
                         <div class="flex justify-center">
                             <button type="submit" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors duration-300 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-neutral-800">
-                                Submit Feedback
+                                {{ $existingRating ? 'Update Feedback' : 'Submit Feedback' }}
                             </button>
                         </div>
                     </form>
@@ -77,7 +94,7 @@
                     </svg>
                     Why Your Feedback Matters
                 </h2>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300">
                         <div class="p-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 w-14 h-14 flex items-center justify-center">
@@ -90,7 +107,7 @@
                             Your feedback helps us identify areas where we can enhance our platform to better serve your needs and provide a more intuitive experience.
                         </p>
                     </div>
-                    
+
                     <div class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300">
                         <div class="p-3 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4 w-14 h-14 flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,7 +119,7 @@
                             We use your suggestions to prioritize new features and enhancements, ensuring our development roadmap aligns with what matters most to our users.
                         </p>
                     </div>
-                    
+
                     <div class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300">
                         <div class="p-3 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4 w-14 h-14 flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -118,26 +135,35 @@
             </div>
         </div>
     </div>
-    
+
     <!-- JavaScript for Star Rating -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const stars = document.querySelectorAll('input[name="rating"]');
-            
+
+            // Function to update star display
+            function updateStars(rating) {
+                stars.forEach((star, index) => {
+                    const svg = star.parentElement.querySelector('svg');
+                    if (index < rating) {
+                        svg.classList.remove('text-neutral-500');
+                        svg.classList.add('text-yellow-400');
+                    } else {
+                        svg.classList.remove('text-yellow-400');
+                        svg.classList.add('text-neutral-500');
+                    }
+                });
+            }
+
+            // Initialize stars based on existing rating
+            @if($existingRating)
+                updateStars({{ $existingRating->rating }});
+            @endif
+
             stars.forEach(star => {
                 star.addEventListener('change', function() {
-                    // Reset all stars
-                    stars.forEach(s => {
-                        s.parentElement.querySelector('svg').classList.remove('text-yellow-400');
-                        s.parentElement.querySelector('svg').classList.add('text-neutral-500');
-                    });
-                    
-                    // Highlight selected star and all stars before it
                     const rating = parseInt(this.value);
-                    for (let i = 0; i < rating; i++) {
-                        stars[i].parentElement.querySelector('svg').classList.remove('text-neutral-500');
-                        stars[i].parentElement.querySelector('svg').classList.add('text-yellow-400');
-                    }
+                    updateStars(rating);
                 });
             });
         });
