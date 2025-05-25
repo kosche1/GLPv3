@@ -171,8 +171,42 @@
                     <script>
                         // Timer functionality - make global
                         window.taskTimer = null;
-                        window.timeRemaining = {{ $currentTask->time_limit ? $currentTask->time_limit * 60 : 0 }}; // Convert minutes to seconds
                         window.timerStarted = false;
+
+                        // Timer persistence key
+                        const TIMER_KEY = 'task_timer_{{ $currentTask->id }}_{{ auth()->user()->id }}';
+                        const TIMER_START_KEY = 'task_start_{{ $currentTask->id }}_{{ auth()->user()->id }}';
+
+                        // Initialize time remaining with persistence
+                        function initializeTimer() {
+                            const originalTime = {{ $currentTask->time_limit ? $currentTask->time_limit * 60 : 0 }};
+                            const savedStartTime = localStorage.getItem(TIMER_START_KEY);
+
+                            if (savedStartTime && originalTime > 0) {
+                                // Calculate elapsed time since timer started
+                                const startTime = parseInt(savedStartTime);
+                                const currentTime = Math.floor(Date.now() / 1000);
+                                const elapsedTime = currentTime - startTime;
+
+                                // Calculate remaining time
+                                window.timeRemaining = Math.max(0, originalTime - elapsedTime);
+
+                                console.log('Timer restored:', {
+                                    originalTime,
+                                    elapsedTime,
+                                    timeRemaining: window.timeRemaining
+                                });
+                            } else {
+                                // First time starting the timer
+                                window.timeRemaining = originalTime;
+                                if (originalTime > 0) {
+                                    localStorage.setItem(TIMER_START_KEY, Math.floor(Date.now() / 1000).toString());
+                                }
+                            }
+                        }
+
+                        // Initialize timer on page load
+                        initializeTimer();
 
                         window.startTaskTimer = function() {
                             if (!window.timeRemaining || window.timerStarted) return;
@@ -219,6 +253,10 @@
                         }
 
                         window.handleTimeUp = function() {
+                            // Clear timer storage
+                            localStorage.removeItem(TIMER_KEY);
+                            localStorage.removeItem(TIMER_START_KEY);
+
                             // Auto-submit the current answer
                             window.autoSubmitAnswer();
 
@@ -227,6 +265,12 @@
                             if (modal) {
                                 modal.classList.remove('hidden');
                             }
+                        }
+
+                        // Clear timer storage when task is completed
+                        window.clearTimerStorage = function() {
+                            localStorage.removeItem(TIMER_KEY);
+                            localStorage.removeItem(TIMER_START_KEY);
                         }
 
                         window.autoSubmitAnswer = function() {
@@ -355,10 +399,11 @@
                                         if (data.success) {
                                             console.log('Answer submitted successfully');
 
-                                            // Stop timer if running
+                                            // Stop timer if running and clear storage
                                             if (window.taskTimer) {
                                                 clearInterval(window.taskTimer);
                                             }
+                                            window.clearTimerStorage();
 
                                             // Show task submitted modal instead of completion modal
                                             setTimeout(() => {
@@ -418,6 +463,76 @@
                                     }
                                 });
                             }
+
+                            // Anti-cheating measures
+                            @if($currentTask->time_limit)
+                                // Prevent back button navigation
+                                history.pushState(null, null, location.href);
+                                window.addEventListener('popstate', function(event) {
+                                    history.pushState(null, null, location.href);
+
+                                    // Show warning modal or message
+                                    alert('Navigation is disabled during timed tasks to prevent cheating. Please complete the task or wait for the timer to expire.');
+                                });
+
+                                // Prevent page refresh with confirmation
+                                window.addEventListener('beforeunload', function(e) {
+                                    if (window.timerStarted && window.timeRemaining > 0) {
+                                        const confirmationMessage = 'Are you sure you want to leave? Your timer will continue running and you may lose your progress.';
+                                        e.returnValue = confirmationMessage;
+                                        return confirmationMessage;
+                                    }
+                                });
+
+                                // Disable right-click context menu
+                                document.addEventListener('contextmenu', function(e) {
+                                    e.preventDefault();
+                                    return false;
+                                });
+
+                                // Disable common keyboard shortcuts
+                                document.addEventListener('keydown', function(e) {
+                                    // Disable F5 (refresh)
+                                    if (e.key === 'F5') {
+                                        e.preventDefault();
+                                        alert('Page refresh is disabled during timed tasks.');
+                                        return false;
+                                    }
+
+                                    // Disable Ctrl+R (refresh)
+                                    if (e.ctrlKey && e.key === 'r') {
+                                        e.preventDefault();
+                                        alert('Page refresh is disabled during timed tasks.');
+                                        return false;
+                                    }
+
+                                    // Disable Ctrl+Shift+I (Developer Tools)
+                                    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                                        e.preventDefault();
+                                        return false;
+                                    }
+
+                                    // Disable F12 (Developer Tools)
+                                    if (e.key === 'F12') {
+                                        e.preventDefault();
+                                        return false;
+                                    }
+
+                                    // Disable Ctrl+U (View Source)
+                                    if (e.ctrlKey && e.key === 'u') {
+                                        e.preventDefault();
+                                        return false;
+                                    }
+                                });
+
+                                // Detect tab visibility changes (user switching tabs)
+                                document.addEventListener('visibilitychange', function() {
+                                    if (document.hidden && window.timerStarted && window.timeRemaining > 0) {
+                                        console.warn('User switched away from task tab');
+                                        // You could implement additional logging here
+                                    }
+                                });
+                            @endif
                         });
                     </script>
                 </div>
