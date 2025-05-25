@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('tasks', function (Blueprint $table) {
             if (!Schema::hasColumn('tasks', 'time_limit')) {
-                $table->integer('time_limit')->nullable()->after('challenge_content')
+                $table->integer('time_limit')->nullable()->after('is_active')
                     ->comment('Time limit in minutes for task completion');
             }
         });
