@@ -106,6 +106,13 @@ class Challenge extends Model
      */
     protected static function booted()
     {
+        static::creating(function (Challenge $challenge) {
+            // Set points_reward to 0 when creating a new challenge
+            if (is_null($challenge->points_reward)) {
+                $challenge->points_reward = 0;
+            }
+        });
+
         static::saved(function (Challenge $challenge) {
             // After a challenge is saved, recalculate its points reward
             // to ensure it's always up-to-date, but only if it wasn't explicitly set
@@ -137,10 +144,10 @@ class Challenge extends Model
      */
     public function updatePointsReward()
     {
-        $totalTaskPoints = $this->tasks()->sum('points_reward');
+        $totalTaskPoints = $this->tasks()->sum('points_reward') ?: 0;
 
-        // Only update if there are tasks and the total is different from current value
-        if ($totalTaskPoints > 0 && $totalTaskPoints != $this->points_reward) {
+        // Always update if the total is different from current value
+        if ($totalTaskPoints != $this->points_reward) {
             $this->update(['points_reward' => $totalTaskPoints]);
         }
     }

@@ -35,6 +35,7 @@ class Task extends Model
                 'due_date',
                 'challenge_id',
                 'order',
+                'time_limit',
             ])
             ->useLogName('Task')
             ->logOnlyDirty()
@@ -68,7 +69,8 @@ class Task extends Model
         "due_date",
         "challenge_id",
         "order",
-        "challenge_content"
+        "challenge_content",
+        "time_limit"
     ];
 
     /**
