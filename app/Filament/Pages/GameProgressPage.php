@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\User;
+use App\Exports\GameProgressExport;
 use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,6 +16,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Notifications\Notification;
 
 class GameProgressPage extends Page implements HasTable
 {
@@ -215,12 +217,31 @@ class GameProgressPage extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
-            PageAction::make('export')
-                ->label('Export Progress Report')
+            PageAction::make('export_csv')
+                ->label('Export as CSV')
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('success')
                 ->action(function () {
-                    $this->notify('success', 'Export functionality will be implemented soon!');
+                    $export = new GameProgressExport();
+                    return $export->exportCsv();
+                }),
+
+            PageAction::make('export_excel')
+                ->label('Export as Excel')
+                ->icon('heroicon-o-table-cells')
+                ->color('info')
+                ->action(function () {
+                    $export = new GameProgressExport();
+                    return $export->exportExcel();
+                }),
+
+            PageAction::make('export_pdf')
+                ->label('Export as PDF')
+                ->icon('heroicon-o-document-text')
+                ->color('warning')
+                ->action(function () {
+                    $export = new GameProgressExport();
+                    return $export->exportPdf();
                 }),
         ];
     }
