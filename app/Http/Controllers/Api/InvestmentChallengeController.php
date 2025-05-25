@@ -190,6 +190,7 @@ class InvestmentChallengeController extends Controller
             ->where('user_id', $user->id)
             ->firstOrFail();
 
+        $wasCompleted = $userChallenge->status === 'completed';
         $userChallenge->progress = $request->progress;
 
         if ($request->progress >= 100) {
@@ -197,6 +198,40 @@ class InvestmentChallengeController extends Controller
         }
 
         $userChallenge->save();
+
+        // Fire challenge completion event for audit trail if newly completed
+        if ($request->progress >= 100 && !$wasCompleted) {
+            try {
+                $user = Auth::user();
+                if ($user) {
+                    // Create a pseudo-challenge object for audit trail
+                    $challengeData = (object) [
+                        'name' => $userChallenge->challenge->title ?? 'Investment Challenge',
+                        'points_reward' => $userChallenge->challenge->points_reward ?? 0,
+                        'difficulty_level' => $userChallenge->challenge->difficulty_level ?? null,
+                    ];
+
+                    \App\Models\AuditTrail::recordChallengeCompletion($user, $challengeData, [
+                        'challenge_type' => 'investment_challenge',
+                        'subject_name' => 'ABM',
+                        'subject_type' => 'Specialized',
+                        'score' => $userChallenge->challenge->points_reward ?? 100, // Use points as score, default to 100
+                    ]);
+
+                    \Illuminate\Support\Facades\Log::info("Investment challenge completion recorded in audit trail", [
+                        'user_id' => $user->id,
+                        'challenge_id' => $userChallenge->challenge->id,
+                        'challenge_title' => $userChallenge->challenge->title
+                    ]);
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Error recording investment challenge completion: {$e->getMessage()}", [
+                    'user_id' => $user->id ?? null,
+                    'challenge_id' => $userChallenge->challenge->id ?? null,
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+        }
 
         return response()->json([
             'message' => 'Challenge progress updated',

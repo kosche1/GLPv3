@@ -167,6 +167,40 @@ class UserRecipeResource extends Resource
                             reason: "Recipe approved: {$record->name}"
                         );
 
+                        // Record recipe completion in audit trail
+                        try {
+                            // Create a pseudo-challenge object for audit trail
+                            $challengeData = (object) [
+                                'name' => "Recipe Challenge: {$record->name}",
+                                'points_reward' => $pointsToAward,
+                                'difficulty_level' => $record->recipeTemplate ? $record->recipeTemplate->difficulty_level : 'beginner',
+                            ];
+
+                            \App\Models\AuditTrail::recordChallengeCompletion($user, $challengeData, [
+                                'challenge_type' => 'recipe_challenge',
+                                'subject_name' => 'HE',
+                                'subject_type' => 'Specialized',
+                                'score' => $record->score ?? $pointsToAward,
+                                'recipe_name' => $record->name,
+                                'is_balanced' => $record->is_balanced,
+                                'meets_requirements' => $record->meets_requirements,
+                                'template_name' => $record->recipeTemplate ? $record->recipeTemplate->name : null,
+                            ]);
+
+                            \Illuminate\Support\Facades\Log::info('Recipe challenge completion recorded in audit trail', [
+                                'user_id' => $user->id,
+                                'recipe_id' => $record->id,
+                                'recipe_name' => $record->name,
+                                'points_awarded' => $pointsToAward
+                            ]);
+                        } catch (\Exception $e) {
+                            \Illuminate\Support\Facades\Log::error('Error recording recipe challenge completion: ' . $e->getMessage(), [
+                                'user_id' => $user->id,
+                                'recipe_id' => $record->id,
+                                'trace' => $e->getTraceAsString()
+                            ]);
+                        }
+
                         // Show notification in the bell and persist it
                         Notification::make()
                             ->success()

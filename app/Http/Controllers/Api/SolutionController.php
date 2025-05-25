@@ -234,6 +234,7 @@ class SolutionController extends Controller
 
                         $progress = $totalTasks > 0 ? ($completedTasks / $totalTasks) * 100 : 0;
                         $isCompleted = $completedTasks >= $totalTasks;
+                        $wasAlreadyCompleted = $userChallenge->pivot->status === 'completed';
 
                         DB::table('user_challenges')
                             ->where('user_id', $userId)
@@ -244,14 +245,27 @@ class SolutionController extends Controller
                                 'completed_at' => $isCompleted ? now() : null
                             ]);
 
-                        // If challenge is completed, award additional points
-                        if ($isCompleted && $user) {
-                            $challengePoints = $challenge->points_reward ?? 0;
-                            if ($challengePoints > 0) {
-                                DB::table('experiences')
-                                    ->where('user_id', $userId)
-                                    ->increment('experience_points', $challengePoints);
-                                Log::info("Awarded $challengePoints challenge completion experience points to user $userId");
+                        // If challenge is completed for the first time, use the User model method to trigger events
+                        if ($isCompleted && !$wasAlreadyCompleted && $user) {
+                            try {
+                                // Use the User model method to properly trigger events and handle rewards
+                                $user->updateChallengeProgress($challenge, 100);
+                                Log::info("Challenge completion processed through User model for user $userId, challenge {$challenge->id}");
+                            } catch (\Exception $e) {
+                                Log::error("Error processing challenge completion through User model: {$e->getMessage()}", [
+                                    'user_id' => $userId,
+                                    'challenge_id' => $challenge->id,
+                                    'trace' => $e->getTraceAsString()
+                                ]);
+
+                                // Fallback: Award points directly if User model method fails
+                                $challengePoints = $challenge->points_reward ?? 0;
+                                if ($challengePoints > 0) {
+                                    DB::table('experiences')
+                                        ->where('user_id', $userId)
+                                        ->increment('experience_points', $challengePoints);
+                                    Log::info("Awarded $challengePoints challenge completion experience points to user $userId (fallback)");
+                                }
                             }
                         }
                     } else {

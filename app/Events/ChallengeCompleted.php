@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Challenge;
+use App\Models\GroupChallenge;
 use App\Models\User;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -17,6 +18,6 @@ class ChallengeCompleted
      */
     public function __construct(
         public User $user,
-        public Challenge $challenge,
+        public Challenge|GroupChallenge $challenge,
     ) {}
 }

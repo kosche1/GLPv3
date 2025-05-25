@@ -188,7 +188,7 @@ class HistoricalTimelineMazeController extends Controller
             'completed' => filter_var($request->completed, FILTER_VALIDATE_BOOLEAN),
         ]);
 
-        // If the game is completed, add to the leaderboard
+        // If the game is completed, add to the leaderboard and record in audit trail
         if (filter_var($request->completed, FILTER_VALIDATE_BOOLEAN)) {
             // Check if this is a high score for this user, era, and difficulty
             $existingEntry = HistoricalTimelineMazeLeaderboard::where('user_id', $user->id)
@@ -197,6 +197,7 @@ class HistoricalTimelineMazeController extends Controller
                 ->first();
 
             $shouldUpdateLeaderboard = false;
+            $isFirstCompletion = !$existingEntry;
 
             if (!$existingEntry) {
                 $shouldUpdateLeaderboard = true;
@@ -223,6 +224,46 @@ class HistoricalTimelineMazeController extends Controller
 
                 // Update ranks for this era and difficulty
                 $this->updateLeaderboardRanks($request->era, $request->difficulty);
+            }
+
+            // Record completion in audit trail (only for first completion of each era/difficulty)
+            if ($isFirstCompletion) {
+                try {
+                    // Create a pseudo-challenge object for audit trail
+                    $challengeData = (object) [
+                        'name' => "Historical Timeline Maze - {$request->era} ({$request->difficulty})",
+                        'points_reward' => 0, // Timeline maze doesn't have points
+                        'difficulty_level' => $request->difficulty,
+                    ];
+
+                    \App\Models\AuditTrail::recordChallengeCompletion($user, $challengeData, [
+                        'challenge_type' => 'historical_timeline_maze',
+                        'subject_name' => 'HUMMS',
+                        'subject_type' => 'Specialized',
+                        'score' => $request->score, // This will be used as the main score field
+                        'era' => $request->era,
+                        'difficulty' => $request->difficulty,
+                        'time_taken' => $request->time_taken,
+                        'accuracy' => $accuracy,
+                        'questions_answered' => $request->questions_answered,
+                        'correct_answers' => $request->correct_answers,
+                    ]);
+
+                    \Illuminate\Support\Facades\Log::info('Historical Timeline Maze completion recorded in audit trail', [
+                        'user_id' => $user->id,
+                        'era' => $request->era,
+                        'difficulty' => $request->difficulty,
+                        'score' => $request->score,
+                        'accuracy' => $accuracy
+                    ]);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Error recording Historical Timeline Maze completion: ' . $e->getMessage(), [
+                        'user_id' => $user->id,
+                        'era' => $request->era,
+                        'difficulty' => $request->difficulty,
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                }
             }
         }
 
