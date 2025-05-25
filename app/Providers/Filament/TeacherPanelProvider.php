@@ -44,6 +44,7 @@ class TeacherPanelProvider extends PanelProvider
                 \App\Filament\Teacher\Pages\AssessmentTools::class,
                 \App\Filament\Teacher\Pages\StudentAnalytics::class,
                 \App\Filament\Teacher\Pages\StudentAttendancePage::class,
+                \App\Filament\Teacher\Pages\GameProgressPage::class,
             ])
             // Register only the widgets we need
             ->widgets([

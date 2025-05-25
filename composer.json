@@ -26,7 +26,9 @@
         "tomatophp/filament-users": "^2.0",
         "westacks/filament-monaco-editor": "^1.1",
         "wire-elements/modal": "^2.0",
-        "workos/workos-php-laravel": "^4.1"
+        "workos/workos-php-laravel": "^4.1",
+        "maatwebsite/excel": "^3.1",
+        "dompdf/dompdf": "^3.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

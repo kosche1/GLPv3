@@ -451,6 +451,46 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the typing test results for the user.
+     */
+    public function typing_test_results()
+    {
+        return $this->hasMany(TypingTestResult::class);
+    }
+
+    /**
+     * Get the equation drop results for the user.
+     */
+    public function equation_drop_results()
+    {
+        return $this->hasMany(EquationDropResult::class);
+    }
+
+    /**
+     * Get the historical timeline maze results for the user.
+     */
+    public function historical_timeline_maze_results()
+    {
+        return $this->hasMany(HistoricalTimelineMazeResult::class);
+    }
+
+    /**
+     * Get the invest smart results for the user.
+     */
+    public function invest_smart_results()
+    {
+        return $this->hasMany(InvestSmartResult::class);
+    }
+
+    /**
+     * Get the user recipes for the user.
+     */
+    public function user_recipes()
+    {
+        return $this->hasMany(UserRecipe::class);
+    }
+
+    /**
      * Get the historical timeline maze leaderboard entries for the user.
      */
     public function historicalTimelineMazeLeaderboard()
