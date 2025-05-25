@@ -27,6 +27,23 @@ class TypingTestResult extends Model
         'words_typed',
         'characters_typed',
         'errors',
+        'approved',
+        'approved_by',
+        'approved_at',
+        'points_awarded',
+        'notification_shown',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'approved' => 'boolean',
+        'approved_at' => 'datetime',
+        'points_awarded' => 'boolean',
+        'notification_shown' => 'boolean',
     ];
 
     /**
@@ -43,5 +60,13 @@ class TypingTestResult extends Model
     public function challenge()
     {
         return $this->belongsTo(TypingTestChallenge::class, 'challenge_id');
+    }
+
+    /**
+     * Get the user who approved this result.
+     */
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

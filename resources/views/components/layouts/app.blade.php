@@ -23,6 +23,7 @@
             @livewire('welcome-modals')
             @livewire('recipe-approval-modal')
             @livewire('task-approval-notification-modal')
+            @livewire('typing-test-approval-modal')
             @livewire('user-activity-history-modal')
         @endauth
     </flux:main>

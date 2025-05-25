@@ -42,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
         Livewire::component('student-approval-notification-modal', StudentApprovalNotificationModal::class);
         Livewire::component('recipe-approval-modal', RecipeApprovalModal::class);
         Livewire::component('task-approval-notification-modal', TaskApprovalNotificationModal::class);
+        Livewire::component('typing-test-approval-modal', \App\Livewire\TypingTestApprovalModal::class);
 
         // Configure Prism providers
         $this->configurePrisms();
