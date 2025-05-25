@@ -31,7 +31,7 @@ class TasksRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Grid::make(2)->schema([
+                Grid::make(3)->schema([
                     TextInput::make('name')
                         ->required()
                         ->maxLength(255)
@@ -39,6 +39,13 @@ class TasksRelationManager extends RelationManager
                     TextInput::make('points_reward')
                         ->numeric()
                         ->required()
+                        ->columnSpan(1),
+                    TextInput::make('time_limit')
+                        ->label('Time Limit (minutes)')
+                        ->numeric()
+                        ->minValue(1)
+                        ->placeholder('Leave empty for no time limit')
+                        ->helperText('How long users have to complete this task')
                         ->columnSpan(1),
                 ]),
                 Textarea::make('description')
@@ -157,6 +164,12 @@ class TasksRelationManager extends RelationManager
                     ->tooltip(fn ($state) => $state ?: 'No description'),
                 Tables\Columns\TextColumn::make('points_reward')
                     ->numeric()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('time_limit')
+                    ->label('Time Limit')
+                    ->formatStateUsing(
+                        fn($state) => $state ? "{$state} min" : "No limit"
+                    )
                     ->sortable(),
                 Tables\Columns\TextColumn::make('submission_type')
                     ->label('Submission')

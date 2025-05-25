@@ -88,8 +88,18 @@ class ChallengeResource extends Resource
                     ])
                     ->required(),
                 Forms\Components\TextInput::make("points_reward")
+                    ->label("Total Points Reward")
                     ->numeric()
-                    ->required(),
+                    ->disabled()
+                    ->dehydrated(false)
+                    ->helperText("Automatically calculated from all tasks in this challenge")
+                    ->live()
+                    ->formatStateUsing(function ($record) {
+                        if ($record && $record->exists) {
+                            return $record->fresh()->tasks()->sum('points_reward') ?: 0;
+                        }
+                        return 0;
+                    }),
                 FileUpload::make('image')
                     ->disk('public')
                     ->directory('challenge-images')
@@ -146,14 +156,7 @@ class ChallengeResource extends Resource
                     ]);
                 }),
 
-            Forms\Components\TextInput::make("time_limit")
-                ->label("Time Limit (minutes)")
-                ->numeric()
-                ->minValue(1)
-                ->placeholder("Leave empty for no time limit")
-                ->helperText(
-                    "How long users have to complete this challenge"
-                ),
+
         ]),
 
         // Dynamic content section for each challenge type
@@ -351,11 +354,7 @@ public static function table(Table $table): Table
                 "danger" => "advanced",
                 "gray" => "expert",
             ]),
-            Tables\Columns\TextColumn::make("time_limit")
-                ->label("Time Limit")
-                ->formatStateUsing(
-                    fn($state) => $state ? "{$state} min" : "No limit"
-                ),
+
             Tables\Columns\TextColumn::make("points_reward")->sortable(),
             Tables\Columns\TextColumn::make("start_date")
                 ->dateTime()

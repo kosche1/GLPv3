@@ -25,13 +25,13 @@ use Filament\Forms\Components\Grid;
 class TasksRelationManager extends RelationManager
 {
     protected static string $relationship = 'tasks';
-    
+
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-                Grid::make(2)->schema([
+                Grid::make(3)->schema([
                     TextInput::make('name')
                         ->required()
                         ->maxLength(255)
@@ -39,6 +39,13 @@ class TasksRelationManager extends RelationManager
                     TextInput::make('points_reward')
                         ->numeric()
                         ->required()
+                        ->columnSpan(1),
+                    TextInput::make('time_limit')
+                        ->label('Time Limit (minutes)')
+                        ->numeric()
+                        ->minValue(1)
+                        ->placeholder('Leave empty for no time limit')
+                        ->helperText('How long users have to complete this task')
                         ->columnSpan(1),
                 ]),
                 Textarea::make('description')
@@ -158,6 +165,12 @@ class TasksRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('points_reward')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('time_limit')
+                    ->label('Time Limit')
+                    ->formatStateUsing(
+                        fn($state) => $state ? "{$state} min" : "No limit"
+                    )
+                    ->sortable(),
                 Tables\Columns\BadgeColumn::make('submission_type')
                     ->label('Submission')
                     ->colors([
@@ -235,12 +248,12 @@ class TasksRelationManager extends RelationManager
                 ]),
             ]);
     }
-    
+
     /**
      * Sync experience points for users who have completed the task
      * NOTE: This entire method is likely OBSOLETE or needs significant refactoring.
      * Awarding points should be tied to StudentAnswer evaluation, not just task CRUD.
-     * 
+     *
      * @param Task $task
      * @return void
      */

@@ -6,10 +6,12 @@ use App\Filament\Teacher\Resources\TypingTestResultResource\Pages;
 use App\Models\TypingTestResult;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class TypingTestResultResource extends Resource
 {
@@ -145,6 +147,17 @@ class TypingTestResultResource extends Resource
                     ->label('Date')
                     ->dateTime()
                     ->sortable(),
+                Tables\Columns\IconColumn::make('approved')
+                    ->label('Approved')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+                Tables\Columns\TextColumn::make('approver.name')
+                    ->label('Approved By')
+                    ->placeholder('Not approved')
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('test_mode')
@@ -166,6 +179,55 @@ class TypingTestResultResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('approve')
+                    ->label('Approve')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn (TypingTestResult $record): bool => !$record->approved && $record->challenge_id !== null)
+                    ->requiresConfirmation()
+                    ->modalHeading('Approve Typing Test Result')
+                    ->modalDescription(fn (TypingTestResult $record): string =>
+                        "Are you sure you want to approve this typing test result? This will award " .
+                        ($record->challenge?->points_reward ?? 0) . " points to " . ($record->user?->name ?? 'the student') . "."
+                    )
+                    ->action(function (TypingTestResult $record): void {
+                        $user = $record->user;
+                        $challenge = $record->challenge;
+
+                        if (!$user || !$challenge) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Error')
+                                ->body('Unable to approve: User or challenge not found.')
+                                ->send();
+                            return;
+                        }
+
+                        // Update the record
+                        $record->update([
+                            'approved' => true,
+                            'approved_by' => Auth::id(),
+                            'approved_at' => now(),
+                            'points_awarded' => true,
+                            'notification_shown' => false, // Will trigger notification to student
+                        ]);
+
+                        // Award points to the user
+                        $pointsToAward = $challenge->points_reward ?? 0;
+                        if ($pointsToAward > 0) {
+                            $user->addPoints(
+                                amount: $pointsToAward,
+                                reason: "Typing test approved: {$challenge->title}"
+                            );
+                        }
+
+                        // Show success notification
+                        Notification::make()
+                            ->success()
+                            ->title('Result Approved')
+                            ->body("Approved typing test result and awarded {$pointsToAward} points to {$user->name}")
+                            ->send();
+                    }),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

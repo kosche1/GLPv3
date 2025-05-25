@@ -18,15 +18,15 @@ class GroupChallengeController extends Controller
     public function create(StudyGroup $studyGroup): View
     {
         $user = Auth::user();
-        
+
         // Check if user is a leader or moderator
         if (!$studyGroup->isModerator($user)) {
             abort(403, 'You do not have permission to create challenges for this study group.');
         }
-        
+
         // Get categories for the form
         $categories = Category::all();
-        
+
         return view('study-groups.challenges.create', [
             'studyGroup' => $studyGroup,
             'categories' => $categories,
@@ -39,12 +39,12 @@ class GroupChallengeController extends Controller
     public function store(Request $request, StudyGroup $studyGroup)
     {
         $user = Auth::user();
-        
+
         // Check if user is a leader or moderator
         if (!$studyGroup->isModerator($user)) {
             abort(403, 'You do not have permission to create challenges for this study group.');
         }
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -57,7 +57,7 @@ class GroupChallengeController extends Controller
             'time_limit' => 'nullable|integer|min:0',
             'challenge_content' => 'nullable|string',
         ]);
-        
+
         // Create the group challenge
         $groupChallenge = new GroupChallenge();
         $groupChallenge->name = $request->name;
@@ -73,9 +73,9 @@ class GroupChallengeController extends Controller
         $groupChallenge->challenge_type = $request->challenge_type;
         $groupChallenge->time_limit = $request->time_limit;
         $groupChallenge->challenge_content = $request->challenge_content;
-        
+
         $groupChallenge->save();
-        
+
         return redirect()->route('study-groups.challenges.show', [
             'studyGroup' => $studyGroup,
             'groupChallenge' => $groupChallenge,
@@ -88,25 +88,25 @@ class GroupChallengeController extends Controller
     public function show(StudyGroup $studyGroup, GroupChallenge $groupChallenge): View
     {
         $user = Auth::user();
-        
+
         // Check if user is a member of the study group
         if (!$studyGroup->hasMember($user)) {
             abort(403, 'You are not a member of this study group.');
         }
-        
+
         // Check if the challenge belongs to the study group
         if ($groupChallenge->study_group_id !== $studyGroup->id) {
             abort(404, 'Challenge not found in this study group.');
         }
-        
+
         // Load relationships
         $groupChallenge->load(['creator', 'category', 'tasks', 'participants']);
-        
+
         // Get user's progress in this challenge
         $userProgress = $groupChallenge->participants()
             ->where('user_id', $user->id)
             ->first();
-        
+
         return view('study-groups.challenges.show', [
             'studyGroup' => $studyGroup,
             'groupChallenge' => $groupChallenge,
@@ -121,20 +121,20 @@ class GroupChallengeController extends Controller
     public function edit(StudyGroup $studyGroup, GroupChallenge $groupChallenge): View
     {
         $user = Auth::user();
-        
+
         // Check if user is a leader or moderator
         if (!$studyGroup->isModerator($user)) {
             abort(403, 'You do not have permission to edit challenges for this study group.');
         }
-        
+
         // Check if the challenge belongs to the study group
         if ($groupChallenge->study_group_id !== $studyGroup->id) {
             abort(404, 'Challenge not found in this study group.');
         }
-        
+
         // Get categories for the form
         $categories = Category::all();
-        
+
         return view('study-groups.challenges.edit', [
             'studyGroup' => $studyGroup,
             'groupChallenge' => $groupChallenge,
@@ -148,17 +148,17 @@ class GroupChallengeController extends Controller
     public function update(Request $request, StudyGroup $studyGroup, GroupChallenge $groupChallenge)
     {
         $user = Auth::user();
-        
+
         // Check if user is a leader or moderator
         if (!$studyGroup->isModerator($user)) {
             abort(403, 'You do not have permission to edit challenges for this study group.');
         }
-        
+
         // Check if the challenge belongs to the study group
         if ($groupChallenge->study_group_id !== $studyGroup->id) {
             abort(404, 'Challenge not found in this study group.');
         }
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -172,7 +172,7 @@ class GroupChallengeController extends Controller
             'time_limit' => 'nullable|integer|min:0',
             'challenge_content' => 'nullable|string',
         ]);
-        
+
         // Update the group challenge
         $groupChallenge->name = $request->name;
         $groupChallenge->description = $request->description;
@@ -185,9 +185,9 @@ class GroupChallengeController extends Controller
         $groupChallenge->challenge_type = $request->challenge_type;
         $groupChallenge->time_limit = $request->time_limit;
         $groupChallenge->challenge_content = $request->challenge_content;
-        
+
         $groupChallenge->save();
-        
+
         return redirect()->route('study-groups.challenges.show', [
             'studyGroup' => $studyGroup,
             'groupChallenge' => $groupChallenge,
@@ -200,22 +200,22 @@ class GroupChallengeController extends Controller
     public function join(StudyGroup $studyGroup, GroupChallenge $groupChallenge)
     {
         $user = Auth::user();
-        
+
         // Check if user is a member of the study group
         if (!$studyGroup->hasMember($user)) {
             abort(403, 'You are not a member of this study group.');
         }
-        
+
         // Check if the challenge belongs to the study group
         if ($groupChallenge->study_group_id !== $studyGroup->id) {
             abort(404, 'Challenge not found in this study group.');
         }
-        
+
         // Check if the challenge is active
         if (!$groupChallenge->isActive()) {
             return redirect()->back()->with('error', 'This challenge is not currently active.');
         }
-        
+
         // Check if user is already participating
         if ($groupChallenge->participants()->where('user_id', $user->id)->exists()) {
             return redirect()->route('study-groups.challenges.show', [
@@ -223,14 +223,14 @@ class GroupChallengeController extends Controller
                 'groupChallenge' => $groupChallenge,
             ])->with('info', 'You are already participating in this challenge.');
         }
-        
+
         // Add user as a participant
         $groupChallenge->participants()->attach($user->id, [
             'status' => 'in_progress',
             'progress' => 0,
             'attempts' => 1,
         ]);
-        
+
         return redirect()->route('study-groups.challenges.show', [
             'studyGroup' => $studyGroup,
             'groupChallenge' => $groupChallenge,
@@ -243,47 +243,63 @@ class GroupChallengeController extends Controller
     public function updateProgress(Request $request, StudyGroup $studyGroup, GroupChallenge $groupChallenge)
     {
         $user = Auth::user();
-        
+
         // Check if user is a member of the study group
         if (!$studyGroup->hasMember($user)) {
             abort(403, 'You are not a member of this study group.');
         }
-        
+
         // Check if the challenge belongs to the study group
         if ($groupChallenge->study_group_id !== $studyGroup->id) {
             abort(404, 'Challenge not found in this study group.');
         }
-        
+
         $request->validate([
             'progress' => 'required|integer|min:0|max:100',
         ]);
-        
+
         // Check if user is participating
         $userProgress = $groupChallenge->participants()->where('user_id', $user->id)->first();
-        
+
         if (!$userProgress) {
             return redirect()->back()->with('error', 'You are not participating in this challenge.');
         }
-        
+
         // Update progress
         $progress = $request->progress;
         $status = $progress >= 100 ? 'completed' : 'in_progress';
         $completedAt = $progress >= 100 ? now() : null;
-        
+
         $groupChallenge->participants()->updateExistingPivot($user->id, [
             'status' => $status,
             'progress' => $progress,
             'completed_at' => $completedAt,
         ]);
-        
-        // Award points if completed
+
+        // Award points and trigger events if completed
         if ($progress >= 100 && $userProgress->pivot->status !== 'completed') {
             $user->addPoints(
                 $groupChallenge->points_reward,
                 reason: "Completed group challenge: {$groupChallenge->name}"
             );
+
+            // Fire challenge completion events for audit trail
+            try {
+                event(new \App\Events\ChallengeCompleted($user, $groupChallenge));
+                \Illuminate\Support\Facades\Log::info("Group challenge completion event fired", [
+                    'user_id' => $user->id,
+                    'challenge_id' => $groupChallenge->id,
+                    'challenge_name' => $groupChallenge->name
+                ]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Error firing group challenge completion event: {$e->getMessage()}", [
+                    'user_id' => $user->id,
+                    'challenge_id' => $groupChallenge->id,
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
         }
-        
+
         return redirect()->route('study-groups.challenges.show', [
             'studyGroup' => $studyGroup,
             'groupChallenge' => $groupChallenge,

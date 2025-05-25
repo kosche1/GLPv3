@@ -119,20 +119,54 @@ class AuditTrail extends Model
      * Record a challenge completion event.
      *
      * @param User $user The user who completed the challenge
-     * @param Challenge $challenge The challenge that was completed
+     * @param Challenge|GroupChallenge $challenge The challenge that was completed
      * @param array $additionalData Additional data to store
      * @return AuditTrail
      */
-    public static function recordChallengeCompletion(User $user, Challenge $challenge, array $additionalData = []): AuditTrail
+    public static function recordChallengeCompletion(User $user, $challenge, array $additionalData = []): AuditTrail
     {
         // Get subject type and name if available
-        $subjectType = $challenge->subjectType ? $challenge->subjectType->name : null;
+        $subjectType = null;
         $subjectName = null;
+        $challengeType = 'challenge';
 
-        if ($challenge->strand) {
-            $subjectName = $challenge->strand->name;
-        } elseif (isset($additionalData['subject_name'])) {
+        // Handle regular Challenge model
+        if ($challenge instanceof Challenge) {
+            $subjectType = $challenge->subjectType ? $challenge->subjectType->name : null;
+            if ($challenge->strand) {
+                $subjectName = $challenge->strand->name;
+            }
+        }
+        // Handle GroupChallenge model
+        elseif ($challenge instanceof GroupChallenge) {
+            $challengeType = 'group_challenge';
+            if ($challenge->category) {
+                $subjectName = $challenge->category->name;
+            }
+        }
+        // Handle generic challenge objects (like investment challenges)
+        elseif (is_object($challenge)) {
+            $challengeType = $additionalData['challenge_type'] ?? 'challenge';
+        }
+
+        // Allow override from additional data
+        if (isset($additionalData['subject_name'])) {
             $subjectName = $additionalData['subject_name'];
+        }
+        if (isset($additionalData['subject_type'])) {
+            $subjectType = $additionalData['subject_type'];
+        }
+
+        // Determine score for the audit trail
+        $score = null;
+        if (isset($additionalData['score'])) {
+            $score = $additionalData['score'];
+        } elseif (isset($additionalData['wpm_achieved'])) {
+            // For typing tests, use WPM as score
+            $score = $additionalData['wpm_achieved'];
+        } elseif (isset($challenge->points_reward)) {
+            // For challenges with points, use points as score
+            $score = $challenge->points_reward;
         }
 
         return self::create([
@@ -141,11 +175,13 @@ class AuditTrail extends Model
             'subject_type' => $subjectType,
             'subject_name' => $subjectName,
             'challenge_name' => $challenge->name,
-            'description' => "Completed challenge: {$challenge->name}",
+            'score' => $score,
+            'description' => "Completed {$challengeType}: {$challenge->name}",
             'additional_data' => array_merge([
                 'completed_at' => now()->toDateTimeString(),
-                'points_earned' => $challenge->points_reward,
-                'difficulty_level' => $challenge->difficulty_level,
+                'points_earned' => $challenge->points_reward ?? 0,
+                'difficulty_level' => $challenge->difficulty_level ?? null,
+                'challenge_type' => $challengeType,
             ], $additionalData),
         ]);
     }

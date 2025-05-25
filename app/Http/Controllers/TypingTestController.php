@@ -171,6 +171,62 @@ class TypingTestController extends Controller
             $result->save();
 
             if ($request->challenge_id) {
+                // Check if this result completes the challenge
+                $challenge = \App\Models\TypingTestChallenge::find($request->challenge_id);
+                $user = Auth::user();
+
+                if ($challenge && $user) {
+                    $metWpmTarget = $result->wpm >= $challenge->target_wpm;
+                    $metAccuracyTarget = $result->accuracy >= $challenge->target_accuracy;
+
+                    // Check if user has already completed this challenge before
+                    $hasCompletedBefore = \App\Models\TypingTestResult::where('user_id', $user->id)
+                        ->where('challenge_id', $challenge->id)
+                        ->where('id', '!=', $result->id) // Exclude current result
+                        ->get()
+                        ->filter(function ($previousResult) use ($challenge) {
+                            return $previousResult->wpm >= $challenge->target_wpm &&
+                                   $previousResult->accuracy >= $challenge->target_accuracy;
+                        })
+                        ->isNotEmpty();
+
+                    // If both targets are met and this is the first completion, record in audit trail
+                    if ($metWpmTarget && $metAccuracyTarget && !$hasCompletedBefore) {
+                        try {
+                            // Create a pseudo-challenge object for audit trail
+                            $challengeData = (object) [
+                                'name' => $challenge->title,
+                                'points_reward' => 0, // Typing challenges don't have points
+                                'difficulty_level' => $challenge->difficulty,
+                            ];
+
+                            \App\Models\AuditTrail::recordChallengeCompletion($user, $challengeData, [
+                                'challenge_type' => 'typing_test',
+                                'subject_name' => 'ICT',
+                                'subject_type' => 'Specialized',
+                                'wpm_achieved' => $result->wpm,
+                                'accuracy_achieved' => $result->accuracy,
+                                'target_wpm' => $challenge->target_wpm,
+                                'target_accuracy' => $challenge->target_accuracy,
+                            ]);
+
+                            Log::info('Typing test challenge completion recorded in audit trail', [
+                                'user_id' => $user->id,
+                                'challenge_id' => $challenge->id,
+                                'challenge_title' => $challenge->title,
+                                'wpm_achieved' => $result->wpm,
+                                'accuracy_achieved' => $result->accuracy
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Error recording typing test challenge completion: ' . $e->getMessage(), [
+                                'user_id' => $user->id,
+                                'challenge_id' => $challenge->id,
+                                'trace' => $e->getTraceAsString()
+                            ]);
+                        }
+                    }
+                }
+
                 Log::info('Typing test challenge result saved successfully', [
                     'user_id' => Auth::id(),
                     'result_id' => $result->id,
