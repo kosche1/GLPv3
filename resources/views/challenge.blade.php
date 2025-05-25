@@ -375,18 +375,28 @@
                                                         </svg>
                                                     </span>
                                                 @else
-                                                    <a href="{{
-                                                        $challenge->subject_type === 'core' ? route('core.challenge.task', ['challenge' => $challenge, 'task' => $task]) :
-                                                        ($challenge->subject_type === 'applied' ? route('applied.challenge.task', ['challenge' => $challenge, 'task' => $task]) :
-                                                        ($challenge->subject_type === 'specialized' ? route('specialized.challenge.task', ['challenge' => $challenge, 'task' => $task]) :
-                                                        route('challenge.task', ['challenge' => $challenge, 'task' => $task])))
-                                                    }}"
-                                                       class="px-6 py-1.5 text-sm font-medium rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white transition-colors duration-300 flex items-center gap-1.5">
-                                                        {{ $task->completed ? 'Review' : 'Start' }}
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                        </svg>
-                                                    </a>
+                                                    <div class="flex flex-col items-end gap-2">
+                                                        @if($task->time_limit)
+                                                            <div class="text-xs text-neutral-400 flex items-center gap-1">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                {{ $task->time_limit }} min limit
+                                                            </div>
+                                                        @endif
+                                                        <a href="{{
+                                                            $challenge->subject_type === 'core' ? route('core.challenge.task', ['challenge' => $challenge, 'task' => $task]) :
+                                                            ($challenge->subject_type === 'applied' ? route('applied.challenge.task', ['challenge' => $challenge, 'task' => $task]) :
+                                                            ($challenge->subject_type === 'specialized' ? route('specialized.challenge.task', ['challenge' => $challenge, 'task' => $task]) :
+                                                            route('challenge.task', ['challenge' => $challenge, 'task' => $task])))
+                                                        }}"
+                                                           class="px-6 py-1.5 text-sm font-medium rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white transition-colors duration-300 flex items-center gap-1.5">
+                                                            {{ $task->completed ? 'Review' : 'Start' }}
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                                            </svg>
+                                                        </a>
+                                                    </div>
                                                 @endif
                                             @else
                                                 <span class="px-3 py-1.5 text-sm font-medium rounded-lg bg-neutral-700/50 text-neutral-400 cursor-not-allowed flex items-center gap-1.5">

@@ -119,10 +119,20 @@
                                 submitBtn.textContent = 'Answer Submitted - Pending Review';
                             }
 
-                            // Redirect to challenge page after a short delay
+                            // Stop timer if running
+                            if (window.taskTimer) {
+                                clearInterval(window.taskTimer);
+                            }
+
+                            // Show task submitted modal
                             setTimeout(() => {
-                                window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
-                            }, 1500);
+                                if (window.showTaskSubmittedModal) {
+                                    window.showTaskSubmittedModal();
+                                } else {
+                                    // Fallback to direct redirect if modal function not available
+                                    window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
+                                }
+                            }, 1000);
                         } else {
                             // Show error message
                             const messageContainer = document.getElementById('submission-message');
@@ -178,6 +188,19 @@
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
         <!-- Hidden element to store next task URL -->
         <div id="next-task-url" class="hidden" data-url="{{ $nextTask ? route('challenge.task', ['challenge' => $challenge, 'task' => $nextTask]) : '' }}"></div>
+        <!-- Timer Display (shown when task is started) -->
+        @if($currentTask->time_limit)
+        <div id="timer-display" class="hidden mb-4 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-center">
+            <div class="flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-lg font-semibold text-amber-400">Time Remaining: </span>
+                <span id="timer-countdown" class="text-2xl font-bold text-white">{{ $currentTask->time_limit }}:00</span>
+            </div>
+        </div>
+        @endif
+
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="p-2 bg-emerald-500/10 rounded-lg">
@@ -674,6 +697,140 @@
     </style>
 
     <script>
+        // Timer functionality - make global
+        window.taskTimer = null;
+        window.timeRemaining = {{ $currentTask->time_limit ? $currentTask->time_limit * 60 : 0 }}; // Convert minutes to seconds
+        window.timerStarted = false;
+
+        window.startTaskTimer = function() {
+            if (!window.timeRemaining || window.timerStarted) return;
+
+            window.timerStarted = true;
+            const timerDisplay = document.getElementById('timer-display');
+            const timerCountdown = document.getElementById('timer-countdown');
+
+            if (timerDisplay) {
+                timerDisplay.classList.remove('hidden');
+            }
+
+            window.taskTimer = setInterval(function() {
+                window.timeRemaining--;
+                window.updateTimerDisplay();
+
+                if (window.timeRemaining <= 0) {
+                    clearInterval(window.taskTimer);
+                    window.handleTimeUp();
+                }
+            }, 1000);
+
+            window.updateTimerDisplay();
+        }
+
+        window.updateTimerDisplay = function() {
+            const timerCountdown = document.getElementById('timer-countdown');
+            if (!timerCountdown) return;
+
+            const minutes = Math.floor(window.timeRemaining / 60);
+            const seconds = window.timeRemaining % 60;
+            const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            timerCountdown.textContent = timeString;
+
+            // Change color when time is running low
+            if (window.timeRemaining <= 60) { // Last minute
+                timerCountdown.classList.add('text-red-400');
+                timerCountdown.classList.remove('text-white');
+            } else if (window.timeRemaining <= 300) { // Last 5 minutes
+                timerCountdown.classList.add('text-amber-400');
+                timerCountdown.classList.remove('text-white');
+            }
+        }
+
+        window.handleTimeUp = function() {
+            // Auto-submit the current answer
+            window.autoSubmitAnswer();
+
+            // Show time's up modal
+            const modal = document.getElementById('times-up-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        window.autoSubmitAnswer = function() {
+            // Check if we're in a coding challenge with an editor
+            if (document.getElementById('monaco-editor-container') && window.editor) {
+                const code = window.editor.getValue();
+                const currentOutput = window.lastExecutionOutput || '';
+
+                // Submit coding solution
+                fetch('/api/direct-text-solution', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        task_id: {{ $currentTask->id }},
+                        user_id: {{ auth()->user()->id }},
+                        student_answer: {
+                            code: code,
+                            output: currentOutput,
+                            submitted_text: currentOutput,
+                            auto_submitted: true,
+                            time_expired: true
+                        }
+                    })
+                }).catch(error => {
+                    console.error('Error auto-submitting coding solution:', error);
+                });
+            } else {
+                // Submit text answer
+                const answerInput = document.getElementById('answer-input');
+                const submittedAnswer = answerInput ? answerInput.value.trim() : '';
+
+                fetch('/api/direct-text-solution', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        task_id: {{ $currentTask->id }},
+                        user_id: {{ auth()->user()->id }},
+                        student_answer: {
+                            submitted_text: submittedAnswer,
+                            output: submittedAnswer,
+                            auto_submitted: true,
+                            time_expired: true
+                        }
+                    })
+                }).catch(error => {
+                    console.error('Error auto-submitting text answer:', error);
+                });
+            }
+        }
+
+        window.showTaskSubmittedModal = function() {
+            const modal = document.getElementById('task-submitted-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        window.navigateToNextTask = function() {
+            const nextTaskUrl = '{{ $nextTask ? route("challenge.task", ["challenge" => $challenge, "task" => $nextTask]) : "" }}';
+
+            if (nextTaskUrl) {
+                window.location.href = nextTaskUrl;
+            } else {
+                // Redirect to the challenge page if there's no next task
+                window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
+            }
+        }
+
         // Wait until the DOM is fully loaded
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize variables
@@ -897,21 +1054,15 @@
                             displayOutput('Solution submitted successfully.', false);
                         }
 
-                        // Get the next task URL
-                        const nextTaskUrl = '{{ $nextTask ? route("challenge.task", ["challenge" => $challenge, "task" => $nextTask]) : "" }}';
-
-                        if (nextTaskUrl) {
-                            displayOutput('Redirecting to Next Task...', false);
-                            setTimeout(() => {
-                                window.location.href = nextTaskUrl;
-                            }, 1500);
-                        } else {
-                            // Redirect to the challenge page if there's no next task
-                            displayOutput('Redirecting to Challenge Page...', false);
-                            setTimeout(() => {
-                                window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
-                            }, 1500);
+                        // Stop timer if running
+                        if (window.taskTimer) {
+                            clearInterval(window.taskTimer);
                         }
+
+                        // Show task submitted modal
+                        setTimeout(() => {
+                            window.showTaskSubmittedModal();
+                        }, 1000);
                     } else {
                         displayOutput(data.message || 'Failed to submit solution', true);
                     }
@@ -996,10 +1147,15 @@
                                 messageText.textContent = data.message;
                             }
 
-                            // Redirect to challenge page after a short delay
+                            // Stop timer if running
+                            if (window.taskTimer) {
+                                clearInterval(window.taskTimer);
+                            }
+
+                            // Show task submitted modal
                             setTimeout(() => {
-                                window.location.href = '{{ route("challenge", ["challenge" => $currentTask->challenge_id]) }}';
-                            }, 1500);
+                                window.showTaskSubmittedModal();
+                            }, 1000);
                         } else {
                             // Show error message
                             const messageContainer = document.getElementById('submission-message');
@@ -1120,7 +1276,101 @@
             window.addEventListener('resize', function() {
                 if (editor) editor.layout();
             });
+
+            // Start timer when page loads (if task has time limit)
+            @if($currentTask->time_limit)
+                window.startTaskTimer();
+            @endif
+
+            // Modal event listeners
+            const timesUpNextBtn = document.getElementById('times-up-next-btn');
+            const submittedNextBtn = document.getElementById('submitted-next-btn');
+            const closeSubmittedModal = document.getElementById('close-submitted-modal');
+
+            if (timesUpNextBtn) {
+                timesUpNextBtn.addEventListener('click', window.navigateToNextTask);
+            }
+
+            if (submittedNextBtn) {
+                submittedNextBtn.addEventListener('click', window.navigateToNextTask);
+            }
+
+            if (closeSubmittedModal) {
+                closeSubmittedModal.addEventListener('click', function() {
+                    const modal = document.getElementById('task-submitted-modal');
+                    if (modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Make editor and lastExecutionOutput globally accessible
+            window.editor = editor;
+            window.lastExecutionOutput = lastExecutionOutput;
         });
 
     </script>
+
+    <!-- Time's Up Modal -->
+    <div id="times-up-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="relative bg-neutral-800 rounded-xl shadow-lg p-8 max-w-md w-full mx-4 border border-red-500/30 transform transition-all">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-500/20 mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Time's Up!</h3>
+                <p class="text-neutral-300 mb-6">Your time limit has expired. Your current answer will be automatically submitted.</p>
+                <div class="flex flex-col gap-3">
+                    <button id="times-up-next-btn" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center flex items-center justify-center gap-2">
+                        <span>Next Task</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Submitted Modal -->
+    <div id="task-submitted-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+        <div class="relative bg-neutral-800 rounded-xl shadow-lg p-8 max-w-md w-full mx-4 border border-emerald-500/30 transform transition-all">
+            <div class="absolute top-4 right-4">
+                <button id="close-submitted-modal" class="text-neutral-400 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/20 mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Task Submitted!</h3>
+                <p class="text-neutral-300 mb-2">Great job! Your answer has been submitted successfully.</p>
+                <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
+                    <p class="text-blue-400 flex items-start gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Your answer will be reviewed by your teacher. You'll receive feedback and points once the review is complete.</span>
+                    </p>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <button id="submitted-next-btn" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-colors duration-300 text-white font-semibold text-center flex items-center justify-center gap-2">
+                        <span>Next Task</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </x-layouts.app>
