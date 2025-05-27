@@ -4,6 +4,9 @@ import CodeEditor from './components/CodeEditor.vue'
 // Import AiWidget to ensure it's included in the build
 import './AiWidget/index.js'
 
+// Import real-time functionality
+import './realtime.js'
+
 // Disabled old AutoLock in favor of Livewire component
 // import AutoLock from './auto-lock.js'
 

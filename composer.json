@@ -28,7 +28,8 @@
         "wire-elements/modal": "^2.0",
         "workos/workos-php-laravel": "^4.1",
         "maatwebsite/excel": "^3.1",
-        "dompdf/dompdf": "^3.0"
+        "dompdf/dompdf": "^3.0",
+        "pusher/pusher-php-server": "^7.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
