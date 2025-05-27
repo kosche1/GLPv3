@@ -1,4 +1,8 @@
 <x-layouts.app>
+    <!-- Meta tags for real-time functionality -->
+    <meta name="user-id" content="{{ auth()->id() }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- Task and recipe approval notifications are now handled by global components -->
 
     <div class="relative flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg overflow-hidden backdrop-blur-sm">
@@ -11,6 +15,14 @@
                 <h1 class="text-2xl font-bold text-white tracking-tight">GLP - Gamified Dashboard</h1>
             </div>
             <div class="flex items-center gap-3">
+                <!-- Real-time Connection Status -->
+                <div class="flex items-center gap-2 bg-neutral-800/50 px-3 py-1.5 rounded-full border border-neutral-700/50 shadow-lg backdrop-blur-sm">
+                    <div class="connection-status connecting">
+                        <div class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
+                    </div>
+                    <span class="text-xs text-gray-400">Connecting...</span>
+                </div>
+
                 <div class="flex items-center gap-3 bg-neutral-800/50 px-4 py-1.5 rounded-full border border-neutral-700/50 shadow-lg backdrop-blur-sm">
                     <span class="text-sm text-gray-300 font-medium">{{ date('l, F j, Y') }}</span>
                     <div class="h-6 w-6 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
@@ -88,7 +100,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
-                        <span x-show="getUnreadCount() > 0" x-text="getUnreadCount()" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"></span>
+                        <span x-show="getUnreadCount() > 0" x-text="getUnreadCount()" class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"></span>
                     </button>
 
                     <!-- Notification Panel -->
@@ -1092,7 +1104,7 @@
                 </div>
 
                 <!-- Leaderboard -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                <div class="leaderboard-container rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(234,179,8,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/0 via-yellow-500/5 to-yellow-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
                     <div class="p-6 relative z-10">
@@ -1110,6 +1122,7 @@
                                 @php $rank = $index + 1; @endphp
                                 <div
                                     onclick="Livewire.dispatch('openUserActivityModal', { userId: {{ $entry->user->id }} })"
+                                    data-user-id="{{ $entry->user->id }}"
                                     class="flex items-center p-3 rounded-xl {{ $entry->user->id === $user->id ? 'bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/15' : 'bg-neutral-700/20 border border-neutral-700/50 hover:bg-neutral-700/30' }} transition-all duration-300 group relative overflow-hidden cursor-pointer"
                                 >
                                     <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0)_75%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
@@ -1243,6 +1256,188 @@
 
     <!-- Activity graph is now server-side rendered -->
 
+    <!-- Real-time Dashboard Integration -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize real-time features when the manager is ready
+            if (window.realTimeManager) {
+                initializeDashboardRealTime();
+            } else {
+                // Wait for real-time manager to load
+                setTimeout(() => {
+                    if (window.realTimeManager) {
+                        initializeDashboardRealTime();
+                    }
+                }, 1000);
+            }
+        });
+
+        function initializeDashboardRealTime() {
+            const rtm = window.realTimeManager;
+
+            // Handle real-time notifications
+            rtm.onNotification((data) => {
+                console.log('Dashboard received notification:', data);
+
+                // Show toast notification
+                showToastNotification(data);
+
+                // Update notification UI if Alpine.js component exists
+                updateNotificationDropdown(data);
+            });
+
+            // Handle leaderboard updates
+            rtm.onLeaderboardUpdate((data) => {
+                console.log('Dashboard received leaderboard update:', data);
+                updateLeaderboardDisplay(data);
+            });
+
+            // Handle activity updates
+            rtm.onActivity((data) => {
+                console.log('Dashboard received activity update:', data);
+                updateActivityDisplay(data);
+            });
+
+            // Handle challenge progress updates
+            rtm.onChallengeProgress((data) => {
+                console.log('Dashboard received challenge progress:', data);
+                updateChallengeProgress(data);
+            });
+        }
+
+        function showToastNotification(data) {
+            // Create toast notification element
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 z-50 max-w-sm bg-neutral-800 border border-emerald-500/30 rounded-lg shadow-xl p-4 transform translate-x-full transition-transform duration-300';
+            toast.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0">
+                        ${getNotificationIcon(data.type)}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-white">${data.title || 'Notification'}</p>
+                        <p class="text-sm text-gray-300 mt-1">${data.message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 text-gray-400 hover:text-white">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        function getNotificationIcon(type) {
+            const icons = {
+                'achievement': '<div class="w-6 h-6 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">🏆</div>',
+                'level_up': '<div class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">⬆️</div>',
+                'challenge': '<div class="w-6 h-6 rounded-full bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400">⚡</div>',
+                'system': '<div class="w-6 h-6 rounded-full bg-gray-500/20 border border-gray-500/30 flex items-center justify-center text-gray-400">ℹ️</div>',
+            };
+            return icons[type] || icons['system'];
+        }
+
+        function updateNotificationDropdown(data) {
+            // This would integrate with Alpine.js notification component
+            const notificationContainer = document.querySelector('[x-data*="notifications"]');
+            if (notificationContainer && window.Alpine) {
+                const alpineData = window.Alpine.$data(notificationContainer);
+                if (alpineData && alpineData.notifications) {
+                    alpineData.notifications.unshift(data);
+                }
+            }
+        }
+
+        function updateLeaderboardDisplay(data) {
+            // Update leaderboard entries with animation
+            if (data.leaderboard) {
+                data.leaderboard.forEach((entry, index) => {
+                    const element = document.querySelector(`[data-user-id="${entry.user_id}"]`);
+                    if (element) {
+                        // Add update animation
+                        element.classList.add('rank-updated');
+                        setTimeout(() => element.classList.remove('rank-updated'), 1000);
+
+                        // Update rank if changed
+                        const rankElement = element.querySelector('.font-bold');
+                        if (rankElement && rankElement.textContent !== (index + 1).toString()) {
+                            rankElement.textContent = index + 1;
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateActivityDisplay(data) {
+            // Update activity graph or feed
+            console.log('Updating activity display:', data);
+        }
+
+        function updateChallengeProgress(data) {
+            // Update challenge progress bars
+            const challengeElement = document.querySelector(`[data-challenge-id="${data.challenge_id}"]`);
+            if (challengeElement) {
+                const progressBar = challengeElement.querySelector('.progress-bar, [style*="width"]');
+                if (progressBar) {
+                    progressBar.style.width = `${data.progress}%`;
+                    progressBar.classList.add('progress-updated');
+                    setTimeout(() => progressBar.classList.remove('progress-updated'), 1000);
+                }
+            }
+        }
+
+        // Connection status updates
+        function updateConnectionStatus(status) {
+            const statusElement = document.querySelector('.connection-status');
+            const statusText = statusElement?.nextElementSibling;
+
+            if (statusElement && statusText) {
+                statusElement.className = `connection-status ${status}`;
+
+                const statusTexts = {
+                    'connected': 'Connected',
+                    'disconnected': 'Disconnected',
+                    'connecting': 'Connecting...',
+                    'error': 'Connection Error'
+                };
+
+                statusText.textContent = statusTexts[status] || 'Unknown';
+            }
+        }
+
+        // Listen for connection status changes
+        if (window.Echo) {
+            window.Echo.connector.pusher.connection.bind('connected', () => {
+                updateConnectionStatus('connected');
+            });
+
+            window.Echo.connector.pusher.connection.bind('disconnected', () => {
+                updateConnectionStatus('disconnected');
+            });
+
+            window.Echo.connector.pusher.connection.bind('connecting', () => {
+                updateConnectionStatus('connecting');
+            });
+
+            window.Echo.connector.pusher.connection.bind('error', () => {
+                updateConnectionStatus('error');
+            });
+        }
+    </script>
+
     <!-- Keyboard Shortcuts -->
     <script>
         // Keyboard shortcuts for quick navigation
@@ -1350,6 +1545,48 @@
             .animate-shimmer {
                 animation-duration: 6s;
             }
+        }
+
+        /* Real-time connection status styles */
+        .connection-status.connected .w-2 {
+            background-color: #10b981; /* emerald-500 */
+            animation: none;
+        }
+        .connection-status.disconnected .w-2 {
+            background-color: #ef4444; /* red-500 */
+            animation: pulse 2s infinite;
+        }
+        .connection-status.error .w-2 {
+            background-color: #f59e0b; /* amber-500 */
+            animation: pulse 1s infinite;
+        }
+
+        /* Real-time update animations */
+        .rank-updated {
+            animation: rankUpdate 1s ease-in-out;
+        }
+        @keyframes rankUpdate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); background-color: rgba(16, 185, 129, 0.2); }
+            100% { transform: scale(1); }
+        }
+
+        .progress-updated {
+            animation: progressUpdate 1s ease-in-out;
+        }
+        @keyframes progressUpdate {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Notification animations */
+        .notification-new {
+            animation: notificationPulse 2s ease-in-out;
+        }
+        @keyframes notificationPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
     </style>
 

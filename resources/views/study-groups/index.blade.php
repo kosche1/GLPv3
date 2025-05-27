@@ -1,10 +1,38 @@
 <x-layouts.app>
-    <div class="container mx-auto px-4 py-8">
+    <div class="relative flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500 rounded-lg overflow-hidden backdrop-blur-sm">
+        <!-- Enhanced Header Section -->
         <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Study Groups</h1>
-                <p class="mt-2 text-gray-600 dark:text-gray-400">Collaborate with other learners to achieve your goals together</p>
+                <p class="mt-2 text-gray-600 dark:text-gray-400">Join collaborative learning communities and achieve your academic goals together with fellow students</p>
+
+                <!-- Quick Stats -->
+                <div class="mt-4 flex flex-wrap gap-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="rounded-full bg-emerald-100 p-2 dark:bg-emerald-900/30">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600 dark:text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Your Groups</p>
+                            <p class="font-semibold text-gray-900 dark:text-white">{{ $myGroups->count() }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="rounded-full bg-blue-100 p-2 dark:bg-blue-900/30">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Available</p>
+                            <p class="font-semibold text-gray-900 dark:text-white">{{ $publicGroups->count() }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             <div class="mt-4 md:mt-0">
                 <a href="{{ route('study-groups.create') }}" class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-300">
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -31,9 +59,19 @@
         </div>
 
         <!-- My Study Groups -->
-        <div class="mb-8">
-            <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">My Study Groups</h2>
-            
+        <div class="mb-12">
+            <div class="mb-8 flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white">My Study Groups</h2>
+                    <p class="mt-1 text-gray-600 dark:text-gray-400">Groups you've joined or created</p>
+                </div>
+                @if(!$myGroups->isEmpty())
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ $myGroups->count() }} {{ Str::plural('group', $myGroups->count()) }}
+                    </div>
+                @endif
+            </div>
+
             @if($myGroups->isEmpty())
                 <div class="rounded-lg bg-white p-6 text-center shadow-md dark:bg-zinc-800">
                     <p class="text-gray-600 dark:text-gray-400">You haven't joined any study groups yet.</p>
@@ -42,9 +80,9 @@
             @else
                 <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     @foreach($myGroups as $group)
-                        <div class="group flex flex-col rounded-xl border border-neutral-200 bg-white overflow-hidden transition-all duration-300 hover:shadow-lg dark:border-neutral-700 dark:bg-zinc-800">
+                        <div class="group relative flex flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.01] hover:-translate-y-0.5 dark:border-neutral-700 dark:bg-zinc-800">
                             <!-- Group Image -->
-                            <div class="h-40 w-full overflow-hidden bg-gradient-to-r from-emerald-500 to-blue-500">
+                            <div class="h-40 w-full overflow-hidden bg-emerald-500">
                                 @if($group->image)
                                     <img src="{{ asset('storage/' . $group->image) }}" alt="{{ $group->name }}" class="h-full w-full object-cover">
                                 @else
@@ -55,7 +93,7 @@
                                     </div>
                                 @endif
                             </div>
-                            
+
                             <!-- Group Info -->
                             <div class="flex flex-grow flex-col p-4">
                                 <div class="mb-2 flex items-center justify-between">
@@ -64,11 +102,11 @@
                                         {{ $group->is_private ? 'Private' : 'Public' }}
                                     </span>
                                 </div>
-                                
+
                                 <p class="mb-4 flex-grow text-sm text-gray-600 dark:text-gray-400">
                                     {{ Str::limit($group->description, 100) }}
                                 </p>
-                                
+
                                 <div class="mt-auto">
                                     <div class="mb-3 flex items-center text-sm text-gray-500 dark:text-gray-400">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -76,7 +114,7 @@
                                         </svg>
                                         {{ $group->members->count() }} / {{ $group->max_members }} members
                                     </div>
-                                    
+
                                     <a href="{{ route('study-groups.show', $group) }}" class="inline-block w-full rounded-lg bg-emerald-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-300 dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800">
                                         View Group
                                     </a>
@@ -90,8 +128,18 @@
 
         <!-- Public Study Groups -->
         <div>
-            <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Public Study Groups</h2>
-            
+            <div class="mb-8 flex items-center justify-between">
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Discover Public Groups</h2>
+                    <p class="mt-1 text-gray-600 dark:text-gray-400">Join open communities and expand your learning network</p>
+                </div>
+                @if(!$publicGroups->isEmpty())
+                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ $publicGroups->count() }} available {{ Str::plural('group', $publicGroups->count()) }}
+                    </div>
+                @endif
+            </div>
+
             @if($publicGroups->isEmpty())
                 <div class="rounded-lg bg-white p-6 text-center shadow-md dark:bg-zinc-800">
                     <p class="text-gray-600 dark:text-gray-400">No public study groups available at the moment.</p>
@@ -99,9 +147,9 @@
             @else
                 <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     @foreach($publicGroups as $group)
-                        <div class="group flex flex-col rounded-xl border border-neutral-200 bg-white overflow-hidden transition-all duration-300 hover:shadow-lg dark:border-neutral-700 dark:bg-zinc-800">
+                        <div class="group relative flex flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-md transition-all duration-300 hover:shadow-lg hover:scale-[1.01] hover:-translate-y-0.5 dark:border-neutral-700 dark:bg-zinc-800">
                             <!-- Group Image -->
-                            <div class="h-40 w-full overflow-hidden bg-gradient-to-r from-blue-500 to-purple-500">
+                            <div class="h-40 w-full overflow-hidden bg-blue-500">
                                 @if($group->image)
                                     <img src="{{ asset('storage/' . $group->image) }}" alt="{{ $group->name }}" class="h-full w-full object-cover">
                                 @else
@@ -112,14 +160,14 @@
                                     </div>
                                 @endif
                             </div>
-                            
+
                             <!-- Group Info -->
                             <div class="flex flex-grow flex-col p-4">
                                 <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">{{ $group->name }}</h3>
                                 <p class="mb-4 flex-grow text-sm text-gray-600 dark:text-gray-400">
                                     {{ Str::limit($group->description, 100) }}
                                 </p>
-                                
+
                                 <div class="mt-auto">
                                     <div class="mb-3 flex items-center text-sm text-gray-500 dark:text-gray-400">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -127,7 +175,7 @@
                                         </svg>
                                         {{ $group->members_count }} / {{ $group->max_members }} members
                                     </div>
-                                    
+
                                     <form action="{{ route('study-groups.join') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="study_group_id" value="{{ $group->id }}">

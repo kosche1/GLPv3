@@ -25,6 +25,8 @@ class GradesComponent extends Component
     public $selectedSemester = 'current';
     public $courses = [];
     public $searchQuery = '';
+    public $sortField = 'name';
+    public $sortDirection = 'asc';
 
     public function mount()
     {
@@ -174,9 +176,52 @@ class GradesComponent extends Component
         $this->loadCourses(); // Reload courses based on selected semester
     }
 
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
+
     public function render()
     {
-        return view('livewire.grades-component');
+        $filteredCourses = collect($this->courses);
+
+        // Apply search filter
+        if (!empty($this->searchQuery)) {
+            $filteredCourses = $filteredCourses->filter(function ($course) {
+                return stripos($course['name'], $this->searchQuery) !== false ||
+                       stripos($course['code'], $this->searchQuery) !== false ||
+                       stripos($course['grade'], $this->searchQuery) !== false ||
+                       stripos($course['status'], $this->searchQuery) !== false;
+            });
+        }
+
+        // Apply sorting
+        $filteredCourses = $filteredCourses->sortBy(function ($course) {
+            switch ($this->sortField) {
+                case 'name':
+                    return $course['name'];
+                case 'code':
+                    return $course['code'];
+                case 'credits':
+                    return $course['credits'];
+                case 'grade':
+                    // Sort grades by their point value for better ordering
+                    return $this->getGradePoints($course['grade']);
+                case 'status':
+                    return $course['status'];
+                default:
+                    return $course['name'];
+            }
+        }, SORT_REGULAR, $this->sortDirection === 'desc');
+
+        return view('livewire.grades-component', [
+            'courses' => $filteredCourses->values()->all()
+        ]);
     }
 
     private function getGradePoints($grade)

@@ -47,12 +47,12 @@ class StudyGroup extends Model
     public static function generateJoinCode(): string
     {
         $code = Str::random(8);
-        
+
         // Ensure the code is unique
         while (self::where('join_code', $code)->exists()) {
             $code = Str::random(8);
         }
-        
+
         return $code;
     }
 
@@ -89,6 +89,8 @@ class StudyGroup extends Model
     {
         return $this->hasMany(GroupDiscussion::class);
     }
+
+
 
     /**
      * Check if the group has reached its maximum number of members.

@@ -11,7 +11,7 @@ export default defineConfig({
     },
     plugins: [
         laravel({
-            input: ["resources/css/app.css", "resources/js/app.js", "resources/js/AiWidget/index.js", "resources/js/components/InvestSmart/index.js", "resources/js/chemistry-lab-app.js"],
+            input: ["resources/css/app.css", "resources/js/app.js", "resources/js/realtime.js", "resources/js/AiWidget/index.js", "resources/js/components/InvestSmart/index.js", "resources/js/chemistry-lab-app.js"],
             refresh: [`resources/views/**/*`],
         }),
         tailwindcss(),

@@ -31,6 +31,18 @@
                         <option value="all">All Semesters</option>
                 </select>
             </div>
+
+            <!-- Sort Dropdown -->
+            <div>
+                <select class="w-full md:w-auto rounded-lg border border-neutral-700 bg-neutral-800 px-4 py-2 text-sm text-white focus:border-emerald-500/30 focus:outline-hidden transition-all duration-300 hover:border-neutral-600"
+                        wire:model.live="sortField">
+                        <option value="name">Sort by Course Name</option>
+                        <option value="code">Sort by Course Code</option>
+                        <option value="credits">Sort by Credits</option>
+                        <option value="grade">Sort by Grade</option>
+                        <option value="status">Sort by Status</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -110,10 +122,70 @@
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-neutral-700 text-sm">
-                        <th class="whitespace-nowrap px-6 py-4 text-left font-medium text-neutral-400">{{ __('Course') }}</th>
-                        <th class="whitespace-nowrap px-6 py-4 text-left font-medium text-neutral-400">{{ __('Credits') }}</th>
-                        <th class="whitespace-nowrap px-6 py-4 text-left font-medium text-neutral-400">{{ __('Grade') }}</th>
-                        <th class="whitespace-nowrap px-6 py-4 text-left font-medium text-neutral-400">{{ __('Status') }}</th>
+                        <th class="whitespace-nowrap px-6 py-4 text-left font-medium text-neutral-400">
+                            <button wire:click="sortBy('name')" class="flex items-center gap-1 hover:text-white transition-colors">
+                                {{ __('Course') }}
+                                @if($sortField === 'name')
+                                    @if($sortDirection === 'asc')
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                        <th class="whitespace-nowrap px-6 py-4 text-left font-medium text-neutral-400">
+                            <button wire:click="sortBy('credits')" class="flex items-center gap-1 hover:text-white transition-colors">
+                                {{ __('Credits') }}
+                                @if($sortField === 'credits')
+                                    @if($sortDirection === 'asc')
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                        <th class="whitespace-nowrap px-6 py-4 text-left font-medium text-neutral-400">
+                            <button wire:click="sortBy('grade')" class="flex items-center gap-1 hover:text-white transition-colors">
+                                {{ __('Grade') }}
+                                @if($sortField === 'grade')
+                                    @if($sortDirection === 'asc')
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
+                        <th class="whitespace-nowrap px-6 py-4 text-left font-medium text-neutral-400">
+                            <button wire:click="sortBy('status')" class="flex items-center gap-1 hover:text-white transition-colors">
+                                {{ __('Status') }}
+                                @if($sortField === 'status')
+                                    @if($sortDirection === 'asc')
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    @endif
+                                @endif
+                            </button>
+                        </th>
                         <th class="whitespace-nowrap px-6 py-4 text-left font-medium text-neutral-400">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
