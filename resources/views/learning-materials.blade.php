@@ -83,7 +83,7 @@
         </div>
 
         <!-- Learning Materials Grid -->
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div id="materialsGrid" class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             @if($materials->count() > 0)
                 @foreach($materials as $material)
                 @php
@@ -151,7 +151,12 @@
                         $materialType = 'ppt';
                     }
                 @endphp
-                <div class="material-card group bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20" data-type="{{ $materialType }}">
+                <div class="material-card group bg-linear-to-br from-neutral-800 to-neutral-900 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-neutral-700 hover:border-emerald-500/30 hover:shadow-emerald-900/20"
+                     data-type="{{ $materialType }}"
+                     data-title="{{ strtolower($material->title) }}"
+                     data-date="{{ $material->created_at->timestamp }}"
+                     data-size="{{ $material->file_size }}"
+                     data-description="{{ strtolower($material->description ?? '') }}">
                     <div class="relative h-40 overflow-hidden bg-neutral-700">
 
                         <div class="absolute inset-0 flex items-center justify-center {{ $bgClass }}">
@@ -245,7 +250,7 @@
         @endif
     </div>
 
-    <!-- JavaScript for filtering materials -->
+    <!-- JavaScript for filtering and sorting materials -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const filterButtons = document.querySelectorAll('#material-filters button');
@@ -253,46 +258,80 @@
             const searchInput = document.getElementById('material-search');
             const typeFilter = document.getElementById('material-type-filter');
             const sortSelect = document.getElementById('material-sort');
-            const resultsCount = document.querySelector('.bg-emerald-500\/10.text-emerald-400.px-2\\.5.py-1.rounded-full.text-xs.font-medium');
+            const materialsGrid = document.getElementById('materialsGrid');
+            const resultsCount = document.querySelector('.bg-emerald-500\\/10.text-emerald-400.px-2\\.5.py-1.rounded-full.text-xs.font-medium');
 
             let activeFilter = 'all';
 
-            // Function to filter materials
-            function filterMaterials() {
+            // Function to sort materials
+            function sortMaterials(cards, sortValue) {
+                return cards.sort((a, b) => {
+                    switch(sortValue) {
+                        case 'newest':
+                            return parseInt(b.dataset.date) - parseInt(a.dataset.date);
+                        case 'oldest':
+                            return parseInt(a.dataset.date) - parseInt(b.dataset.date);
+                        case 'name-asc':
+                            return a.dataset.title.localeCompare(b.dataset.title);
+                        case 'name-desc':
+                            return b.dataset.title.localeCompare(a.dataset.title);
+                        case 'size-asc':
+                            return parseInt(a.dataset.size) - parseInt(b.dataset.size);
+                        case 'size-desc':
+                            return parseInt(b.dataset.size) - parseInt(a.dataset.size);
+                        default:
+                            return parseInt(b.dataset.date) - parseInt(a.dataset.date);
+                    }
+                });
+            }
+
+            // Function to filter and sort materials
+            function filterAndSortMaterials() {
                 const searchTerm = searchInput.value.toLowerCase();
                 const typeValue = typeFilter.value;
-                let visibleCount = 0;
+                const sortValue = sortSelect.value;
 
-                materialCards.forEach(card => {
-                    // Get material data
+                // Convert NodeList to Array for filtering and sorting
+                const cardsArray = Array.from(materialCards);
+
+                // Filter cards based on search and filter criteria
+                const filteredCards = cardsArray.filter(card => {
                     const materialType = card.dataset.type;
-                    const materialTitle = card.querySelector('h3')?.textContent.toLowerCase() || '';
-                    const materialDescription = card.querySelector('p')?.textContent.toLowerCase() || '';
+                    const materialTitle = card.dataset.title;
+                    const materialDescription = card.dataset.description;
 
                     // Check if material matches search and filter criteria
                     const matchesSearch = materialTitle.includes(searchTerm) || materialDescription.includes(searchTerm);
                     const matchesTypeFilter = typeValue === 'all' || materialType === typeValue;
                     const matchesButtonFilter = activeFilter === 'all' || materialType === activeFilter;
 
-                    // Show or hide based on filters
-                    if (matchesSearch && matchesTypeFilter && matchesButtonFilter) {
-                        card.style.display = '';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
+                    return matchesSearch && matchesTypeFilter && matchesButtonFilter;
+                });
+
+                // Sort filtered cards
+                const sortedCards = sortMaterials(filteredCards, sortValue);
+
+                // Hide all cards first
+                cardsArray.forEach(card => {
+                    card.style.display = 'none';
+                });
+
+                // Show and reorder sorted cards
+                sortedCards.forEach((card, index) => {
+                    card.style.display = '';
+                    card.style.order = index;
                 });
 
                 // Update results count
                 if (resultsCount) {
-                    resultsCount.textContent = `${visibleCount} results`;
+                    resultsCount.textContent = `${sortedCards.length} results`;
                 }
 
                 // Handle pagination visibility
                 const paginationContainer = document.querySelector('.mt-8.flex.items-center.justify-center');
                 if (paginationContainer) {
-                    // Hide pagination when filtering/searching
-                    if (searchTerm || typeValue !== 'all' || activeFilter !== 'all') {
+                    // Hide pagination when filtering/searching/sorting
+                    if (searchTerm || typeValue !== 'all' || activeFilter !== 'all' || sortValue !== 'newest') {
                         paginationContainer.style.display = 'none';
                     } else {
                         paginationContainer.style.display = '';
@@ -302,7 +341,7 @@
                 // Show/hide empty state
                 const emptyState = document.querySelector('.col-span-full');
                 if (emptyState) {
-                    if (visibleCount === 0) {
+                    if (sortedCards.length === 0) {
                         emptyState.style.display = '';
                     } else {
                         emptyState.style.display = 'none';
@@ -326,22 +365,18 @@
                     // Get filter type from button id
                     activeFilter = this.id.replace('filter-', '');
 
-                    // Filter materials
-                    filterMaterials();
+                    // Filter and sort materials
+                    filterAndSortMaterials();
                 });
             });
 
-            // Add event listeners for search and dropdown filters
-            searchInput.addEventListener('input', filterMaterials);
-            typeFilter.addEventListener('change', filterMaterials);
-            sortSelect.addEventListener('change', function() {
-                // Sort functionality would go here
-                // For now, just re-filter to maintain consistency
-                filterMaterials();
-            });
+            // Add event listeners for search, dropdown filters, and sorting
+            searchInput.addEventListener('input', filterAndSortMaterials);
+            typeFilter.addEventListener('change', filterAndSortMaterials);
+            sortSelect.addEventListener('change', filterAndSortMaterials);
 
-            // Initial filter
-            filterMaterials();
+            // Initial filter and sort
+            filterAndSortMaterials();
         });
     </script>
 </x-layouts.app>

@@ -24,19 +24,37 @@
 
         <!-- Subject Categories Section -->
         <div class="mt-6">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="p-2 bg-emerald-500/10 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-emerald-500/10 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-semibold text-white">Subject Categories</h2>
                 </div>
-                <h2 class="text-xl font-semibold text-white">Subject Categories</h2>
+
+                <!-- Filter and Sort Controls -->
+                <div class="flex flex-wrap gap-3">
+                    <select id="sortSubjects" class="px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-sm">
+                        <option value="order">Default Order</option>
+                        <option value="name">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                        <option value="code">Code</option>
+                    </select>
+
+                    <input type="text" id="searchSubjects" placeholder="Search subjects..." class="px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white placeholder-neutral-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-sm min-w-[200px]">
+                </div>
             </div>
 
-            <div class="grid gap-5 md:grid-cols-3">
+            <div id="subjectGrid" class="grid gap-5 md:grid-cols-3">
                 @foreach($subjectTypes as $subjectType)
                 <!-- {{ $subjectType->name }} Card -->
-                <div class="group flex flex-col rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
+                <div class="subject-card group flex flex-col rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30"
+                     data-name="{{ strtolower($subjectType->name) }}"
+                     data-code="{{ strtolower($subjectType->code) }}"
+                     data-order="{{ $subjectType->order ?? 0 }}"
+                     data-description="{{ strtolower($subjectType->description ?? '') }}">
                     <!-- Top image banner section -->
                     @if($subjectType->image)
                         <!-- If there's an uploaded image, use it as a banner -->
@@ -82,64 +100,100 @@
             </div>
         </div>
 
-        <!-- JavaScript for filtering -->
+        <!-- JavaScript for filtering and sorting subjects -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const techCategorySelect = document.getElementById('tech_category');
-                const programmingLanguageSelect = document.getElementById('programming_language');
-                const challengeCards = document.querySelectorAll('#challenge-grid > div');
-                const resultCount = document.getElementById('result-count');
+                const searchInput = document.getElementById('searchSubjects');
+                const sortSelect = document.getElementById('sortSubjects');
+                const subjectGrid = document.getElementById('subjectGrid');
+                const subjectCards = document.querySelectorAll('.subject-card');
 
-                // Function to filter challenges
-                function filterChallenges() {
-                    const selectedCategory = techCategorySelect.value;
-                    const selectedLanguage = programmingLanguageSelect.value;
-                    let visibleCount = 0;
+                // Function to filter and sort subjects
+                function filterAndSortSubjects() {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    const sortValue = sortSelect.value;
 
-                    challengeCards.forEach(card => {
-                        const cardCategory = card.dataset.category;
-                        const cardLanguage = card.dataset.language;
+                    // Convert NodeList to Array for sorting
+                    const cardsArray = Array.from(subjectCards);
 
-                        // For category filtering:
-                        // - If "All Categories" is selected (empty value), show all categories
-                        // - Otherwise, show cards matching the selected category ID
-                        const categoryMatch = selectedCategory === '' || cardCategory === selectedCategory;
+                    // Filter cards based on search term
+                    const filteredCards = cardsArray.filter(card => {
+                        const name = card.dataset.name;
+                        const code = card.dataset.code;
+                        const description = card.dataset.description;
 
-                        // For language filtering:
-                        // - If "All Languages" is selected (empty value), show all languages
-                        // - Otherwise, show cards matching the selected language
-                        const languageMatch = selectedLanguage === '' || cardLanguage === selectedLanguage.toLowerCase();
+                        return name.includes(searchTerm) ||
+                               code.includes(searchTerm) ||
+                               description.includes(searchTerm);
+                    });
 
-                        if (categoryMatch && languageMatch) {
-                            card.style.display = 'flex';
-                            visibleCount++;
-                        } else {
-                            card.style.display = 'none';
+                    // Sort filtered cards
+                    filteredCards.sort((a, b) => {
+                        switch(sortValue) {
+                            case 'name':
+                                return a.dataset.name.localeCompare(b.dataset.name);
+                            case 'name-desc':
+                                return b.dataset.name.localeCompare(a.dataset.name);
+                            case 'code':
+                                return a.dataset.code.localeCompare(b.dataset.code);
+                            case 'order':
+                            default:
+                                return parseInt(a.dataset.order) - parseInt(b.dataset.order);
                         }
                     });
 
-                    // Update result count
-                    if (resultCount) {
-                        resultCount.textContent = visibleCount;
-                    }
+                    // Hide all cards first
+                    cardsArray.forEach(card => {
+                        card.style.display = 'none';
+                    });
 
-                    // Show/hide empty state
-                    const emptyState = document.getElementById('empty-results');
+                    // Show and reorder filtered cards
+                    filteredCards.forEach((card, index) => {
+                        card.style.display = 'flex';
+                        card.style.order = index;
+                    });
+
+                    // Show empty state if no results
+                    if (filteredCards.length === 0) {
+                        showEmptyState();
+                    } else {
+                        hideEmptyState();
+                    }
+                }
+
+                // Function to show empty state
+                function showEmptyState() {
+                    let emptyState = document.getElementById('empty-subjects-state');
+                    if (!emptyState) {
+                        emptyState = document.createElement('div');
+                        emptyState.id = 'empty-subjects-state';
+                        emptyState.className = 'col-span-full text-center py-12';
+                        emptyState.innerHTML = `
+                            <svg class="w-16 h-16 mx-auto mb-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <h3 class="text-xl font-medium text-white mb-2">No subjects found</h3>
+                            <p class="text-neutral-400">Try adjusting your search terms or filters.</p>
+                        `;
+                        subjectGrid.appendChild(emptyState);
+                    }
+                    emptyState.style.display = 'block';
+                }
+
+                // Function to hide empty state
+                function hideEmptyState() {
+                    const emptyState = document.getElementById('empty-subjects-state');
                     if (emptyState) {
-                        if (visibleCount === 0) {
-                            emptyState.classList.remove('hidden');
-                        } else {
-                            emptyState.classList.add('hidden');
-                        }
+                        emptyState.style.display = 'none';
                     }
                 }
 
                 // Add event listeners
-                techCategorySelect.addEventListener('change', filterChallenges);
-                programmingLanguageSelect.addEventListener('change', filterChallenges);
+                searchInput.addEventListener('input', filterAndSortSubjects);
+                sortSelect.addEventListener('change', filterAndSortSubjects);
 
-                // Initial filter
-                filterChallenges();
+                // Initial filter and sort
+                filterAndSortSubjects();
             });
         </script>
 
