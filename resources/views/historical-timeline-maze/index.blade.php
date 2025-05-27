@@ -372,46 +372,33 @@
             </div>
         </div>
 
-        <!-- Leaderboard Section -->
+        <!-- Your History Section -->
         <div class="mt-3">
             <div class="bg-neutral-800 rounded-xl border border-neutral-700 p-3 shadow-lg">
-                <h2 class="text-lg font-semibold text-white mb-2">Leaderboard</h2>
+                <h2 class="text-lg font-semibold text-white mb-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Your History
+                </h2>
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead>
                             <tr class="border-b border-neutral-700">
-                                <th class="px-3 py-1.5 text-left text-sm font-medium text-neutral-400">Rank</th>
-                                <th class="px-3 py-1.5 text-left text-sm font-medium text-neutral-400">Player</th>
+                                <th class="px-3 py-1.5 text-left text-sm font-medium text-neutral-400">Date</th>
                                 <th class="px-3 py-1.5 text-left text-sm font-medium text-neutral-400">Era</th>
+                                <th class="px-3 py-1.5 text-left text-sm font-medium text-neutral-400">Difficulty</th>
                                 <th class="px-3 py-1.5 text-left text-sm font-medium text-neutral-400">Score</th>
                                 <th class="px-3 py-1.5 text-left text-sm font-medium text-neutral-400">Time</th>
                                 <th class="px-3 py-1.5 text-left text-sm font-medium text-neutral-400">Accuracy</th>
+                                <th class="px-3 py-1.5 text-left text-sm font-medium text-neutral-400">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="leaderboard-body">
-                            <tr class="border-b border-neutral-700">
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">1</td>
-                                <td class="px-3 py-1.5 text-sm text-white">HistoryBuff</td>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">Ancient</td>
-                                <td class="px-3 py-1.5 text-sm text-emerald-400">1250</td>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">01:45</td>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">92%</td>
-                            </tr>
-                            <tr class="border-b border-neutral-700">
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">2</td>
-                                <td class="px-3 py-1.5 text-sm text-white">TimeExplorer</td>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">Medieval</td>
-                                <td class="px-3 py-1.5 text-sm text-emerald-400">980</td>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">02:10</td>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">85%</td>
-                            </tr>
+                        <tbody id="history-table-body">
                             <tr>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">3</td>
-                                <td class="px-3 py-1.5 text-sm text-white">ChronoMaster</td>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">Modern</td>
-                                <td class="px-3 py-1.5 text-sm text-emerald-400">820</td>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">02:30</td>
-                                <td class="px-3 py-1.5 text-sm text-neutral-300">78%</td>
+                                <td colspan="7" class="px-3 py-6 text-center text-neutral-400 italic">
+                                    No games played yet. Complete a game to see your history here!
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -559,7 +546,7 @@
             const streakDisplay = document.getElementById('streak-display');
             const saveScoreBtn = document.getElementById('save-score-btn');
             const playerNameInput = document.getElementById('player-name');
-            const leaderboardBody = document.getElementById('leaderboard-body');
+
 
             // Results elements
             const resultsBtn = document.getElementById('results-btn');
@@ -2099,15 +2086,11 @@
                             saveButton.classList.add('bg-green-600');
                         }
 
-                        // Load and update the leaderboard with a slight delay to ensure the database has updated
-                        // Try multiple times with increasing delays to ensure we get the updated data
-                        const refreshIntervals = [1000, 2000, 4000];
-                        refreshIntervals.forEach((delay, index) => {
-                            setTimeout(() => {
-                                console.log(`Refreshing leaderboard after successful save (attempt ${index + 1})`);
-                                loadLeaderboard();
-                            }, delay);
-                        });
+                        // Load and update the history with a slight delay to ensure the database has updated
+                        setTimeout(() => {
+                            console.log('Refreshing history after successful save');
+                            loadHistoryFromDatabase();
+                        }, 1000);
                     } else {
                         throw new Error(data.message || 'Failed to save progress');
                     }
@@ -2157,197 +2140,171 @@
                 }
             }
 
-            // Load leaderboard data from the server
-            async function loadLeaderboard() {
-                // Track retry attempts
-                let retryCount = 0;
-                const maxRetries = 3;
+            // Load history data from the server
+            async function loadHistoryFromDatabase() {
+                const historyTableBody = document.getElementById('history-table-body');
 
-                async function attemptLoadLeaderboard() {
-                    try {
-                        // Remove any existing error notifications
-                        removeErrorNotifications();
-
-                        // Show loading state
-                        leaderboardBody.innerHTML = `
-                            <tr>
-                                <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
-                                    Loading leaderboard data...
-                                </td>
-                            </tr>
-                        `;
-
-                        // Make sure we have valid era and difficulty
-                        if (!currentEra || !currentDifficulty) {
-                            console.warn('Cannot load leaderboard: missing era or difficulty');
-                            leaderboardBody.innerHTML = `
-                                <tr>
-                                    <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
-                                        Select an era and difficulty to view leaderboard.
-                                    </td>
-                                </tr>
-                            `;
-                            // Display default leaderboard data
-                            displayDefaultLeaderboard();
-                            return;
-                        }
-
-                        console.log(`Attempting to load leaderboard for era: ${currentEra}, difficulty: ${currentDifficulty}, attempt: ${retryCount + 1}`);
-
-                        // Create a controller to allow aborting the fetch if it takes too long
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-
-                        // Add a cache-busting parameter to prevent caching
-                        const cacheBuster = new Date().getTime();
-
-                        // Fetch leaderboard data from the server
-                        const response = await fetch(`{{ route('subjects.specialized.humms.historical-timeline-maze.leaderboard') }}?era=${currentEra}&difficulty=${currentDifficulty}&_=${cacheBuster}`, {
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json',
-                                'Cache-Control': 'no-cache, no-store, must-revalidate', // Stronger cache prevention
-                                'Pragma': 'no-cache',
-                                'Expires': '0'
-                            },
-                            signal: controller.signal
-                        });
-
-                        // Clear the timeout since the request completed
-                        clearTimeout(timeoutId);
-
-                        if (!response.ok) {
-                            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-                        }
-
-                        // Check if the response is JSON
-                        const contentType = response.headers.get('content-type');
-                        if (!contentType || !contentType.includes('application/json')) {
-                            throw new Error('Server returned non-JSON response');
-                        }
-
-                        const responseText = await response.text();
-                        console.log('Raw leaderboard response:', responseText);
-
-                        // Try to parse the JSON
-                        let data;
-                        try {
-                            data = JSON.parse(responseText);
-                        } catch (parseError) {
-                            console.error('JSON parse error:', parseError);
-                            throw new Error(`Failed to parse JSON response: ${parseError.message}`);
-                        }
-
-                        console.log('Parsed leaderboard data:', data);
-
-                        // Check if the data has the expected structure
-                        if (!data || !data.leaderboard) {
-                            console.warn('Leaderboard data is missing or has unexpected format:', data);
-                            throw new Error('Server returned invalid leaderboard data structure');
-                        }
-
-                        // Update the leaderboard display
-                        updateLeaderboardDisplay(data.leaderboard, data.user_rank);
-
-                        // Reset retry count on success
-                        retryCount = 0;
-
-                        return true; // Success
-                    } catch (error) {
-                        console.error(`Error loading leaderboard (attempt ${retryCount + 1}):`, error);
-
-                        // Remove any existing error notifications
-                        removeErrorNotifications();
-
-                        // Create a more detailed error message
-                        let errorMessage = 'Error loading leaderboard data. Please try again later.';
-
-                        if (error.name === 'AbortError') {
-                            errorMessage = 'Leaderboard request timed out. The server might be busy. Please try again later.';
-                        } else if (error.message.includes('Unexpected token') || error.message.includes('non-JSON response') || error.message.includes('parse')) {
-                            errorMessage = 'Server returned an invalid response. This might be due to a CSRF token issue. Please refresh the page and try again.';
-                        }
-
-                        // Increment retry count
-                        retryCount++;
-
-                        if (retryCount < maxRetries) {
-                            // Show retry message in the leaderboard table
-                            leaderboardBody.innerHTML = `
-                                <tr>
-                                    <td colspan="6" class="px-4 py-4 text-center text-yellow-400">
-                                        Retrying to load leaderboard (attempt ${retryCount + 1})...
-                                    </td>
-                                </tr>
-                            `;
-
-                            // Wait a bit before retrying (exponential backoff)
-                            const retryDelay = Math.min(1000 * Math.pow(2, retryCount - 1), 5000);
-                            console.log(`Retrying in ${retryDelay}ms...`);
-
-                            await new Promise(resolve => setTimeout(resolve, retryDelay));
-                            return false; // Retry needed
-                        } else {
-                            // Show error state in the leaderboard table after max retries
-                            leaderboardBody.innerHTML = `
-                                <tr>
-                                    <td colspan="6" class="px-4 py-4 text-center text-red-400">
-                                        ${errorMessage}
-                                    </td>
-                                </tr>
-                            `;
-
-                            // Log the error but don't show a notification - we'll just display default data
-                            console.log('Displaying default leaderboard data after max retries:', error.message);
-
-                            // Fall back to default leaderboard
-                            displayDefaultLeaderboard();
-
-                            // Reset retry count
-                            retryCount = 0;
-
-                            return true; // Stop retrying
-                        }
-                    }
-                }
-
-                // Start the retry loop
-                let success = false;
-                while (!success && retryCount < maxRetries) {
-                    success = await attemptLoadLeaderboard();
-                }
-            }
-
-            // Initialize the leaderboard with default data
-            function updateLeaderboard() {
-                // Check if leaderboardBody exists
-                if (!leaderboardBody) {
-                    console.error("Leaderboard body element not found");
+                if (!historyTableBody) {
+                    console.error('History table body not found');
                     return;
                 }
 
-                // Show loading state
-                leaderboardBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
-                            Select an era and difficulty to view leaderboard.
-                        </td>
-                    </tr>
+                try {
+                    // Show loading state
+                    historyTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-3 py-6 text-center text-neutral-400">
+                                Loading your history...
+                            </td>
+                        </tr>
+                    `;
+
+                    const response = await fetch('{{ route('subjects.specialized.humms.historical-timeline-maze.results') }}', {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch history');
+                    }
+
+                    const data = await response.json();
+                    console.log('History data loaded:', data);
+
+                    // Clear the table
+                    historyTableBody.innerHTML = '';
+
+                    if (data.length === 0) {
+                        historyTableBody.innerHTML = `
+                            <tr>
+                                <td colspan="7" class="px-3 py-6 text-center text-neutral-400 italic">
+                                    No games played yet. Complete a game to see your history here!
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    // Populate the history table
+                    data.forEach(result => {
+                        const date = new Date(result.created_at);
+                        const formattedDate = date.toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
+                        // Format time from seconds to MM:SS
+                        const minutes = Math.floor(result.time_spent_seconds / 60);
+                        const seconds = result.time_spent_seconds % 60;
+                        const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                        // Get difficulty color
+                        const difficultyColors = {
+                            'easy': 'text-green-400',
+                            'medium': 'text-yellow-400',
+                            'hard': 'text-red-400'
+                        };
+
+                        const row = document.createElement('tr');
+                        row.className = 'border-b border-neutral-700 hover:bg-neutral-700/30 transition-colors';
+                        row.innerHTML = `
+                            <td class="px-3 py-2 text-sm text-neutral-300">${formattedDate}</td>
+                            <td class="px-3 py-2 text-sm text-neutral-300 capitalize">${result.era?.era || 'Unknown'}</td>
+                            <td class="px-3 py-2 text-sm ${difficultyColors[result.difficulty] || 'text-neutral-300'} capitalize font-medium">${result.difficulty}</td>
+                            <td class="px-3 py-2 text-sm text-emerald-400 font-bold">${result.score}</td>
+                            <td class="px-3 py-2 text-sm text-neutral-300">${formattedTime}</td>
+                            <td class="px-3 py-2 text-sm text-neutral-300">${Math.round(result.accuracy_percentage)}%</td>
+                            <td class="px-3 py-2 text-sm">
+                                <button onclick="deleteHistoryEntry(${result.id})"
+                                        class="inline-flex items-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-medium rounded transition-colors duration-200">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Delete
+                                </button>
+                            </td>
+                        `;
+                        historyTableBody.appendChild(row);
+                    });
+
+                } catch (error) {
+                    console.error('Error loading history:', error);
+                    historyTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-3 py-6 text-center text-red-400">
+                                Error loading history. Please try again.
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            // Delete a history entry
+            async function deleteHistoryEntry(resultId) {
+                if (!confirm('Are you sure you want to delete this history entry?')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`{{ route('subjects.specialized.humms.historical-timeline-maze.results') }}/${resultId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to delete entry');
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Show success notification
+                        showNotification('History entry deleted successfully.', 'success');
+                        // Refresh the history
+                        loadHistoryFromDatabase();
+                    } else {
+                        throw new Error(data.message || 'Failed to delete entry');
+                    }
+                } catch (error) {
+                    console.error('Error deleting history entry:', error);
+                    showNotification('Error deleting entry. Please try again.', 'error');
+                }
+            }
+
+            // Show notification function
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 flex items-center ${
+                    type === 'success' ? 'bg-green-600 text-white' :
+                    type === 'error' ? 'bg-red-600 text-white' :
+                    'bg-blue-600 text-white'
+                }`;
+
+                notification.innerHTML = `
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        ${type === 'success' ?
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>' :
+                            type === 'error' ?
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>' :
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+                        }
+                    </svg>
+                    ${message}
                 `;
 
-                // If we have a current era and difficulty, try to load the leaderboard
-                if (currentEra && currentDifficulty) {
-                    // Use a try-catch block to handle any synchronous errors
-                    try {
-                        loadLeaderboard();
-                    } catch (error) {
-                        console.error("Error initiating leaderboard load:", error);
-                        displayDefaultLeaderboard();
-                    }
-                } else {
-                    // Display default leaderboard if no era/difficulty selected
-                    displayDefaultLeaderboard();
-                }
+                document.body.appendChild(notification);
+
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
             }
 
             // Function to remove any error notifications at the top of the page
@@ -2412,137 +2369,9 @@
                 }
             }
 
-            // Display default leaderboard data when API fails
-            function displayDefaultLeaderboard() {
-                if (!leaderboardBody) return;
 
-                // Remove any error notifications first
-                removeErrorNotifications();
 
-                leaderboardBody.innerHTML = '';
 
-                // Use the default leaderboard data
-                const defaultData = [
-                    { rank: 1, player: 'HistoryBuff', era: 'Ancient', score: 1250, time: '01:45', accuracy: '92%' },
-                    { rank: 2, player: 'TimeExplorer', era: 'Medieval', score: 980, time: '02:10', accuracy: '85%' },
-                    { rank: 3, player: 'ChronoMaster', era: 'Modern', score: 820, time: '02:30', accuracy: '78%' }
-                ];
-
-                defaultData.forEach(entry => {
-                    const row = document.createElement('tr');
-                    row.className = 'border-b border-neutral-700';
-
-                    row.innerHTML = `
-                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.rank}</td>
-                        <td class="px-4 py-2 text-sm text-white">${entry.player}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.era}</td>
-                        <td class="px-4 py-2 text-sm text-emerald-400">${entry.score}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.time}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.accuracy}</td>
-                    `;
-
-                    leaderboardBody.appendChild(row);
-                });
-            }
-
-            // Update leaderboard display with data from the server
-            function updateLeaderboardDisplay(leaderboardData, userRank) {
-                leaderboardBody.innerHTML = '';
-
-                if (!leaderboardData || leaderboardData.length === 0) {
-                    leaderboardBody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="px-4 py-4 text-center text-neutral-400">
-                                No leaderboard entries yet. Be the first to complete this level!
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-
-                console.log('Updating leaderboard display with', leaderboardData.length, 'entries');
-
-                // Check if the current user is in the leaderboard data
-                const userInLeaderboard = leaderboardData.some(entry => entry.user_id == currentUserId);
-                console.log('Current user in leaderboard:', userInLeaderboard);
-
-                // Display leaderboard entries
-                leaderboardData.forEach(entry => {
-                    const row = document.createElement('tr');
-
-                    // Format time from seconds to MM:SS
-                    const minutes = Math.floor(entry.time_taken / 60);
-                    const seconds = entry.time_taken % 60;
-                    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                    // Highlight the current user's entry
-                    const isCurrentUser = entry.user_id == currentUserId;
-
-                    // Apply special styling for the current user's row
-                    if (isCurrentUser) {
-                        row.className = 'border-b border-neutral-700 bg-emerald-900/30 animate-pulse';
-
-                        // Stop the animation after 3 seconds
-                        setTimeout(() => {
-                            row.classList.remove('animate-pulse');
-                        }, 3000);
-                    } else {
-                        row.className = 'border-b border-neutral-700';
-                    }
-
-                    row.innerHTML = `
-                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.rank}</td>
-                        <td class="px-4 py-2 text-sm ${isCurrentUser ? 'font-bold text-emerald-300' : 'text-white'}">${isCurrentUser ? 'You' : (entry.username || 'Anonymous')}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${entry.era.charAt(0).toUpperCase() + entry.era.slice(1)}</td>
-                        <td class="px-4 py-2 text-sm ${isCurrentUser ? 'font-bold text-emerald-300' : 'text-emerald-400'}">${entry.score}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${formattedTime}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${Math.round(entry.accuracy)}%</td>
-                    `;
-
-                    leaderboardBody.appendChild(row);
-                });
-
-                // Display user's rank if available but not in top 10
-                if (userRank && !userInLeaderboard) {
-                    console.log('Adding user rank row for user not in top leaderboard');
-
-                    const userRow = document.createElement('tr');
-                    userRow.className = 'border-t-2 border-neutral-600 bg-emerald-900/30 animate-pulse';
-
-                    // Stop the animation after 3 seconds
-                    setTimeout(() => {
-                        userRow.classList.remove('animate-pulse');
-                    }, 3000);
-
-                    // Format time from seconds to MM:SS
-                    const minutes = Math.floor(userRank.time_taken / 60);
-                    const seconds = userRank.time_taken % 60;
-                    const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                    userRow.innerHTML = `
-                        <td class="px-4 py-2 text-sm text-neutral-300">${userRank.rank}</td>
-                        <td class="px-4 py-2 text-sm font-bold text-emerald-300">You</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${currentEra.charAt(0).toUpperCase() + currentEra.slice(1)}</td>
-                        <td class="px-4 py-2 text-sm font-bold text-emerald-300">${userRank.score}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${formattedTime}</td>
-                        <td class="px-4 py-2 text-sm text-neutral-300">${Math.round(userRank.accuracy)}%</td>
-                    `;
-
-                    leaderboardBody.appendChild(userRow);
-                }
-
-                // Add a visual indicator that the leaderboard has been updated
-                const leaderboardContainer = leaderboardBody.closest('.bg-neutral-800');
-                if (leaderboardContainer) {
-                    leaderboardContainer.classList.add('border-emerald-500');
-
-                    // Reset the border after a short delay
-                    setTimeout(() => {
-                        leaderboardContainer.classList.remove('border-emerald-500');
-                        leaderboardContainer.classList.add('border-neutral-700');
-                    }, 2000);
-                }
-            }
 
             // Update the timeline based on the selected era
             async function updateTimelineEra() {
@@ -2968,8 +2797,8 @@
                 }
             }
 
-            // Initialize the leaderboard with default data
-            displayDefaultLeaderboard();
+            // Initialize the history
+            loadHistoryFromDatabase();
 
             // Results functionality
             resultsBtn.addEventListener('click', function() {

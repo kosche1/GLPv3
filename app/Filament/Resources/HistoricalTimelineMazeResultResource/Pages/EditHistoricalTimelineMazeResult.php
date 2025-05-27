@@ -4,16 +4,16 @@ namespace App\Filament\Resources\HistoricalTimelineMazeResultResource\Pages;
 
 use App\Filament\Resources\HistoricalTimelineMazeResultResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ViewRecord;
+use Filament\Resources\Pages\EditRecord;
 
-class ViewHistoricalTimelineMazeResult extends ViewRecord
+class EditHistoricalTimelineMazeResult extends EditRecord
 {
     protected static string $resource = HistoricalTimelineMazeResultResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
     }

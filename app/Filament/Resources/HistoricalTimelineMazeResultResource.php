@@ -29,44 +29,53 @@ class HistoricalTimelineMazeResultResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Result Information')
                     ->schema([
-                        Forms\Components\TextInput::make('user.name')
+                        Forms\Components\Select::make('user_id')
                             ->label('Student')
-                            ->disabled(),
-                        Forms\Components\TextInput::make('historicalTimelineMaze.title')
+                            ->relationship('user', 'name')
+                            ->searchable()
+                            ->required(),
+                        Forms\Components\Select::make('historical_timeline_maze_id')
                             ->label('Game')
-                            ->disabled(),
-                        Forms\Components\TextInput::make('era.name')
+                            ->relationship('historicalTimelineMaze', 'title')
+                            ->required(),
+                        Forms\Components\Select::make('era_id')
                             ->label('Era')
-                            ->disabled(),
+                            ->relationship('era', 'title')
+                            ->nullable(),
                         Forms\Components\DateTimePicker::make('created_at')
                             ->label('Date')
-                            ->disabled(),
+                            ->required(),
                         Forms\Components\Select::make('difficulty')
                             ->options([
                                 'easy' => 'Easy',
                                 'medium' => 'Medium',
                                 'hard' => 'Hard',
                             ])
-                            ->disabled(),
+                            ->required(),
                         Forms\Components\TextInput::make('score')
                             ->label('Score')
-                            ->disabled(),
+                            ->numeric()
+                            ->required(),
                         Forms\Components\TextInput::make('questions_attempted')
                             ->label('Questions Attempted')
-                            ->disabled(),
+                            ->numeric()
+                            ->required(),
                         Forms\Components\TextInput::make('questions_correct')
                             ->label('Questions Correct')
-                            ->disabled(),
+                            ->numeric()
+                            ->required(),
                         Forms\Components\TextInput::make('accuracy_percentage')
                             ->label('Accuracy (%)')
                             ->suffix('%')
-                            ->disabled(),
+                            ->numeric()
+                            ->required(),
                         Forms\Components\TextInput::make('time_spent_seconds')
                             ->label('Time Spent (seconds)')
-                            ->disabled(),
+                            ->numeric()
+                            ->required(),
                         Forms\Components\Toggle::make('completed')
                             ->label('Game Completed')
-                            ->disabled(),
+                            ->required(),
                     ])
                     ->columns(2),
 
@@ -74,7 +83,6 @@ class HistoricalTimelineMazeResultResource extends Resource
                     ->schema([
                         Forms\Components\Textarea::make('notes')
                             ->label('Notes')
-                            ->disabled()
                             ->columnSpanFull(),
                     ]),
             ]);
@@ -147,6 +155,8 @@ class HistoricalTimelineMazeResultResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -168,6 +178,7 @@ class HistoricalTimelineMazeResultResource extends Resource
         return [
             'index' => Pages\ListHistoricalTimelineMazeResults::route('/'),
             'view' => Pages\ViewHistoricalTimelineMazeResult::route('/{record}'),
+            'edit' => Pages\EditHistoricalTimelineMazeResult::route('/{record}/edit'),
         ];
     }
 }

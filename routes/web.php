@@ -252,6 +252,7 @@ Route::middleware(
         Route::get('/historical-timeline-maze/leaderboard', [HistoricalTimelineMazeController::class, 'getLeaderboard'])->name('historical-timeline-maze.leaderboard');
         Route::post('/historical-timeline-maze/save-result', [HistoricalTimelineMazeController::class, 'saveResult'])->name('historical-timeline-maze.save-result');
         Route::get('/historical-timeline-maze/results', [HistoricalTimelineMazeController::class, 'getResults'])->name('historical-timeline-maze.results');
+        Route::delete('/historical-timeline-maze/results/{id}', [HistoricalTimelineMazeController::class, 'deleteResult'])->name('historical-timeline-maze.delete-result');
     });
 
     // Collaborative Learning Routes

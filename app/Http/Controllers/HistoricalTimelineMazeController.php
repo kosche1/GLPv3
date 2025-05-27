@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use App\Models\HistoricalTimelineMaze;
 use App\Models\HistoricalTimelineMazeQuestion;
 use App\Models\HistoricalTimelineMazeProgress;
@@ -188,47 +188,35 @@ class HistoricalTimelineMazeController extends Controller
             'completed' => filter_var($request->completed, FILTER_VALIDATE_BOOLEAN),
         ]);
 
-        // If the game is completed, add to the leaderboard and record in audit trail
+        // If the game is completed, save to results table (like typing test)
         if (filter_var($request->completed, FILTER_VALIDATE_BOOLEAN)) {
-            // Check if this is a high score for this user, era, and difficulty
-            $existingEntry = HistoricalTimelineMazeLeaderboard::where('user_id', $user->id)
-                ->where('era', $request->era)
-                ->where('difficulty', $request->difficulty)
-                ->first();
+            // Save detailed result for history tracking
+            $result = HistoricalTimelineMazeResult::create([
+                'user_id' => $user->id,
+                'historical_timeline_maze_id' => $historicalTimelineMaze->id,
+                'era_id' => null, // We'll set this if needed
+                'score' => $request->score,
+                'questions_attempted' => $request->questions_answered,
+                'questions_correct' => $request->correct_answers,
+                'accuracy_percentage' => $accuracy,
+                'time_spent_seconds' => $request->time_taken,
+                'completed' => true,
+                'notes' => "Era: {$request->era}, Difficulty: {$request->difficulty}",
+                'difficulty' => $request->difficulty,
+                'era' => $request->era,
+            ]);
 
-            $shouldUpdateLeaderboard = false;
-            $isFirstCompletion = !$existingEntry;
+            Log::info('Historical Timeline Maze result saved successfully', [
+                'user_id' => $user->id,
+                'result_id' => $result->id,
+                'era' => $request->era,
+                'difficulty' => $request->difficulty,
+                'score' => $request->score,
+                'accuracy' => $accuracy
+            ]);
 
-            if (!$existingEntry) {
-                $shouldUpdateLeaderboard = true;
-            } else if ($existingEntry->score < $request->score ||
-                      ($existingEntry->score == $request->score && $existingEntry->time_taken > $request->time_taken)) {
-                // Update if new score is higher or same score but faster time
-                $shouldUpdateLeaderboard = true;
-                $existingEntry->delete(); // Remove old entry
-            }
-
-            if ($shouldUpdateLeaderboard) {
-                // Add to leaderboard
-                HistoricalTimelineMazeLeaderboard::create([
-                    'user_id' => $user->id,
-                    'historical_timeline_maze_id' => $historicalTimelineMaze->id,
-                    'era' => $request->era,
-                    'difficulty' => $request->difficulty,
-                    'score' => $request->score,
-                    'time_taken' => $request->time_taken,
-                    'accuracy' => $accuracy,
-                    'username' => $user->name,
-                    'avatar' => $user->avatar,
-                ]);
-
-                // Update ranks for this era and difficulty
-                $this->updateLeaderboardRanks($request->era, $request->difficulty);
-            }
-
-            // Record completion in audit trail (only for first completion of each era/difficulty)
-            if ($isFirstCompletion) {
-                try {
+            // Record completion in audit trail
+            try {
                     // Create a pseudo-challenge object for audit trail
                     $challengeData = (object) [
                         'name' => "Historical Timeline Maze - {$request->era} ({$request->difficulty})",
@@ -256,14 +244,13 @@ class HistoricalTimelineMazeController extends Controller
                         'score' => $request->score,
                         'accuracy' => $accuracy
                     ]);
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error('Error recording Historical Timeline Maze completion: ' . $e->getMessage(), [
-                        'user_id' => $user->id,
-                        'era' => $request->era,
-                        'difficulty' => $request->difficulty,
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error recording Historical Timeline Maze completion: ' . $e->getMessage(), [
+                    'user_id' => $user->id,
+                    'era' => $request->era,
+                    'difficulty' => $request->difficulty,
+                    'trace' => $e->getTraceAsString()
+                ]);
             }
         }
 
@@ -274,29 +261,7 @@ class HistoricalTimelineMazeController extends Controller
         ]);
     }
 
-    /**
-     * Update the ranks in the leaderboard for a specific era and difficulty.
-     *
-     * @param string $era
-     * @param string $difficulty
-     * @return void
-     */
-    private function updateLeaderboardRanks(string $era, string $difficulty): void
-    {
-        // Get all entries for this era and difficulty, ordered by score (desc) and time_taken (asc)
-        $entries = HistoricalTimelineMazeLeaderboard::where('era', $era)
-            ->where('difficulty', $difficulty)
-            ->orderBy('score', 'desc')
-            ->orderBy('time_taken', 'asc')
-            ->get();
 
-        // Update ranks
-        $rank = 1;
-        foreach ($entries as $entry) {
-            $entry->rank = $rank++;
-            $entry->save();
-        }
-    }
 
     /**
      * Save a detailed result of the game.
@@ -381,6 +346,51 @@ class HistoricalTimelineMazeController extends Controller
             ->get();
 
         return response()->json($results);
+    }
+
+    /**
+     * Delete a user's historical timeline maze result.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function deleteResult(int $id): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+
+            // Find the result and ensure it belongs to the current user
+            $result = HistoricalTimelineMazeResult::where('id', $id)
+                ->where('user_id', $user->id)
+                ->first();
+
+            if (!$result) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Result not found or you do not have permission to delete it.'
+                ], 404);
+            }
+
+            // Delete the result
+            $result->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Result deleted successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error deleting historical timeline maze result: ' . $e->getMessage(), [
+                'result_id' => $id,
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting result. Please try again.'
+            ], 500);
+        }
     }
 
     /**

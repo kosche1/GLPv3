@@ -19,6 +19,7 @@ class HistoricalTimelineMazeResult extends Model
         'user_id',
         'historical_timeline_maze_id',
         'era_id',
+        'difficulty',
         'score',
         'questions_attempted',
         'questions_correct',
