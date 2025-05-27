@@ -13,11 +13,18 @@ class SupportTicketController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tickets = SupportTicket::where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = SupportTicket::where('user_id', Auth::id());
+
+        // Apply status filter if provided
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $tickets = $query->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->appends($request->query()); // Preserve query parameters in pagination
 
         return view('support-tickets.index', compact('tickets'));
     }

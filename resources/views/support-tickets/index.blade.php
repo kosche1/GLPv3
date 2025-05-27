@@ -12,10 +12,10 @@
                 <div class="flex space-x-4">
                     <select id="statusFilter" class="px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-sm">
                         <option value="">All Statuses</option>
-                        <option value="open">Open</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="resolved">Resolved</option>
-                        <option value="closed">Closed</option>
+                        <option value="open" {{ request('status') === 'open' ? 'selected' : '' }}>Open</option>
+                        <option value="in_progress" {{ request('status') === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                        <option value="resolved" {{ request('status') === 'resolved' ? 'selected' : '' }}>Resolved</option>
+                        <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Closed</option>
                     </select>
                 </div>
                 <a href="{{ route('technical-support') }}" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors">
@@ -54,9 +54,9 @@
                                 </span>
                             </div>
                         </div>
-                        
+
                         <p class="text-neutral-300 mb-4">{{ Str::limit($ticket->description, 150) }}</p>
-                        
+
                         <div class="flex justify-between items-center">
                             <div class="text-sm text-neutral-400">
                                 <span>Created {{ $ticket->created_at->diffForHumans() }}</span>
@@ -100,4 +100,27 @@
             @endif
         </div>
     </div>
+
+    <!-- JavaScript for status filtering -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusFilter = document.getElementById('statusFilter');
+
+            statusFilter.addEventListener('change', function() {
+                const selectedStatus = this.value;
+                const url = new URL(window.location.href);
+
+                if (selectedStatus) {
+                    url.searchParams.set('status', selectedStatus);
+                } else {
+                    url.searchParams.delete('status');
+                }
+
+                // Remove page parameter to start from first page when filtering
+                url.searchParams.delete('page');
+
+                window.location.href = url.toString();
+            });
+        });
+    </script>
 </x-layouts.app>
