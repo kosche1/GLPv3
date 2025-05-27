@@ -2,11 +2,13 @@
 
 namespace App\Filament\Components;
 
+use App\Models\BackupArchive;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use ShuvroRoy\FilamentSpatieLaravelBackup\Models\BackupDestination;
 use ShuvroRoy\FilamentSpatieLaravelBackup\Components\BackupDestinationListRecords;
 use Spatie\Backup\BackupDestination\Backup;
@@ -84,22 +86,65 @@ class CustomBackupDestinationListRecords extends BackupDestinationListRecords
                     ->requiresConfirmation()
                     ->color('danger')
                     ->modalIcon('heroicon-o-trash')
+                    ->modalHeading('Delete Backup')
+                    ->modalDescription('Are you sure you want to delete this backup? The backup information will be archived for future reference.')
+                    ->modalSubmitActionLabel('Yes, delete backup')
                     ->action(function (BackupDestination $record) {
-                        SpatieBackupDestination::create($record->disk, config('backup.backup.name'))
-                            ->backups()
-                            ->first(function (Backup $backup) use ($record) {
-                                return $backup->path() === $record->path;
-                            })
-                            ->delete();
+                        try {
+                            // Archive the backup information before deletion
+                            BackupArchive::create([
+                                'original_path' => $record->path,
+                                'disk' => $record->disk,
+                                'filename' => basename($record->path),
+                                'size' => $record->size,
+                                'backup_date' => $record->date,
+                                'archived_date' => now(),
+                                'archived_by' => Auth::id(),
+                                'notes' => 'Backup deleted from admin panel',
+                                'metadata' => [
+                                    'type' => $this->determineBackupType($record->path),
+                                    'original_record_id' => $record->getKey(),
+                                ],
+                            ]);
 
-                        Notification::make()
-                            ->title(__('filament-spatie-backup::backup.pages.backups.messages.backup_delete_success'))
-                            ->success()
-                            ->send();
+                            // Delete the actual backup file
+                            SpatieBackupDestination::create($record->disk, config('backup.backup.name'))
+                                ->backups()
+                                ->first(function (Backup $backup) use ($record) {
+                                    return $backup->path() === $record->path;
+                                })
+                                ->delete();
+
+                            Notification::make()
+                                ->title('Backup deleted and archived')
+                                ->body('The backup has been deleted and its information has been archived.')
+                                ->success()
+                                ->send();
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->title('Error deleting backup')
+                                ->body('An error occurred while deleting the backup: ' . $e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
                     }),
             ])
             ->bulkActions([
                 // You can add bulk actions here if needed
             ]);
+    }
+
+    /**
+     * Determine the backup type from the file path.
+     */
+    private function determineBackupType(string $path): string
+    {
+        if (str_contains($path, 'db-only')) {
+            return 'Database Only';
+        } elseif (str_contains($path, 'files-only')) {
+            return 'Files Only';
+        } else {
+            return 'Full Backup';
+        }
     }
 }
