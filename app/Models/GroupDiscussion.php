@@ -58,7 +58,7 @@ class GroupDiscussion extends Model
     }
 
     /**
-     * Get the root-level comments for this discussion.
+     * Get the root comments (not replies) for this discussion.
      */
     public function rootComments(): HasMany
     {
