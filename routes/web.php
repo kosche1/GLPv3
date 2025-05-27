@@ -11,6 +11,8 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ActivityGoalController;
 use App\Http\Controllers\EquationDropController;
 use App\Http\Controllers\HistoricalTimelineMazeController;
+use App\Http\Controllers\HelpCenterController;
+use App\Http\Controllers\SupportTicketController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -223,14 +225,20 @@ Route::middleware(
     Route::get('recipe-builder/user-recipes', [\App\Http\Controllers\RecipeBuilderController::class, 'getUserRecipes'])->name('recipe-builder.user-recipes');
     Route::delete('recipe-builder/delete/{id}', [\App\Http\Controllers\RecipeBuilderController::class, 'deleteRecipe'])->name('recipe-builder.delete');
 
-    Route::view('help-center', 'help-center')->name('help-center');
-    Route::view('technical-support', 'technical-support')->name('technical-support');
+    // Help Center routes
+    Route::get('help-center', [HelpCenterController::class, 'index'])->name('help-center');
+    Route::get('help-center/search', [HelpCenterController::class, 'search'])->name('help-center.search');
+    Route::get('help-center/article/{article}', [HelpCenterController::class, 'article'])->name('help-center.article');
+    Route::get('help-center/category/{category}', [HelpCenterController::class, 'category'])->name('help-center.category');
+    Route::post('help-center/mark-helpful', [HelpCenterController::class, 'markHelpful'])->name('help-center.mark-helpful');
 
     // Support Ticket routes
-    Route::resource('support-tickets', \App\Http\Controllers\SupportTicketController::class);
+    Route::resource('support-tickets', SupportTicketController::class);
     Route::get('support-tickets/{supportTicket}/attachments/{attachmentIndex}',
-        [\App\Http\Controllers\SupportTicketController::class, 'downloadAttachment'])
+        [SupportTicketController::class, 'downloadAttachment'])
         ->name('support-tickets.download-attachment');
+
+    Route::view('technical-support', 'technical-support')->name('technical-support');
     Route::get('rate-us', [\App\Http\Controllers\RateUsController::class, 'index'])->name('rate-us');
     Route::post('rate-us', [\App\Http\Controllers\RateUsController::class, 'store'])->name('rate-us.store');
 
