@@ -365,6 +365,14 @@
                 $userAchievements = $user->getUserAchievements();
             }
 
+            // --- Badges Data ---
+            $userBadges = $user->badges()
+                ->orderBy('user_badges.earned_at', 'desc')
+                ->get();
+
+            $showcasedBadges = $userBadges->where('pivot.is_showcased', true)->take(3);
+            $recentBadges = $userBadges->take(6);
+
             // --- Challenges Data ---
             $activeChallenges = $user->getActiveChallenges()->take(3);
         @endphp
@@ -578,6 +586,194 @@
                     </div>
                 </div>
 
+                <!-- Badges & Achievements Showcase -->
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(168,85,247,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(168,85,247,0.01)_1px,transparent_1px)] bg-[size:20px_20px] opacity-10"></div>
+                    <div class="p-6 h-full relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-70"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Badges & Achievements</span>
+                            </h3>
+                        </div>
+
+                        @if((isset($userBadges) && $userBadges->isNotEmpty()) || (isset($userAchievements) && $userAchievements->isNotEmpty()))
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Badges Section -->
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-blue-400"></div>
+                                        <h4 class="text-sm font-semibold text-blue-400">Recent Badges</h4>
+                                        @if(isset($userBadges) && $userBadges->count() > 3)
+                                            <span class="text-xs text-gray-500 bg-neutral-800/60 px-2 py-0.5 rounded-full">+{{ $userBadges->count() - 3 }} more</span>
+                                        @endif
+                                    </div>
+                                    @if(isset($userBadges) && $userBadges->isNotEmpty())
+                                        <div class="grid grid-cols-3 gap-2">
+                                            @foreach($userBadges->take(3) as $badge)
+                                                <div
+                                                    class="group relative rounded-lg bg-neutral-700/20 border border-neutral-700/50 p-3 hover:bg-neutral-700/30 hover:border-blue-500/30 transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                                                    title="{{ $badge->description }}"
+                                                    x-data="{ showTooltip: false }"
+                                                    @mouseenter="showTooltip = true"
+                                                    @mouseleave="showTooltip = false"
+                                                >
+                                                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
+                                                    <div class="relative z-10 flex flex-col items-center">
+                                                        @if($badge->image)
+                                                            <img src="{{ asset($badge->image) }}" alt="{{ $badge->name }}" class="h-8 w-8 object-contain mb-1">
+                                                        @else
+                                                            <div class="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 flex items-center justify-center mb-1 group-hover:border-blue-500/50 transition-colors duration-300">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </div>
+                                                        @endif
+                                                        <p class="text-xs text-gray-200 font-medium text-center leading-tight group-hover:text-blue-300 transition-colors duration-300">{{ Str::limit($badge->name, 12) }}</p>
+                                                        @php
+                                                            $rarityColors = [
+                                                                1 => 'bg-gray-500/20 text-gray-400',
+                                                                2 => 'bg-green-500/20 text-green-400',
+                                                                3 => 'bg-blue-500/20 text-blue-400',
+                                                                4 => 'bg-purple-500/20 text-purple-400',
+                                                                5 => 'bg-yellow-500/20 text-yellow-400'
+                                                            ];
+                                                            $rarityNames = [1 => 'Common', 2 => 'Uncommon', 3 => 'Rare', 4 => 'Epic', 5 => 'Legendary'];
+                                                        @endphp
+                                                        <span class="text-[10px] px-1.5 py-0.5 rounded-full mt-1 {{ $rarityColors[$badge->rarity_level] ?? $rarityColors[1] }}">
+                                                            {{ $rarityNames[$badge->rarity_level] ?? 'Common' }}
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- Tooltip -->
+                                                    <div
+                                                        x-show="showTooltip"
+                                                        x-transition:enter="transition ease-out duration-200"
+                                                        x-transition:enter-start="opacity-0 transform scale-95"
+                                                        x-transition:enter-end="opacity-100 transform scale-100"
+                                                        x-transition:leave="transition ease-in duration-150"
+                                                        x-transition:leave-start="opacity-100 transform scale-100"
+                                                        x-transition:leave-end="opacity-0 transform scale-95"
+                                                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-900 text-white text-xs rounded-lg shadow-lg border border-neutral-700 whitespace-nowrap z-50"
+                                                        style="display: none;"
+                                                    >
+                                                        {{ $badge->description }}
+                                                        <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-900"></div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="text-center py-4">
+                                            <div class="w-12 h-12 mx-auto rounded-full bg-blue-500/10 flex items-center justify-center mb-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <p class="text-xs text-gray-400">No badges yet</p>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Achievements Section -->
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-purple-400"></div>
+                                        <h4 class="text-sm font-semibold text-purple-400">Recent Achievements</h4>
+                                        @if(isset($userAchievements) && $userAchievements->count() > 3)
+                                            <span class="text-xs text-gray-500 bg-neutral-800/60 px-2 py-0.5 rounded-full">+{{ $userAchievements->count() - 3 }} more</span>
+                                        @endif
+                                    </div>
+                                    @if(isset($userAchievements) && $userAchievements->isNotEmpty())
+                                        <div class="grid grid-cols-3 gap-2">
+                                            @foreach($userAchievements->take(3) as $achievement)
+                                                <div
+                                                    class="group relative rounded-lg bg-neutral-700/20 border border-neutral-700/50 p-3 hover:bg-neutral-700/30 hover:border-purple-500/30 transition-all duration-300 transform hover:scale-105 cursor-pointer"
+                                                    title="{{ $achievement->description }}"
+                                                    x-data="{ showTooltip: false }"
+                                                    @mouseenter="showTooltip = true"
+                                                    @mouseleave="showTooltip = false"
+                                                >
+                                                    <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
+                                                    <div class="relative z-10 flex flex-col items-center">
+                                                        @if($achievement->image)
+                                                            <img src="{{ asset($achievement->image) }}" alt="{{ $achievement->name }}" class="h-8 w-8 object-contain mb-1">
+                                                        @else
+                                                            <div class="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30 flex items-center justify-center mb-1 group-hover:border-purple-500/50 transition-colors duration-300">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </div>
+                                                        @endif
+                                                        <p class="text-xs text-gray-200 font-medium text-center leading-tight group-hover:text-purple-300 transition-colors duration-300">{{ Str::limit($achievement->name, 12) }}</p>
+                                                        @if(isset($achievement->pivot) && isset($achievement->pivot->progress))
+                                                            <div class="w-full mt-1">
+                                                                <div class="w-full bg-neutral-800/80 rounded-full h-1 overflow-hidden">
+                                                                    <div class="bg-gradient-to-r from-purple-500 to-indigo-500 h-1 rounded-full" style="width: {{ $achievement->pivot->progress }}%"></div>
+                                                                </div>
+                                                                <span class="text-[10px] text-purple-400 mt-0.5">{{ $achievement->pivot->progress }}%</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+
+                                                    <!-- Tooltip -->
+                                                    <div
+                                                        x-show="showTooltip"
+                                                        x-transition:enter="transition ease-out duration-200"
+                                                        x-transition:enter-start="opacity-0 transform scale-95"
+                                                        x-transition:enter-end="opacity-100 transform scale-100"
+                                                        x-transition:leave="transition ease-in duration-150"
+                                                        x-transition:leave-start="opacity-100 transform scale-100"
+                                                        x-transition:leave-end="opacity-0 transform scale-95"
+                                                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-900 text-white text-xs rounded-lg shadow-lg border border-neutral-700 whitespace-nowrap z-50"
+                                                        style="display: none;"
+                                                    >
+                                                        {{ $achievement->description }}
+                                                        <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-900"></div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="text-center py-4">
+                                            <div class="w-12 h-12 mx-auto rounded-full bg-purple-500/10 flex items-center justify-center mb-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                                </svg>
+                                            </div>
+                                            <p class="text-xs text-gray-400">No achievements yet</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @else
+                            <!-- Empty State -->
+                            <div class="text-center py-8">
+                                <div class="flex justify-center space-x-4 mb-4">
+                                    <div class="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="text-gray-400 text-sm mb-4">Complete challenges and level up to earn amazing badges and achievements</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                
                 <!-- Recent Activities -->
                 <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -793,8 +989,6 @@
                     </div>
                 </div>
 
-
-
                 <!-- Active Challenges with Skeleton Loading -->
                 <div x-data="{ loading: true }" x-init="setTimeout(() => loading = false, 1000)" class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <!-- Skeleton Loading State -->
@@ -969,186 +1163,6 @@
                     </a>
                 </div>
 
-                <!-- Keyboard Shortcuts Help -->
-                <div x-data="{ showShortcuts: false }" class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300 mt-6">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
-                    <div class="p-6 relative z-10">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <div class="relative">
-                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-70"></div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <span class="text-white bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Keyboard Shortcuts</span>
-                            </h3>
-                            <button @click="showShortcuts = !showShortcuts" class="text-xs text-purple-400 hover:text-purple-300 transition-colors duration-300">
-                                <span x-text="showShortcuts ? 'Hide' : 'Show'"></span>
-                            </button>
-                        </div>
-                        <div x-show="showShortcuts" x-transition class="space-y-2">
-                            <div class="grid grid-cols-2 gap-2">
-                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm text-neutral-300">Learning</span>
-                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + L</span>
-                                    </div>
-                                </div>
-                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm text-neutral-300">Profile</span>
-                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + P</span>
-                                    </div>
-                                </div>
-                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm text-neutral-300">Grades</span>
-                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + G</span>
-                                    </div>
-                                </div>
-                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm text-neutral-300">Schedule</span>
-                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + S</span>
-                                    </div>
-                                </div>
-                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-sm text-neutral-300">Forums</span>
-                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + F</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Badges -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300 mt-6">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
-                    <div class="p-6 relative z-10">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <div class="relative">
-                                    <div class="absolute -inset-1 bg-blue-500/20 rounded-full blur-sm opacity-70"></div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 relative" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <span class="text-white bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Badges</span>
-                            </h3>
-                        </div>
-                        @if(isset($userBadges) && $userBadges->isNotEmpty())
-                            <div class="grid grid-cols-3 gap-3">
-                                @foreach($userBadges as $badge)
-                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-2 flex flex-col items-center justify-between hover:bg-neutral-700/30 hover:border-blue-500/30 transition-all transform hover:scale-105 group relative overflow-hidden w-20 h-28 mx-auto" title="{{ $badge->description }}">
-                                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                        <div class="absolute -inset-1 bg-blue-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                        <div class="relative z-10">
-                                            @if($badge->image)
-                                                <div class="relative mb-1 mx-auto">
-                                                    <div class="absolute -inset-1 bg-blue-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                    <img src="{{ asset($badge->image) }}" alt="{{ $badge->name }}" class="h-10 w-10 object-contain relative mx-auto">
-                                                </div>
-                                            @else
-                                                <div class="relative mb-1 mx-auto">
-                                                    <div class="absolute -inset-1 bg-blue-500/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 flex items-center justify-center relative overflow-hidden group-hover:border-blue-500/50 transition-colors duration-300">
-                                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.2),transparent_50%)] opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400 relative z-10" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                            <div class="mt-2 w-full pb-1">
-                                                <p class="text-[10px] text-gray-200 font-medium text-center leading-tight group-hover:text-blue-300 transition-colors duration-300 mx-auto px-1">{{ $badge->name }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="flex flex-col items-center justify-center p-6 bg-neutral-800/30 rounded-xl border border-neutral-700/50">
-                                <div class="h-16 w-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <p class="text-gray-300 text-center mb-1">No badges earned yet</p>
-                                <p class="text-sm text-gray-500 text-center">Keep leveling up to earn badges!</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Achievements -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300 mt-6">
-                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
-                    <div class="p-6 relative z-10">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <div class="relative">
-                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-70"></div>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                                    </svg>
-                                </div>
-                                <span class="text-white bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Achievements</span>
-                            </h3>
-                        </div>
-                        @if(isset($userAchievements) && $userAchievements->isNotEmpty())
-                            <div class="grid grid-cols-3 gap-3">
-                                @foreach($userAchievements as $achievement)
-                                    <div class="rounded-xl bg-neutral-700/20 border border-neutral-700/50 p-2 flex flex-col items-center justify-between hover:bg-neutral-700/30 hover:border-purple-500/30 transition-all transform hover:scale-105 group relative overflow-hidden w-20 h-28 mx-auto" title="{{ $achievement->description }}">
-                                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                        <div class="absolute -inset-1 bg-purple-400/5 blur-xl opacity-0 group-hover:opacity-70 transition-opacity duration-300 rounded-full"></div>
-                                        <div class="relative z-10">
-                                            @if($achievement->image)
-                                                <div class="relative mb-0.5 mx-auto">
-                                                    <div class="absolute -inset-1 bg-purple-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                    <img src="{{ asset($achievement->image) }}" alt="{{ $achievement->name }}" class="h-7 w-7 object-contain relative mx-auto">
-                                                </div>
-                                            @else
-                                                <div class="relative mb-0.5 mx-auto">
-                                                    <div class="absolute -inset-1 bg-purple-500/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                                    <div class="h-7 w-7 rounded-full bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/30 flex items-center justify-center relative overflow-hidden group-hover:border-purple-500/50 transition-colors duration-300">
-                                                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.2),transparent_50%)] opacity-0 group-hover:opacity-70 transition-opacity duration-300"></div>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative z-10" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                            <div class="mt-2 w-full pb-1">
-                                                <p class="text-[10px] text-gray-200 font-medium text-center leading-tight group-hover:text-purple-300 transition-colors duration-300 mx-auto px-1">{{ $achievement->name }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <!-- <div class="mt-3 text-right">
-                                <span class="text-xs text-gray-400">{{ $userAchievements->count() }} achievements earned</span>
-                            </div> -->
-                        @else
-                            <div class="flex flex-col items-center justify-center p-6 bg-neutral-800/30 rounded-xl border border-neutral-700/50">
-                                <div class="h-16 w-16 rounded-full bg-purple-500/10 flex items-center justify-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
-                                    </svg>
-                                </div>
-                                <p class="text-gray-300 text-center mb-1">No achievements earned yet</p>
-                                <p class="text-sm text-gray-500 text-center">Keep learning to earn achievements!</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
                 <!-- Leaderboard -->
                 <div class="leaderboard-container rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(234,179,8,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -1293,6 +1307,62 @@
                                     </div>
                                 </div>
                             @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keyboard Shortcuts Help -->
+                <div x-data="{ showShortcuts: false }" class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300 mt-6">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(139,92,246,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-purple-500/20 rounded-full blur-sm opacity-70"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <span class="text-white bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Keyboard Shortcuts</span>
+                            </h3>
+                            <button @click="showShortcuts = !showShortcuts" class="text-xs text-purple-400 hover:text-purple-300 transition-colors duration-300">
+                                <span x-text="showShortcuts ? 'Hide' : 'Show'"></span>
+                            </button>
+                        </div>
+                        <div x-show="showShortcuts" x-transition class="space-y-2">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Learning</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + L</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Profile</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + P</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Grades</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + G</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Schedule</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + S</span>
+                                    </div>
+                                </div>
+                                <div class="p-2 rounded-lg bg-neutral-800/80 border border-neutral-700/50">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-300">Forums</span>
+                                        <span class="text-xs font-medium px-2 py-1 rounded-full bg-neutral-700/50 text-neutral-400 border border-neutral-700/50">Alt + F</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
