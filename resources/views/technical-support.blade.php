@@ -1,5 +1,28 @@
 <x-layouts.app>
     <div class="flex h-full w-full flex-1 flex-col gap-6 text-gray-100 p-6 border border-emerald-500/30 rounded-lg bg-linear-to-b from-neutral-900 to-neutral-800">
+
+        <!-- Success/Error Messages -->
+        @if(session('success'))
+            <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-lg mb-6">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg mb-6">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    {{ session('error') }}
+                </div>
+            </div>
+        @endif
         <div class="max-w-7xl mx-auto w-full">
             <!-- Enhanced Header Section with Animated Gradient -->
             <div class="text-center mb-12 relative">
@@ -22,12 +45,12 @@
                     <button class="absolute right-3 top-2 px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-md text-sm border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors">
                         Search
                     </button>
-                    
+
                     <!-- Auto-suggestions with Enhanced Design -->
                     <div id="suggestions" class="hidden bg-neutral-800 border border-neutral-700 shadow-lg rounded-lg mt-2 absolute w-full z-10 overflow-hidden">
                         <!-- Suggestions will appear here dynamically -->
                     </div>
-                    
+
                     <!-- Suggested Searches -->
                     <div class="mt-3 flex flex-wrap gap-2 justify-center">
                         <span class="text-xs text-neutral-400">Popular searches:</span>
@@ -47,7 +70,7 @@
                     </svg>
                     Support Options
                 </h2>
-                
+
                 <!-- Enhanced Quick Help Categories -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg hover:shadow-emerald-900/20 hover:border-emerald-500/30">
@@ -108,7 +131,7 @@
                     </svg>
                     Your Support Tickets
                 </h2>
-                
+
                 <div class="rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 p-6 mb-8">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                         <h3 class="text-lg font-semibold text-white">Recent Tickets</h3>
@@ -121,7 +144,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full">
                             <thead>
@@ -134,42 +157,59 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-neutral-700">
-                                <tr class="text-sm hover:bg-neutral-700/30 transition-colors">
-                                    <td class="px-4 py-3 text-white">#TK-2305</td>
-                                    <td class="px-4 py-3 text-white">Video playback issue on mobile</td>
-                                    <td class="px-4 py-3">
-                                        <span class="inline-flex rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 text-xs font-medium text-amber-400">In Progress</span>
-                                    </td>
-                                    <td class="px-4 py-3 text-neutral-400">2 hours ago</td>
-                                    <td class="px-4 py-3">
-                                        <a href="#" class="text-emerald-400 hover:text-emerald-300 transition-colors">View</a>
-                                    </td>
-                                </tr>
-                                <tr class="text-sm hover:bg-neutral-700/30 transition-colors">
-                                    <td class="px-4 py-3 text-white">#TK-2304</td>
-                                    <td class="px-4 py-3 text-white">Payment method declined</td>
-                                    <td class="px-4 py-3">
-                                        <span class="inline-flex rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-medium text-emerald-400">Resolved</span>
-                                    </td>
-                                    <td class="px-4 py-3 text-neutral-400">Yesterday</td>
-                                    <td class="px-4 py-3">
-                                        <a href="#" class="text-emerald-400 hover:text-emerald-300 transition-colors">View</a>
-                                    </td>
-                                </tr>
-                                <tr class="text-sm hover:bg-neutral-700/30 transition-colors">
-                                    <td class="px-4 py-3 text-white">#TK-2298</td>
-                                    <td class="px-4 py-3 text-white">Cannot access course materials</td>
-                                    <td class="px-4 py-3">
-                                        <span class="inline-flex rounded-full bg-blue-500/10 border border-blue-500/20 px-2.5 py-0.5 text-xs font-medium text-blue-400">Open</span>
-                                    </td>
-                                    <td class="px-4 py-3 text-neutral-400">3 days ago</td>
-                                    <td class="px-4 py-3">
-                                        <a href="#" class="text-emerald-400 hover:text-emerald-300 transition-colors">View</a>
-                                    </td>
-                                </tr>
+                                @php
+                                    $userTickets = \App\Models\SupportTicket::where('user_id', auth()->id())
+                                        ->orderBy('created_at', 'desc')
+                                        ->limit(5)
+                                        ->get();
+                                @endphp
+
+                                @forelse($userTickets as $ticket)
+                                    <tr class="text-sm hover:bg-neutral-700/30 transition-colors">
+                                        <td class="px-4 py-3 text-white">#{{ $ticket->ticket_number }}</td>
+                                        <td class="px-4 py-3 text-white">{{ Str::limit($ticket->subject, 40) }}</td>
+                                        <td class="px-4 py-3">
+                                            @php
+                                                $statusColors = [
+                                                    'open' => 'bg-blue-500/10 border-blue-500/20 text-blue-400',
+                                                    'in_progress' => 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+                                                    'resolved' => 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+                                                    'closed' => 'bg-gray-500/10 border-gray-500/20 text-gray-400',
+                                                ];
+                                            @endphp
+                                            <span class="inline-flex rounded-full {{ $statusColors[$ticket->status] ?? $statusColors['open'] }} px-2.5 py-0.5 text-xs font-medium">
+                                                {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 text-neutral-400">{{ $ticket->updated_at->diffForHumans() }}</td>
+                                        <td class="px-4 py-3">
+                                            <a href="{{ route('support-tickets.show', $ticket) }}" class="text-emerald-400 hover:text-emerald-300 transition-colors">View</a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-8 text-center text-neutral-400">
+                                            <div class="flex flex-col items-center">
+                                                <svg class="w-12 h-12 mb-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                                <p class="text-lg font-medium mb-2">No support tickets yet</p>
+                                                <p class="text-sm">Create your first support ticket below to get help with any issues.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
+                    @if($userTickets->count() > 0)
+                        <div class="mt-4 text-center">
+                            <a href="{{ route('support-tickets.index') }}" class="text-emerald-400 hover:text-emerald-300 transition-colors text-sm">
+                                View all tickets →
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -183,23 +223,31 @@
                         </svg>
                         Create Support Ticket
                     </h2>
-                    <form id="ticketForm" class="space-y-6">
+                    <form id="ticketForm" action="{{ route('support-tickets.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="subject" class="block text-sm font-medium text-zinc-300 mb-2">Subject</label>
-                                <input type="text" id="subject" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" required>
+                                <input type="text" id="subject" name="subject" value="{{ old('subject') }}" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" required>
+                                @error('subject')
+                                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
-                            
+
                             <div>
                                 <label for="category" class="block text-sm font-medium text-zinc-300 mb-2">Category</label>
-                                <select id="category" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300">
-                                    <option>Technical Issue</option>
-                                    <option>Account Problem</option>
-                                    <option>Billing Question</option>
-                                    <option>Course Access</option>
-                                    <option>Feature Request</option>
-                                    <option>Other</option>
+                                <select id="category" name="category" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" required>
+                                    <option value="">Select a category</option>
+                                    <option value="technical_issue" {{ old('category') == 'technical_issue' ? 'selected' : '' }}>Technical Issue</option>
+                                    <option value="account_problem" {{ old('category') == 'account_problem' ? 'selected' : '' }}>Account Problem</option>
+                                    <option value="billing_question" {{ old('category') == 'billing_question' ? 'selected' : '' }}>Billing Question</option>
+                                    <option value="course_access" {{ old('category') == 'course_access' ? 'selected' : '' }}>Course Access</option>
+                                    <option value="feature_request" {{ old('category') == 'feature_request' ? 'selected' : '' }}>Feature Request</option>
+                                    <option value="other" {{ old('category') == 'other' ? 'selected' : '' }}>Other</option>
                                 </select>
+                                @error('category')
+                                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
@@ -207,23 +255,29 @@
                             <label for="priority" class="block text-sm font-medium text-zinc-300 mb-2">Priority</label>
                             <div class="flex space-x-4">
                                 <label class="inline-flex items-center">
-                                    <input type="radio" name="priority" value="low" class="text-emerald-500 focus:ring-emerald-500/50">
+                                    <input type="radio" name="priority" value="low" class="text-emerald-500 focus:ring-emerald-500/50" {{ old('priority', 'medium') == 'low' ? 'checked' : '' }}>
                                     <span class="ml-2 text-zinc-300">Low</span>
                                 </label>
                                 <label class="inline-flex items-center">
-                                    <input type="radio" name="priority" value="medium" class="text-emerald-500 focus:ring-emerald-500/50" checked>
+                                    <input type="radio" name="priority" value="medium" class="text-emerald-500 focus:ring-emerald-500/50" {{ old('priority', 'medium') == 'medium' ? 'checked' : '' }}>
                                     <span class="ml-2 text-zinc-300">Medium</span>
                                 </label>
                                 <label class="inline-flex items-center">
-                                    <input type="radio" name="priority" value="high" class="text-emerald-500 focus:ring-emerald-500/50">
+                                    <input type="radio" name="priority" value="high" class="text-emerald-500 focus:ring-emerald-500/50" {{ old('priority', 'medium') == 'high' ? 'checked' : '' }}>
                                     <span class="ml-2 text-zinc-300">High</span>
                                 </label>
                             </div>
+                            @error('priority')
+                                <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
                             <label for="description" class="block text-sm font-medium text-zinc-300 mb-2">Description</label>
-                            <textarea rows="4" id="description" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" required placeholder="Please describe your issue in detail..."></textarea>
+                            <textarea rows="4" id="description" name="description" class="w-full px-4 py-2 rounded-lg bg-neutral-800 border border-neutral-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 text-white hover:border-neutral-600 transition-all duration-300" required placeholder="Please describe your issue in detail...">{{ old('description') }}</textarea>
+                            @error('description')
+                                <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
@@ -236,7 +290,7 @@
                                     <div class="flex text-sm text-neutral-400">
                                         <label for="file-upload" class="relative cursor-pointer rounded-md font-medium text-emerald-400 hover:text-emerald-300 focus-within:outline-hidden">
                                             <span>Upload files</span>
-                                            <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple>
+                                            <input id="file-upload" name="attachments[]" type="file" class="sr-only" multiple accept=".png,.jpg,.jpeg,.gif,.pdf,.doc,.docx">
                                         </label>
                                         <p class="pl-1">or drag and drop</p>
                                     </div>
@@ -248,7 +302,7 @@
                         </div>
 
                         <div class="flex items-center">
-                            <input id="notify" type="checkbox" class="h-4 w-4 text-emerald-500 focus:ring-emerald-500/50 border-neutral-700 rounded-sm">
+                            <input id="notify" name="notify_on_update" type="checkbox" value="1" class="h-4 w-4 text-emerald-500 focus:ring-emerald-500/50 border-neutral-700 rounded-sm" {{ old('notify_on_update') ? 'checked' : '' }}>
                             <label for="notify" class="ml-2 block text-sm text-zinc-300">
                                 Notify me when my ticket is updated
                             </label>
@@ -274,7 +328,7 @@
                     </svg>
                     Frequently Asked Technical Questions
                 </h2>
-                
+
                 <div class="space-y-4">
                     <!-- FAQ Item 1 -->
                     <div class="border border-neutral-700 rounded-lg overflow-hidden">
@@ -300,7 +354,7 @@
                             </p>
                         </div>
                     </div>
-                    
+
                     <!-- FAQ Item 2 -->
                     <div class="border border-neutral-700 rounded-lg overflow-hidden">
                         <button class="w-full flex justify-between items-center p-4 bg-neutral-800 hover:bg-neutral-700 transition-colors text-left" onclick="toggleFaq('faq2')">
@@ -324,7 +378,7 @@
                             </p>
                         </div>
                     </div>
-                    
+
                     <!-- FAQ Item 3 -->
                     <div class="border border-neutral-700 rounded-lg overflow-hidden">
                         <button class="w-full flex justify-between items-center p-4 bg-neutral-800 hover:bg-neutral-700 transition-colors text-left" onclick="toggleFaq('faq3')">
@@ -348,7 +402,7 @@
                             </p>
                         </div>
                     </div>
-                    
+
                     <!-- FAQ Item 4 -->
                     <div class="border border-neutral-700 rounded-lg overflow-hidden">
                         <button class="w-full flex justify-between items-center p-4 bg-neutral-800 hover:bg-neutral-700 transition-colors text-left" onclick="toggleFaq('faq4')">
@@ -383,7 +437,7 @@
                         <h2 class="text-2xl font-bold text-white mb-4">Need Immediate Help?</h2>
                         <p class="text-zinc-400 max-w-2xl mx-auto">Our technical support team is available to assist you with any urgent issues</p>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <a href="#" class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300 flex flex-col items-center text-center group">
                             <div class="p-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 group-hover:bg-emerald-500/20 transition-colors">
@@ -395,7 +449,7 @@
                             <p class="text-zinc-400 text-sm mb-3">Send us an email and we'll respond within 24 hours</p>
                             <span class="text-emerald-400 text-sm">techsupport@example.com</span>
                         </a>
-                        
+
                         <a href="#" class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300 flex flex-col items-center text-center group">
                             <div class="p-3 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4 group-hover:bg-blue-500/20 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -406,7 +460,7 @@
                             <p class="text-zinc-400 text-sm mb-3">Chat with our technical support team in real-time</p>
                             <span class="text-blue-400 text-sm">Available 24/7</span>
                         </a>
-                        
+
                         <a href="#" class="p-5 rounded-xl border border-neutral-700 bg-neutral-800/50 hover:bg-neutral-800 transition-all duration-300 flex flex-col items-center text-center group">
                             <div class="p-3 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4 group-hover:bg-purple-500/20 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -442,26 +496,17 @@
     </div>
 
     <script>
-        // Enhanced form validation
+        // Form submission handling is now done server-side
+        // Keep the form validation for better UX
         document.getElementById('ticketForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const subject = document.getElementById('subject').value;
+            const subject = document.getElementById('subject').value.trim();
             const category = document.getElementById('category').value;
-            const description = document.getElementById('description').value;
+            const description = document.getElementById('description').value.trim();
 
-            if (subject && category && description) {
-                // Show success toast
-                document.getElementById('toast').classList.remove('opacity-0', 'pointer-events-none');
-                document.getElementById('toast').classList.add('opacity-100', 'pointer-events-auto');
-                
-                // Reset form
-                this.reset();
-                
-                // Hide toast after delay
-                setTimeout(() => {
-                    document.getElementById('toast').classList.remove('opacity-100', 'pointer-events-auto');
-                    document.getElementById('toast').classList.add('opacity-0', 'pointer-events-none');
-                }, 3000);
+            if (!subject || !category || !description) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return false;
             }
         });
 
@@ -473,7 +518,7 @@
             const query = searchInput.value.trim();
             if (query.length > 2) {
                 suggestions.classList.remove('hidden');
-                
+
                 // Mock suggestions based on input
                 const mockSuggestions = [
                     `"${query}" in video playback issues`,
@@ -481,12 +526,12 @@
                     `"${query}" in payment problems`,
                     `"${query}" in course access`
                 ];
-                
+
                 let suggestionsHTML = '';
                 mockSuggestions.forEach(suggestion => {
                     suggestionsHTML += `<div class="p-3 hover:bg-neutral-700 cursor-pointer transition-colors">${suggestion}</div>`;
                 });
-                
+
                 suggestions.innerHTML = suggestionsHTML;
             } else {
                 suggestions.classList.add('hidden');
@@ -504,7 +549,7 @@
         function toggleFaq(id) {
             const content = document.getElementById(id);
             const icon = document.getElementById(id + '-icon');
-            
+
             if (content.classList.contains('hidden')) {
                 content.classList.remove('hidden');
                 icon.classList.add('rotate-180');

@@ -225,6 +225,12 @@ Route::middleware(
 
     Route::view('help-center', 'help-center')->name('help-center');
     Route::view('technical-support', 'technical-support')->name('technical-support');
+
+    // Support Ticket routes
+    Route::resource('support-tickets', \App\Http\Controllers\SupportTicketController::class);
+    Route::get('support-tickets/{supportTicket}/attachments/{attachmentIndex}',
+        [\App\Http\Controllers\SupportTicketController::class, 'downloadAttachment'])
+        ->name('support-tickets.download-attachment');
     Route::get('rate-us', [\App\Http\Controllers\RateUsController::class, 'index'])->name('rate-us');
     Route::post('rate-us', [\App\Http\Controllers\RateUsController::class, 'store'])->name('rate-us.store');
 
