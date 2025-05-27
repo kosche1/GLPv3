@@ -15,12 +15,49 @@
                 <h1 class="text-2xl font-bold text-white tracking-tight">GLP - Gamified Dashboard</h1>
             </div>
             <div class="flex items-center gap-3">
-                <!-- Real-time Connection Status -->
-                <div class="flex items-center gap-2 bg-neutral-800/50 px-3 py-1.5 rounded-full border border-neutral-700/50 shadow-lg backdrop-blur-sm">
-                    <div class="connection-status connecting">
-                        <div class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
+                <!-- Internet Connection Status -->
+                <div x-data="{
+                    isOnline: navigator.onLine,
+                    init() {
+                        // Listen for online/offline events
+                        window.addEventListener('online', () => {
+                            this.isOnline = true;
+                        });
+                        window.addEventListener('offline', () => {
+                            this.isOnline = false;
+                        });
+
+                        // Check connectivity every 30 seconds
+                        setInterval(() => {
+                            this.checkConnection();
+                        }, 30000);
+                    },
+                    checkConnection() {
+                        // Simple connectivity check using fetch with timeout
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                        fetch('/ping', {
+                            method: 'HEAD',
+                            signal: controller.signal,
+                            cache: 'no-cache'
+                        })
+                        .then(() => {
+                            clearTimeout(timeoutId);
+                            this.isOnline = true;
+                        })
+                        .catch(() => {
+                            clearTimeout(timeoutId);
+                            this.isOnline = false;
+                        });
+                    }
+                }" class="flex items-center gap-2 bg-neutral-800/50 px-3 py-1.5 rounded-full border border-neutral-700/50 shadow-lg backdrop-blur-sm">
+                    <div class="connection-status">
+                        <div x-show="isOnline" class="w-2 h-2 rounded-full bg-green-400"></div>
+                        <div x-show="!isOnline" class="w-2 h-2 rounded-full bg-red-400 animate-pulse"></div>
                     </div>
-                    <span class="text-xs text-gray-400">Connecting...</span>
+                    <span x-show="isOnline" class="text-xs text-green-400">Connected</span>
+                    <span x-show="!isOnline" class="text-xs text-red-400">Offline</span>
                 </div>
 
                 <div class="flex items-center gap-3 bg-neutral-800/50 px-4 py-1.5 rounded-full border border-neutral-700/50 shadow-lg backdrop-blur-sm">

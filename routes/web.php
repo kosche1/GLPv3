@@ -34,6 +34,11 @@ Route::view('terms', 'terms')->name('terms');
 Route::view('disclaimer', 'disclaimer')->name('disclaimer');
 Route::view('system-policy', 'system-policy')->name('system-policy');
 
+// Simple ping route for connectivity check
+Route::get('/ping', function () {
+    return response()->json(['status' => 'ok'], 200);
+})->name('ping');
+
 
 
 Route::middleware(
