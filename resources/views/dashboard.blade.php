@@ -578,8 +578,8 @@
                     </div>
                 </div>
 
-                <!-- Activity Graph (Server-Side Rendered) -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300" style="min-height: 550px; height: auto;">
+                <!-- Recent Activities -->
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/5 to-emerald-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
                     <div class="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(16,185,129,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(16,185,129,0.01)_1px,transparent_1px)] bg-[size:20px_20px] opacity-10"></div>
@@ -589,197 +589,206 @@
                                 <div class="relative">
                                     <div class="absolute -inset-1 bg-emerald-500/20 rounded-full blur-sm opacity-70"></div>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400 relative" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
                                     </svg>
                                 </div>
-                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Your Activity</span>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Recent Activities</span>
                             </h3>
-                            <div class="flex items-center gap-2">
-                                <!-- Refresh Activity Button -->
-                                <a href="{{ route('refresh-activity') }}" class="flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner hover:bg-neutral-700/80 transition-colors duration-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                                    </svg>
-                                    <span class="text-xs text-emerald-400">Refresh</span>
-                                </a>
-                            </div>
                         </div>
 
-                        <!-- Activity Filters and Time Range -->
-                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                            <!-- Activity Type Filter -->
-                            <form action="{{ route('dashboard') }}" method="GET" class="flex items-center gap-2">
-                                <input type="hidden" name="time_range" value="{{ $selectedTimeRange }}">
-                                <div class="flex items-center gap-2 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner">
-                                    <div class="text-xs text-gray-400">Filter:</div>
-                                    <select name="activity_type" onchange="this.form.submit()" class="bg-transparent text-xs text-white border-0 focus:ring-0 cursor-pointer">
-                                        <option value="all" {{ $selectedActivityType == 'all' ? 'selected' : '' }}>All Activity</option>
-                                        <option value="logins" {{ $selectedActivityType == 'logins' ? 'selected' : '' }}>Logins</option>
-                                        <option value="submissions" {{ $selectedActivityType == 'submissions' ? 'selected' : '' }}>Submissions</option>
-                                        <option value="tasks" {{ $selectedActivityType == 'tasks' ? 'selected' : '' }}>Tasks</option>
-                                    </select>
-                                </div>
-                            </form>
+                        @php
+                            // Get recent activities for the current user
+                            $recentActivities = collect();
 
-                            <!-- Time Range Selector -->
-                            <form action="{{ route('dashboard') }}" method="GET" class="flex items-center gap-2">
-                                <input type="hidden" name="activity_type" value="{{ $selectedActivityType }}">
-                                <div class="flex items-center gap-2 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner">
-                                    <div class="text-xs text-gray-400">Time Range:</div>
-                                    <select name="time_range" onchange="this.form.submit()" class="bg-transparent text-xs text-white border-0 focus:ring-0 cursor-pointer">
-                                        @foreach($timeRanges as $value => $label)
-                                            <option value="{{ $value }}" {{ $selectedTimeRange == $value ? 'selected' : '' }}>{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </form>
+                            // Get recent student answers (submissions)
+                            $recentSubmissions = \App\Models\StudentAnswer::where('user_id', auth()->id())
+                                ->with('task.challenge')
+                                ->latest()
+                                ->take(5)
+                                ->get()
+                                ->map(function($answer) {
+                                    return (object)[
+                                        'type' => 'submission',
+                                        'title' => 'Submitted answer for: ' . ($answer->task->challenge->name ?? 'Unknown Challenge'),
+                                        'description' => $answer->is_correct ? 'Correct answer' : 'Incorrect answer',
+                                        'created_at' => $answer->created_at,
+                                        'icon' => $answer->is_correct ? 'check-circle' : 'x-circle',
+                                        'color' => $answer->is_correct ? 'emerald' : 'red'
+                                    ];
+                                });
 
-                            <!-- Activity Level Legend -->
-                            <div class="flex items-center gap-2 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 shadow-inner">
-                                <div class="text-xs text-gray-400">Less</div>
-                                <div class="flex items-center gap-1">
-                                    <div class="h-3 w-3 rounded-sm bg-neutral-700 shadow-inner" title="No activity"></div>
-                                    <div class="h-3 w-3 rounded-sm bg-emerald-900 shadow-inner" title="Low activity"></div>
-                                    <div class="h-3 w-3 rounded-sm bg-emerald-700 shadow-inner" title="Medium activity"></div>
-                                    <div class="h-3 w-3 rounded-sm bg-emerald-500 shadow-inner" title="High activity"></div>
-                                    <div class="h-3 w-3 rounded-sm bg-emerald-300 shadow-inner" title="Very high activity"></div>
-                                </div>
-                                <div class="text-xs text-gray-400">More</div>
-                            </div>
-                        </div>
+                            // Get recent login activities
+                            $recentLogins = \App\Models\StudentAttendance::where('user_id', auth()->id())
+                                ->latest()
+                                ->take(3)
+                                ->get()
+                                ->map(function($attendance) {
+                                    return (object)[
+                                        'type' => 'login',
+                                        'title' => 'Logged in to the system',
+                                        'description' => 'Login count: ' . $attendance->login_count,
+                                        'created_at' => $attendance->date,
+                                        'icon' => 'login',
+                                        'color' => 'blue'
+                                    ];
+                                });
 
-                        <!-- Status Message -->
-                        @if(session('status'))
-                            <div class="mb-4 p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                </svg>
-                                {{ session('status') }}
-                            </div>
-                        @endif
+                            // Get recent experience gains
+                            $recentExperience = \Illuminate\Support\Facades\DB::table('experience_audits')
+                                ->where('user_id', auth()->id())
+                                ->where('type', 'add')
+                                ->where('points', '>', 0)
+                                ->latest('created_at')
+                                ->take(3)
+                                ->get()
+                                ->map(function($audit) {
+                                    return (object)[
+                                        'type' => 'experience',
+                                        'title' => 'Gained experience points',
+                                        'description' => '+' . $audit->points . ' XP - ' . ($audit->reason ?? 'Activity completed'),
+                                        'created_at' => \Carbon\Carbon::parse($audit->created_at),
+                                        'icon' => 'star',
+                                        'color' => 'yellow'
+                                    ];
+                                });
 
-                        <!-- Modern Activity Graph with Weekly Breakdown -->
-                        <div x-data="{
-                            months: {},
-                            activityData: {},
-                            init() {
-                                // Initialize months as collapsed except for the first one
-                                @if(isset($activityData) && isset($activityData['monthly_data']))
-                                    @foreach($activityData['monthly_data'] as $month => $data)
-                                        this.months['{{ $month }}'] = {{ $loop->first ? 'true' : 'false' }};
-                                    @endforeach
-                                @else
-                                    // Default months if no data available
-                                    const currentDate = new Date();
-                                    for (let i = 0; i < 6; i++) {
-                                        const date = new Date(currentDate);
-                                        date.setMonth(currentDate.getMonth() - i);
-                                        const monthKey = date.toLocaleString('default', { month: 'long' }) + ' ' + date.getFullYear();
-                                        this.months[monthKey] = i === 0;
-                                    }
-                                @endif
-                            },
-                            toggleMonth(month) {
-                                this.months[month] = !this.months[month];
-                            }
-                        }" class="space-y-4">
-                            <!-- Stats Summary -->
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-neutral-800/30 rounded-xl border border-neutral-700/30 p-4">
-                                <div class="text-center">
-                                    <p class="text-gray-400 text-sm">Total Activity</p>
-                                    <p class="text-2xl font-bold text-white">{{ isset($activityData['total_activity']) ? number_format($activityData['total_activity']) : '0' }}</p>
-                                </div>
-                                <div class="text-center">
-                                    <p class="text-gray-400 text-sm">Weekly Average</p>
-                                    <p class="text-2xl font-bold text-white">{{ isset($activityData['weekly_average']) ? number_format($activityData['weekly_average']) : '0' }}</p>
-                                </div>
-                                <div class="text-center">
-                                    <p class="text-gray-400 text-sm">Current Streak</p>
-                                    <p class="text-2xl font-bold text-white">{{ $currentLoginStreak }} days</p>
-                                </div>
-                                <div class="text-center">
-                                    <p class="text-gray-400 text-sm">Completion Rate</p>
-                                    <p class="text-2xl font-bold text-white">{{ isset($activityData['completion_rate']) ? $activityData['completion_rate'] : '0' }}%</p>
-                                </div>
-                            </div>
+                            // Combine and sort all activities
+                            $recentActivities = $recentSubmissions
+                                ->concat($recentLogins)
+                                ->concat($recentExperience)
+                                ->sortByDesc('created_at')
+                                ->take(8);
 
-                            <!-- Monthly Activity Breakdown -->
-                            @if(isset($activityData) && isset($activityData['monthly_data']))
-                                @foreach($activityData['monthly_data'] as $month => $monthData)
-                                    <div class="bg-neutral-800/30 rounded-xl border border-neutral-700/30 overflow-hidden">
-                                        <!-- Month Header -->
-                                        <div class="p-4 border-b border-neutral-700/50 bg-neutral-800/50">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-sm font-medium text-gray-300">{{ $month }}</span>
-                                                <div class="flex items-center">
-                                                    <div class="w-32 h-2 bg-neutral-700/50 rounded-full overflow-hidden mr-3">
-                                                        <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full" style="width: {{ $monthData['completion_percentage'] }}%"></div>
-                                                    </div>
-                                                    <span class="text-sm font-medium text-gray-300">{{ $monthData['completion_percentage'] }}%</span>
-                                                    <button @click="toggleMonth('{{ $month }}')" class="ml-3 text-emerald-400 hover:text-emerald-300 transition-colors">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{ 'transform rotate-180': months['{{ $month }}'] }" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                            // Calculate metrics for cards
+                            $todayLogins = \App\Models\StudentAttendance::where('user_id', auth()->id())
+                                ->whereDate('date', today())
+                                ->sum('login_count');
 
-                                        <!-- Weekly Breakdown -->
-                                        <div x-show="months['{{ $month }}']" x-transition class="p-4">
-                                            <div class="space-y-3">
-                                                @foreach($monthData['weeks'] as $weekNum => $weekData)
-                                                    <div>
-                                                        <div class="flex items-center justify-between mb-1">
-                                                            <span class="text-xs text-gray-500">Week {{ $weekNum }}</span>
-                                                            <span class="text-xs text-gray-500">{{ $weekData['date_range'] }}</span>
-                                                        </div>
-                                                        <div class="flex items-center">
-                                                            <div class="flex-1 h-1.5 bg-neutral-700/50 rounded-full overflow-hidden">
-                                                                <div class="h-full bg-emerald-500 rounded-full" style="width: {{ $weekData['completion_percentage'] }}%"></div>
-                                                            </div>
-                                                            <span class="ml-3 text-xs font-medium text-gray-400">{{ $weekData['completion_percentage'] }}%</span>
-                                                        </div>
-                                                        <!-- Daily dots -->
-                                                        <div class="flex space-x-1 mt-1.5">
-                                                            @foreach($weekData['days'] as $day)
-                                                                @php
-                                                                    $bgColor = 'bg-neutral-700';
-                                                                    if ($day['activity_level'] === 1) $bgColor = 'bg-emerald-900';
-                                                                    if ($day['activity_level'] === 2) $bgColor = 'bg-emerald-700';
-                                                                    if ($day['activity_level'] === 3) $bgColor = 'bg-emerald-500';
-                                                                    if ($day['activity_level'] >= 4) $bgColor = 'bg-emerald-300';
-                                                                @endphp
-                                                                <div class="w-1.5 h-1.5 rounded-full {{ $bgColor }}" title="{{ $day['date'] }}: {{ $day['activity_count'] }} activities"></div>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
+                            $tasksThisWeek = \App\Models\StudentAnswer::where('user_id', auth()->id())
+                                ->where('is_correct', true)
+                                ->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])
+                                ->count();
+                        @endphp
 
-                                        <!-- Collapsed State -->
-                                        <div x-show="!months['{{ $month }}']" class="p-4 text-center">
-                                            <button @click="toggleMonth('{{ $month }}')" class="text-xs text-emerald-500 font-medium hover:text-emerald-400 transition-colors">
-                                                Click to expand weekly breakdown
-                                            </button>
-                                        </div>
+                        <!-- Activity Metrics Cards -->
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                            <!-- Current Level Card -->
+                            <div class="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 rounded-xl p-3 sm:p-4 hover:border-emerald-500/30 transition-all duration-300 group">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                                        </svg>
                                     </div>
-                                @endforeach
-                            @else
-                                <!-- Fallback for when no activity data is available -->
-                                <div class="bg-neutral-800/30 rounded-xl border border-neutral-700/30 p-6 text-center">
-                                    <p class="text-gray-400 mb-2">No activity data available yet.</p>
-                                    <a href="{{ route('refresh-activity') }}" class="inline-flex items-center justify-center px-4 py-2 text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg text-white transition-colors shadow-lg shadow-emerald-900/30">
-                                        Refresh Activity Data
-                                    </a>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-xs text-gray-400 font-medium truncate">Current Level</p>
+                                        <p class="text-lg sm:text-xl font-bold text-white">{{ $currentLevel }}</p>
+                                    </div>
                                 </div>
-                            @endif
-
-                            <!-- Activity Goals Section -->
-                            <div class="mt-4">
-                                {!! $weeklySummaryHtml !!}
                             </div>
+
+                            <!-- Today's Logins Card -->
+                            <div class="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 rounded-xl p-3 sm:p-4 hover:border-blue-500/30 transition-all duration-300 group">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-xs text-gray-400 font-medium truncate">Today's Logins</p>
+                                        <p class="text-lg sm:text-xl font-bold text-white">{{ $todayLogins }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tasks This Week Card -->
+                            <div class="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20 rounded-xl p-3 sm:p-4 hover:border-purple-500/30 transition-all duration-300 group">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-xs text-gray-400 font-medium truncate">Tasks This Week</p>
+                                        <p class="text-lg sm:text-xl font-bold text-white">{{ $tasksThisWeek }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Current Streak Card -->
+                            <div class="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20 rounded-xl p-3 sm:p-4 hover:border-orange-500/30 transition-all duration-300 group">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-orange-500/20 border border-orange-500/30 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5 text-orange-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <p class="text-xs text-gray-400 font-medium truncate">Current Streak</p>
+                                        <p class="text-lg sm:text-xl font-bold text-white">{{ $currentLoginStreak }} <span class="text-sm text-gray-400">days</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activities List -->
+                        <div class="space-y-3">
+                            @forelse($recentActivities as $activity)
+                                <div class="flex items-start gap-3 p-3 rounded-xl bg-neutral-700/20 border border-neutral-700/50 hover:bg-neutral-700/30 hover:border-emerald-500/30 transition-all duration-200 group">
+                                    <div class="flex-shrink-0 mt-0.5">
+                                        @if($activity->icon === 'check-circle')
+                                            <div class="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        @elseif($activity->icon === 'x-circle')
+                                            <div class="w-8 h-8 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        @elseif($activity->icon === 'login')
+                                            <div class="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        @elseif($activity->icon === 'star')
+                                            <div class="w-8 h-8 rounded-full bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            </div>
+                                        @else
+                                            <div class="w-8 h-8 rounded-full bg-gray-500/20 border border-gray-500/30 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-white group-hover:text-emerald-300 transition-colors duration-200">{{ $activity->title }}</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">{{ $activity->description }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">{{ $activity->created_at->setTimezone('Asia/Manila')->diffForHumans() }}</p>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-8">
+                                    <div class="w-16 h-16 mx-auto rounded-full bg-neutral-700/30 flex items-center justify-center mb-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-gray-400 text-sm">No recent activities</p>
+                                    <p class="text-gray-500 text-xs mt-1">Start learning to see your activities here!</p>
+                                </div>
+                            @endforelse
+
+
                         </div>
                     </div>
                 </div>
