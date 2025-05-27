@@ -130,7 +130,7 @@
         </div>
 
         <!-- Assignments Grid -->
-        <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div id="tasksGrid" class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             @if(isset($tasks) && count($tasks) > 0)
                 @foreach($tasks as $task)
                     @php
@@ -151,7 +151,9 @@
                          data-challenge="{{ strtolower($task->challenge->name) }}"
                          data-submission-type="{{ strtolower($task->submission_type ?? 'standard') }}"
                          data-difficulty="{{ strtolower($task->challenge->difficulty_level) }}"
-                         data-category="{{ $categoryType }}">
+                         data-category="{{ $categoryType }}"
+                         data-points="{{ $task->points_reward }}"
+                         data-status="{{ in_array($task->id, $completedTaskIds) ? 'completed' : (in_array($task->id, $inProgressTaskIds) ? 'in-progress' : 'not-started') }}">
                         <div class="mb-4 flex items-center justify-between">
                             @php
                                 $status = 'Not Started';
@@ -282,6 +284,42 @@
             const statusFilter = document.getElementById('task-status-filter');
             const sortSelect = document.getElementById('task-sort');
             const taskCards = document.querySelectorAll('.task-card');
+            const tasksGrid = document.getElementById('tasksGrid');
+            const categoryButtons = document.querySelectorAll('.flex-wrap.gap-2.py-2 button');
+
+            let activeCategory = 'all';
+
+            // Function to sort tasks
+            function sortTasks(cards, sortValue) {
+                return cards.sort((a, b) => {
+                    switch(sortValue) {
+                        case 'name-asc':
+                            return a.dataset.name.localeCompare(b.dataset.name);
+                        case 'name-desc':
+                            return b.dataset.name.localeCompare(a.dataset.name);
+                        case 'points-asc':
+                            return parseInt(a.dataset.points) - parseInt(b.dataset.points);
+                        case 'points-desc':
+                            return parseInt(b.dataset.points) - parseInt(a.dataset.points);
+                        case 'difficulty-asc':
+                        case 'difficulty-desc':
+                            const difficultyMap = {
+                                'beginner': 1,
+                                'easy': 2,
+                                'medium': 3,
+                                'intermediate': 4,
+                                'hard': 5,
+                                'advanced': 6,
+                                'expert': 7
+                            };
+                            const diffValueA = difficultyMap[a.dataset.difficulty] || 0;
+                            const diffValueB = difficultyMap[b.dataset.difficulty] || 0;
+                            return sortValue === 'difficulty-asc' ? diffValueA - diffValueB : diffValueB - diffValueA;
+                        default:
+                            return 0;
+                    }
+                });
+            }
 
             // Function to filter and sort tasks
             function filterAndSortTasks() {
@@ -289,92 +327,64 @@
                 const statusValue = statusFilter.value;
                 const sortValue = sortSelect.value;
 
-                // Create an array from the task cards for sorting
-                let taskCardsArray = Array.from(taskCards);
+                // Convert NodeList to Array for filtering and sorting
+                const cardsArray = Array.from(taskCards);
 
-                // Filter tasks
-                taskCardsArray.forEach(card => {
-                    // Get task data for filtering from data attributes
-                    const taskName = card.dataset.name || '';
-                    const taskDescription = card.dataset.description || '';
-                    const challengeName = card.dataset.challenge || '';
-                    const submissionType = card.dataset.submissionType || '';
-
-                    // Get task status for filtering
-                    let taskStatus = 'not-started';
-                    const statusElement = card.querySelector('.rounded-full');
-                    if (statusElement) {
-                        const statusText = statusElement.textContent.toLowerCase();
-                        if (statusText.includes('completed')) {
-                            taskStatus = 'completed';
-                        } else if (statusText.includes('progress')) {
-                            taskStatus = 'in-progress';
-                        }
-                    }
+                // Filter cards based on search and filter criteria
+                const filteredCards = cardsArray.filter(card => {
+                    const taskName = card.dataset.name;
+                    const taskDescription = card.dataset.description;
+                    const challengeName = card.dataset.challenge;
+                    const taskStatus = card.dataset.status;
+                    const taskCategory = card.dataset.category;
 
                     // Check if task matches search and filter criteria
                     const matchesSearch = taskName.includes(searchTerm) ||
                                          taskDescription.includes(searchTerm) ||
                                          challengeName.includes(searchTerm);
                     const matchesStatus = statusValue === 'all' || taskStatus === statusValue;
+                    const matchesCategory = activeCategory === 'all' || taskCategory === activeCategory;
 
-                    // Show or hide based on filters
-                    if (matchesSearch && matchesStatus) {
-                        card.style.display = '';
+                    return matchesSearch && matchesStatus && matchesCategory;
+                });
+
+                // Sort filtered cards
+                const sortedCards = sortTasks(filteredCards, sortValue);
+
+                // Hide all cards first
+                cardsArray.forEach(card => {
+                    card.style.display = 'none';
+                });
+
+                // Show and reorder sorted cards
+                sortedCards.forEach((card, index) => {
+                    card.style.display = '';
+                    card.style.order = index;
+                });
+
+                // Handle pagination visibility
+                const paginationContainer = document.querySelector('.mt-8.flex.items-center.justify-center');
+                if (paginationContainer) {
+                    // Hide pagination when filtering/searching/sorting
+                    if (searchTerm || statusValue !== 'all' || activeCategory !== 'all' || sortValue !== 'name-asc') {
+                        paginationContainer.style.display = 'none';
                     } else {
-                        card.style.display = 'none';
+                        paginationContainer.style.display = '';
                     }
-                });
+                }
 
-                // Sort visible tasks
-                taskCardsArray = Array.from(document.querySelectorAll('.task-card:not([style*="display: none"])'));
-
-                // Sort based on selected criteria
-                taskCardsArray.sort((a, b) => {
-                    if (sortValue === 'name-asc' || sortValue === 'name-desc') {
-                        const nameA = a.dataset.name || '';
-                        const nameB = b.dataset.name || '';
-                        return sortValue === 'name-asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+                // Show/hide empty state
+                const emptyState = document.querySelector('.col-span-3');
+                if (emptyState) {
+                    if (sortedCards.length === 0) {
+                        emptyState.style.display = '';
+                    } else {
+                        emptyState.style.display = 'none';
                     }
-                    else if (sortValue === 'points-asc' || sortValue === 'points-desc') {
-                        const pointsA = parseInt(a.querySelector('.text-sm.font-medium.text-white')?.textContent || '0');
-                        const pointsB = parseInt(b.querySelector('.text-sm.font-medium.text-white')?.textContent || '0');
-                        return sortValue === 'points-asc' ? pointsA - pointsB : pointsB - pointsA;
-                    }
-                    else if (sortValue === 'difficulty-asc' || sortValue === 'difficulty-desc') {
-                        const difficultyMap = {
-                            'beginner': 1,
-                            'easy': 2,
-                            'medium': 3,
-                            'intermediate': 4,
-                            'hard': 5,
-                            'advanced': 6,
-                            'expert': 7
-                        };
-
-                        const difficultyA = a.dataset.difficulty || '';
-                        const difficultyB = b.dataset.difficulty || '';
-
-                        const diffValueA = difficultyMap[difficultyA] || 0;
-                        const diffValueB = difficultyMap[difficultyB] || 0;
-
-                        return sortValue === 'difficulty-asc' ? diffValueA - diffValueB : diffValueB - diffValueA;
-                    }
-
-                    return 0;
-                });
-
-                // Reorder the DOM elements based on sort
-                const container = document.querySelector('.grid-cols-1.gap-5');
-                taskCardsArray.forEach(card => {
-                    container.appendChild(card);
-                });
+                }
             }
 
             // Handle category filter buttons
-            const categoryButtons = document.querySelectorAll('.flex-wrap.gap-2.py-2 button');
-            let activeCategory = 'all';
-
             categoryButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     // Remove active class from all buttons
@@ -390,110 +400,12 @@
                     // Get category from button id
                     activeCategory = this.id.replace('filter-', '');
 
-                    // Filter tasks
+                    // Filter and sort tasks
                     filterAndSortTasks();
                 });
             });
 
-            // Update filter function to include category filtering
-            const originalFilterAndSortTasks = filterAndSortTasks;
-            filterAndSortTasks = function() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const statusValue = statusFilter.value;
-                const sortValue = sortSelect.value;
-
-                // Create an array from the task cards for sorting
-                let taskCardsArray = Array.from(taskCards);
-
-                // Filter tasks
-                taskCardsArray.forEach(card => {
-                    // Get task data for filtering
-                    const taskName = card.querySelector('h3')?.textContent.toLowerCase() || '';
-                    const taskDescription = card.querySelector('p')?.textContent.toLowerCase() || '';
-                    const challengeName = card.querySelector('.text-xs.text-neutral-400.ml-3 span')?.textContent.toLowerCase() || '';
-                    const submissionType = card.querySelector('.grid-cols-2.gap-2.mb-4 .flex.items-center.gap-1\\.5:nth-child(2) span')?.textContent.toLowerCase() || '';
-
-                    // Get task status for filtering
-                    let taskStatus = 'not-started';
-                    const statusElement = card.querySelector('.rounded-full');
-                    if (statusElement) {
-                        const statusText = statusElement.textContent.toLowerCase();
-                        if (statusText.includes('completed')) {
-                            taskStatus = 'completed';
-                        } else if (statusText.includes('progress')) {
-                            taskStatus = 'in-progress';
-                        }
-                    }
-
-                    // Check if task matches category
-                    let matchesCategory = activeCategory === 'all';
-                    if (!matchesCategory) {
-                        const taskCategory = card.dataset.category || '';
-                        if (taskCategory === activeCategory) {
-                            matchesCategory = true;
-                        }
-                    }
-
-                    // Check if task matches search and filter criteria
-                    const matchesSearch = taskName.includes(searchTerm) ||
-                                         taskDescription.includes(searchTerm) ||
-                                         challengeName.includes(searchTerm);
-                    const matchesStatus = statusValue === 'all' || taskStatus === statusValue;
-
-                    // Show or hide based on filters
-                    if (matchesSearch && matchesStatus && matchesCategory) {
-                        card.style.display = '';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                // Sort visible tasks
-                taskCardsArray = Array.from(document.querySelectorAll('.grid-cols-1.gap-5 > div.group:not([style*="display: none"])'));
-
-                // Sort based on selected criteria
-                taskCardsArray.sort((a, b) => {
-                    if (sortValue === 'name-asc' || sortValue === 'name-desc') {
-                        const nameA = a.querySelector('h3')?.textContent.toLowerCase() || '';
-                        const nameB = b.querySelector('h3')?.textContent.toLowerCase() || '';
-                        return sortValue === 'name-asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-                    }
-                    else if (sortValue === 'points-asc' || sortValue === 'points-desc') {
-                        const pointsA = parseInt(a.querySelector('.text-sm.font-medium.text-white')?.textContent || '0');
-                        const pointsB = parseInt(b.querySelector('.text-sm.font-medium.text-white')?.textContent || '0');
-                        return sortValue === 'points-asc' ? pointsA - pointsB : pointsB - pointsA;
-                    }
-                    else if (sortValue === 'difficulty-asc' || sortValue === 'difficulty-desc') {
-                        const difficultyMap = {
-                            'beginner': 1,
-                            'easy': 2,
-                            'medium': 3,
-                            'intermediate': 4,
-                            'hard': 5,
-                            'advanced': 6,
-                            'expert': 7
-                        };
-
-                        const difficultyA = a.querySelector('.rounded-full')?.textContent.toLowerCase() || '';
-                        const difficultyB = b.querySelector('.rounded-full')?.textContent.toLowerCase() || '';
-
-                        const diffValueA = difficultyMap[difficultyA] || 0;
-                        const diffValueB = difficultyMap[difficultyB] || 0;
-
-                        return sortValue === 'difficulty-asc' ? diffValueA - diffValueB : diffValueB - diffValueA;
-                    }
-
-                    return 0;
-                });
-
-                // Reorder the DOM elements based on sort
-                const container = document.querySelector('.grid-cols-1.gap-5');
-                taskCardsArray.forEach(card => {
-                    container.appendChild(card);
-                });
-            };
-
-            // Add event listeners
+            // Add event listeners for search, dropdown filters, and sorting
             searchInput.addEventListener('input', filterAndSortTasks);
             statusFilter.addEventListener('change', filterAndSortTasks);
             sortSelect.addEventListener('change', filterAndSortTasks);
