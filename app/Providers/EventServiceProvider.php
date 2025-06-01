@@ -21,6 +21,7 @@ use App\Listeners\SendChallengeCompletionNotification;
 use App\Listeners\SendLevelUpNotification;
 use App\Listeners\SendNewChallengeNotification;
 use App\Listeners\AssignStudentRole;
+use App\Listeners\RecordFriendActivity;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use LevelUp\Experience\Events\AchievementAwarded;
@@ -47,18 +48,22 @@ class EventServiceProvider extends ServiceProvider
         ],
         UserLevelledUp::class => [
             SendLevelUpNotification::class,
+            RecordFriendActivity::class,
         ],
         AchievementAwarded::class => [
             SendAchievementNotification::class,
+            RecordFriendActivity::class,
         ],
         UserEnrolledInChallenge::class => [
             SendNewChallengeNotification::class,
         ],
         UserCompletedChallenge::class => [
             SendChallengeCompletionNotification::class,
+            RecordFriendActivity::class,
         ],
         ChallengeCompleted::class => [
             RecordChallengeCompletion::class,
+            RecordFriendActivity::class,
         ],
         TaskSubmitted::class => [
             RecordTaskSubmission::class,

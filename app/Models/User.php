@@ -451,6 +451,225 @@ class User extends Authenticatable
     }
 
     /**
+     * Get friendships where this user is the initiator.
+     */
+    public function sentFriendRequests()
+    {
+        return $this->hasMany(Friendship::class, 'user_id');
+    }
+
+    /**
+     * Get friendships where this user is the recipient.
+     */
+    public function receivedFriendRequests()
+    {
+        return $this->hasMany(Friendship::class, 'friend_id');
+    }
+
+    /**
+     * Get all friends (accepted friendships in both directions).
+     */
+    public function friends()
+    {
+        $sentFriends = $this->sentFriendRequests()
+            ->accepted()
+            ->with('friend')
+            ->get()
+            ->pluck('friend');
+
+        $receivedFriends = $this->receivedFriendRequests()
+            ->accepted()
+            ->with('user')
+            ->get()
+            ->pluck('user');
+
+        return $sentFriends->merge($receivedFriends)->unique('id');
+    }
+
+    /**
+     * Get active friends (online in the last 15 minutes).
+     */
+    public function getActiveFriends()
+    {
+        $friends = $this->friends();
+
+        return $friends->filter(function ($friend) {
+            // Check if friend was active in the last 15 minutes
+            return $friend->last_activity_at &&
+                   $friend->last_activity_at->diffInMinutes(now()) <= 15;
+        })->map(function ($friend) {
+            // Add status and activity information
+            $minutesAgo = $friend->last_activity_at ?
+                         $friend->last_activity_at->diffInMinutes(now()) : null;
+
+            $friend->status = $this->getFriendStatus($minutesAgo);
+            $friend->last_activity_description = $this->getLastActivityDescription($friend);
+            $friend->activity_time = $friend->last_activity_at ?
+                                   $friend->last_activity_at->diffForHumans() : 'Unknown';
+
+            return $friend;
+        })->sortBy(function ($friend) {
+            // Sort by status priority: online, active, away
+            $statusPriority = ['online' => 1, 'active' => 2, 'away' => 3];
+            return $statusPriority[$friend->status] ?? 4;
+        })->values();
+    }
+
+    /**
+     * Get friend status based on last activity.
+     */
+    private function getFriendStatus($minutesAgo)
+    {
+        if ($minutesAgo === null) return 'away';
+        if ($minutesAgo <= 5) return 'online';
+        if ($minutesAgo <= 15) return 'active';
+        return 'away';
+    }
+
+    /**
+     * Get last activity description for a friend.
+     */
+    private function getLastActivityDescription($friend)
+    {
+        // Get the most recent activity from experience_audits
+        $lastAudit = \Illuminate\Support\Facades\DB::table('experience_audits')
+            ->where('user_id', $friend->id)
+            ->where('type', 'add')
+            ->where('points', '>', 0)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($lastAudit && $lastAudit->reason) {
+            return $lastAudit->reason;
+        }
+
+        // Fallback to generic activities
+        $activities = [
+            'Completed a challenge',
+            'Earned experience points',
+            'Logged into the system',
+            'Updated profile',
+            'Participated in learning'
+        ];
+
+        return $activities[array_rand($activities)];
+    }
+
+    /**
+     * Check if this user is friends with another user.
+     */
+    public function isFriendsWith(User $user): bool
+    {
+        return $this->sentFriendRequests()
+            ->where('friend_id', $user->id)
+            ->accepted()
+            ->exists() ||
+            $this->receivedFriendRequests()
+            ->where('user_id', $user->id)
+            ->accepted()
+            ->exists();
+    }
+
+    /**
+     * Check if this user has sent a friend request to another user.
+     */
+    public function hasSentFriendRequestTo(User $user): bool
+    {
+        return $this->sentFriendRequests()
+            ->where('friend_id', $user->id)
+            ->pending()
+            ->exists();
+    }
+
+    /**
+     * Check if this user has received a friend request from another user.
+     */
+    public function hasReceivedFriendRequestFrom(User $user): bool
+    {
+        return $this->receivedFriendRequests()
+            ->where('user_id', $user->id)
+            ->pending()
+            ->exists();
+    }
+
+    /**
+     * Send a friend request to another user.
+     */
+    public function sendFriendRequestTo(User $user): ?Friendship
+    {
+        // Don't send request to self
+        if ($this->id === $user->id) {
+            return null;
+        }
+
+        // Don't send if already friends or request exists
+        if ($this->isFriendsWith($user) ||
+            $this->hasSentFriendRequestTo($user) ||
+            $this->hasReceivedFriendRequestFrom($user)) {
+            return null;
+        }
+
+        return Friendship::create([
+            'user_id' => $this->id,
+            'friend_id' => $user->id,
+            'status' => 'pending'
+        ]);
+    }
+
+    /**
+     * Accept a friend request from another user.
+     */
+    public function acceptFriendRequestFrom(User $user): bool
+    {
+        $friendship = $this->receivedFriendRequests()
+            ->where('user_id', $user->id)
+            ->pending()
+            ->first();
+
+        return $friendship ? $friendship->accept() : false;
+    }
+
+    /**
+     * Get pending friend requests received by this user.
+     */
+    public function getPendingFriendRequests()
+    {
+        return $this->receivedFriendRequests()
+            ->pending()
+            ->with('user')
+            ->get()
+            ->pluck('user');
+    }
+
+    /**
+     * Get friend activities for this user.
+     */
+    public function friendActivities()
+    {
+        return $this->hasMany(FriendActivity::class);
+    }
+
+    /**
+     * Get activity likes by this user.
+     */
+    public function activityLikes()
+    {
+        return $this->hasMany(ActivityLike::class);
+    }
+
+    /**
+     * Get the user's recent activities.
+     */
+    public function getRecentActivities($limit = 10)
+    {
+        return $this->friendActivities()
+            ->with('likes')
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
      * Get the typing test results for the user.
      */
     public function typing_test_results()

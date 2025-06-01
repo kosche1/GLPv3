@@ -773,7 +773,7 @@
                         @endif
                     </div>
                 </div>
-                
+
                 <!-- Recent Activities -->
                 <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.15),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -1161,6 +1161,108 @@
                             </span>
                         </div>
                     </a>
+                </div>
+
+                <!-- Active Friends -->
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
+                    <div class="p-6 relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-blue-500/20 rounded-full blur-sm opacity-70"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-400 relative" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M7 4V2a1 1 0 011-1h4a1 1 0 011 1v2h4a1 1 0 110 2h-1v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6H3a1 1 0 010-2h4zM9 3v1h2V3H9zm0 5a1 1 0 112 0v6a1 1 0 11-2 0V8z"/>
+                                    </svg>
+                                </div>
+                                <span class="text-white bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Friend Activity</span>
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    onclick="console.log('Add Friend button clicked'); openAddFriendModal();"
+                                    class="text-sm text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 hover:bg-neutral-800 hover:border-blue-500/30 transition-all duration-300"
+                                    id="addFriendButton"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/>
+                                    </svg>
+                                    Add Friend
+                                </button>
+                                <!-- Debug button for testing -->
+                                <button
+                                    onclick="console.log('Debug button clicked'); alert('Button click works! Modal element exists: ' + !!document.getElementById('addFriendModal'));"
+                                    class="text-xs text-gray-400 hover:text-gray-300 transition-colors px-2 py-1 rounded border border-gray-600/50"
+                                    title="Debug button - click to test if JavaScript is working"
+                                >
+                                    🔧
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Activity Filter Tabs -->
+                        <div class="flex gap-1 mb-4 bg-neutral-800/50 rounded-lg p-1">
+                            <button
+                                onclick="filterActivities('all')"
+                                class="activity-filter-btn active flex-1 text-xs py-2 px-3 rounded-md transition-all duration-200 text-blue-400 bg-blue-500/20 border border-blue-500/30"
+                                data-filter="all"
+                            >
+                                All
+                            </button>
+                            <button
+                                onclick="filterActivities('challenge_completed')"
+                                class="activity-filter-btn flex-1 text-xs py-2 px-3 rounded-md transition-all duration-200 text-gray-400 hover:text-white hover:bg-neutral-700/50"
+                                data-filter="challenge_completed"
+                            >
+                                🎓 Challenges
+                            </button>
+                            <button
+                                onclick="filterActivities('level_up')"
+                                class="activity-filter-btn flex-1 text-xs py-2 px-3 rounded-md transition-all duration-200 text-gray-400 hover:text-white hover:bg-neutral-700/50"
+                                data-filter="level_up"
+                            >
+                                ⭐ Levels
+                            </button>
+                            <button
+                                onclick="filterActivities('achievement_unlocked')"
+                                class="activity-filter-btn flex-1 text-xs py-2 px-3 rounded-md transition-all duration-200 text-gray-400 hover:text-white hover:bg-neutral-700/50"
+                                data-filter="achievement_unlocked"
+                            >
+                                🏆 Achievements
+                            </button>
+                        </div>
+
+                        <!-- Activity Feed Container -->
+                        <div id="activityFeedContainer" class="space-y-3 max-h-96 overflow-y-auto">
+                            <!-- Activities will be loaded here -->
+                            <div id="activityFeedLoading" class="text-center py-6">
+                                <div class="w-8 h-8 mx-auto border-2 border-blue-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+                                <p class="text-gray-400 text-sm">Loading friend activities...</p>
+                            </div>
+                        </div>
+
+                        <!-- Load More Button -->
+                        <div id="loadMoreContainer" class="mt-4 pt-3 border-t border-neutral-700/50 text-center hidden">
+                            <button
+                                onclick="loadMoreActivities()"
+                                id="loadMoreBtn"
+                                class="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                            >
+                                Load More Activities
+                            </button>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div id="emptyActivityState" class="text-center py-6 hidden">
+                            <div class="w-16 h-16 mx-auto rounded-full bg-blue-500/10 flex items-center justify-center mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M7 4V2a1 1 0 011-1h4a1 1 0 011 1v2h4a1 1 0 110 2h-1v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6H3a1 1 0 010-2h4zM9 3v1h2V3H9zm0 5a1 1 0 112 0v6a1 1 0 11-2 0V8z"/>
+                                </svg>
+                            </div>
+                            <p class="text-gray-400 text-sm mb-2">No friend activities yet</p>
+                            <p class="text-gray-500 text-xs">Add friends to see their learning activities here!</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Leaderboard -->
@@ -1580,6 +1682,787 @@
                 if (e.altKey && e.key === 'f') {
                     window.location.href = '{{ route("forums") }}';
                 }
+            }
+        });
+    </script>
+
+    <!-- Add Friend Modal -->
+    <div id="addFriendModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-neutral-800 rounded-2xl border border-neutral-700 shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden">
+            <div class="p-6 border-b border-neutral-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-white">Add Friend</h3>
+                    <button onclick="closeAddFriendModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <input
+                        type="text"
+                        id="friendSearchInput"
+                        placeholder="Search for users by name..."
+                        class="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+                        oninput="searchUsers(this.value)"
+                    >
+                </div>
+                <div id="searchResults" class="space-y-2 max-h-60 overflow-y-auto">
+                    <div class="text-center text-gray-400 py-4">
+                        <p>Start typing to search for users...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Friend Profile Modal -->
+    <div id="friendProfileModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-neutral-800 rounded-2xl border border-neutral-700 shadow-xl max-w-md w-full">
+            <div class="p-6 border-b border-neutral-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-white">Friend Profile</h3>
+                    <button onclick="closeFriendProfileModal()" class="text-gray-400 hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="friendProfileContent" class="p-6">
+                <!-- Profile content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Friends JavaScript -->
+    <script>
+        let searchTimeout;
+        let currentActivityPage = 1;
+        let currentActivityFilter = 'all';
+        let isLoadingActivities = false;
+        let hasMoreActivities = true;
+
+        function openAddFriendModal() {
+            console.log('Opening add friend modal...');
+            const modal = document.getElementById('addFriendModal');
+            const searchInput = document.getElementById('friendSearchInput');
+
+            if (!modal) {
+                console.error('Add friend modal not found!');
+                showNotification('Error: Modal not found', 'error');
+                return;
+            }
+
+            if (!searchInput) {
+                console.error('Friend search input not found!');
+                showNotification('Error: Search input not found', 'error');
+                return;
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                searchInput.focus();
+            }, 100);
+            console.log('Add friend modal opened successfully');
+        }
+
+        function closeAddFriendModal() {
+            document.getElementById('addFriendModal').classList.add('hidden');
+            document.getElementById('friendSearchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '<div class="text-center text-gray-400 py-4"><p>Start typing to search for users...</p></div>';
+        }
+
+        function searchUsers(query) {
+            clearTimeout(searchTimeout);
+
+            if (query.length < 2) {
+                document.getElementById('searchResults').innerHTML = '<div class="text-center text-gray-400 py-4"><p>Start typing to search for users...</p></div>';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch(`/friends/search?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displaySearchResults(data.users);
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        document.getElementById('searchResults').innerHTML = '<div class="text-center text-red-400 py-4"><p>Error searching users</p></div>';
+                    });
+            }, 300);
+        }
+
+        function displaySearchResults(users) {
+            const resultsContainer = document.getElementById('searchResults');
+
+            if (users.length === 0) {
+                resultsContainer.innerHTML = '<div class="text-center text-gray-400 py-4"><p>No users found</p></div>';
+                return;
+            }
+
+            resultsContainer.innerHTML = users.map(user => `
+                <div class="flex items-center justify-between p-3 bg-neutral-700/20 rounded-lg border border-neutral-700/50 hover:bg-neutral-700/30 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-sm font-bold text-white">
+                            ${user.initials}
+                        </div>
+                        <div>
+                            <p class="font-medium text-white">${user.name}</p>
+                            <p class="text-xs text-gray-400">Level ${user.level} • ${user.points.toLocaleString()} XP</p>
+                        </div>
+                    </div>
+                    <div>
+                        ${user.is_friend ?
+                            '<span class="text-xs text-green-400 bg-green-500/20 px-2 py-1 rounded-full">Friends</span>' :
+                            user.request_sent ?
+                                '<span class="text-xs text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded-full">Pending</span>' :
+                                user.request_received ?
+                                    '<button onclick="acceptFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Accept</button>' :
+                                    '<button onclick="sendFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Add Friend</button>'
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function sendFriendRequest(userId) {
+            console.log('Sending friend request to user ID:', userId);
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (!csrfToken) {
+                console.error('CSRF token not found!');
+                showNotification('Error: Security token missing', 'error');
+                return;
+            }
+
+            // Disable the button to prevent double-clicks
+            const button = event.target;
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Sending...';
+
+            fetch('/friends/send-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    showNotification('Friend request sent!', 'success');
+                    // Refresh search results
+                    const query = document.getElementById('friendSearchInput').value;
+                    if (query.length >= 2) {
+                        searchUsers(query);
+                    }
+                } else {
+                    showNotification(data.message || 'Failed to send friend request', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending friend request:', error);
+                showNotification('Error sending friend request: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Re-enable the button
+                button.disabled = false;
+                button.textContent = originalText;
+            });
+        }
+
+        function acceptFriendRequest(userId) {
+            fetch('/friends/accept-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Friend request accepted!', 'success');
+                    // Refresh search results and active friends
+                    const query = document.getElementById('friendSearchInput').value;
+                    if (query.length >= 2) {
+                        searchUsers(query);
+                    }
+                    refreshActiveFriends();
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error accepting friend request', 'error');
+            });
+        }
+
+        function viewFriendProfile(userId) {
+            fetch(`/friends/profile/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayFriendProfile(data.friend);
+                        document.getElementById('friendProfileModal').classList.remove('hidden');
+                    } else {
+                        showNotification(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error loading friend profile', 'error');
+                });
+        }
+
+        function displayFriendProfile(friend) {
+            document.getElementById('friendProfileContent').innerHTML = `
+                <div class="text-center mb-6">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-xl font-bold text-white mx-auto mb-3">
+                        ${friend.initials}
+                    </div>
+                    <h4 class="text-xl font-bold text-white">${friend.name}</h4>
+                    <p class="text-gray-400">Level ${friend.level}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-neutral-700/20 rounded-lg p-3 text-center">
+                        <p class="text-2xl font-bold text-blue-400">${friend.points.toLocaleString()}</p>
+                        <p class="text-xs text-gray-400">Experience Points</p>
+                    </div>
+                    <div class="bg-neutral-700/20 rounded-lg p-3 text-center">
+                        <p class="text-2xl font-bold text-purple-400">${friend.badges_count}</p>
+                        <p class="text-xs text-gray-400">Badges Earned</p>
+                    </div>
+                    <div class="bg-neutral-700/20 rounded-lg p-3 text-center">
+                        <p class="text-2xl font-bold text-green-400">${friend.achievements_count}</p>
+                        <p class="text-xs text-gray-400">Achievements</p>
+                    </div>
+                    <div class="bg-neutral-700/20 rounded-lg p-3 text-center">
+                        <p class="text-2xl font-bold text-orange-400">${friend.challenges_completed}</p>
+                        <p class="text-xs text-gray-400">Challenges Done</p>
+                    </div>
+                </div>
+
+                ${friend.last_activity_at ? `
+                    <div class="bg-neutral-700/20 rounded-lg p-3">
+                        <p class="text-sm text-gray-400">Last seen: ${friend.last_activity_at}</p>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function closeFriendProfileModal() {
+            document.getElementById('friendProfileModal').classList.add('hidden');
+        }
+
+        // Activity Feed Functions
+        function loadActivityFeed(page = 1, filter = 'all', append = false) {
+            if (isLoadingActivities) return;
+
+            isLoadingActivities = true;
+
+            if (!append) {
+                document.getElementById('activityFeedLoading').classList.remove('hidden');
+                document.getElementById('emptyActivityState').classList.add('hidden');
+            }
+
+            fetch(`/friends/activities/dashboard?page=${page}&filters=${filter}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayActivityFeed(data.activities, append);
+
+                    if (!append) {
+                        document.getElementById('activityFeedLoading').classList.add('hidden');
+                    }
+
+                    // Show empty state if no activities
+                    if (data.activities.length === 0 && !append) {
+                        document.getElementById('emptyActivityState').classList.remove('hidden');
+                        document.getElementById('loadMoreContainer').classList.add('hidden');
+                    } else {
+                        document.getElementById('emptyActivityState').classList.add('hidden');
+
+                        // Show/hide load more button
+                        if (data.pagination && data.pagination.has_more) {
+                            document.getElementById('loadMoreContainer').classList.remove('hidden');
+                            hasMoreActivities = true;
+                        } else {
+                            document.getElementById('loadMoreContainer').classList.add('hidden');
+                            hasMoreActivities = false;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading activity feed:', error);
+                    document.getElementById('activityFeedLoading').classList.add('hidden');
+                    showNotification('Error loading activity feed', 'error');
+                })
+                .finally(() => {
+                    isLoadingActivities = false;
+                });
+        }
+
+        function displayActivityFeed(activities, append = false) {
+            const container = document.getElementById('activityFeedContainer');
+
+            if (!append) {
+                container.innerHTML = '';
+            }
+
+            activities.forEach(activity => {
+                const activityElement = createActivityElement(activity);
+                container.appendChild(activityElement);
+
+                // Animate in
+                setTimeout(() => {
+                    activityElement.style.opacity = '1';
+                    activityElement.style.transform = 'translateY(0)';
+                }, 100);
+            });
+        }
+
+        function createActivityElement(activity) {
+            const element = document.createElement('div');
+            element.className = 'activity-item opacity-0 transform translate-y-4 transition-all duration-300';
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(16px)';
+
+            const colorClasses = {
+                'blue': 'border-blue-500/30 bg-blue-500/10',
+                'yellow': 'border-yellow-500/30 bg-yellow-500/10',
+                'purple': 'border-purple-500/30 bg-purple-500/10',
+                'green': 'border-green-500/30 bg-green-500/10',
+                'red': 'border-red-500/30 bg-red-500/10',
+                'orange': 'border-orange-500/30 bg-orange-500/10',
+                'cyan': 'border-cyan-500/30 bg-cyan-500/10',
+                'emerald': 'border-emerald-500/30 bg-emerald-500/10',
+                'pink': 'border-pink-500/30 bg-pink-500/10',
+                'gray': 'border-gray-500/30 bg-gray-500/10'
+            };
+
+            const colorClass = colorClasses[activity.color] || colorClasses['gray'];
+
+            element.innerHTML = `
+                <div class="flex items-start p-3 rounded-xl bg-neutral-700/20 border border-neutral-700/50 hover:bg-neutral-700/30 hover:border-blue-500/30 transition-all duration-300 group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0)_75%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+
+                    <!-- User Avatar -->
+                    <div class="relative flex-shrink-0 mr-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-sm font-bold text-white shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                             onclick="viewFriendProfile(${activity.user.id})">
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.25),transparent_50%)] opacity-70"></div>
+                            <div class="relative z-10">${activity.user.initials}</div>
+                        </div>
+
+                        <!-- Activity Type Badge -->
+                        <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-neutral-800 ${colorClass} flex items-center justify-center text-xs">
+                            ${activity.icon}
+                        </div>
+                    </div>
+
+                    <!-- Activity Content -->
+                    <div class="flex-grow relative z-10 min-w-0">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm text-gray-100 group-hover:text-white transition-colors duration-300">
+                                    <span class="font-medium cursor-pointer hover:text-blue-400" onclick="viewFriendProfile(${activity.user.id})">${activity.user.name}</span>
+                                    <span class="text-gray-400">${getActivityAction(activity.type)}</span>
+                                    <span class="font-medium text-white">${getActivityTarget(activity)}</span>
+                                </p>
+                                ${activity.description ? `<p class="text-xs text-gray-400 mt-0.5">${activity.description}</p>` : ''}
+                                <div class="flex items-center gap-3 mt-1">
+                                    <span class="text-xs text-gray-500">${activity.time_ago}</span>
+                                    ${activity.points_earned > 0 ? `
+                                        <span class="text-xs text-blue-400 flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                            +${activity.points_earned}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Like Button -->
+                            <div class="flex items-center gap-1 ml-2">
+                                <button
+                                    onclick="likeActivity(${activity.id}, this)"
+                                    class="like-btn flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-all duration-200 ${activity.is_liked ? 'text-red-400 bg-red-500/20' : 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'}"
+                                >
+                                    <svg class="w-3 h-3" fill="${activity.is_liked ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    </svg>
+                                    <span class="likes-count">${activity.likes_count}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return element;
+        }
+
+        function getActivityAction(type) {
+            const actions = {
+                'challenge_completed': ' completed ',
+                'badge_earned': ' earned ',
+                'level_up': ' reached ',
+                'achievement_unlocked': ' unlocked ',
+                'streak_milestone': ' achieved ',
+                'points_milestone': ' reached ',
+                'task_completed': ' completed '
+            };
+            return actions[type] || ' did ';
+        }
+
+        function getActivityTarget(activity) {
+            switch(activity.type) {
+                case 'challenge_completed':
+                    return activity.data.challenge_name || activity.title;
+                case 'badge_earned':
+                    return `the "${activity.data.badge_name}" badge`;
+                case 'level_up':
+                    return `Level ${activity.data.new_level}`;
+                case 'achievement_unlocked':
+                    return `"${activity.data.achievement_name}"`;
+                case 'streak_milestone':
+                    return `${activity.data.streak_days}-day streak`;
+                case 'points_milestone':
+                    return `${activity.data.milestone} points milestone`;
+                default:
+                    return activity.title;
+            }
+        }
+
+        function filterActivities(filter) {
+            // Update filter buttons
+            document.querySelectorAll('.activity-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'text-blue-400', 'bg-blue-500/20', 'border', 'border-blue-500/30');
+                btn.classList.add('text-gray-400');
+            });
+
+            const activeBtn = document.querySelector(`[data-filter="${filter}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active', 'text-blue-400', 'bg-blue-500/20', 'border', 'border-blue-500/30');
+                activeBtn.classList.remove('text-gray-400');
+            }
+
+            // Reset pagination and load new activities
+            currentActivityFilter = filter;
+            currentActivityPage = 1;
+            hasMoreActivities = true;
+            loadActivityFeed(1, filter, false);
+        }
+
+        function loadMoreActivities() {
+            if (!hasMoreActivities || isLoadingActivities) return;
+
+            currentActivityPage++;
+            loadActivityFeed(currentActivityPage, currentActivityFilter, true);
+        }
+
+        function likeActivity(activityId, button) {
+            fetch('/friends/activities/like', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ activity_id: activityId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update like button state
+                    const likesCount = button.querySelector('.likes-count');
+                    const heart = button.querySelector('svg');
+
+                    if (data.liked) {
+                        button.classList.add('text-red-400', 'bg-red-500/20');
+                        button.classList.remove('text-gray-400');
+                        heart.setAttribute('fill', 'currentColor');
+                    } else {
+                        button.classList.remove('text-red-400', 'bg-red-500/20');
+                        button.classList.add('text-gray-400');
+                        heart.setAttribute('fill', 'none');
+                    }
+
+                    likesCount.textContent = data.likes_count;
+
+                    // Add animation
+                    button.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        button.style.transform = 'scale(1)';
+                    }, 150);
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error liking activity:', error);
+                showNotification('Error liking activity', 'error');
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 max-w-sm bg-neutral-800 border rounded-lg shadow-xl p-4 transform translate-x-full transition-transform duration-300 ${
+                type === 'success' ? 'border-green-500/30' :
+                type === 'error' ? 'border-red-500/30' :
+                'border-blue-500/30'
+            }`;
+
+            notification.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0">
+                        ${type === 'success' ?
+                            '<div class="w-6 h-6 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center text-green-400">✓</div>' :
+                            type === 'error' ?
+                                '<div class="w-6 h-6 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center text-red-400">✕</div>' :
+                                '<div class="w-6 h-6 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">ℹ</div>'
+                        }
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-white">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="flex-shrink-0 text-gray-400 hover:text-white">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+
+        // Real-time Notifications Setup
+        function setupRealTimeNotifications() {
+            if (typeof window.Echo !== 'undefined') {
+                const userId = {{ auth()->id() }};
+
+                // Listen for friend request notifications
+                window.Echo.private(`user.${userId}`)
+                    .listen('.friend.request.received', (data) => {
+                        showFriendRequestNotification(data);
+                    })
+                    .listen('.friend.request.accepted', (data) => {
+                        showNotification(data.message, 'success');
+                        // Refresh activity feed to show new friend's activities
+                        loadActivityFeed(1, currentActivityFilter, false);
+                    })
+                    .listen('.friend.online', (data) => {
+                        showNotification(data.message, 'info');
+                        updateFriendStatus(data.friend.id, 'online');
+                    })
+                    .listen('.friend.activity.created', (data) => {
+                        addNewActivityToFeed(data.activity, data.user);
+                    });
+            }
+        }
+
+        function showFriendRequestNotification(data) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 z-50 max-w-sm bg-neutral-800 border border-blue-500/30 rounded-lg shadow-xl p-4 transform translate-x-full transition-transform duration-300';
+
+            notification.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-sm font-bold text-white">
+                        ${data.sender.initials}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-white">${data.message}</p>
+                        <div class="flex gap-2 mt-2">
+                            <button onclick="acceptFriendRequestFromNotification(${data.sender.id}, this.parentElement.parentElement.parentElement)"
+                                    class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full transition-colors">
+                                Accept
+                            </button>
+                            <button onclick="declineFriendRequestFromNotification(${data.sender.id}, this.parentElement.parentElement.parentElement)"
+                                    class="text-xs bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded-full transition-colors">
+                                Decline
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-white">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            // Auto remove after 10 seconds if no action taken
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 10000);
+        }
+
+        function acceptFriendRequestFromNotification(userId, notificationElement) {
+            acceptFriendRequest(userId);
+            notificationElement.remove();
+        }
+
+        function declineFriendRequestFromNotification(userId, notificationElement) {
+            fetch('/friends/decline-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Friend request declined', 'info');
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error declining friend request', 'error');
+            });
+
+            notificationElement.remove();
+        }
+
+        function addNewActivityToFeed(activity, user) {
+            // Only add if we're showing all activities or the specific type
+            if (currentActivityFilter === 'all' || currentActivityFilter === activity.type) {
+                const container = document.getElementById('activityFeedContainer');
+                const activityData = {
+                    id: activity.id,
+                    type: activity.type,
+                    title: activity.title,
+                    description: activity.description,
+                    data: activity.data,
+                    points_earned: activity.points_earned,
+                    icon: activity.icon,
+                    color: activity.color,
+                    time_ago: activity.time_ago,
+                    likes_count: 0,
+                    is_liked: false,
+                    user: user
+                };
+
+                const activityElement = createActivityElement(activityData);
+
+                // Add to top of feed with animation
+                if (container.firstChild) {
+                    container.insertBefore(activityElement, container.firstChild);
+                } else {
+                    container.appendChild(activityElement);
+                    // Hide empty state if it was showing
+                    document.getElementById('emptyActivityState').classList.add('hidden');
+                }
+
+                // Animate in
+                setTimeout(() => {
+                    activityElement.style.opacity = '1';
+                    activityElement.style.transform = 'translateY(0)';
+                }, 100);
+
+                // Show a subtle notification
+                showNotification(`${user.name} ${getActivityAction(activity.type)}${getActivityTarget(activityData)}`, 'info');
+            }
+        }
+
+        function updateFriendStatus(friendId, status) {
+            // Update friend status indicators if they exist
+            const friendElements = document.querySelectorAll(`[data-friend-id="${friendId}"]`);
+            friendElements.forEach(element => {
+                const statusDot = element.querySelector('.status-indicator');
+                if (statusDot) {
+                    statusDot.className = `status-indicator ${status}`;
+                    if (status === 'online') {
+                        statusDot.classList.add('animate-pulse');
+                    }
+                }
+            });
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard DOM loaded, initializing...');
+
+            // Verify critical elements exist
+            const addFriendModal = document.getElementById('addFriendModal');
+            const addFriendButton = document.getElementById('addFriendButton');
+            const friendSearchInput = document.getElementById('friendSearchInput');
+            const searchResults = document.getElementById('searchResults');
+
+            console.log('Friend modal exists:', !!addFriendModal);
+            console.log('Add friend button exists:', !!addFriendButton);
+            console.log('Friend search input exists:', !!friendSearchInput);
+            console.log('Search results container exists:', !!searchResults);
+
+            if (!addFriendModal) {
+                console.error('CRITICAL: Add friend modal not found in DOM!');
+            }
+            if (!addFriendButton) {
+                console.error('CRITICAL: Add friend button not found in DOM!');
+            }
+
+            // Load initial activity feed
+            loadActivityFeed(1, 'all', false);
+
+            // Setup real-time notifications
+            setupRealTimeNotifications();
+
+            console.log('Dashboard initialization complete');
+        });
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const addFriendModal = document.getElementById('addFriendModal');
+            const friendProfileModal = document.getElementById('friendProfileModal');
+
+            if (event.target === addFriendModal) {
+                closeAddFriendModal();
+            }
+
+            if (event.target === friendProfileModal) {
+                closeFriendProfileModal();
             }
         });
     </script>

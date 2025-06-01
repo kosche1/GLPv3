@@ -272,6 +272,23 @@ Route::middleware(
         Route::delete('/historical-timeline-maze/results/{id}', [HistoricalTimelineMazeController::class, 'deleteResult'])->name('historical-timeline-maze.delete-result');
     });
 
+    // Friendship Routes
+    Route::prefix('friends')->name('friends.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\FriendshipController::class, 'index'])->name('index');
+        Route::get('/search', [\App\Http\Controllers\FriendshipController::class, 'search'])->name('search');
+        Route::post('/send-request', [\App\Http\Controllers\FriendshipController::class, 'sendRequest'])->name('send-request');
+        Route::post('/accept-request', [\App\Http\Controllers\FriendshipController::class, 'acceptRequest'])->name('accept-request');
+        Route::post('/decline-request', [\App\Http\Controllers\FriendshipController::class, 'declineRequest'])->name('decline-request');
+        Route::delete('/remove-friend', [\App\Http\Controllers\FriendshipController::class, 'removeFriend'])->name('remove-friend');
+        Route::get('/active', [\App\Http\Controllers\FriendshipController::class, 'getActiveFriends'])->name('active');
+        Route::get('/profile/{userId}', [\App\Http\Controllers\FriendshipController::class, 'getFriendProfile'])->name('profile');
+
+        // Activity Feed Routes
+        Route::get('/activities', [\App\Http\Controllers\FriendshipController::class, 'getFriendActivities'])->name('activities');
+        Route::get('/activities/dashboard', [\App\Http\Controllers\FriendshipController::class, 'getDashboardActivityFeed'])->name('activities.dashboard');
+        Route::post('/activities/like', [\App\Http\Controllers\FriendshipController::class, 'likeActivity'])->name('activities.like');
+    });
+
     // Collaborative Learning Routes
     Route::prefix('study-groups')->name('study-groups.')->group(function () {
         // Study Group Routes
