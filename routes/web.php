@@ -282,11 +282,6 @@ Route::middleware(
         Route::delete('/remove-friend', [\App\Http\Controllers\FriendshipController::class, 'removeFriend'])->name('remove-friend');
         Route::get('/active', [\App\Http\Controllers\FriendshipController::class, 'getActiveFriends'])->name('active');
         Route::get('/profile/{userId}', [\App\Http\Controllers\FriendshipController::class, 'getFriendProfile'])->name('profile');
-
-        // Activity Feed Routes
-        Route::get('/activities', [\App\Http\Controllers\FriendshipController::class, 'getFriendActivities'])->name('activities');
-        Route::get('/activities/dashboard', [\App\Http\Controllers\FriendshipController::class, 'getDashboardActivityFeed'])->name('activities.dashboard');
-        Route::post('/activities/like', [\App\Http\Controllers\FriendshipController::class, 'likeActivity'])->name('activities.like');
     });
 
     // Collaborative Learning Routes

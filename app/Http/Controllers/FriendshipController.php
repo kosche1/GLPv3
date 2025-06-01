@@ -4,11 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Friendship;
-use App\Models\FriendActivity;
-use App\Models\ActivityLike;
-use App\Services\ActivityFeedService;
-use App\Events\FriendRequestReceived;
-use App\Events\FriendRequestAccepted;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -22,11 +17,11 @@ class FriendshipController extends Controller
     public function index(): View
     {
         $user = Auth::user();
-
+        
         $friends = $user->friends();
         $pendingRequests = $user->getPendingFriendRequests();
         $activeFriends = $user->getActiveFriends();
-
+        
         return view('friends.index', compact('friends', 'pendingRequests', 'activeFriends'));
     }
 
@@ -37,11 +32,11 @@ class FriendshipController extends Controller
     {
         $query = $request->get('query');
         $user = Auth::user();
-
+        
         if (strlen($query) < 2) {
             return response()->json(['users' => []]);
         }
-
+        
         $users = User::where('name', 'like', "%{$query}%")
             ->where('id', '!=', $user->id)
             ->whereDoesntHave('sentFriendRequests', function ($q) use ($user) {
@@ -65,7 +60,7 @@ class FriendshipController extends Controller
                     'request_received' => $user->hasReceivedFriendRequestFrom($searchUser),
                 ];
             });
-
+        
         return response()->json(['users' => $users]);
     }
 
@@ -77,22 +72,19 @@ class FriendshipController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id'
         ]);
-
+        
         $user = Auth::user();
         $targetUser = User::findOrFail($request->user_id);
-
+        
         $friendship = $user->sendFriendRequestTo($targetUser);
-
+        
         if ($friendship) {
-            // Broadcast friend request event
-            broadcast(new FriendRequestReceived($user, $targetUser, $friendship));
-
             return response()->json([
                 'success' => true,
                 'message' => 'Friend request sent successfully!'
             ]);
         }
-
+        
         return response()->json([
             'success' => false,
             'message' => 'Unable to send friend request. You may already be friends or have a pending request.'
@@ -107,27 +99,19 @@ class FriendshipController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id'
         ]);
-
+        
         $user = Auth::user();
         $requester = User::findOrFail($request->user_id);
-
-        $friendship = $user->receivedFriendRequests()
-            ->where('user_id', $requester->id)
-            ->pending()
-            ->first();
-
+        
         $accepted = $user->acceptFriendRequestFrom($requester);
-
-        if ($accepted && $friendship) {
-            // Broadcast friend request accepted event
-            broadcast(new FriendRequestAccepted($user, $requester, $friendship));
-
+        
+        if ($accepted) {
             return response()->json([
                 'success' => true,
                 'message' => 'Friend request accepted!'
             ]);
         }
-
+        
         return response()->json([
             'success' => false,
             'message' => 'Unable to accept friend request.'
@@ -142,23 +126,23 @@ class FriendshipController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id'
         ]);
-
+        
         $user = Auth::user();
-
+        
         $friendship = $user->receivedFriendRequests()
             ->where('user_id', $request->user_id)
             ->pending()
             ->first();
-
+        
         if ($friendship) {
             $friendship->delete();
-
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Friend request declined.'
             ]);
         }
-
+        
         return response()->json([
             'success' => false,
             'message' => 'Friend request not found.'
@@ -173,19 +157,19 @@ class FriendshipController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id'
         ]);
-
+        
         $user = Auth::user();
         $friendUser = User::findOrFail($request->user_id);
-
+        
         // Remove friendship in both directions
         $user->sentFriendRequests()
             ->where('friend_id', $friendUser->id)
             ->delete();
-
+            
         $user->receivedFriendRequests()
             ->where('user_id', $friendUser->id)
             ->delete();
-
+        
         return response()->json([
             'success' => true,
             'message' => 'Friend removed successfully.'
@@ -199,7 +183,7 @@ class FriendshipController extends Controller
     {
         $user = Auth::user();
         $activeFriends = $user->getActiveFriends();
-
+        
         return response()->json([
             'friends' => $activeFriends->map(function ($friend) {
                 return [
@@ -223,7 +207,7 @@ class FriendshipController extends Controller
     {
         $user = Auth::user();
         $friend = User::findOrFail($userId);
-
+        
         // Check if they are friends
         if (!$user->isFriendsWith($friend)) {
             return response()->json([
@@ -231,7 +215,7 @@ class FriendshipController extends Controller
                 'message' => 'You are not friends with this user.'
             ], 403);
         }
-
+        
         return response()->json([
             'success' => true,
             'friend' => [
@@ -247,134 +231,6 @@ class FriendshipController extends Controller
                     ->wherePivot('status', 'completed')
                     ->count(),
             ]
-        ]);
-    }
-
-    /**
-     * Get friend activities for the activity feed.
-     */
-    public function getFriendActivities(Request $request): JsonResponse
-    {
-        $user = Auth::user();
-        $filters = $request->get('filters', 'all');
-        $page = $request->get('page', 1);
-
-        // Convert comma-separated filters to array
-        if (is_string($filters)) {
-            $filters = explode(',', $filters);
-        }
-
-        $activityService = app(ActivityFeedService::class);
-        $activities = $activityService->getFriendActivities($user, $filters, 15);
-
-        return response()->json([
-            'activities' => collect($activities->items())->map(function ($activity) use ($user) {
-                return [
-                    'id' => $activity->id,
-                    'user' => [
-                        'id' => $activity->user->id,
-                        'name' => $activity->user->name,
-                        'initials' => $activity->user->initials(),
-                        'level' => $activity->user->getLevel(),
-                    ],
-                    'type' => $activity->activity_type,
-                    'title' => $activity->activity_title,
-                    'description' => $activity->activity_description,
-                    'data' => $activity->activity_data,
-                    'points_earned' => $activity->points_earned,
-                    'icon' => $activity->icon,
-                    'color' => $activity->color,
-                    'time_ago' => $activity->created_at->diffForHumans(),
-                    'formatted_time' => $activity->created_at->format('M j, Y g:i A'),
-                    'likes_count' => $activity->likes()->count(),
-                    'is_liked' => $activity->isLikedBy($user),
-                ];
-            }),
-            'pagination' => [
-                'current_page' => $activities->currentPage(),
-                'last_page' => $activities->lastPage(),
-                'per_page' => $activities->perPage(),
-                'total' => $activities->total(),
-                'has_more' => $activities->hasMorePages(),
-            ]
-        ]);
-    }
-
-    /**
-     * Like or unlike an activity.
-     */
-    public function likeActivity(Request $request): JsonResponse
-    {
-        $request->validate([
-            'activity_id' => 'required|exists:friend_activities,id'
-        ]);
-
-        $user = Auth::user();
-        $activity = FriendActivity::findOrFail($request->activity_id);
-
-        // Check if the activity belongs to a friend
-        if (!$user->isFriendsWith($activity->user)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You can only like activities from friends.'
-            ], 403);
-        }
-
-        // Toggle like
-        $like = ActivityLike::where('user_id', $user->id)
-            ->where('friend_activity_id', $activity->id)
-            ->first();
-
-        if ($like) {
-            $like->delete();
-            $liked = false;
-        } else {
-            ActivityLike::create([
-                'user_id' => $user->id,
-                'friend_activity_id' => $activity->id
-            ]);
-            $liked = true;
-        }
-
-        return response()->json([
-            'success' => true,
-            'liked' => $liked,
-            'likes_count' => $activity->likes()->count()
-        ]);
-    }
-
-    /**
-     * Get activity feed for dashboard (limited recent activities).
-     */
-    public function getDashboardActivityFeed(): JsonResponse
-    {
-        $user = Auth::user();
-        $activityService = app(ActivityFeedService::class);
-
-        // Get recent activities from friends (last 7 days, limit 10)
-        $activities = $activityService->getFriendActivities($user, ['all'], 10);
-
-        return response()->json([
-            'activities' => collect($activities->items())->map(function ($activity) use ($user) {
-                return [
-                    'id' => $activity->id,
-                    'user' => [
-                        'id' => $activity->user->id,
-                        'name' => $activity->user->name,
-                        'initials' => $activity->user->initials(),
-                        'level' => $activity->user->getLevel(),
-                    ],
-                    'type' => $activity->activity_type,
-                    'title' => $activity->activity_title,
-                    'description' => $activity->activity_description,
-                    'points_earned' => $activity->points_earned,
-                    'icon' => $activity->icon,
-                    'color' => $activity->color,
-                    'time_ago' => $activity->created_at->diffForHumans(),
-                    'likes_count' => $activity->likes()->count(),
-                    'is_liked' => $activity->isLikedBy($user),
-                ];
-            })
         ]);
     }
 }

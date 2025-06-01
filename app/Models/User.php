@@ -642,34 +642,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Get friend activities for this user.
-     */
-    public function friendActivities()
-    {
-        return $this->hasMany(FriendActivity::class);
-    }
-
-    /**
-     * Get activity likes by this user.
-     */
-    public function activityLikes()
-    {
-        return $this->hasMany(ActivityLike::class);
-    }
-
-    /**
-     * Get the user's recent activities.
-     */
-    public function getRecentActivities($limit = 10)
-    {
-        return $this->friendActivities()
-            ->with('likes')
-            ->orderBy('created_at', 'desc')
-            ->limit($limit)
-            ->get();
-    }
-
-    /**
      * Get the typing test results for the user.
      */
     public function typing_test_results()

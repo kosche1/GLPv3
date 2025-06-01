@@ -22,37 +22,10 @@ return new class extends Migration
 
             // Ensure unique friendship pairs
             $table->unique(['user_id', 'friend_id']);
-
+            
             // Add indexes for better performance
             $table->index(['user_id', 'status']);
             $table->index(['friend_id', 'status']);
-        });
-
-        // Create friend activities table
-        Schema::create('friend_activities', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('activity_type'); // 'challenge_completed', 'badge_earned', 'level_up', etc.
-            $table->string('activity_title');
-            $table->text('activity_description')->nullable();
-            $table->json('activity_data')->nullable(); // Store additional data
-            $table->integer('points_earned')->default(0);
-            $table->boolean('is_public')->default(true);
-            $table->timestamps();
-
-            $table->index(['user_id', 'created_at']);
-            $table->index(['activity_type', 'created_at']);
-            $table->index(['is_public', 'created_at']);
-        });
-
-        // Create activity likes table
-        Schema::create('activity_likes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('friend_activity_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-
-            $table->unique(['user_id', 'friend_activity_id']);
         });
     }
 
@@ -61,8 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('activity_likes');
-        Schema::dropIfExists('friend_activities');
         Schema::dropIfExists('friendships');
     }
 };
