@@ -7,7 +7,9 @@ use App\Models\Friendship;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\View\View;
+use App\Notifications\FriendRequestSent;
 
 class FriendshipController extends Controller
 {
@@ -79,6 +81,8 @@ class FriendshipController extends Controller
         $friendship = $user->sendFriendRequestTo($targetUser);
         
         if ($friendship) {
+            Notification::send($targetUser, new FriendRequestSent($user));
+
             return response()->json([
                 'success' => true,
                 'message' => 'Friend request sent successfully!'
