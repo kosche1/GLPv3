@@ -1189,14 +1189,6 @@
                                     </svg>
                                     Add Friend
                                 </button>
-                                <!-- Debug button for testing -->
-                                <button
-                                    onclick="console.log('Debug button clicked'); alert('Button click works! Modal element exists: ' + !!document.getElementById('addFriendModal'));"
-                                    class="text-xs text-gray-400 hover:text-gray-300 transition-colors px-2 py-1 rounded border border-gray-600/50"
-                                    title="Debug button - click to test if JavaScript is working"
-                                >
-                                    🔧
-                                </button>
                             </div>
                         </div>
 
