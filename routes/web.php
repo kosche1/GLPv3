@@ -281,6 +281,8 @@ Route::middleware(
         Route::post('/decline-request', [\App\Http\Controllers\FriendshipController::class, 'declineRequest'])->name('decline-request');
         Route::delete('/remove-friend', [\App\Http\Controllers\FriendshipController::class, 'removeFriend'])->name('remove-friend');
         Route::get('/active', [\App\Http\Controllers\FriendshipController::class, 'getActiveFriends'])->name('active');
+        Route::get('/by-status', [\App\Http\Controllers\FriendshipController::class, 'getFriendsByStatus'])->name('by-status');
+        Route::get('/pending', [\App\Http\Controllers\FriendshipController::class, 'getPendingRequests'])->name('pending');
         Route::get('/profile/{userId}', [\App\Http\Controllers\FriendshipController::class, 'getFriendProfile'])->name('profile');
     });
 

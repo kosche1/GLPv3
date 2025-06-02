@@ -187,7 +187,7 @@ class FriendshipController extends Controller
     {
         $user = Auth::user();
         $activeFriends = $user->getActiveFriends();
-        
+
         return response()->json([
             'friends' => $activeFriends->map(function ($friend) {
                 return [
@@ -202,6 +202,140 @@ class FriendshipController extends Controller
                 ];
             })
         ]);
+    }
+
+    /**
+     * Get friends by status (online, offline, all).
+     */
+    public function getFriendsByStatus(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+        $status = $request->get('status', 'all');
+
+        $friends = $user->friends();
+
+        // Add status information to all friends
+        $friendsWithStatus = $friends->map(function ($friend) {
+            $minutesAgo = $friend->last_activity_at ?
+                         $friend->last_activity_at->diffInMinutes(now()) : null;
+
+            $friend->status = $this->getFriendStatus($minutesAgo);
+            $friend->last_activity_description = $this->getLastActivityDescription($friend);
+            $friend->activity_time = $friend->last_activity_at ?
+                                   $friend->last_activity_at->diffForHumans() : 'Unknown';
+
+            return $friend;
+        });
+
+        // Filter by status if requested
+        if ($status === 'online') {
+            $friendsWithStatus = $friendsWithStatus->filter(function ($friend) {
+                return $friend->status === 'online';
+            });
+        } elseif ($status === 'offline') {
+            $friendsWithStatus = $friendsWithStatus->filter(function ($friend) {
+                return $friend->status === 'away';
+            });
+        }
+
+        // Sort by status priority and name
+        $friendsWithStatus = $friendsWithStatus->sortBy(function ($friend) {
+            $statusPriority = ['online' => 1, 'active' => 2, 'away' => 3];
+            return ($statusPriority[$friend->status] ?? 4) . $friend->name;
+        })->values();
+
+        return response()->json([
+            'friends' => $friendsWithStatus->map(function ($friend) {
+                return [
+                    'id' => $friend->id,
+                    'name' => $friend->name,
+                    'initials' => $friend->initials(),
+                    'level' => $friend->getLevel(),
+                    'status' => $friend->status,
+                    'last_activity' => $friend->last_activity_description,
+                    'activity_time' => $friend->activity_time,
+                    'points' => $friend->getPoints()
+                ];
+            })
+        ]);
+    }
+
+    /**
+     * Get pending friend requests (sent and received).
+     */
+    public function getPendingRequests(): JsonResponse
+    {
+        $user = Auth::user();
+
+        $sentRequests = $user->sentFriendRequests()
+            ->pending()
+            ->with('friend')
+            ->get()
+            ->map(function ($friendship) {
+                return [
+                    'id' => $friendship->friend->id,
+                    'name' => $friendship->friend->name,
+                    'initials' => $friendship->friend->initials(),
+                    'level' => $friendship->friend->getLevel(),
+                    'points' => $friendship->friend->getPoints(),
+                    'type' => 'sent',
+                    'created_at' => $friendship->created_at->diffForHumans()
+                ];
+            });
+
+        $receivedRequests = $user->receivedFriendRequests()
+            ->pending()
+            ->with('user')
+            ->get()
+            ->map(function ($friendship) {
+                return [
+                    'id' => $friendship->user->id,
+                    'name' => $friendship->user->name,
+                    'initials' => $friendship->user->initials(),
+                    'level' => $friendship->user->getLevel(),
+                    'points' => $friendship->user->getPoints(),
+                    'type' => 'received',
+                    'created_at' => $friendship->created_at->diffForHumans()
+                ];
+            });
+
+        return response()->json([
+            'sent_requests' => $sentRequests,
+            'received_requests' => $receivedRequests
+        ]);
+    }
+
+    /**
+     * Helper method to get friend status.
+     */
+    private function getFriendStatus($minutesAgo)
+    {
+        if ($minutesAgo === null) return 'away';
+        if ($minutesAgo <= 5) return 'online';
+        if ($minutesAgo <= 15) return 'active';
+        return 'away';
+    }
+
+    /**
+     * Helper method to get last activity description.
+     */
+    private function getLastActivityDescription($friend)
+    {
+        if (!$friend->last_activity_at) {
+            return 'No recent activity';
+        }
+
+        $minutesAgo = $friend->last_activity_at->diffInMinutes(now());
+
+        if ($minutesAgo <= 1) {
+            return 'Active now';
+        } elseif ($minutesAgo <= 5) {
+            return 'Active recently';
+        } elseif ($minutesAgo <= 15) {
+            return 'Active ' . $minutesAgo . ' minutes ago';
+        } else {
+            return 'Last seen ' . $friend->last_activity_at->diffForHumans();
+        }
     }
 
     /**

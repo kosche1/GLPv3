@@ -1163,7 +1163,7 @@
                     </a>
                 </div>
 
-                <!-- Active Friends -->
+                <!-- Friends Management -->
                 <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
@@ -1176,85 +1176,175 @@
                                         <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
                                     </svg>
                                 </div>
-                                <span class="text-white bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Active Friends</span>
+                                <span class="text-white bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Friends</span>
                             </h3>
-                            <button
-                                onclick="openAddFriendModal()"
-                                class="text-sm text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1 bg-neutral-800/80 px-3 py-1 rounded-full border border-neutral-700/50 hover:bg-neutral-800 hover:border-blue-500/30 transition-all duration-300"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/>
-                                </svg>
-                                Add Friend
-                            </button>
                         </div>
 
-                        @php
-                            // Get real active friends data
-                            $activeFriends = $user->getActiveFriends();
-                        @endphp
-
-                        <div class="space-y-3">
-                            @forelse($activeFriends as $friend)
-                                <div
-                                    class="flex items-center p-3 rounded-xl bg-neutral-700/20 border border-neutral-700/50 hover:bg-neutral-700/30 hover:border-blue-500/30 transition-all duration-300 group relative overflow-hidden cursor-pointer"
-                                    onclick="viewFriendProfile({{ $friend->id }})"
+                        <!-- Friend Tabs -->
+                        <div class="mb-4" x-data="{ activeTab: 'active' }">
+                            <nav class="flex space-x-1 bg-neutral-700/30 rounded-lg p-1">
+                                <button
+                                    @click="activeTab = 'search'; switchFriendTab('search')"
+                                    :class="activeTab === 'search' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
+                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1"
                                 >
-                                    <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0)_75%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    Add Friend
+                                </button>
+                                <button
+                                    @click="activeTab = 'online'; switchFriendTab('online')"
+                                    :class="activeTab === 'online' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
+                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1"
+                                >
+                                    <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                                    Online
+                                </button>
+                                <button
+                                    @click="activeTab = 'offline'; switchFriendTab('offline')"
+                                    :class="activeTab === 'offline' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
+                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1"
+                                >
+                                    <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+                                    Offline
+                                </button>
+                                <button
+                                    @click="activeTab = 'active'; switchFriendTab('active')"
+                                    :class="activeTab === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
+                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    Friend List
+                                </button>
+                                <button
+                                    @click="activeTab = 'pending'; switchFriendTab('pending')"
+                                    :class="activeTab === 'pending' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
+                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 relative"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Pending
+                                    <span id="dashboardPendingCount" class="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
+                                </button>
+                            </nav>
+                        </div>
 
-                                    <!-- Avatar with status indicator -->
-                                    <div class="relative flex-shrink-0">
-                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-sm font-bold text-white shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
-                                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.25),transparent_50%)] opacity-70"></div>
-                                            <div class="relative z-10">{{ $friend->initials() }}</div>
-                                        </div>
-                                        <!-- Status indicator -->
-                                        <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-neutral-800
-                                            {{ $friend->status === 'online' ? 'bg-green-400' : ($friend->status === 'active' ? 'bg-yellow-400' : 'bg-gray-400') }}
-                                            {{ $friend->status === 'online' ? 'animate-pulse' : '' }}">
-                                        </div>
-                                    </div>
-
-                                    <!-- Friend info -->
-                                    <div class="ml-3 flex-grow relative z-10 min-w-0">
-                                        <div class="flex justify-between items-start">
-                                            <div class="min-w-0 flex-1">
-                                                <div class="flex items-center gap-2">
-                                                    <span class="font-medium text-gray-100 truncate group-hover:text-white transition-colors duration-300">{{ $friend->name }}</span>
-                                                    <span class="text-xs bg-neutral-800/80 rounded-full px-2 py-0.5 text-gray-300 border border-neutral-700/50">L{{ $friend->getLevel() }}</span>
-                                                </div>
-                                                <p class="text-xs text-gray-400 truncate mt-0.5">{{ $friend->last_activity_description }}</p>
-                                                <p class="text-xs text-gray-500">{{ $friend->activity_time }}</p>
-                                            </div>
-                                            <div class="flex items-center gap-1 ml-2">
-                                                <span class="text-xs font-mono text-blue-400">{{ number_format($friend->getPoints()) }}</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="text-center py-6">
-                                    <div class="w-16 h-16 mx-auto rounded-full bg-blue-500/10 flex items-center justify-center mb-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                        <!-- Tab Content -->
+                        <div class="min-h-[280px]">
+                            <!-- Search Tab -->
+                            <div id="dashboardSearchTab" class="friend-tab-content">
+                                <div class="mb-3">
+                                    <div class="relative">
+                                        <input
+                                            type="text"
+                                            id="dashboardSearchInput"
+                                            placeholder="Search for users by name..."
+                                            class="w-full px-3 py-2 pl-8 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 transition-colors text-sm"
+                                            oninput="dashboardSearchUsers(this.value)"
+                                        >
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 absolute left-2.5 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                         </svg>
                                     </div>
-                                    <p class="text-gray-400 text-sm mb-2">No active friends yet</p>
-                                    <p class="text-gray-500 text-xs">Add friends to see their activity here!</p>
                                 </div>
-                            @endforelse
-                        </div>
-
-                        @if($activeFriends->isNotEmpty())
-                            <div class="mt-4 pt-3 border-t border-neutral-700/50">
-                                <div class="text-center">
-                                    <button class="text-xs text-blue-400 hover:text-blue-300 transition-colors">View All Friends</button>
+                                <div id="dashboardSearchResults" class="space-y-2 max-h-56 overflow-y-auto">
+                                    <div class="text-center text-gray-400 py-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                        <p class="text-sm font-medium">Start typing to search for users</p>
+                                        <p class="text-xs text-gray-500 mt-1">Find friends by their name</p>
+                                    </div>
                                 </div>
                             </div>
-                        @endif
+
+                            <!-- Other tabs content will be loaded dynamically -->
+                            <div id="dashboardOnlineTab" class="friend-tab-content hidden">
+                                <div id="dashboardOnlineFriends" class="space-y-2 max-h-56 overflow-y-auto">
+                                    <div class="text-center text-gray-400 py-8">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-3"></div>
+                                        <p class="text-sm">Loading online friends...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="dashboardOfflineTab" class="friend-tab-content hidden">
+                                <div id="dashboardOfflineFriends" class="space-y-2 max-h-56 overflow-y-auto">
+                                    <div class="text-center text-gray-400 py-8">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-3"></div>
+                                        <p class="text-sm">Loading offline friends...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="dashboardActiveTab" class="friend-tab-content">
+                                <div id="dashboardActiveFriends" class="space-y-2 max-h-56 overflow-y-auto">
+                                    @php
+                                        // Get real active friends data
+                                        $activeFriends = $user->getActiveFriends();
+                                    @endphp
+
+                                    @forelse($activeFriends as $friend)
+                                        <div class="flex items-center p-2 rounded-lg bg-neutral-700/20 border border-neutral-700/50 hover:bg-neutral-700/30 hover:border-blue-500/30 transition-all duration-300 group relative overflow-hidden cursor-pointer"
+                                             onclick="viewFriendProfile({{ $friend->id }})">
+                                            <div class="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0)_25%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0)_75%)] bg-[length:250%_250%] opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
+
+                                            <!-- Avatar with status indicator -->
+                                            <div class="relative flex-shrink-0">
+                                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-xs font-bold text-white shadow-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                                                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_60%_35%,rgba(255,255,255,0.25),transparent_50%)] opacity-70"></div>
+                                                    <div class="relative z-10">{{ $friend->initials() }}</div>
+                                                </div>
+                                                <!-- Status indicator -->
+                                                <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-neutral-800
+                                                    {{ $friend->status === 'online' ? 'bg-green-400' : ($friend->status === 'active' ? 'bg-yellow-400' : 'bg-gray-400') }}
+                                                    {{ $friend->status === 'online' ? 'animate-pulse' : '' }}">
+                                                </div>
+                                            </div>
+
+                                            <!-- Friend info -->
+                                            <div class="ml-2 flex-grow relative z-10 min-w-0">
+                                                <div class="flex justify-between items-start">
+                                                    <div class="min-w-0 flex-1">
+                                                        <div class="flex items-center gap-1">
+                                                            <span class="text-sm font-medium text-gray-100 truncate group-hover:text-white transition-colors duration-300">{{ $friend->name }}</span>
+                                                            <span class="text-xs bg-neutral-800/80 rounded-full px-1.5 py-0.5 text-gray-300 border border-neutral-700/50">L{{ $friend->getLevel() }}</span>
+                                                        </div>
+                                                        <p class="text-xs text-gray-400 truncate">{{ $friend->last_activity_description }}</p>
+                                                    </div>
+                                                    <div class="flex items-center gap-1 ml-1">
+                                                        <span class="text-xs font-mono text-blue-400">{{ number_format($friend->getPoints()) }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-6">
+                                            <div class="w-12 h-12 mx-auto rounded-full bg-blue-500/10 flex items-center justify-center mb-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                                                </svg>
+                                            </div>
+                                            <p class="text-gray-400 text-sm mb-1">No active friends yet</p>
+                                            <p class="text-gray-500 text-xs">Add friends to see their activity here!</p>
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+
+                            <div id="dashboardPendingTab" class="friend-tab-content hidden">
+                                <div id="dashboardPendingRequests" class="space-y-3 max-h-56 overflow-y-auto">
+                                    <div class="text-center text-gray-400 py-8">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-3"></div>
+                                        <p class="text-sm">Loading pending requests...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1649,12 +1739,12 @@
         });
     </script>
 
-    <!-- Add Friend Modal -->
+    <!-- Enhanced Friend Management Modal -->
     <div id="addFriendModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-neutral-800 rounded-2xl border border-neutral-700 shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden">
+        <div class="bg-neutral-800 rounded-2xl border border-neutral-700 shadow-xl max-w-2xl w-full max-h-[85vh] overflow-hidden">
             <div class="p-6 border-b border-neutral-700">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-white">Add Friend</h3>
+                    <h3 class="text-lg font-bold text-white">Friends Management</h3>
                     <button onclick="closeAddFriendModal()" class="text-gray-400 hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -1662,19 +1752,137 @@
                     </button>
                 </div>
             </div>
-            <div class="p-6">
-                <div class="mb-4">
-                    <input
-                        type="text"
-                        id="friendSearchInput"
-                        placeholder="Search for users by name..."
-                        class="w-full px-4 py-2 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
-                        oninput="searchUsers(this.value)"
+
+            <!-- Tab Navigation -->
+            <div class="border-b border-neutral-700">
+                <nav class="flex space-x-8 px-6" x-data="{ activeTab: 'search' }">
+                    <button
+                        @click="activeTab = 'search'; switchTab('search')"
+                        :class="activeTab === 'search' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-gray-400 hover:text-gray-300'"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
                     >
+                        <div class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            Add Friend
+                        </div>
+                    </button>
+                    <button
+                        @click="activeTab = 'online'; switchTab('online')"
+                        :class="activeTab === 'online' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-gray-400 hover:text-gray-300'"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                    >
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                            Online
+                        </div>
+                    </button>
+                    <button
+                        @click="activeTab = 'offline'; switchTab('offline')"
+                        :class="activeTab === 'offline' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-gray-400 hover:text-gray-300'"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                    >
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+                            Offline
+                        </div>
+                    </button>
+                    <button
+                        @click="activeTab = 'friends'; switchTab('friends')"
+                        :class="activeTab === 'friends' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-gray-400 hover:text-gray-300'"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                    >
+                        <div class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Friend List
+                        </div>
+                    </button>
+                    <button
+                        @click="activeTab = 'pending'; switchTab('pending')"
+                        :class="activeTab === 'pending' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-gray-400 hover:text-gray-300'"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                    >
+                        <div class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Pending
+                            <span id="pendingCount" class="bg-yellow-500/20 text-yellow-400 text-xs rounded-full px-2 py-0.5 hidden">0</span>
+                        </div>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6 max-h-[60vh] overflow-y-auto">
+                <!-- Search Tab -->
+                <div id="searchTab" class="tab-content">
+                    <div class="mb-4">
+                        <div class="relative">
+                            <input
+                                type="text"
+                                id="friendSearchInput"
+                                placeholder="Search for users by name..."
+                                class="w-full px-4 py-3 pl-10 bg-neutral-700 border border-neutral-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500 transition-colors"
+                                oninput="searchUsers(this.value)"
+                            >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="searchResults" class="space-y-2">
+                        <div class="text-center text-gray-400 py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                            <p class="font-medium">Start typing to search for users</p>
+                            <p class="text-sm text-gray-500 mt-1">Find friends by their name</p>
+                        </div>
+                    </div>
                 </div>
-                <div id="searchResults" class="space-y-2 max-h-60 overflow-y-auto">
-                    <div class="text-center text-gray-400 py-4">
-                        <p>Start typing to search for users...</p>
+
+                <!-- Other tabs content will be loaded dynamically -->
+                <div id="onlineTab" class="tab-content hidden">
+                    <div id="onlineFriends" class="space-y-2">
+                        <div class="text-center text-gray-400 py-8">
+                            <div class="w-2 h-2 rounded-full bg-green-400 mx-auto mb-3"></div>
+                            <p>Loading online friends...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="offlineTab" class="tab-content hidden">
+                    <div id="offlineFriends" class="space-y-2">
+                        <div class="text-center text-gray-400 py-8">
+                            <div class="w-2 h-2 rounded-full bg-gray-400 mx-auto mb-3"></div>
+                            <p>Loading offline friends...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="friendsTab" class="tab-content hidden">
+                    <div id="allFriends" class="space-y-2">
+                        <div class="text-center text-gray-400 py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <p>Loading all friends...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="pendingTab" class="tab-content hidden">
+                    <div id="pendingRequests" class="space-y-4">
+                        <div class="text-center text-gray-400 py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <p>Loading pending requests...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1703,44 +1911,120 @@
     <!-- Friends JavaScript -->
     <script>
         let searchTimeout;
+        let currentTab = 'search';
 
         function openAddFriendModal() {
             document.getElementById('addFriendModal').classList.remove('hidden');
             document.getElementById('friendSearchInput').focus();
+            // Load pending count when modal opens
+            loadPendingCount();
         }
 
         function closeAddFriendModal() {
             document.getElementById('addFriendModal').classList.add('hidden');
             document.getElementById('friendSearchInput').value = '';
-            document.getElementById('searchResults').innerHTML = '<div class="text-center text-gray-400 py-4"><p>Start typing to search for users...</p></div>';
+            resetSearchResults();
+            currentTab = 'search';
+            switchTab('search');
+        }
+
+        function resetSearchResults() {
+            document.getElementById('searchResults').innerHTML = `
+                <div class="text-center text-gray-400 py-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <p class="font-medium">Start typing to search for users</p>
+                    <p class="text-sm text-gray-500 mt-1">Find friends by their name</p>
+                </div>
+            `;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show selected tab
+            document.getElementById(tab + 'Tab').classList.remove('hidden');
+
+            // Load content based on tab
+            switch(tab) {
+                case 'search':
+                    // Reset search if needed
+                    if (document.getElementById('friendSearchInput').value === '') {
+                        resetSearchResults();
+                    }
+                    break;
+                case 'online':
+                    loadFriendsByStatus('online');
+                    break;
+                case 'offline':
+                    loadFriendsByStatus('offline');
+                    break;
+                case 'friends':
+                    loadFriendsByStatus('all');
+                    break;
+                case 'pending':
+                    loadPendingRequests();
+                    break;
+            }
         }
 
         function searchUsers(query) {
             clearTimeout(searchTimeout);
 
             if (query.length < 2) {
-                document.getElementById('searchResults').innerHTML = '<div class="text-center text-gray-400 py-4"><p>Start typing to search for users...</p></div>';
+                resetSearchResults();
                 return;
             }
+
+            // Show searching state
+            document.getElementById('searchResults').innerHTML = `
+                <div class="text-center text-gray-400 py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-3"></div>
+                    <p class="font-medium">Searching...</p>
+                    <p class="text-sm text-gray-500 mt-1">Looking for "${query}"</p>
+                </div>
+            `;
 
             searchTimeout = setTimeout(() => {
                 fetch(`/friends/search?query=${encodeURIComponent(query)}`)
                     .then(response => response.json())
                     .then(data => {
-                        displaySearchResults(data.users);
+                        displaySearchResults(data.users, query);
                     })
                     .catch(error => {
                         console.error('Search error:', error);
-                        document.getElementById('searchResults').innerHTML = '<div class="text-center text-red-400 py-4"><p>Error searching users</p></div>';
+                        document.getElementById('searchResults').innerHTML = `
+                            <div class="text-center text-red-400 py-8">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                                <p class="font-medium">Error searching for users</p>
+                                <p class="text-sm text-gray-500 mt-1">Please try again</p>
+                            </div>
+                        `;
                     });
             }, 300);
         }
 
-        function displaySearchResults(users) {
+        function displaySearchResults(users, query = '') {
             const resultsContainer = document.getElementById('searchResults');
 
             if (users.length === 0) {
-                resultsContainer.innerHTML = '<div class="text-center text-gray-400 py-4"><p>No users found</p></div>';
+                resultsContainer.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="font-medium">No users found</p>
+                        <p class="text-sm text-gray-500 mt-1">${query ? `No results for "${query}"` : 'Try a different search term'}</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -1759,7 +2043,7 @@
                         ${user.is_friend ?
                             '<span class="text-xs text-green-400 bg-green-500/20 px-2 py-1 rounded-full">Friends</span>' :
                             user.request_sent ?
-                                '<span class="text-xs text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded-full">Pending</span>' :
+                                '<span class="text-xs text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded-full">Pending...</span>' :
                                 user.request_received ?
                                     `<button onclick="acceptFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Accept</button>` :
                                     `<button onclick="sendFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Add Friend</button>`
@@ -1767,6 +2051,241 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        // New functions for tab functionality
+        function loadFriendsByStatus(status) {
+            const containerId = status === 'online' ? 'onlineFriends' :
+                               status === 'offline' ? 'offlineFriends' : 'allFriends';
+
+            document.getElementById(containerId).innerHTML = `
+                <div class="text-center text-gray-400 py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-3"></div>
+                    <p>Loading ${status === 'all' ? 'all' : status} friends...</p>
+                </div>
+            `;
+
+            fetch(`/friends/by-status?status=${status}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayFriendsList(data.friends, containerId, status);
+                })
+                .catch(error => {
+                    console.error('Error loading friends:', error);
+                    document.getElementById(containerId).innerHTML = `
+                        <div class="text-center text-red-400 py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <p class="font-medium">Error loading friends</p>
+                            <p class="text-sm text-gray-500 mt-1">Please try again</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function displayFriendsList(friends, containerId, status) {
+            const container = document.getElementById(containerId);
+
+            if (friends.length === 0) {
+                const statusText = status === 'online' ? 'online' :
+                                 status === 'offline' ? 'offline' : '';
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p class="font-medium">No ${statusText} friends</p>
+                        <p class="text-sm text-gray-500 mt-1">${status === 'all' ? 'Add some friends to get started!' : `No friends are currently ${statusText}`}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = friends.map(friend => `
+                <div class="flex items-center justify-between p-3 bg-neutral-700/20 rounded-lg border border-neutral-700/50 hover:bg-neutral-700/30 transition-colors cursor-pointer"
+                     onclick="viewFriendProfile(${friend.id})">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-sm font-bold text-white">
+                                ${friend.initials}
+                            </div>
+                            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-neutral-800
+                                ${friend.status === 'online' ? 'bg-green-400' : friend.status === 'active' ? 'bg-yellow-400' : 'bg-gray-400'}
+                                ${friend.status === 'online' ? 'animate-pulse' : ''}">
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium text-white">${friend.name}</p>
+                            <p class="text-xs text-gray-400">Level ${friend.level} • ${friend.points.toLocaleString()} XP</p>
+                            <p class="text-xs text-gray-500">${friend.activity_time}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs px-2 py-1 rounded-full ${
+                            friend.status === 'online' ? 'text-green-400 bg-green-500/20' :
+                            friend.status === 'active' ? 'text-yellow-400 bg-yellow-500/20' :
+                            'text-gray-400 bg-gray-500/20'
+                        }">
+                            ${friend.status === 'online' ? 'Online' : friend.status === 'active' ? 'Active' : 'Offline'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadPendingRequests() {
+            document.getElementById('pendingRequests').innerHTML = `
+                <div class="text-center text-gray-400 py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-3"></div>
+                    <p>Loading pending requests...</p>
+                </div>
+            `;
+
+            fetch('/friends/pending')
+                .then(response => response.json())
+                .then(data => {
+                    displayPendingRequests(data.sent_requests, data.received_requests);
+                })
+                .catch(error => {
+                    console.error('Error loading pending requests:', error);
+                    document.getElementById('pendingRequests').innerHTML = `
+                        <div class="text-center text-red-400 py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <p class="font-medium">Error loading requests</p>
+                            <p class="text-sm text-gray-500 mt-1">Please try again</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function displayPendingRequests(sentRequests, receivedRequests) {
+            const container = document.getElementById('pendingRequests');
+
+            if (sentRequests.length === 0 && receivedRequests.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="font-medium">No pending requests</p>
+                        <p class="text-sm text-gray-500 mt-1">All caught up!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            if (receivedRequests.length > 0) {
+                html += `
+                    <div class="mb-6">
+                        <h4 class="text-sm font-medium text-emerald-400 mb-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                            </svg>
+                            Received Requests (${receivedRequests.length})
+                        </h4>
+                        <div class="space-y-2">
+                            ${receivedRequests.map(request => `
+                                <div class="flex items-center justify-between p-3 bg-neutral-700/20 rounded-lg border border-neutral-700/50">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-sm font-bold text-white">
+                                            ${request.initials}
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">${request.name}</p>
+                                            <p class="text-xs text-gray-400">Level ${request.level} • ${request.points.toLocaleString()} XP</p>
+                                            <p class="text-xs text-gray-500">${request.created_at}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="acceptFriendRequest(${request.id})" class="text-xs text-green-400 bg-green-500/20 px-3 py-1 rounded-full hover:bg-green-500/30 transition-colors">Accept</button>
+                                        <button onclick="declineFriendRequest(${request.id})" class="text-xs text-red-400 bg-red-500/20 px-3 py-1 rounded-full hover:bg-red-500/30 transition-colors">Decline</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (sentRequests.length > 0) {
+                html += `
+                    <div>
+                        <h4 class="text-sm font-medium text-yellow-400 mb-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                            Sent Requests (${sentRequests.length})
+                        </h4>
+                        <div class="space-y-2">
+                            ${sentRequests.map(request => `
+                                <div class="flex items-center justify-between p-3 bg-neutral-700/20 rounded-lg border border-neutral-700/50">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-sm font-bold text-white">
+                                            ${request.initials}
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-white">${request.name}</p>
+                                            <p class="text-xs text-gray-400">Level ${request.level} • ${request.points.toLocaleString()} XP</p>
+                                            <p class="text-xs text-gray-500">${request.created_at}</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-yellow-400 bg-yellow-500/20 px-3 py-1 rounded-full">Pending...</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function loadPendingCount() {
+            fetch('/friends/pending')
+                .then(response => response.json())
+                .then(data => {
+                    const count = data.received_requests.length;
+                    const countElement = document.getElementById('pendingCount');
+                    if (count > 0) {
+                        countElement.textContent = count;
+                        countElement.classList.remove('hidden');
+                    } else {
+                        countElement.classList.add('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading pending count:', error);
+                });
+        }
+
+        function declineFriendRequest(userId) {
+            fetch('/friends/decline-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Friend request declined', 'success');
+                    loadPendingRequests();
+                    loadPendingCount();
+                } else {
+                    showNotification(data.message || 'Failed to decline request', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error declining friend request:', error);
+                showNotification('Error declining friend request', 'error');
+            });
         }
 
         function sendFriendRequest(userId) {
@@ -1795,11 +2314,12 @@
             .then(data => {
                 if (data.success) {
                     showNotification('Friend request sent!', 'success');
-                    // Refresh search results
+                    // Refresh search results and pending count
                     const query = document.getElementById('friendSearchInput').value;
                     if (query.length >= 2) {
                         searchUsers(query);
                     }
+                    loadPendingCount();
                 } else {
                     showNotification(data.message || 'Failed to send friend request', 'error');
                 }
@@ -1833,11 +2353,18 @@
             .then(data => {
                 if (data.success) {
                     showNotification('Friend request accepted!', 'success');
-                    // Refresh search results and active friends
+                    // Refresh search results, active friends, and pending count
                     const query = document.getElementById('friendSearchInput').value;
                     if (query.length >= 2) {
                         searchUsers(query);
                     }
+                    // Refresh current tab if it's pending or friends
+                    if (currentTab === 'pending') {
+                        loadPendingRequests();
+                    } else if (currentTab === 'friends') {
+                        loadFriendsByStatus('all');
+                    }
+                    loadPendingCount();
                     refreshActiveFriends();
                 } else {
                     showNotification(data.message || 'Failed to accept friend request', 'error');
@@ -1987,6 +2514,385 @@
                 closeFriendProfileModal();
             }
         });
+
+        // Dashboard Friend Tabs JavaScript
+        let dashboardCurrentTab = 'active';
+        let dashboardSearchTimeout;
+
+        // Initialize dashboard on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load pending count on page load
+            loadDashboardPendingCount();
+        });
+
+        function switchFriendTab(tab) {
+            dashboardCurrentTab = tab;
+
+            // Hide all tabs
+            document.querySelectorAll('.friend-tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show selected tab
+            const tabElement = document.getElementById('dashboard' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab');
+            if (tabElement) {
+                tabElement.classList.remove('hidden');
+            }
+
+            // Load content based on tab
+            switch(tab) {
+                case 'search':
+                    // Reset search if needed
+                    const searchInput = document.getElementById('dashboardSearchInput');
+                    if (searchInput && searchInput.value === '') {
+                        resetDashboardSearchResults();
+                    }
+                    break;
+                case 'online':
+                    loadDashboardFriendsByStatus('online');
+                    break;
+                case 'offline':
+                    loadDashboardFriendsByStatus('offline');
+                    break;
+                case 'active':
+                    // Active friends are already loaded from server-side
+                    break;
+                case 'pending':
+                    loadDashboardPendingRequests();
+                    break;
+            }
+        }
+
+        function resetDashboardSearchResults() {
+            document.getElementById('dashboardSearchResults').innerHTML = `
+                <div class="text-center text-gray-400 py-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <p class="text-sm font-medium">Start typing to search for users</p>
+                    <p class="text-xs text-gray-500 mt-1">Find friends by their name</p>
+                </div>
+            `;
+        }
+
+        function dashboardSearchUsers(query) {
+            clearTimeout(dashboardSearchTimeout);
+
+            if (query.length < 2) {
+                resetDashboardSearchResults();
+                return;
+            }
+
+            // Show searching state
+            document.getElementById('dashboardSearchResults').innerHTML = `
+                <div class="text-center text-gray-400 py-6">
+                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-400 mx-auto mb-2"></div>
+                    <p class="text-sm font-medium">Searching...</p>
+                    <p class="text-xs text-gray-500 mt-1">Looking for "${query}"</p>
+                </div>
+            `;
+
+            dashboardSearchTimeout = setTimeout(() => {
+                fetch(`/friends/search?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayDashboardSearchResults(data.users, query);
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        document.getElementById('dashboardSearchResults').innerHTML = `
+                            <div class="text-center text-red-400 py-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                                <p class="text-sm font-medium">Error searching for users</p>
+                                <p class="text-xs text-gray-500 mt-1">Please try again</p>
+                            </div>
+                        `;
+                    });
+            }, 300);
+        }
+
+        function displayDashboardSearchResults(users, query = '') {
+            const resultsContainer = document.getElementById('dashboardSearchResults');
+
+            if (users.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="text-center text-gray-400 py-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="text-sm font-medium">No users found</p>
+                        <p class="text-xs text-gray-500 mt-1">${query ? `No results for "${query}"` : 'Try a different search term'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsContainer.innerHTML = users.map(user => `
+                <div class="flex items-center justify-between p-2 bg-neutral-700/20 rounded-lg border border-neutral-700/50 hover:bg-neutral-700/30 transition-colors">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-xs font-bold text-white">
+                            ${user.initials}
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-white">${user.name}</p>
+                            <p class="text-xs text-gray-400">Level ${user.level} • ${user.points.toLocaleString()} XP</p>
+                        </div>
+                    </div>
+                    <div>
+                        ${user.is_friend ?
+                            '<span class="text-xs text-green-400 bg-green-500/20 px-2 py-1 rounded-full">Friends</span>' :
+                            user.request_sent ?
+                                '<span class="text-xs text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded-full">Pending...</span>' :
+                                user.request_received ?
+                                    `<button onclick="acceptFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Accept</button>` :
+                                    `<button onclick="sendFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Add Friend</button>`
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadDashboardFriendsByStatus(status) {
+            const containerId = status === 'online' ? 'dashboardOnlineFriends' : 'dashboardOfflineFriends';
+            const container = document.getElementById(containerId);
+
+            if (!container) {
+                console.error('Container not found:', containerId);
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="text-center text-gray-400 py-6">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-3"></div>
+                    <p class="text-sm">Loading ${status} friends...</p>
+                </div>
+            `;
+
+            fetch(`/friends/by-status?status=${status}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayDashboardFriendsList(data.friends, containerId, status);
+                })
+                .catch(error => {
+                    console.error('Error loading friends:', error);
+                    container.innerHTML = `
+                        <div class="text-center text-red-400 py-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <p class="text-sm font-medium">Error loading friends</p>
+                            <p class="text-xs text-gray-500 mt-1">Please try again</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function displayDashboardFriendsList(friends, containerId, status) {
+            const container = document.getElementById(containerId);
+
+            if (!container) {
+                console.error('Container not found:', containerId);
+                return;
+            }
+
+            if (friends.length === 0) {
+                const statusText = status === 'online' ? 'online' : 'offline';
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p class="text-sm font-medium">No ${statusText} friends</p>
+                        <p class="text-xs text-gray-500 mt-1">No friends are currently ${statusText}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = friends.map(friend => `
+                <div class="flex items-center justify-between p-2 bg-neutral-700/20 rounded-lg border border-neutral-700/50 hover:bg-neutral-700/30 transition-colors cursor-pointer"
+                     onclick="viewFriendProfile(${friend.id})">
+                    <div class="flex items-center gap-2">
+                        <div class="relative">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-xs font-bold text-white">
+                                ${friend.initials}
+                            </div>
+                            <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-neutral-800
+                                ${friend.status === 'online' ? 'bg-green-400' : friend.status === 'active' ? 'bg-yellow-400' : 'bg-gray-400'}
+                                ${friend.status === 'online' ? 'animate-pulse' : ''}">
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-white">${friend.name}</p>
+                            <p class="text-xs text-gray-400">Level ${friend.level} • ${friend.points.toLocaleString()} XP</p>
+                            <p class="text-xs text-gray-500">${friend.activity_time}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs px-2 py-1 rounded-full ${
+                            friend.status === 'online' ? 'text-green-400 bg-green-500/20' :
+                            friend.status === 'active' ? 'text-yellow-400 bg-yellow-500/20' :
+                            'text-gray-400 bg-gray-500/20'
+                        }">
+                            ${friend.status === 'online' ? 'Online' : friend.status === 'active' ? 'Active' : 'Offline'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadDashboardPendingRequests() {
+            const container = document.getElementById('dashboardPendingRequests');
+
+            if (!container) {
+                console.error('Container not found: dashboardPendingRequests');
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="text-center text-gray-400 py-6">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-3"></div>
+                    <p class="text-sm">Loading pending requests...</p>
+                </div>
+            `;
+
+            fetch('/friends/pending')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayDashboardPendingRequests(data.sent_requests, data.received_requests);
+                })
+                .catch(error => {
+                    console.error('Error loading pending requests:', error);
+                    container.innerHTML = `
+                        <div class="text-center text-red-400 py-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <p class="text-sm font-medium">Error loading requests</p>
+                            <p class="text-xs text-gray-500 mt-1">Please try again</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function displayDashboardPendingRequests(sentRequests, receivedRequests) {
+            const container = document.getElementById('dashboardPendingRequests');
+
+            if (!container) {
+                console.error('Container not found: dashboardPendingRequests');
+                return;
+            }
+
+            if (sentRequests.length === 0 && receivedRequests.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-sm font-medium">No pending requests</p>
+                        <p class="text-xs text-gray-500 mt-1">All caught up!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            if (receivedRequests.length > 0) {
+                html += `
+                    <div class="mb-4">
+                        <h4 class="text-xs font-medium text-emerald-400 mb-2 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                            </svg>
+                            Received (${receivedRequests.length})
+                        </h4>
+                        <div class="space-y-2">
+                            ${receivedRequests.map(request => `
+                                <div class="flex items-center justify-between p-2 bg-neutral-700/20 rounded-lg border border-neutral-700/50">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-xs font-bold text-white">
+                                            ${request.initials}
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-white">${request.name}</p>
+                                            <p class="text-xs text-gray-400">Level ${request.level} • ${request.points.toLocaleString()} XP</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <button onclick="acceptFriendRequest(${request.id})" class="text-xs text-green-400 bg-green-500/20 px-2 py-1 rounded-full hover:bg-green-500/30 transition-colors">Accept</button>
+                                        <button onclick="declineFriendRequest(${request.id})" class="text-xs text-red-400 bg-red-500/20 px-2 py-1 rounded-full hover:bg-red-500/30 transition-colors">Decline</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (sentRequests.length > 0) {
+                html += `
+                    <div>
+                        <h4 class="text-xs font-medium text-yellow-400 mb-2 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                            Sent (${sentRequests.length})
+                        </h4>
+                        <div class="space-y-2">
+                            ${sentRequests.map(request => `
+                                <div class="flex items-center justify-between p-2 bg-neutral-700/20 rounded-lg border border-neutral-700/50">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-xs font-bold text-white">
+                                            ${request.initials}
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-white">${request.name}</p>
+                                            <p class="text-xs text-gray-400">Level ${request.level} • ${request.points.toLocaleString()} XP</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded-full">Pending...</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function loadDashboardPendingCount() {
+            fetch('/friends/pending')
+                .then(response => response.json())
+                .then(data => {
+                    const count = data.received_requests.length;
+                    const countElement = document.getElementById('dashboardPendingCount');
+                    if (countElement) {
+                        if (count > 0) {
+                            countElement.textContent = count;
+                            countElement.classList.remove('hidden');
+                        } else {
+                            countElement.classList.add('hidden');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading pending count:', error);
+                });
+        }
     </script>
 
     <style>
