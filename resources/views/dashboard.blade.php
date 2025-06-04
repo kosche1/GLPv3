@@ -1164,7 +1164,7 @@
                 </div>
 
                 <!-- Friends Management -->
-                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl overflow-hidden relative group hover:border-neutral-700 transition-all duration-300">
+                <div class="rounded-2xl border border-neutral-800 bg-neutral-800/50 backdrop-blur-sm shadow-xl relative group hover:border-neutral-700 transition-all duration-300">
                     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.1),transparent_70%)] opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-blue-500/0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 group-hover:duration-200"></div>
                     <div class="p-6 relative z-10">
@@ -1182,11 +1182,11 @@
 
                         <!-- Friend Tabs -->
                         <div class="mb-4" x-data="{ activeTab: 'active' }">
-                            <nav class="flex space-x-1 bg-neutral-700/30 rounded-lg p-1">
+                            <nav class="flex bg-neutral-700/30 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
                                 <button
                                     @click="activeTab = 'search'; switchFriendTab('search')"
                                     :class="activeTab === 'search' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
-                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1"
+                                    class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 min-w-max"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -1196,7 +1196,7 @@
                                 <button
                                     @click="activeTab = 'online'; switchFriendTab('online')"
                                     :class="activeTab === 'online' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
-                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1"
+                                    class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 min-w-max"
                                 >
                                     <div class="w-2 h-2 rounded-full bg-green-400"></div>
                                     Online
@@ -1204,7 +1204,7 @@
                                 <button
                                     @click="activeTab = 'offline'; switchFriendTab('offline')"
                                     :class="activeTab === 'offline' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
-                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1"
+                                    class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 min-w-max"
                                 >
                                     <div class="w-2 h-2 rounded-full bg-gray-400"></div>
                                     Offline
@@ -1212,7 +1212,7 @@
                                 <button
                                     @click="activeTab = 'active'; switchFriendTab('active')"
                                     :class="activeTab === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
-                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1"
+                                    class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 min-w-max"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -1222,7 +1222,7 @@
                                 <button
                                     @click="activeTab = 'pending'; switchFriendTab('pending')"
                                     :class="activeTab === 'pending' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
-                                    class="flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 relative"
+                                    class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 relative min-w-max"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1789,8 +1789,8 @@
                         </div>
                     </button>
                     <button
-                        @click="activeTab = 'friends'; switchTab('friends')"
-                        :class="activeTab === 'friends' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-gray-400 hover:text-gray-300'"
+                        @click="activeTab = 'active'; switchTab('active')"
+                        :class="activeTab === 'active' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-gray-400 hover:text-gray-300'"
                         class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
                     >
                         <div class="flex items-center gap-2">
