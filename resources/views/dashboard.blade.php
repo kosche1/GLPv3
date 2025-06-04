@@ -187,7 +187,7 @@
                                             <template x-if="notification.type === 'achievement'">
                                                 <div class="h-7 w-7 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                                     </svg>
                                                 </div>
                                             </template>
@@ -1021,7 +1021,7 @@
                                 <div class="relative">
                                     <div class="absolute -inset-1 bg-orange-500/20 rounded-full blur-sm opacity-70"></div>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-400 relative" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
+                                        <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 001-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd" />
                                         <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0010 15c-2.796 0-5.487-.46-8-1.308z" />
                                     </svg>
                                 </div>
@@ -1181,7 +1181,7 @@
                         </div>
 
                         <!-- Friend Tabs -->
-                        <div class="mb-4" x-data="{ activeTab: 'active' }">
+                        <div class="mb-4" x-data="{ activeTab: localStorage.getItem('dashboardFriendTab') || 'online' }">
                             <nav class="flex bg-neutral-700/30 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
                                 <button
                                     @click="activeTab = 'search'; switchFriendTab('search')"
@@ -1236,7 +1236,7 @@
                         <!-- Tab Content -->
                         <div class="min-h-[280px]">
                             <!-- Search Tab -->
-                            <div id="dashboardSearchTab" class="friend-tab-content">
+                            <div id="dashboardSearchTab" class="friend-tab-content hidden">
                                 <div class="mb-3">
                                     <div class="relative">
                                         <input
@@ -1281,7 +1281,7 @@
                                 </div>
                             </div>
 
-                            <div id="dashboardActiveTab" class="friend-tab-content">
+                            <div id="dashboardActiveTab" class="friend-tab-content hidden">
                                 <div id="dashboardActiveFriends" class="space-y-2 max-h-56 overflow-y-auto">
                                     @php
                                         // Get real active friends data
@@ -1553,9 +1553,8 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Activity graph is now server-side rendered -->
+        <!-- Activity graph is now server-side rendered -->
 
     <!-- Real-time Dashboard Integration -->
     <script>
@@ -2021,8 +2020,8 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <p class="font-medium">No users found</p>
-                        <p class="text-sm text-gray-500 mt-1">${query ? `No results for "${query}"` : 'Try a different search term'}</p>
+                        <p class="text-sm font-medium">No users found</p>
+                        <p class="text-xs text-gray-500 mt-1">${query ? `No results for "${query}"` : 'Try a different search term'}</p>
                     </div>
                 `;
                 return;
@@ -2529,39 +2528,22 @@
             dashboardCurrentTab = tab;
 
             // Hide all tabs
-            document.querySelectorAll('.friend-tab-content').forEach(content => {
-                content.classList.add('hidden');
+            document.querySelectorAll('.friend-tab-content').forEach(function(element) {
+                element.classList.add('hidden');
             });
 
-            // Show selected tab
-            const tabElement = document.getElementById('dashboard' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab');
-            if (tabElement) {
-                tabElement.classList.remove('hidden');
-            }
-
-            // Load content based on tab
-            switch(tab) {
-                case 'search':
-                    // Reset search if needed
-                    const searchInput = document.getElementById('dashboardSearchInput');
-                    if (searchInput && searchInput.value === '') {
-                        resetDashboardSearchResults();
-                    }
-                    break;
-                case 'online':
-                    loadDashboardFriendsByStatus('online');
-                    break;
-                case 'offline':
-                    loadDashboardFriendsByStatus('offline');
-                    break;
-                case 'active':
-                    // Active friends are already loaded from server-side
-                    break;
-                case 'pending':
-                    loadDashboardPendingRequests();
-                    break;
+            // Show the selected tab content
+            const selectedTabContent = document.getElementById('dashboard' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab');
+            if (selectedTabContent) {
+                selectedTabContent.classList.remove('hidden');
             }
         }
+
+        // Call on page load to set the initial tab
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialTab = localStorage.getItem('dashboardFriendTab') || 'online';
+            switchFriendTab(initialTab);
+        });
 
         function resetDashboardSearchResults() {
             document.getElementById('dashboardSearchResults').innerHTML = `
