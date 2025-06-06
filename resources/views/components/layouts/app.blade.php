@@ -16,15 +16,15 @@
         </div>
     <flux:main>
         {{ $slot }}
-
-        @livewire('AiWidget')
-        @auth
-            @livewire('session-timeout')
-            @livewire('welcome-modals')
-            @livewire('recipe-approval-modal')
-            @livewire('task-approval-notification-modal')
-            @livewire('typing-test-approval-modal')
-            @livewire('user-activity-history-modal')
-        @endauth
     </flux:main>
+
+    @livewire('AiWidget')
+    @auth
+        @livewire('session-timeout')
+        @livewire('welcome-modals')
+        @livewire('recipe-approval-modal')
+        @livewire('task-approval-notification-modal')
+        @livewire('typing-test-approval-modal')
+        @livewire('user-activity-history-modal')
+    @endauth
 </x-layouts.app.sidebar>
