@@ -2526,6 +2526,7 @@
 
         function switchFriendTab(tab) {
             dashboardCurrentTab = tab;
+            localStorage.setItem('dashboardFriendTab', tab);
 
             // Hide all tabs
             document.querySelectorAll('.friend-tab-content').forEach(function(element) {
@@ -2536,6 +2537,25 @@
             const selectedTabContent = document.getElementById('dashboard' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab');
             if (selectedTabContent) {
                 selectedTabContent.classList.remove('hidden');
+            }
+
+            // Load content for the selected tab
+            switch(tab) {
+                case 'search':
+                    resetDashboardSearchResults();
+                    break;
+                case 'online':
+                    loadDashboardFriendsByStatus('online');
+                    break;
+                case 'offline':
+                    loadDashboardFriendsByStatus('offline');
+                    break;
+                case 'active':
+                    // Content is pre-rendered with PHP, no action needed
+                    break;
+                case 'pending':
+                    loadDashboardPendingRequests();
+                    break;
             }
         }
 
