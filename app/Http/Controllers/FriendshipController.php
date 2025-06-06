@@ -74,25 +74,34 @@ class FriendshipController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id'
         ]);
-        
+
         $user = Auth::user();
         $targetUser = User::findOrFail($request->user_id);
-        
-        $friendship = $user->sendFriendRequestTo($targetUser);
-        
-        if ($friendship) {
-            Notification::send($targetUser, new FriendRequestSent($user));
 
+        $friendship = $user->sendFriendRequestTo($targetUser);
+
+        if (!$friendship) {
             return response()->json([
-                'success' => true,
-                'message' => 'Friend request sent successfully!'
-            ]);
+                'success' => false,
+                'message' => 'Unable to send friend request. You may already be friends or have a pending request.'
+            ], 400);
         }
-        
-        return response()->json([
-            'success' => false,
-            'message' => 'Unable to send friend request. You may already be friends or have a pending request.'
-        ], 400);
+
+        // The friendship was created successfully. Prepare the success response.
+        $response = response()->json([
+            'success' => true,
+            'message' => 'Friend request sent successfully!'
+        ]);
+
+        // Now, attempt to send the notification. A failure here will be logged
+        // but will not prevent the success response from being sent.
+        try {
+            Notification::send($targetUser, new FriendRequestSent($user));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send friend request notification: ' . $e->getMessage());
+        }
+
+        return $response;
     }
 
     /**
@@ -150,6 +159,33 @@ class FriendshipController extends Controller
         return response()->json([
             'success' => false,
             'message' => 'Friend request not found.'
+        ], 400);
+    }
+
+    /**
+     * Cancel a friend request.
+     */
+    public function cancelRequest(Request $request): JsonResponse
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id'
+        ]);
+
+        $user = Auth::user();
+        $targetUser = User::findOrFail($request->user_id);
+
+        $deleted = $user->cancelFriendRequestTo($targetUser);
+
+        if ($deleted) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Friend request canceled.'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Friend request not found or could not be canceled.'
         ], 400);
     }
 

@@ -279,6 +279,7 @@ Route::middleware(
         Route::post('/send-request', [\App\Http\Controllers\FriendshipController::class, 'sendRequest'])->name('send-request');
         Route::post('/accept-request', [\App\Http\Controllers\FriendshipController::class, 'acceptRequest'])->name('accept-request');
         Route::post('/decline-request', [\App\Http\Controllers\FriendshipController::class, 'declineRequest'])->name('decline-request');
+        Route::post('/cancel-request', [\App\Http\Controllers\FriendshipController::class, 'cancelRequest'])->name('cancel-request');
         Route::delete('/remove-friend', [\App\Http\Controllers\FriendshipController::class, 'removeFriend'])->name('remove-friend');
         Route::get('/active', [\App\Http\Controllers\FriendshipController::class, 'getActiveFriends'])->name('active');
         Route::get('/by-status', [\App\Http\Controllers\FriendshipController::class, 'getFriendsByStatus'])->name('by-status');

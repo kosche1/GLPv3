@@ -2042,10 +2042,10 @@
                         ${user.is_friend ?
                             '<span class="text-xs text-green-400 bg-green-500/20 px-2 py-1 rounded-full">Friends</span>' :
                             user.request_sent ?
-                                '<span class="text-xs text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded-full">Pending...</span>' :
+                                `<button onclick="cancelFriendRequest(this, ${user.id})" class="text-xs text-red-400 bg-red-500/20 px-2 py-1 rounded-full hover:bg-red-500/30 transition-colors">Cancel Request</button>` :
                                 user.request_received ?
                                     `<button onclick="acceptFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Accept</button>` :
-                                    `<button onclick="sendFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Add Friend</button>`
+                                    `<button onclick="sendFriendRequest(this, ${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Add Friend</button>`
                         }
                     </div>
                 </div>
@@ -2287,45 +2287,82 @@
             });
         }
 
-        function sendFriendRequest(userId) {
-            console.log('Attempting to send friend request to user ID:', userId);
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            console.log('CSRF Token:', csrfToken);
+        function sendFriendRequest(button, userId) {
+            button.disabled = true;
+            button.innerHTML = `
+                <div class="flex items-center justify-center gap-1">
+                    <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                    Adding...
+                </div>
+            `;
 
             fetch('/friends/send-request', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
                 body: JSON.stringify({ user_id: userId })
             })
-            .then(response => {
-                // Check if response is OK (status in 200-299 range)
-                if (!response.ok) {
-                    // If not OK, parse JSON and throw an error with the message
-                    return response.json().then(errorData => {
-                        throw new Error(errorData.message || 'Network response was not ok');
-                    });
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     showNotification('Friend request sent!', 'success');
-                    // Refresh search results and pending count
-                    const query = document.getElementById('friendSearchInput').value;
-                    if (query.length >= 2) {
-                        searchUsers(query);
-                    }
-                    loadPendingCount();
+                    button.innerHTML = 'Request Sent';
+                    button.classList.remove('text-blue-400', 'bg-blue-500/20', 'hover:bg-blue-500/30');
+                    button.classList.add('text-yellow-400', 'bg-yellow-500/20');
+                    button.disabled = true;
                 } else {
                     showNotification(data.message || 'Failed to send friend request', 'error');
+                    button.innerHTML = 'Add Friend';
+                    button.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error sending friend request:', error);
-                showNotification('Error sending friend request: ' + error.message, 'error');
+                showNotification('An unexpected error occurred. Please try again.', 'error');
+                button.innerHTML = 'Add Friend';
+                button.disabled = false;
+            });
+        }
+
+        function cancelFriendRequest(button, userId) {
+            button.disabled = true;
+            button.innerHTML = `
+                <div class="flex items-center justify-center gap-1">
+                    <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                    Canceling...
+                </div>
+            `;
+
+            fetch('/friends/cancel-request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ user_id: userId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Friend request canceled', 'success');
+                    button.innerHTML = 'Add Friend';
+                    button.classList.remove('text-red-400', 'bg-red-500/20', 'hover:bg-red-500/30');
+                    button.classList.add('text-blue-400', 'bg-blue-500/20', 'hover:bg-blue-500/30');
+                    button.onclick = () => sendFriendRequest(button, userId);
+                    button.disabled = false;
+                } else {
+                    showNotification(data.message || 'Failed to cancel request', 'error');
+                    button.innerHTML = 'Cancel Request';
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error canceling friend request:', error);
+                showNotification('An unexpected error occurred. Please try again.', 'error');
+                button.innerHTML = 'Cancel Request';
+                button.disabled = false;
             });
         }
 
@@ -2646,10 +2683,10 @@
                         ${user.is_friend ?
                             '<span class="text-xs text-green-400 bg-green-500/20 px-2 py-1 rounded-full">Friends</span>' :
                             user.request_sent ?
-                                '<span class="text-xs text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded-full">Pending...</span>' :
+                                `<button onclick="cancelFriendRequest(this, ${user.id})" class="text-xs text-red-400 bg-red-500/20 px-2 py-1 rounded-full hover:bg-red-500/30 transition-colors">Cancel Request</button>` :
                                 user.request_received ?
                                     `<button onclick="acceptFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Accept</button>` :
-                                    `<button onclick="sendFriendRequest(${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Add Friend</button>`
+                                    `<button onclick="sendFriendRequest(this, ${user.id})" class="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full hover:bg-blue-500/30 transition-colors">Add Friend</button>`
                         }
                     </div>
                 </div>

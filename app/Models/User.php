@@ -630,6 +630,19 @@ class User extends Authenticatable
     }
 
     /**
+     * Cancel a friend request sent to another user.
+     */
+    public function cancelFriendRequestTo(User $user): bool
+    {
+        $friendship = $this->sentFriendRequests()
+            ->where('friend_id', $user->id)
+            ->pending()
+            ->first();
+
+        return $friendship ? $friendship->delete() : false;
+    }
+
+    /**
      * Get pending friend requests received by this user.
      */
     public function getPendingFriendRequests()
