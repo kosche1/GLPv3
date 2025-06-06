@@ -37,6 +37,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\LogFilamentLogout::class,
+            \App\Http\Middleware\UpdateUserActivity::class,
             // Disabled in favor of using Login event listener
             // \App\Http\Middleware\TrackAttendance::class,
         ],

@@ -6,7 +6,6 @@ use App\Models\Challenge;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ForumController;
-use App\Http\Controllers\ParagonZController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ActivityGoalController;
 use App\Http\Controllers\EquationDropController;
@@ -33,6 +32,11 @@ Route::get('/', [\App\Http\Controllers\WelcomeController::class, 'index'])->name
 Route::view('terms', 'terms')->name('terms');
 Route::view('disclaimer', 'disclaimer')->name('disclaimer');
 Route::view('system-policy', 'system-policy')->name('system-policy');
+
+// Simple ping route for connectivity check
+Route::get('/ping', function () {
+    return response()->json(['status' => 'ok'], 200);
+})->name('ping');
 
 
 
@@ -148,7 +152,6 @@ Route::middleware(
     // Dynamic route for any subject type - must be after specific routes
     Route::get('subjects/{code}', [\App\Http\Controllers\SubjectsController::class, 'showSubjectType'])->name('subjects.type');
     // Notification routes
-    Route::get('paragonz', [ParagonZController::class, 'index'])->name('paragonz');
 
     Route::get('notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');
     Route::get('api/notifications', [\App\Http\Controllers\NotificationController::class, 'getNotifications'])->name('notifications.get');
@@ -267,6 +270,20 @@ Route::middleware(
         Route::post('/historical-timeline-maze/save-result', [HistoricalTimelineMazeController::class, 'saveResult'])->name('historical-timeline-maze.save-result');
         Route::get('/historical-timeline-maze/results', [HistoricalTimelineMazeController::class, 'getResults'])->name('historical-timeline-maze.results');
         Route::delete('/historical-timeline-maze/results/{id}', [HistoricalTimelineMazeController::class, 'deleteResult'])->name('historical-timeline-maze.delete-result');
+    });
+
+    // Friendship Routes
+    Route::prefix('friends')->name('friends.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\FriendshipController::class, 'index'])->name('index');
+        Route::get('/search', [\App\Http\Controllers\FriendshipController::class, 'search'])->name('search');
+        Route::post('/send-request', [\App\Http\Controllers\FriendshipController::class, 'sendRequest'])->name('send-request');
+        Route::post('/accept-request', [\App\Http\Controllers\FriendshipController::class, 'acceptRequest'])->name('accept-request');
+        Route::post('/decline-request', [\App\Http\Controllers\FriendshipController::class, 'declineRequest'])->name('decline-request');
+        Route::delete('/remove-friend', [\App\Http\Controllers\FriendshipController::class, 'removeFriend'])->name('remove-friend');
+        Route::get('/active', [\App\Http\Controllers\FriendshipController::class, 'getActiveFriends'])->name('active');
+        Route::get('/by-status', [\App\Http\Controllers\FriendshipController::class, 'getFriendsByStatus'])->name('by-status');
+        Route::get('/pending', [\App\Http\Controllers\FriendshipController::class, 'getPendingRequests'])->name('pending');
+        Route::get('/profile/{userId}', [\App\Http\Controllers\FriendshipController::class, 'getFriendProfile'])->name('profile');
     });
 
     // Collaborative Learning Routes
