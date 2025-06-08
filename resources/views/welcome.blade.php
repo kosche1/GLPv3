@@ -574,14 +574,6 @@
                     @endauth
                 </div>
                 <br>
-
-                <!-- Floating stars around CTA -->
-                <div class="relative mt-16">
-                    <div class="star absolute -top-8 -left-8 w-6 h-6"></div>
-                    <div class="star absolute -top-4 right-12 w-4 h-4"></div>
-                    <div class="star absolute -bottom-6 left-16 w-5 h-5"></div>
-                    <div class="star absolute -bottom-8 -right-4 w-7 h-7"></div>
-                </div>
             </div>
         </section>
         <br>

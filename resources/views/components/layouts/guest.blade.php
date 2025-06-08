@@ -3,22 +3,60 @@
     <head>
         @include('partials.head')
         <style>
-            .hero-pattern {
-                background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23202020' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            /* Discord-inspired design with green theme */
+            :root {
+                --discord-green: #00D26A;
+                --discord-green-dark: #00B359;
+                --discord-green-light: #4AE54A;
+                --discord-green-darker: #0A5D2C;
+                --discord-bg: #0F0F23;
+                --discord-bg-light: #1A1A2E;
+                --discord-text: #FFFFFF;
+                --discord-text-muted: #B9BBBE;
+            }
+
+            body {
+                background: linear-gradient(135deg, var(--discord-bg) 0%, #16213E 100%);
+                overflow-x: hidden;
+            }
+
+            /* Floating decorative elements */
+            .floating-stars {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                pointer-events: none;
+            }
+
+            .star {
+                position: absolute;
+                background: var(--discord-green);
+                clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+                animation: twinkle 3s infinite ease-in-out;
+            }
+
+            .star-1 { width: 20px; height: 20px; top: 10%; left: 10%; animation-delay: 0s; }
+            .star-2 { width: 15px; height: 15px; top: 20%; right: 15%; animation-delay: 1s; }
+            .star-3 { width: 25px; height: 25px; top: 60%; left: 5%; animation-delay: 2s; }
+            .star-4 { width: 18px; height: 18px; bottom: 20%; right: 10%; animation-delay: 0.5s; }
+            .star-5 { width: 22px; height: 22px; top: 40%; right: 25%; animation-delay: 1.5s; }
+
+            @keyframes twinkle {
+                0%, 100% { opacity: 0.3; transform: scale(1) rotate(0deg); }
+                50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
             }
         </style>
     </head>
-    <body class="min-h-screen bg-zinc-900 antialiased">
-        <!-- Animated Background -->
-        <div class="fixed inset-0 hero-pattern opacity-30 -z-10"></div>
-        <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-            <!-- Glowing orbs -->
-            <div class="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-emerald-500/10 filter blur-3xl animate-pulse-slow"></div>
-            <div class="absolute bottom-1/3 right-1/3 w-96 h-96 rounded-full bg-blue-500/10 filter blur-3xl animate-pulse-slow animation-delay-1000"></div>
-            <div class="absolute top-2/3 left-1/2 w-72 h-72 rounded-full bg-purple-500/10 filter blur-3xl animate-pulse-slow animation-delay-2000"></div>
+    <body class="min-h-screen antialiased">
+        <!-- Floating Stars Background -->
+        <div class="floating-stars">
+            <div class="star star-1"></div>
+            <div class="star star-2"></div>
+            <div class="star star-3"></div>
+            <div class="star star-4"></div>
+            <div class="star star-5"></div>
         </div>
-
-
 
         <!-- Main content -->
         <main class="pt-12">
