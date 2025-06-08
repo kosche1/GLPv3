@@ -165,10 +165,11 @@
                 font-size: clamp(2.5rem, 8vw, 5rem);
                 font-weight: 800;
                 line-height: 1.1;
-                background: linear-gradient(135deg, var(--discord-green), var(--discord-green-light));
+                /* background: linear-gradient(135deg, var(--discord-green), var(--discord-green-light));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
-                background-clip: text;
+                background-clip: text; */
+                color: var(--discord-green-light);
             }
 
             .discord-subheading {
@@ -218,7 +219,7 @@
                         <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
                             <x-app-logo-icon class="h-6 w-6 text-white" />
                         </div>
-                        <span class="text-white font-bold text-xl">GLP</span>
+                        <span class="text-white font-bold text-xl">Gamified Learning Platform</span>
                     </div>
 
                     <div class="hidden md:flex items-center gap-8">
@@ -260,7 +261,7 @@
             <div class="max-w-6xl mx-auto text-center relative z-10">
                 <!-- Main Headline -->
                 <div class="animate-on-scroll">
-                    <h1 class="discord-heading mb-6">
+                    <h1 class="discord-heading mb-6" style="color: var(--discord-green-light); -webkit-text-fill-color: unset;">
                         Learning that's all
                         <br>
                         <span class="relative">
