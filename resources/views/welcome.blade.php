@@ -213,7 +213,7 @@
 
         <!-- Navigation -->
         <nav class="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-lg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-20">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -253,18 +253,12 @@
 
         <!-- Hero Section -->
         <section class="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20">
-            <!-- Floating Characters -->
-            <div class="absolute top-32 left-10 character-blob animate-float animation-delay-2000 hidden lg:block"></div>
-            <div class="absolute top-40 right-16 character-blob animate-float animation-delay-4000 hidden lg:block"></div>
-            <div class="absolute bottom-32 left-20 character-blob animate-float hidden lg:block"></div>
-
-            <div class="max-w-6xl mx-auto text-center relative z-10">
+            <div class="max-w-8xl mx-auto text-center relative z-10">
                 <!-- Main Headline -->
                 <div class="animate-on-scroll">
                     <h1 class="discord-heading mb-6" style="color: var(--discord-green-light); -webkit-text-fill-color: unset;">
                         Learning that's all
-                        <br>
-                        <span class="relative">
+                        <span class="relative block mt-[-25px]">
                             fun & games
                             <svg class="absolute -bottom-2 left-0 w-full h-4" viewBox="0 0 400 20" fill="none">
                                 <path d="M0 15 Q100 5 200 15 T400 15" stroke="var(--discord-green)" stroke-width="4" fill="none" stroke-linecap="round"/>
@@ -282,17 +276,14 @@
                 </div>
 
                 <!-- CTA Buttons -->
-                <div class="animate-on-scroll flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                <div class="animate-on-scroll mb-20">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="discord-btn text-lg px-8 py-4">
+                        <a href="{{ route('dashboard') }}" class="discord-btn text-xl px-12 py-6 inline-block">
                             Open Dashboard
                         </a>
                     @else
-                        <a href="{{ route('register') }}" class="discord-btn text-lg px-8 py-4">
+                        <a href="{{ route('register') }}" class="discord-btn text-xl px-12 py-6 inline-block">
                             Start Learning for Free
-                        </a>
-                        <a href="{{ route('login') }}" class="discord-btn-outline text-lg px-8 py-4">
-                            Open GLP in your browser
                         </a>
                     @endauth
                 </div>
@@ -387,7 +378,7 @@
             </div>
 
             <!-- Feature 3: Community Learning -->
-            <div class="max-w-7xl mx-auto mb-32">
+            <div class="max-w-7xl mx-auto mb-0">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <div class="animate-on-scroll">
                         <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -416,9 +407,9 @@
         </section>
 
         <!-- Subjects Section -->
-        <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-green-900/10">
-            <div class="max-w-6xl mx-auto text-center">
-                <div class="animate-on-scroll mb-16">
+        <section class="pt-0 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-green-900/10">
+            <div class="max-w-8xl mx-auto text-center">
+                <div class="animate-on-scroll mb-8 pt-10">
                     <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
                         See what subjects are around to learn
                     </h2>
@@ -427,7 +418,6 @@
                         For supported tracks, you can see what modules or specializations are available and directly jump in.
                     </p>
                 </div>
-                <br>
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 animate-on-scroll stagger-children">
                     @foreach($technologies as $tech)
@@ -466,13 +456,12 @@
                 </div>
             </div>
         </section>
-        <br>
 
         <!-- Featured Courses -->
         <section id="courses" class="py-20 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-6xl mx-auto">
+            <div class="max-w-8xl mx-auto">
                 <div class="text-center mb-16 animate-on-scroll">
-                    <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    <h2 class="text-4xl md:text-6xl font-bold text-white mb-6">
                         Always have something to learn together
                     </h2>
                     <p class="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -480,7 +469,6 @@
                         Seamlessly learn, practice, review, and grow, all in one learning platform.
                     </p>
                 </div>
-                <br>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-on-scroll stagger-children">
                     @foreach($challenges as $challenge)
@@ -514,50 +502,44 @@
             </div>
         </section>
 
-            <!-- Testimonials -->
-            <!-- <div id="testimonials" class="max-w-4xl w-full mb-20">
-                <h2 class="text-3xl font-bold text-white mb-8 text-center">What Our Students Say</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> -->
-                    <!-- Testimonial 1 -->
-                    <!-- <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mr-4 text-emerald-400 font-bold">JS</div>
-                            <div>
-                                <h4 class="text-white font-medium">John Smith</h4>
-                                <p class="text-neutral-400 text-sm">Computer Science Student</p>
-                            </div>
+        <!-- Testimonials -->
+        <!-- <div id="testimonials" class="max-w-4xl w-full mb-20">
+            <h2 class="text-3xl font-bold text-white mb-8 text-center">What Our Students Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> -->
+                <!-- Testimonial 1 -->
+                <!-- <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mr-4 text-emerald-400 font-bold">JS</div>
+                        <div>
+                            <h4 class="text-white font-medium">John Smith</h4>
+                            <p class="text-neutral-400 text-sm">Computer Science Student</p>
                         </div>
-                        <p class="text-neutral-300 italic">"The gamified approach to learning programming has completely transformed how I study. The challenges are engaging and the reward system keeps me motivated."</p>
-                        <div class="mt-4 text-emerald-400">★★★★★</div>
-                    </div> -->
+                    </div>
+                    <p class="text-neutral-300 italic">"The gamified approach to learning programming has completely transformed how I study. The challenges are engaging and the reward system keeps me motivated."</p>
+                    <div class="mt-4 text-emerald-400">★★★★★</div>
+                </div> -->
 
-                    <!-- Testimonial 2 -->
-                    <!-- <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30">
-                        <div class="flex items-center mb-4">
-                            <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mr-4 text-emerald-400 font-bold">AR</div>
-                            <div>
-                                <h4 class="text-white font-medium">Amanda Rodriguez</h4>
-                                <p class="text-neutral-400 text-sm">Web Development Student</p>
-                            </div>
+                <!-- Testimonial 2 -->
+                <!-- <div class="p-6 rounded-xl border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 transition-all duration-300 hover:border-emerald-500/30">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mr-4 text-emerald-400 font-bold">AR</div>
+                        <div>
+                            <h4 class="text-white font-medium">Amanda Rodriguez</h4>
+                            <p class="text-neutral-400 text-sm">Web Development Student</p>
                         </div>
-                        <p class="text-neutral-300 italic">"I've tried many learning platforms, but GLP stands out with its interactive challenges and supportive community. I've improved my skills faster than I thought possible."</p>
-                        <div class="mt-4 text-emerald-400">★★★★★</div>
-                    </div> -->
-                <!-- </div>
-            </div> -->
+                    </div>
+                    <p class="text-neutral-300 italic">"I've tried many learning platforms, but GLP stands out with its interactive challenges and supportive community. I've improved my skills faster than I thought possible."</p>
+                    <div class="mt-4 text-emerald-400">★★★★★</div>
+                </div> -->
+            <!-- </div>
+        </div> -->
 
         <!-- Final CTA Section -->
         <section class="py-20 px-4 sm:px-6 lg:px-8 relative">
-            <!-- Floating decorative elements -->
-            <div class="absolute top-10 left-10 character-blob animate-float animation-delay-2000 hidden lg:block opacity-30"></div>
-            <div class="absolute bottom-10 right-10 character-blob animate-float animation-delay-4000 hidden lg:block opacity-30"></div>
-            <br>
-
             <div class="max-w-4xl mx-auto text-center">
                 <div class="animate-on-scroll mb-12">
                     <h2 class="text-5xl md:text-6xl font-bold text-white mb-6">
                         You can't scroll anymore.
-                        <br>
                         <span class="text-green-400">Better go learn.</span>
                     </h2>
                 </div>
@@ -573,27 +555,11 @@
                         </a>
                     @endauth
                 </div>
-                <br>
             </div>
         </section>
-        <br>
-
-
-            {{-- <!-- Newsletter -->
-            <div class="w-full max-w-4xl mb-20">
-                <div class="p-8 rounded-2xl bg-linear-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20">
-                    <h3 class="text-2xl font-bold text-white mb-4 text-center">Stay Updated</h3>
-                    <p class="text-neutral-400 text-center mb-6">Subscribe to our newsletter for the latest courses, challenges, and learning tips.</p>
-                    <form class="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
-                        <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-neutral-700 text-white placeholder-neutral-500 focus:outline-hidden focus:border-emerald-500"/>
-                        <button type="submit" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold transition-colors">Subscribe</button>
-                    </form>
-                </div>
-            </div> --}}
 
         <!-- Footer -->
         <footer class="py-16 px-4 sm:px-6 lg:px-8 bg-black/20 border-t border-gray-800/50">
-            <br>
             <div class="max-w-6xl mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                     <div>
@@ -658,7 +624,6 @@
                 </div>
             </div>
         </footer>
-
 
         @fluxScripts
         <script>
