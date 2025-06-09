@@ -40,6 +40,7 @@
 
             <!-- Communication -->
             <flux:navlist.group heading="Communication" class="grid gap-1" expandable :expanded="true" icon="chevron-down" class-icon="ml-auto h-4 w-4 shrink-0 transition-transform duration-200">
+                <flux:navlist.item icon="user-group" :href="route('friends.index')" :current="request()->routeIs('friends.*')" wire:navigate class="py-1">{{ __('Friends') }}</flux:navlist.item>
                 <flux:navlist.item icon="users" :href="route('forums')" :current="request()->routeIs('forums')" wire:navigate class="py-1">{{ __('Forums') }}</flux:navlist.item>
                 <flux:navlist.item icon="document-text" :href="route('feedback')" :current="request()->routeIs('feedback')" wire:navigate class="py-1">{{ __('Feedback') }}</flux:navlist.item>
             </flux:navlist.group>

@@ -285,7 +285,23 @@ Route::middleware(
         Route::get('/by-status', [\App\Http\Controllers\FriendshipController::class, 'getFriendsByStatus'])->name('by-status');
         Route::get('/pending', [\App\Http\Controllers\FriendshipController::class, 'getPendingRequests'])->name('pending');
         Route::get('/profile/{userId}', [\App\Http\Controllers\FriendshipController::class, 'getFriendProfile'])->name('profile');
+        Route::get('/messages', [\App\Http\Controllers\FriendshipController::class, 'getRealTimeMessages'])->name('messages');
+        Route::get('/online', [\App\Http\Controllers\FriendshipController::class, 'getOnlineFriends'])->name('online');
+        Route::get('/debug-status', [\App\Http\Controllers\FriendshipController::class, 'debugFriendStatus'])->name('debug-status');
     });
+
+    // Debug route to check current user activity
+    Route::get('/debug/my-activity', function () {
+        $user = Auth::user();
+        return response()->json([
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'last_activity_at' => $user->last_activity_at?->toISOString(),
+            'last_activity_human' => $user->last_activity_at?->diffForHumans(),
+            'minutes_ago' => $user->last_activity_at ? $user->last_activity_at->diffInMinutes(now()) : null,
+            'current_time' => now()->toISOString(),
+        ]);
+    })->middleware('auth');
 
     // Collaborative Learning Routes
     Route::prefix('study-groups')->name('study-groups.')->group(function () {

@@ -10,20 +10,28 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\View\View;
 use App\Notifications\FriendRequestSent;
+use App\Services\RealTimeService;
 
 class FriendshipController extends Controller
 {
+    protected $realTimeService;
+
+    public function __construct(RealTimeService $realTimeService)
+    {
+        $this->realTimeService = $realTimeService;
+    }
+
     /**
      * Display the friends management page.
      */
     public function index(): View
     {
         $user = Auth::user();
-        
+
         $friends = $user->friends();
         $pendingRequests = $user->getPendingFriendRequests();
         $activeFriends = $user->getActiveFriends();
-        
+
         return view('friends.index', compact('friends', 'pendingRequests', 'activeFriends'));
     }
 
@@ -48,7 +56,7 @@ class FriendshipController extends Controller
                 $q->where('user_id', $user->id);
             })
             ->limit(10)
-            ->get(['id', 'name', 'email'])
+            ->get()
             ->map(function ($searchUser) use ($user) {
                 return [
                     'id' => $searchUser->id,
@@ -97,6 +105,8 @@ class FriendshipController extends Controller
         // but will not prevent the success response from being sent.
         try {
             Notification::send($targetUser, new FriendRequestSent($user));
+            // Also broadcast real-time notification
+            $this->realTimeService->broadcastFriendRequest($user, $targetUser);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send friend request notification: ' . $e->getMessage());
         }
@@ -117,8 +127,11 @@ class FriendshipController extends Controller
         $requester = User::findOrFail($request->user_id);
         
         $accepted = $user->acceptFriendRequestFrom($requester);
-        
+
         if ($accepted) {
+            // Broadcast friend request acceptance
+            $this->realTimeService->broadcastFriendRequestAccepted($user, $requester);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Friend request accepted!'
@@ -270,7 +283,7 @@ class FriendshipController extends Controller
             });
         } elseif ($status === 'offline') {
             $friendsWithStatus = $friendsWithStatus->filter(function ($friend) {
-                return $friend->status === 'away';
+                return $friend->status !== 'online'; // Include 'active' and 'away' statuses
             });
         }
 
@@ -398,12 +411,75 @@ class FriendshipController extends Controller
                 'initials' => $friend->initials(),
                 'level' => $friend->getLevel(),
                 'points' => $friend->getPoints(),
+                'bio' => $friend->bio,
+                'skills' => $friend->skills ? explode(',', $friend->skills) : [],
                 'last_activity_at' => $friend->last_activity_at?->diffForHumans(),
                 'badges_count' => $friend->badges()->count(),
                 'achievements_count' => $friend->achievements()->count(),
-                'challenges_completed' => $friend->challenges()
-                    ->wherePivot('status', 'completed')
-                    ->count(),
+            ]
+        ]);
+    }
+
+    /**
+     * Get real-time messages for the authenticated user.
+     */
+    public function getRealTimeMessages(): JsonResponse
+    {
+        $user = Auth::user();
+        $cacheKey = "user_messages_{$user->id}";
+        $messages = \Illuminate\Support\Facades\Cache::get($cacheKey, []);
+
+        // Clear messages after retrieving them
+        \Illuminate\Support\Facades\Cache::forget($cacheKey);
+
+        return response()->json([
+            'messages' => $messages
+        ]);
+    }
+
+    /**
+     * Get online friends for the authenticated user.
+     */
+    public function getOnlineFriends(): JsonResponse
+    {
+        $user = Auth::user();
+        $onlineFriends = $this->realTimeService->getOnlineFriends($user);
+
+        return response()->json([
+            'friends' => $onlineFriends
+        ]);
+    }
+
+    /**
+     * Debug endpoint to check friend status calculation.
+     */
+    public function debugFriendStatus(): JsonResponse
+    {
+        $user = Auth::user();
+        $friends = $user->friends();
+
+        $debugInfo = $friends->map(function ($friend) {
+            $minutesAgo = $friend->last_activity_at ?
+                         $friend->last_activity_at->diffInMinutes(now()) : null;
+
+            return [
+                'id' => $friend->id,
+                'name' => $friend->name,
+                'last_activity_at' => $friend->last_activity_at?->toISOString(),
+                'last_activity_human' => $friend->last_activity_at?->diffForHumans(),
+                'minutes_ago' => $minutesAgo,
+                'calculated_status' => $this->getFriendStatus($minutesAgo),
+                'current_time' => now()->toISOString(),
+            ];
+        });
+
+        return response()->json([
+            'debug_info' => $debugInfo,
+            'current_user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'last_activity_at' => $user->last_activity_at?->toISOString(),
+                'last_activity_human' => $user->last_activity_at?->diffForHumans(),
             ]
         ]);
     }

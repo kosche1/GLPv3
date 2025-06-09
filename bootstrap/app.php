@@ -15,7 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         channels: __DIR__.'/../routes/channels.php',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Register the UpdateLastActivity middleware globally for web routes
+        $middleware->web(append: [
+            \App\Http\Middleware\UpdateLastActivity::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

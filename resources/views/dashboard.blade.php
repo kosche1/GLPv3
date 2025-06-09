@@ -1181,10 +1181,72 @@
                         </div>
 
                         <!-- Friend Tabs -->
-                        <div class="mb-4" x-data="{ activeTab: localStorage.getItem('dashboardFriendTab') || 'online' }">
+                        <div class="mb-4" x-data="{
+                            activeTab: localStorage.getItem('dashboardFriendTab') || 'online',
+                            onlineUsers: [],
+                            init() {
+                                this.switchFriendTab(this.activeTab);
+                                // Echo presence channel for online users
+                                if (window.Echo) {
+                                    window.Echo.join(`online-users`)
+                                        .here((users) => {
+                                            this.onlineUsers = users.filter(u => u.id !== {{ auth()->id() }});
+                                            console.log('Current online users:', this.onlineUsers);
+                                        })
+                                        .joining((user) => {
+                                            if (user.id !== {{ auth()->id() }}) {
+                                                console.log(user.name + ' joined');
+                                                showToastNotification({type: 'system', title: `${user.name} is now online`, message: ''});
+                                                this.onlineUsers.push(user);
+                                            }
+                                        })
+                                        .leaving((user) => {
+                                            if (user.id !== {{ auth()->id() }}) {
+                                                console.log(user.name + ' left');
+                                                showToastNotification({type: 'system', title: `${user.name} went offline`, message: ''});
+                                                this.onlineUsers = this.onlineUsers.filter(u => u.id !== user.id);
+                                            }
+                                        })
+                                        .error((error) => {
+                                            console.error('Echo presence channel error:', error);
+                                        });
+                                }
+                            },
+                            switchFriendTab(tab) {
+                                this.activeTab = tab;
+                                localStorage.setItem('dashboardFriendTab', tab);
+
+                                // Hide all tabs
+                                document.querySelectorAll('.friend-tab-content').forEach(function(element) {
+                                    element.classList.add('hidden');
+                                });
+
+                                // Show selected tab
+                                document.getElementById('dashboard' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Tab').classList.remove('hidden');
+
+                                // Load content based on tab
+                                switch(tab) {
+                                    case 'search':
+                                        resetDashboardSearchResults();
+                                        break;
+                                    case 'online':
+                                        // Data is now handled by Alpine.js onlineUsers array
+                                        break;
+                                    case 'offline':
+                                        loadDashboardFriendsByStatus('offline');
+                                        break;
+                                    case 'active':
+                                        // Content is pre-rendered with PHP, no action needed unless refreshing is desired
+                                        break;
+                                    case 'pending':
+                                        loadDashboardPendingRequests();
+                                        break;
+                                }
+                            }
+                        }">
                             <nav class="flex bg-neutral-700/30 rounded-lg p-1 overflow-x-auto whitespace-nowrap">
                                 <button
-                                    @click="activeTab = 'search'; switchFriendTab('search')"
+                                    @click="switchFriendTab('search')"
                                     :class="activeTab === 'search' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
                                     class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 min-w-max"
                                 >
@@ -1194,7 +1256,7 @@
                                     Add Friend
                                 </button>
                                 <button
-                                    @click="activeTab = 'online'; switchFriendTab('online')"
+                                    @click="switchFriendTab('online')"
                                     :class="activeTab === 'online' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
                                     class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 min-w-max"
                                 >
@@ -1202,7 +1264,7 @@
                                     Online
                                 </button>
                                 <button
-                                    @click="activeTab = 'offline'; switchFriendTab('offline')"
+                                    @click="switchFriendTab('offline')"
                                     :class="activeTab === 'offline' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
                                     class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 min-w-max"
                                 >
@@ -1210,7 +1272,7 @@
                                     Offline
                                 </button>
                                 <button
-                                    @click="activeTab = 'active'; switchFriendTab('active')"
+                                    @click="switchFriendTab('active')"
                                     :class="activeTab === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
                                     class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 min-w-max"
                                 >
@@ -1220,7 +1282,7 @@
                                     Friend List
                                 </button>
                                 <button
-                                    @click="activeTab = 'pending'; switchFriendTab('pending')"
+                                    @click="switchFriendTab('pending')"
                                     :class="activeTab === 'pending' ? 'bg-emerald-500/20 text-emerald-400' : 'text-gray-400 hover:text-gray-300'"
                                     class="py-2 px-3 text-xs font-medium rounded-md transition-colors flex items-center justify-center gap-1 relative min-w-max"
                                 >
@@ -1265,10 +1327,35 @@
                             <!-- Other tabs content will be loaded dynamically -->
                             <div id="dashboardOnlineTab" class="friend-tab-content hidden">
                                 <div id="dashboardOnlineFriends" class="space-y-2 max-h-56 overflow-y-auto">
-                                    <div class="text-center text-gray-400 py-8">
-                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-400 mx-auto mb-3"></div>
-                                        <p class="text-sm">Loading online friends...</p>
+                                    <template x-if="onlineUsers.length === 0">
+                                        <div class="text-center text-gray-400 py-6">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                            <p class="text-sm font-medium">No friends currently online</p>
+                                            <p class="text-xs text-gray-500 mt-1">They'll appear here when they log in</p>
                                     </div>
+                                    </template>
+                                    <template x-for="user in onlineUsers" :key="user.id">
+                                        <div class="flex items-center justify-between p-2 bg-neutral-700/20 rounded-lg border border-neutral-700/50 hover:bg-neutral-700/30 transition-colors cursor-pointer"
+                                             @click="viewFriendProfile(user.id)">
+                                            <div class="flex items-center gap-2">
+                                                <div class="relative">
+                                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-xs font-bold text-white">
+                                                        <span x-text="user.initials"></span>
+                                                    </div>
+                                                    <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-neutral-800 bg-green-400 animate-pulse"></div>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-white" x-text="user.name"></p>
+                                                    <p class="text-xs text-gray-400">Level <span x-text="user.level"></span> • <span x-text="user.experience_points.toLocaleString()"></span> XP</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="text-xs px-2 py-1 rounded-full text-green-400 bg-green-500/20">Online</span>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
 
@@ -1686,8 +1773,97 @@
             }
         }
 
+        function updateOnlineFriendsDisplay(users) {
+            const container = document.getElementById('dashboardOnlineFriends');
+            if (!container) return;
+
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-400 py-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <p class="text-sm font-medium">No friends currently online</p>
+                        <p class="text-xs text-gray-500 mt-1">They'll appear here when they log in</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = users.map(user => `
+                <div class="flex items-center justify-between p-2 bg-neutral-700/20 rounded-lg border border-neutral-700/50 hover:bg-neutral-700/30 transition-colors cursor-pointer"
+                     onclick="viewFriendProfile(${user.id})">
+                    <div class="flex items-center gap-2">
+                        <div class="relative">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-xs font-bold text-white">
+                                ${user.initials}
+                            </div>
+                            <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-neutral-800 bg-green-400 animate-pulse"></div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-white">${user.name}</p>
+                            <p class="text-xs text-gray-400">Level ${user.level} • ${user.experience_points.toLocaleString()} XP</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs px-2 py-1 rounded-full text-green-400 bg-green-500/20">Online</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addOnlineFriend(user) {
+            const container = document.getElementById('dashboardOnlineFriends');
+            if (!container) return;
+
+            // Remove empty state if present
+            const emptyState = container.querySelector('.text-center.text-gray-400');
+            if (emptyState && emptyState.textContent.includes('No friends currently online')) {
+                container.innerHTML = '';
+            }
+
+            // Check if user is already in the list to avoid duplicates
+            if (document.querySelector(`#dashboardOnlineFriends div[onclick*="viewFriendProfile(${user.id})"]`)) {
+                return;
+            }
+
+            const friendHtml = `
+                <div class="flex items-center justify-between p-2 bg-neutral-700/20 rounded-lg border border-neutral-700/50 hover:bg-neutral-700/30 transition-colors cursor-pointer"
+                     onclick="viewFriendProfile(${user.id})">
+                    <div class="flex items-center gap-2">
+                        <div class="relative">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-xs font-bold text-white">
+                                ${user.initials}
+                            </div>
+                            <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-neutral-800 bg-green-400 animate-pulse"></div>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-white">${user.name}</p>
+                            <p class="text-xs text-gray-400">Level ${user.level} • ${user.experience_points.toLocaleString()} XP</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs px-2 py-1 rounded-full text-green-400 bg-green-500/20">Online</span>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('afterbegin', friendHtml);
+        }
+
+        function removeOnlineFriend(user) {
+            const elementToRemove = document.querySelector(`#dashboardOnlineFriends div[onclick*="viewFriendProfile(${user.id})"]`);
+            if (elementToRemove) {
+                elementToRemove.remove();
+            }
+
+            // If no online friends left, show empty state
+            const container = document.getElementById('dashboardOnlineFriends');
+            if (container && container.children.length === 0) {
+                updateOnlineFriendsDisplay([]);
+            }
+        }
+
         // Listen for connection status changes
-        /*
         if (window.Echo) {
             window.Echo.connector.pusher.connection.bind('connected', () => {
                 updateConnectionStatus('connected');
@@ -1701,11 +1877,32 @@
                 updateConnectionStatus('connecting');
             });
 
-            window.Echo.connector.pusher.connection.bind('error', () => {
+            window.Echo.connector.pusher.connection.bind('error', (err) => {
+                console.error('Pusher connection error:', err);
                 updateConnectionStatus('error');
             });
+
+            // Listen for user presence channel for friend status updates
+            window.Echo.join(`online-users`)
+                .here((users) => {
+                    // This initial list may be handled by the backend rendering for 'active' tab
+                    console.log('Online users:', users);
+                    updateOnlineFriendsDisplay(users);
+                })
+                .joining((user) => {
+                    console.log(user.name + ' joined');
+                    showToastNotification({type: 'system', title: `${user.name} is now online`, message: ''});
+                    addOnlineFriend(user);
+                })
+                .leaving((user) => {
+                    console.log(user.name + ' left');
+                    showToastNotification({type: 'system', title: `${user.name} went offline`, message: ''});
+                    removeOnlineFriend(user);
+                })
+                .error((error) => {
+                    console.error('Echo presence channel error:', error);
+                });
         }
-        */
     </script>
 
     <!-- Keyboard Shortcuts -->
@@ -1809,7 +2006,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             Pending
-                            <span id="pendingCount" class="bg-yellow-500/20 text-yellow-400 text-xs rounded-full px-2 py-0.5 hidden">0</span>
+                            <span id="dashboardPendingCount" class="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
                         </div>
                     </button>
                 </nav>
@@ -1833,8 +2030,8 @@
                             </svg>
                         </div>
                     </div>
-                    <div id="searchResults" class="space-y-2">
-                        <div class="text-center text-gray-400 py-8">
+                    <div id="searchResults" class="space-y-2 max-h-56 overflow-y-auto">
+                        <div class="text-center text-gray-400 py-6">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -1880,7 +2077,8 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <p>Loading pending requests...</p>
+                            <p class="font-medium">No pending requests</p>
+                            <p class="text-sm text-gray-500 mt-1">All caught up!</p>
                         </div>
                     </div>
                 </div>
@@ -2115,7 +2313,7 @@
                             </div>
                         </div>
                         <div>
-                            <p class="font-medium text-white">${friend.name}</p>
+                            <p class="text-sm font-medium text-white">${friend.name}</p>
                             <p class="text-xs text-gray-400">Level ${friend.level} • ${friend.points.toLocaleString()} XP</p>
                             <p class="text-xs text-gray-500">${friend.activity_time}</p>
                         </div>
@@ -2517,7 +2715,7 @@
                 notification.classList.add('bg-red-600');
                 notification.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                     </svg>
                     <span>${message}</span>
                 `;
@@ -2582,13 +2780,13 @@
                     resetDashboardSearchResults();
                     break;
                 case 'online':
-                    loadDashboardFriendsByStatus('online');
+                    // Data is now handled by Alpine.js onlineUsers array
                     break;
                 case 'offline':
                     loadDashboardFriendsByStatus('offline');
                     break;
                 case 'active':
-                    // Content is pre-rendered with PHP, no action needed
+                    // Content is pre-rendered with PHP, no action needed unless refreshing is desired
                     break;
                 case 'pending':
                     loadDashboardPendingRequests();
@@ -2709,7 +2907,7 @@
                 </div>
             `;
 
-            fetch(`/friends/by-status?status=${status}`)
+            fetch(`/friends/by-status?status=${encodeURIComponent(status)}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);

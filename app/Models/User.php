@@ -69,6 +69,7 @@ class User extends Authenticatable
         "avatar",
         "bio",
         "skills",
+        "last_activity_at",
     ];
 
     /**
@@ -88,6 +89,7 @@ class User extends Authenticatable
         return [
             "email_verified_at" => "datetime",
             "password" => "hashed",
+            "last_activity_at" => "datetime",
         ];
     }
 
@@ -516,6 +518,49 @@ class User extends Authenticatable
     }
 
     /**
+     * Get pending friend requests (both sent and received).
+     */
+    public function getPendingFriendRequests()
+    {
+        $sentRequests = $this->sentFriendRequests()
+            ->pending()
+            ->with('friend')
+            ->get()
+            ->map(function ($friendship) {
+                return [
+                    'id' => $friendship->friend->id,
+                    'name' => $friendship->friend->name,
+                    'initials' => $friendship->friend->initials(),
+                    'level' => $friendship->friend->getLevel(),
+                    'points' => $friendship->friend->getPoints(),
+                    'type' => 'sent',
+                    'created_at' => $friendship->created_at->diffForHumans()
+                ];
+            });
+
+        $receivedRequests = $this->receivedFriendRequests()
+            ->pending()
+            ->with('user')
+            ->get()
+            ->map(function ($friendship) {
+                return [
+                    'id' => $friendship->user->id,
+                    'name' => $friendship->user->name,
+                    'initials' => $friendship->user->initials(),
+                    'level' => $friendship->user->getLevel(),
+                    'points' => $friendship->user->getPoints(),
+                    'type' => 'received',
+                    'created_at' => $friendship->created_at->diffForHumans()
+                ];
+            });
+
+        return [
+            'sent' => $sentRequests,
+            'received' => $receivedRequests
+        ];
+    }
+
+    /**
      * Get friend status based on last activity.
      */
     private function getFriendStatus($minutesAgo)
@@ -643,16 +688,38 @@ class User extends Authenticatable
     }
 
     /**
-     * Get pending friend requests received by this user.
+     * Decline a friend request from another user.
      */
-    public function getPendingFriendRequests()
+    public function declineFriendRequestFrom(User $user): bool
     {
-        return $this->receivedFriendRequests()
+        $friendship = $this->receivedFriendRequests()
+            ->where('user_id', $user->id)
             ->pending()
-            ->with('user')
-            ->get()
-            ->pluck('user');
+            ->first();
+
+        return $friendship ? $friendship->delete() : false;
     }
+
+    /**
+     * Remove a friend.
+     */
+    public function removeFriend(User $user): bool
+    {
+        // Remove friendship in both directions
+        $removed1 = $this->sentFriendRequests()
+            ->where('friend_id', $user->id)
+            ->accepted()
+            ->delete();
+
+        $removed2 = $this->receivedFriendRequests()
+            ->where('user_id', $user->id)
+            ->accepted()
+            ->delete();
+
+        return $removed1 > 0 || $removed2 > 0;
+    }
+
+
 
     /**
      * Get the typing test results for the user.
